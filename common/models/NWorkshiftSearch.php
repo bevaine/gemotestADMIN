@@ -1,0 +1,87 @@
+<?php
+
+namespace common\models;
+
+use Yii;
+use yii\base\Model;
+use yii\data\ActiveDataProvider;
+use common\models\NWorkshift;
+
+/**
+ * NWorkshiftSearch represents the model behind the search form about `common\models\NWorkshift`.
+ */
+class NWorkshiftSearch extends NWorkshift
+{
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['id', 'user_aid', 'error_check_count', 'error_check_return_count'], 'integer'],
+            [['sender_key', 'kkm', 'z_num', 'open_date', 'close_date', 'sender_key_close', 'file_name', 'code_1c'], 'safe'],
+            [['not_zero_sum_start', 'not_zero_sum_end', 'amount_cash_register', 'error_check_total_cash', 'error_check_total_card', 'error_check_return_total_cash', 'error_check_return_total_card'], 'number'],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        // bypass scenarios() implementation in the parent class
+        return Model::scenarios();
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function search($params)
+    {
+        $query = NWorkshift::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->andFilterWhere([
+            'id' => $this->id,
+            'user_aid' => $this->user_aid,
+            'open_date' => $this->open_date,
+            'close_date' => $this->close_date,
+            'not_zero_sum_start' => $this->not_zero_sum_start,
+            'not_zero_sum_end' => $this->not_zero_sum_end,
+            'amount_cash_register' => $this->amount_cash_register,
+            'error_check_count' => $this->error_check_count,
+            'error_check_total_cash' => $this->error_check_total_cash,
+            'error_check_total_card' => $this->error_check_total_card,
+            'error_check_return_count' => $this->error_check_return_count,
+            'error_check_return_total_cash' => $this->error_check_return_total_cash,
+            'error_check_return_total_card' => $this->error_check_return_total_card,
+        ]);
+
+        $query->andFilterWhere(['like', 'sender_key', $this->sender_key])
+            ->andFilterWhere(['like', 'kkm', $this->kkm])
+            ->andFilterWhere(['like', 'z_num', $this->z_num])
+            ->andFilterWhere(['like', 'sender_key_close', $this->sender_key_close])
+            ->andFilterWhere(['like', 'file_name', $this->file_name])
+            ->andFilterWhere(['like', 'code_1c', $this->code_1c]);
+
+        return $dataProvider;
+    }
+}

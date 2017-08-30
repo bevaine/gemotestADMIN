@@ -14,10 +14,16 @@ return [
     'modules' => [
         'admin' => [
             'class' => 'backend\modules\admin\Module',
-            // ... другие настройки модуля ...
         ],
     ],
     'components' => [
+        'view' => [
+            'theme' => [
+                'pathMap' => [
+                    '@app/views' => 'backend\views'
+                ],
+            ],
+        ],
         'request' => [
             'csrfParam' => '_csrf-backend',
         ],
@@ -33,10 +39,21 @@ return [
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
+                'db'=>[
+                    'class' => 'yii\log\DbTarget',
+                    'db' => 'Localdb',
                     'levels' => ['error', 'warning'],
-                ],
+                    'except'=>['yii\web\HttpException:*', 'yii\i18n\I18N\*'],
+                    'prefix'=>function () {
+                        $url = Yii::$app->request->isConsoleRequest
+                            ? implode('::', [Yii::$app->controller->id, Yii::$app->controller->action->id])
+                            : Yii::$app->request->getUrl();
+
+                        return sprintf('[%s][%s]', Yii::$app->id, $url);
+                    },
+                    'logVars'=>[],
+                    'logTable'=>'{{%system_log}}'
+                ]
             ],
         ],
         'errorHandler' => [
