@@ -16,6 +16,8 @@ class ActiveSyncController extends Controller
     public function actionTest ()
     {
         $ActiveSyncHelper = new ActiveSyncHelper();
+        $ActiveSyncHelper->connectLDAP();
+        exit;
         $ActiveSyncHelper->nurse = 1;
         $ActiveSyncHelper->department = 0;
         //$ActiveSyncHelper->typeLO = "SLO";

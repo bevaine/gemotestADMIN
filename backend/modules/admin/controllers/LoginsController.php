@@ -3,6 +3,7 @@
 namespace app\modules\admin\controllers;
 
 use Yii;
+use common\models\AddOrgForm;
 use common\models\AddUserForm;
 use common\models\Logins;
 use common\models\LoginsSearch;
@@ -11,6 +12,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use common\components\helpers\ActiveSyncHelper;
+use common\models\NAdUsers;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -56,6 +58,38 @@ class LoginsController extends Controller
     {
         return $this->render('view', [
             'model' => $this->findModel($id),
+        ]);
+    }
+
+    public function actionCreateOrg ()
+    {
+        $model = new AddOrgForm();
+        if ($model->load(Yii::$app->request->post()))
+        {
+
+            return $this->redirect(['view', 'id' => $model->aid]);
+        } else {
+            return $this->render('createOrg', [
+                'model' => $model,
+            ]);
+        }
+    }
+
+    public function actionCreateNAdUsers()
+    {
+        $model = new NAdUsers();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($model->validate()) {
+                // form inputs are valid, do something here
+                Yii::getLogger()->log(['$model'=>$model->errors], 1, 'binary');
+            }
+        } else {
+            Yii::getLogger()->log(['$model'=>$model->errors], 1, 'binary');
+        }
+
+        return $this->render('createNAdUsers', [
+            'model' => $model,
         ]);
     }
 
@@ -135,28 +169,59 @@ class LoginsController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+        $modelLogins = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'aid' => $model->aid]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if ($modelLogins->load(Yii::$app->request->post()) && $modelLogins->save())
+        {
+            $adUsersLogins = $this->findModel($id)->adUsers;
+            if ($adUsersLogins) {
+                if ($adUsersLogins->load(Yii::$app->request->post())) {
+                    $adUsersLogins->save();
+                }
+            }
+            return $this->redirect(['view', 'id' => $modelLogins->aid]);
         }
+        return $this->render('update', [
+            'model' => $modelLogins,
+        ]);
     }
 
-    /**
-     * Deletes an existing Logins model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
-     * @return mixed
-     */
-    public function actionDelete($id)
+    public function actionBlockAccount($id, $action)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
 
-        return $this->redirect(['index']);
+        if ($model) {
+            if ($action == 'block') {
+                $model->DateEnd = date("Y-m-d G:i:s:000", time());
+            } elseif ($action == 'active') {
+                $model->DateEnd = NULL;
+            }
+            if (!$model->save()) {
+                Yii::getLogger()->log(['$model->DateEnd'=>$model->errors], 1, 'binary');
+            }
+        }
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+
+    public function actionBlockRegister($id, $action)
+    {
+        $model = $this->findModel($id);
+
+        if ($model) {
+            if ($action == 'block') {
+                $model->block_register = date("Y-m-d G:i:s:000", time());
+            } elseif ($action == 'active') {
+                $model->block_register = NULL;
+            }
+            if (!$model->save()) {
+                Yii::getLogger()->log(['$model->block_register'=>$model->errors], 1, 'binary');
+            }
+        }
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
     }
 
     /**
@@ -193,14 +258,14 @@ class LoginsController extends Controller
         $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
 
         $checkAccount = $activeSyncHelper->checkAccount();
-        if ($checkAccount) {echo 'null'; exit;};
+        if ($checkAccount) exit('null');
 
         if (!in_array($activeSyncHelper->department, [4, 5]))
         {
             //todo проверяем существует ли пользователь с ФИО в AD
             $arrAccountAD = $activeSyncHelper->checkUserNameAd();
 
-            if (!$arrAccountAD || !is_array($arrAccountAD)) {echo 'null'; exit;};
+            if (!$arrAccountAD || !is_array($arrAccountAD)) exit('null');
 
             foreach ($arrAccountAD as $arrAccount) {
                 if (!array_key_exists('SamAccountName', $arrAccount) ||
@@ -212,6 +277,6 @@ class LoginsController extends Controller
             }
         }
         if (!empty($return)) echo Json::encode($return);
-        else echo 'null';
+        else exit('null');
     }
 }

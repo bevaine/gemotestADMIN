@@ -29,9 +29,18 @@ use yii\helpers\ArrayHelper;
  * @property integer $AD_active
  * @property integer $auth_ldap_only
  * @property Logins $logins
+ * @property NAdUserAccounts $adUserAccounts
  */
 class NAdUsers extends \yii\db\ActiveRecord
 {
+    /**
+     * @return array
+     */
+    public static function PrimaryKey()
+    {
+        return ['gs_id'];
+    }
+
     /**
      * @inheritdoc
      */
@@ -101,4 +110,18 @@ class NAdUsers extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Logins::className(), ['Key' => 'gs_key'])->where(['UserType' => '7']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdUserAccounts()
+    {
+        return $this->hasOne(NAdUseraccounts::className(), [
+            'gs_id' => 'gs_key',
+            'last_name' => 'last_name',
+            'first_name' => 'first_name',
+            'middle_name' => 'middle_name',
+        ]);
+    }
+
 }

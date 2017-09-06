@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use phpDocumentor\Reflection\Types\Null_;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -51,7 +52,11 @@ class LoginsSearch extends Logins
      */
     public function search($params)
     {
-        $query = Logins::find()->joinWith(['adUsers'])->joinWith(['adUserAccounts']);
+        $query = Logins::find()->select('*')
+            ->join('FULL JOIN', 'n_ad_Users','[Logins].[aid] = [n_ad_Users].[gs_id] AND [Logins].[UserType] = [n_ad_Users].[gs_usertype]')
+            ->join('LEFT JOIN', 'n_ad_Useraccounts', '[n_ad_Users].[gs_key] = [n_ad_Useraccounts].[gs_id] AND [n_ad_Users].[last_name] = [n_ad_Useraccounts].[last_name] AND [n_ad_Users].[first_name] = [n_ad_Useraccounts].[first_name] AND [n_ad_Users].[middle_name] = [n_ad_Useraccounts].[middle_name]');
+
+        //$query = Logins::find()->with('n_ad_Users','n_ad_Useraccounts');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -64,6 +69,8 @@ class LoginsSearch extends Logins
             // $query->where('0=1');
             return $dataProvider;
         }
+
+       // $query->where(['IS NOT', '[Logins].[aid]', null]);
 
         // grid filtering conditions
         $query->andFilterWhere([
@@ -87,8 +94,6 @@ class LoginsSearch extends Logins
             'mto_editor' => $this->mto_editor,
             'LastLogin' => $this->LastLogin,
             'DateBeg' => $this->DateBeg,
-            //'DateEnd' => $this->DateEnd,
-            //'block_register' => $this->block_register,
             'last_update_password' => $this->last_update_password,
             'show_preanalytic' => $this->show_preanalytic,
             'parentAid' => $this->parentAid,
@@ -126,6 +131,7 @@ class LoginsSearch extends Logins
             ->andFilterWhere(['like', 'n_ad_Users.middle_name', $this->middle_name])
             ->andFilterWhere(['like', 'n_ad_Users.AD_position', $this->AD_position])
             ->andFilterWhere(['like', 'n_ad_Useraccounts.ad_login', $this->ad_login]);
+
         return $dataProvider;
     }
 
@@ -142,27 +148,35 @@ class LoginsSearch extends Logins
         return $id !== false && isset($modules[$id]) ? ArrayHelper::getValue($modules, $id) : $modules;
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAdUserAccounts()
-    {
-        return $this->hasOne(NAdUseraccounts::className(), ['gs_id' => 'gs_key'])->via('adUsers');
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAdUsers()
-    {
-        return $this->hasOne(NAdUsers::className(), ['gs_id' => 'aid'])->where(['gs_usertype' => '7']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOperators()
-    {
-        return $this->hasOne(Operators::className(), ['CACHE_OperatorID' => 'Key']);
-    }
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getAdUserAccounts()
+//    {
+//        return $this->hasOne(NAdUseraccounts::className(), [
+//            //'gs_id' => 'gs_id',
+//            'last_name' => 'last_name',
+//            'first_name' => 'first_name',
+//            'middle_name' => 'middle_name',
+//        ])->via('adUsers');
+//    }
+//
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getAdUsers()
+//    {
+//        return $this->hasOne(NAdUsers::className(), [
+//            'gs_id' => 'aid',
+//            'gs_usertype' => 'UserType'
+//        ]);
+//    }
+//
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getOperators()
+//    {
+//        return $this->hasOne(Operators::className(), ['CACHE_OperatorID' => 'Key']);
+//    }
 }

@@ -447,6 +447,33 @@ class ActiveSyncHelper
         }
     }
 
+    public function connectLDAP() {
+        // используется ldap-привязка
+        $ldaprdn  = 'dymchenko.adm@lab.gemotest.ru';     // ldap rdn или dn
+        $ldappass = '2Hszfaussw';  // ассоциированный пароль
+
+        // соединение с сервером
+        $ldapconn = ldap_connect("192.168.108.3")
+        or die("Не могу соединиться с сервером LDAP.");
+
+        if ($ldapconn) {
+
+            // привязка к ldap-серверу
+            $ldapbind = ldap_bind($ldapconn, $ldaprdn, $ldappass);
+
+            $dn = "DC=lab,DC=gemotest,DC=ru";
+            $sr = ldap_search($ldapconn, $dn, "CH=*");
+            print_r($sr);
+
+            // проверка привязки
+            if ($ldapbind) {
+                echo "LDAP-привязка успешна...";
+            } else {
+                echo "LDAP-привязка не удалась...";
+            }
+
+        }
+    }
     /**
      * @return array|bool
      */

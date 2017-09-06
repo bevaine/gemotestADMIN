@@ -42,6 +42,11 @@
                             ['label' => 'Смены', 'icon' => 'file-code-o', 'url' => ['/admin/workshift'],],
                             ['label' => 'Платежи', 'icon' => 'dashboard', 'url' => ['/admin/pay'],],
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
+                            ['label' => 'Таблицы', 'icon' => 'circle-o', 'url' => '#', 'items' =>
+                                [
+                                    ['label' => 'NAdUsers', 'icon' => 'dashboard', 'url' => ['/admin/logins/create-n-ad-users'],],
+                                ]
+                            ],
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
 //                            [
 //                                'label' => 'Level One',

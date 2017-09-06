@@ -93,6 +93,4 @@ class AddUserForm extends Model
             2 => 'Выездная МС'
         ];
     }
-
-
 }

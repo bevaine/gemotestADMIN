@@ -50,12 +50,18 @@ use common\components\helpers\ActiveSyncHelper;
  * @property integer $GarantLetter
  * @property Operators $operators
  * @property NAdUsers $adUsers
+ * @property NAdUserAccounts $adUserAccounts
  */
 class Logins extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
+    public $last_name;
+    public $first_name;
+    public $middle_name;
+    public $AD_position;
+
     public static function tableName()
     {
         return 'Logins';
@@ -87,7 +93,7 @@ class Logins extends \yii\db\ActiveRecord
             'IsOperator' => 'Is Operator',
             'Email' => 'Email',
             'IsAdmin' => 'Is Admin',
-            'Key' => 'CACHE ID',
+            'Key' => '№ отдел.',
             'Logo' => 'Логотип',
             'LogoText' => 'Текст логотипа №1',
             'LogoText2' => 'Текст логотипа №2',
@@ -98,7 +104,7 @@ class Logins extends \yii\db\ActiveRecord
             'EngVersion' => 'Eng Version',
             'tbl' => 'Tbl',
             'IsDoctor' => 'Is Doctor',
-            'UserType' => 'User Type',
+            'UserType' => 'Тип пользователя',
             'InputOrder' => 'Input Order',
             'PriceID' => 'Price ID',
             'CanRegister' => 'Can Register',
@@ -128,7 +134,12 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getAdUserAccounts()
     {
-        return $this->hasOne(NAdUseraccounts::className(), ['gs_id' => 'gs_key'])->via('adUsers');
+        return $this->hasOne(NAdUseraccounts::className(), [
+            'gs_id' => 'gs_key',
+            'last_name' => 'last_name',
+            'first_name' => 'first_name',
+            'middle_name' => 'middle_name',
+        ])->via('adUsers');
     }
 
     /**
@@ -136,7 +147,27 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getAdUsers()
     {
-        return $this->hasOne(NAdUsers::className(), ['gs_id' => 'aid'])->where(['gs_usertype' => '7']);
+        return $this->hasOne(NAdUsers::className(), [
+            'gs_id' => 'aid',
+            'gs_key' => 'Key',
+            'gs_usertype' => 'UserType',
+        ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdUsersNew()
+    {
+        return $this->hasOne(NAdUsers::className(), [
+            'gs_id' => 'aid',
+            'gs_key' => 'Key',
+            'gs_usertype' => 'UserType',
+        ])
+            ->andFilterWhere(['like', 'last_name', $this->last_name])
+            ->andFilterWhere(['like', 'first_name', $this->first_name])
+            ->andFilterWhere(['like', 'middle_name', $this->middle_name])
+            ->andFilterWhere(['like', 'AD_position', $this->AD_position]);
     }
 
     /**
@@ -152,6 +183,22 @@ class Logins extends \yii\db\ActiveRecord
      */
     public static function getStatusesArray() {
         return ['1' => 'Активный', '2' => 'Заблокирован'];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getTypesArray() {
+        return [
+            '1' => 'Администр.',
+            '3' => 'Юр. лица',
+            '4' => 'Врач иное.',
+            '5' => 'Врач консул.',
+            '7' => 'Собств. лаб. отд.',
+            '8' => 'Франчайзи',
+            '9' => 'Ген. директор',
+            '13' => 'Фин. менеджер',
+        ];
     }
 
 }
