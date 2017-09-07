@@ -1,7 +1,8 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+//use yii\grid\GridView;
+use kartik\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\LoginsSearch */
@@ -9,7 +10,6 @@ use yii\grid\GridView;
 
 $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
-print_r($dataProvider);
 
 ?>
 <div class="logins-index">
@@ -21,12 +21,8 @@ print_r($dataProvider);
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
-
-        //'responsive' => true,
-        'hover' => true,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            //'CACHE_Login',
             [
                 'headerOptions' => array('style' => 'width: 75px;'),
                 'attribute' => 'aid',
@@ -79,7 +75,22 @@ print_r($dataProvider);
             [
                 'label' => 'Должность',
                 'attribute' => 'AD_position',
-                'value' => 'adUsersNew.AD_position',
+                'value' => function ($model) {
+                    /** @var \common\models\LoginsSearch $model */
+                    $AD_position = $model->adUsersNew->AD_position;
+                    return strlen($AD_position) > 35 ? substr($AD_position, 0, 35) . "..." : $AD_position;
+                },
+                'headerOptions' => array('style' => 'width: 100px;'),
+            ],
+            [
+                'label' => 'Логин AD',
+                'attribute' => 'ad_login',
+                'value' => 'adUsersNew.adUserAccounts.ad_login',
+                'headerOptions' => array('style' => 'width: 100px;'),
+            ],
+            [
+                'label' => 'Пароль AD',
+                'value' => 'adUsersNew.adUserAccounts.ad_pass',
                 'headerOptions' => array('style' => 'width: 100px;'),
             ],
             [
@@ -167,46 +178,48 @@ print_r($dataProvider);
 //                },
 //                'format' => 'html',
 //            ],
-            [
-                'label' => 'Логин AD',
-                'headerOptions' => array('style' => 'width: 100px;'),
-                'attribute'=>'ad_login',
-                'value' => function ($model) use ($searchModel) {
-                    /** @var \common\models\LoginsSearch $model */
-                    $findName = $model->getAdUsers()
-                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
-                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
-                    if ($findName->count() == 1) {
-                        return $findName->one()->adUserAccounts->ad_login;
-                    } elseif ($findName->count() > 1) {
-                        return Html::tag('span', Html::encode('(несколько)'),
-                            ['style' => 'font-style: italic; color: red']);
-                    } else return null;
-                },
-                'format' => 'html',
-            ],
-            [
-                'label' => 'Пароль AD',
-                'headerOptions' => array('style' => 'width: 100px;'),
-                'attribute'=>'ad_pass',
-                'value' => function ($model) use ($searchModel) {
-                    /** @var \common\models\LoginsSearch $model */
-                    $findName = $model->getAdUsers()
-                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
-                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
-                    if ($findName->count() == 1) {
-                        return $findName->one()->adUserAccounts->ad_pass;
-                    } elseif ($findName->count() > 1) {
-                        return Html::tag('span', Html::encode('(несколько)'),
-                            ['style' => 'font-style: italic; color: red']);
-                    } else return null;
-                },
-                'format' => 'html',
-            ],
+//
+//            [
+//                'label' => 'Логин AD',
+//                'headerOptions' => array('style' => 'width: 100px;'),
+//                'attribute'=>'ad_login',
+//                'value' => function ($model) use ($searchModel) {
+//                    /** @var \common\models\LoginsSearch $model */
+//                    $findName = $model->getAdUsers()
+//                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
+//                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
+//                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
+//                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
+//                    if ($findName->count() == 1) {
+//                        return $findName->one()->adUserAccounts->ad_login;
+//                    } elseif ($findName->count() > 1) {
+//                        return Html::tag('span', Html::encode('(несколько)'),
+//                            ['style' => 'font-style: italic; color: red']);
+//                    } else return null;
+//                },
+//                'format' => 'html',
+//            ],
+//            [
+//                'label' => 'Пароль AD',
+//                'headerOptions' => array('style' => 'width: 100px;'),
+//                'attribute'=>'ad_pass',
+//                'value' => function ($model) use ($searchModel) {
+//                    /** @var \common\models\LoginsSearch $model */
+//                    $findName = $model->getAdUsers()
+//                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
+//                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
+//                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
+//                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
+//                    if ($findName->count() == 1) {
+//                        return $findName->one()->adUserAccounts->ad_pass;
+//                    } elseif ($findName->count() > 1) {
+//                        return Html::tag('span', Html::encode('(несколько)'),
+//                            ['style' => 'font-style: italic; color: red']);
+//                    } else return null;
+//                },
+//                'format' => 'html',
+//            ],
+            //'CACHE_Login',
             [
                 'label' => 'Доступ к УЗ',
                 'headerOptions' => array('style' => 'width: 100px; text-align: center;'),

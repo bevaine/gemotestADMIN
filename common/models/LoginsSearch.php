@@ -52,7 +52,9 @@ class LoginsSearch extends Logins
      */
     public function search($params)
     {
-        $query = Logins::find()->select('*')
+        $query = Logins::find()
+            //->with('n_ad_Users','n_ad_Useraccounts')
+            //->select('n_ad_Users.*')
             ->join('FULL JOIN', 'n_ad_Users','[Logins].[aid] = [n_ad_Users].[gs_id] AND [Logins].[UserType] = [n_ad_Users].[gs_usertype]')
             ->join('LEFT JOIN', 'n_ad_Useraccounts', '[n_ad_Users].[gs_key] = [n_ad_Useraccounts].[gs_id] AND [n_ad_Users].[last_name] = [n_ad_Useraccounts].[last_name] AND [n_ad_Users].[first_name] = [n_ad_Useraccounts].[first_name] AND [n_ad_Users].[middle_name] = [n_ad_Useraccounts].[middle_name]');
 
@@ -70,7 +72,7 @@ class LoginsSearch extends Logins
             return $dataProvider;
         }
 
-       // $query->where(['IS NOT', '[Logins].[aid]', null]);
+        $query->where(['IS NOT', '[Logins].[aid]', null]);
 
         // grid filtering conditions
         $query->andFilterWhere([
@@ -147,36 +149,4 @@ class LoginsSearch extends Logins
         }
         return $id !== false && isset($modules[$id]) ? ArrayHelper::getValue($modules, $id) : $modules;
     }
-
-//    /**
-//     * @return \yii\db\ActiveQuery
-//     */
-//    public function getAdUserAccounts()
-//    {
-//        return $this->hasOne(NAdUseraccounts::className(), [
-//            //'gs_id' => 'gs_id',
-//            'last_name' => 'last_name',
-//            'first_name' => 'first_name',
-//            'middle_name' => 'middle_name',
-//        ])->via('adUsers');
-//    }
-//
-//    /**
-//     * @return \yii\db\ActiveQuery
-//     */
-//    public function getAdUsers()
-//    {
-//        return $this->hasOne(NAdUsers::className(), [
-//            'gs_id' => 'aid',
-//            'gs_usertype' => 'UserType'
-//        ]);
-//    }
-//
-//    /**
-//     * @return \yii\db\ActiveQuery
-//     */
-//    public function getOperators()
-//    {
-//        return $this->hasOne(Operators::className(), ['CACHE_OperatorID' => 'Key']);
-//    }
 }

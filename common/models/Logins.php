@@ -50,6 +50,7 @@ use common\components\helpers\ActiveSyncHelper;
  * @property integer $GarantLetter
  * @property Operators $operators
  * @property NAdUsers $adUsers
+ * @property NAdUsers $adUsersNew
  * @property NAdUserAccounts $adUserAccounts
  */
 class Logins extends \yii\db\ActiveRecord
@@ -200,5 +201,4 @@ class Logins extends \yii\db\ActiveRecord
             '13' => 'Фин. менеджер',
         ];
     }
-
 }
