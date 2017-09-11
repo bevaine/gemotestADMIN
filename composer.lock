@@ -776,7 +776,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2017-09-01 12:21:36"
+            "time": "2017-09-01T12:21:36+00:00"
         },
         {
             "name": "kartik-v/yii2-krajee-base",
