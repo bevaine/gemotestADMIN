@@ -134,7 +134,7 @@ class ActiveSyncHelper
             $this->aid = 3000000 + $loginId;
 
             if ($this->department == 5) $this->login = 'medr'.$loginId;
-            else  $this->login = 'reg'.$loginId;
+            else $this->login = 'reg'.$loginId;
 
             $objectUsersLogins = new Logins();
             $objectUsersLogins->aid = $this->aid;
@@ -154,7 +154,7 @@ class ActiveSyncHelper
             $objectUsersLogins->OpenExcel = 0;
             $objectUsersLogins->EngVersion = 0;
             $objectUsersLogins->tbl = 'Operators';
-            $objectUsersLogins->UserType = 7;
+            $objectUsersLogins->UserType = $this->department == 5 ? 5 : 7;
             $objectUsersLogins->IsDoctor = 2;
             $objectUsersLogins->InputOrder = 1;
             $objectUsersLogins->PriceID = 0;
@@ -175,7 +175,7 @@ class ActiveSyncHelper
             }
         }
 
-        if (in_array($this->department, [0,1,2,3,6])) {
+        if (in_array($this->department, [0,1,2,3,6,8])) {
             $objectUserAD = new NAdUsers();
             $objectUserAD->last_name = $this->lastName;
             $objectUserAD->first_name = $this->firstName;
@@ -334,7 +334,8 @@ class ActiveSyncHelper
             '4' => ['admin','ClientManager','finance_manager','management_all_offices','Operator','Registrar','Report.Inoe','ReportOrders.Contingents','SkynetEstimationOrder'],
             '5' => ['Operator','ClientManager','MedRegistrar','Report.Inoe','PreanalyticaManager'],
             '6' => ['admin','Administrator.Callcenter.index','bonuses_view','cancelBm_view','ClientManager','discount_all_rights','kurs_view','mis','MisManager','Operator','Registrar','Report.MsZabor','Report.PollPatients','Report.Rep41','ReportOrders.Detail','ReportOrders.SummaryMonth','ReportPrices.Archive','ReportPrices.ByDate','ReportPrices.Detail','ReportPrices.History','SkynetEstimationOrder'],
-            '7' => []
+            '7' => [],
+            '8' => ['admin','Administrator.Callcenter.index','MisManager','mis','Operator','Registrar','SkynetEstimationOrder']
         ];
 
         //todo удаляем все роли у пользователя

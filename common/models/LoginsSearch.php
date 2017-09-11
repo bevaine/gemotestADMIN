@@ -2,27 +2,20 @@
 
 namespace common\models;
 
-use phpDocumentor\Reflection\Types\Null_;
-use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use common\models\Logins;
 use yii\helpers\ArrayHelper;
 
 /**
  * LoginsSearch represents the model behind the search form about `common\models\Logins`.
- * @property Operators $operators
- * @property NAdUsers $adUsers
 */
 
 class LoginsSearch extends Logins
 {
-    public $last_name;
-    public $first_name;
-    public $middle_name;
-    public $AD_position;
+
     public $ad_login;
     public $DateBlocked;
+
     /**
      * @inheritdoc
      */
