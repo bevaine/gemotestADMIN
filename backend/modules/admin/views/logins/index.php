@@ -3,10 +3,13 @@
 use yii\helpers\Html;
 //use yii\grid\GridView;
 use kartik\grid\GridView;
+use kartik\grid\SerialColumn;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\LoginsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
+//print_r($dataProvider);
 
 $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
@@ -21,12 +24,20 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'striped'=>true,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
+            ['class' => 'kartik\grid\SerialColumn'],
             [
                 'headerOptions' => array('style' => 'width: 75px;'),
                 'attribute' => 'aid',
             ],
+//            [
+//                'label' => 'Фамилия',
+//                'name' => 'last_name',
+//                'attribute' => 'Logins.last_name',
+//                'value' => 'last_name',
+//                'headerOptions' => array('style' => 'width: 120px;'),
+//            ],
             [
                 'headerOptions' => array('style' => 'width: 75px;'),
                 'attribute' => 'Key',

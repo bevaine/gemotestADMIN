@@ -91,6 +91,7 @@ class Logins extends \yii\db\ActiveRecord
             'Login' => 'Логин GS',
             'Pass' => 'Пароль GS',
             'Name' => 'Имя GS',
+            'last_name' => 'Фамилия',
             'IsOperator' => 'Is Operator',
             'Email' => 'Email',
             'IsAdmin' => 'Is Admin',
