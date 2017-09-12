@@ -1,38 +1,11 @@
-common           environments   LICENSE.md  Vagrantfile       yii_test
-composer.json    frontend       README.md   vendor            yii_test.bat
-itradmin@itr-test:~/www/admin$ touch .htaccess
-itradmin@itr-test:~/www/admin$ ls
-backend          composer.lock  init        requirements.php  yii
-codeception.yml  console        init.bat    vagrant           yii.bat
-common           environments   LICENSE.md  Vagrantfile       yii_test
-composer.json    frontend       README.md   vendor            yii_test.bat
-itradmin@itr-test:~/www/admin$ ll
-итого 252
-drwxrwxr-x 10 itradmin itradmin   4096 сен  7 13:06 ./
-drwxrwxr-x  4 itradmin itradmin   4096 сен  7 12:38 ../
-drwxrwxrwx 11 itradmin itradmin   4096 сен  6 14:08 backend/
--rw-rw-r--  1 itradmin itradmin     37 сен  6 14:08 .bowerrc
--rwxrwxrwx  1 itradmin itradmin    167 сен  6 14:08 codeception.yml*
-drwxrwxrwx  9 itradmin itradmin   4096 сен  6 14:08 common/
--rwxrwxr-x  1 itradmin itradmin   1662 сен  7 13:04 composer.json*
--rwxrwxr-x  1 itradmin itradmin 145183 сен  7 13:09 composer.lock*
-drwxrwxrwx  7 itradmin itradmin   4096 сен  6 14:08 console/
-drwxrwxrwx  4 itradmin itradmin   4096 сен  6 14:08 environments/
-drwxrwxrwx 11 itradmin itradmin   4096 сен  6 14:08 frontend/
-drwxrwxr-x  8 itradmin itradmin   4096 сен  7 13:06 .git/
--rw-rw-r--  1 itradmin itradmin    478 сен  6 14:08 .gitignore
--rw-rw-r--  1 itradmin itradmin      0 сен  7 13:44 .htaccess
--rwxrwxrwx  1 itradmin itradmin   8853 сен  6 14:08 init*
--rwxrwxrwx  1 itradmin itradmin    511 сен  6 14:08 init.bat*
--rwxrwxrwx  1 itradmin itradmin   1622 сен  6 14:08 LICENSE.md*
--rwxrwxrwx  1 itradmin itradmin   2850 сен  6 14:08 README.md*
--rwxrwxrwx  1 itradmin itradmin   5051 сен  6 14:08 requirements.php*
-drwxrwxrwx  5 itradmin itradmin   4096 сен  6 14:08 vagrant/
--rwxrwxrwx  1 itradmin itradmin   2444 сен  6 14:08 Vagrantfile*
-drwxrwxr-x 32 itradmin itradmin   4096 сен  7 13:09 vendor/
--rwxr-xr-x  1 itradmin itradmin    865 сен  6 16:03 yii*
--rwxrwxrwx  1 itradmin itradmin    515 сен  6 14:08 yii.bat*
--rwxr-xr-x  1 itradmin itradmin    816 сен  6 16:03 yii_test*
--rw-rw-r--  1 itradmin itradmin    520 сен  6 16:03 yii_test.bat
-itradmin@itr-test:~/www/admin$ sudo vi .htaccess
-deny from all
+AddDefaultCharset UTF-8
+ 
+Options -Indexes
+ 
+RewriteEngine On
+ 
+RewriteCond %{REQUEST_URI} ^/(admin)
+RewriteRule ^admin(\/?.*)$ backend/web/$1 [L]
+ 
+RewriteCond %{REQUEST_URI} ^/
+RewriteRule ^(\/?.*)$ frontend/web/$1 [L]

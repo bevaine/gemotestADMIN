@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => \common\models\Logins::getTypesArray(),
                 'format' => 'text',
                 'value' => function ($model) {
-                    if (!array_key_exists($model->UserType, \common\models\Logins::getTypesArray())) {
+                    if (array_key_exists($model->UserType, \common\models\Logins::getTypesArray())) {
                         return \common\models\Logins::getTypesArray()[$model->UserType];
                     } else return NULL;
                 }
