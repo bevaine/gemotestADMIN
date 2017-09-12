@@ -88,8 +88,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'AD_position',
                 'value' => function ($model) {
                     /** @var \common\models\LoginsSearch $model */
-                    $AD_position = $model->adUsersNew->AD_position;
-                    return strlen($AD_position) > 35 ? substr($AD_position, 0, 35) . "..." : $AD_position;
+                    if ($model->adUsersNew) {
+                        $AD_position = $model->adUsersNew->AD_position;
+                        return strlen($AD_position) > 35 ? substr($AD_position, 0, 35) . "..." : $AD_position;
+                    } else return NULL;
                 },
                 'headerOptions' => array('style' => 'width: 100px;'),
             ],
