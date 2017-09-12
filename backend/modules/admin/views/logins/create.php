@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
 
                         <div class="form-group">
-<!--                            --><?//= Html::Button('Создать',['class' => 'btn btn-success']) ?>
+                            <?php //echo Html::Button('Создать',['class' => 'btn btn-success']) ?>
                             <?= 'Пока не доступно!' ?>
                         </div>
 
