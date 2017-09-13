@@ -18,6 +18,13 @@ return [
           ],
     ],
     'components' => [
+        'db' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'mysql:host=localhost;dbname=work',
+            'username' => 'bevaine',
+            'password' => '160584',
+            'charset' => 'utf8',
+        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
