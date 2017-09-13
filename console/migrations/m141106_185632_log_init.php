@@ -24,11 +24,11 @@ class m141106_185632_log_init extends Migration
     /**
      * @var DbTarget[] Targets to create log table for
      */
-    public function init()
-    {
-        $this->db = 'Localdb';
-        parent::init();
-    }
+//    public function init()
+//    {
+//        $this->db = 'Localdb';
+//        parent::init();
+//    }
 
     private $dbTargets = [];
 
