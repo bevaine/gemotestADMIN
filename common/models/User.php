@@ -25,6 +25,7 @@ class User extends ActiveRecord implements IdentityInterface
 {
     const STATUS_DELETED = 0;
     const STATUS_ACTIVE = 10;
+    const SCENARIO_PROFILE = 'profile';
 
     public static function getDb() {
         return Yii::$app->get('Localdb');
@@ -51,11 +52,37 @@ class User extends ActiveRecord implements IdentityInterface
     /**
      * @inheritdoc
      */
+    public function attributeLabels()
+    {
+        return [
+            'email' => 'Почта',
+            'username' => 'Имя пользователя',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
+            ['email', 'required', 'except' => self::SCENARIO_PROFILE],
+            ['email', 'email', 'except' => self::SCENARIO_PROFILE],
+            ['email', 'unique', 'targetClass' => self::className(), 'except' => self::SCENARIO_PROFILE, 'message' => Yii::t('app', 'ERROR_EMAIL_EXISTS')],
+            ['email', 'string', 'max' => 255, 'except' => self::SCENARIO_PROFILE],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function scenarios()
+    {
+        return [
+            self::SCENARIO_DEFAULT => ['username', 'email', 'status'],
+            self::SCENARIO_PROFILE => ['email'],
         ];
     }
 
