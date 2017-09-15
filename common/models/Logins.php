@@ -187,8 +187,7 @@ class Logins extends \yii\db\ActiveRecord
             'gs_id' => 'aid',
             'gs_key' => 'Key',
             'gs_usertype' => 'UserType',
-        ])
-        ->andFilterWhere(['ID' => $this->idAD]) : null;
+        ])->andFilterWhere(['ID' => $this->idAD]) : null;
     }
 
     /**

@@ -286,14 +286,14 @@ class ActiveSyncHelper
         $searchLogin->operators->OrderEdit = in_array($department, [3,4,6]) ? 1 : 0;
         $searchLogin->operators->ClientMen = in_array($department, [3,4,6]) ? 1 : 0;
 
-        $fullName = $searchLogin->adUsers->last_name." ".$searchLogin->adUsers->first_name." ".$searchLogin->adUsers->middle_name;
+        $fullName = $searchLogin->adUsersOne->last_name." ".$searchLogin->adUsersOne->first_name." ".$searchLogin->adUsersOne->middle_name;
 
         if (!in_array($department, [1,2,3,5,6])) {
             if (in_array($nurse,[1,2])) {
                 $objectNurse = new NNurse();
-                $objectNurse->first_name = $searchLogin->adUsers->first_name;
-                $objectNurse->last_name = $searchLogin->adUsers->last_name;
-                $objectNurse->middle_name = $searchLogin->adUsers->middle_name;
+                $objectNurse->first_name = $searchLogin->adUsersOne->first_name;
+                $objectNurse->last_name = $searchLogin->adUsersOne->last_name;
+                $objectNurse->middle_name = $searchLogin->adUsersOne->middle_name;
                 $objectNurse->active = 1;
                 $objectNurse->save();
             }
