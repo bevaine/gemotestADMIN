@@ -30,10 +30,7 @@
             [
                 'options' => ['class' => 'sidebar-menu'],
                 'items' => [
-                    ['label' => 'Menu Yii2', 'options' => ['class' => 'header']],
-                    ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
-                    ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
-                    ['label' => 'Login', 'url' => ['site/login'], 'visible' => Yii::$app->user->isGuest],
+                    ['label' => 'Меню', 'options' => ['class' => 'header']],
                     [
                         'label' => 'Гемотест',
                         'icon' => 'share',
@@ -42,12 +39,12 @@
                             ['label' => 'Смены', 'icon' => 'file-code-o', 'url' => ['/admin/workshift'],],
                             ['label' => 'Платежи', 'icon' => 'dashboard', 'url' => ['/admin/pay'],],
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
+                            ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
                             ['label' => 'Таблицы', 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
                                     ['label' => 'NAdUsers', 'icon' => 'dashboard', 'url' => ['/admin/logins/create-n-ad-users'],],
                                 ]
                             ],
-                            ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
 //                            [
 //                                'label' => 'Level One',
 //                                'icon' => 'circle-o',
@@ -67,6 +64,15 @@
 //                            ],
                         ],
                     ],
+                    [
+                        'label' => 'Служебные',
+                        'icon' => 'share',
+                        'url' => '#',
+                        'items' => [
+                            ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
+                            ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
+                        ]
+                    ]
                 ],
             ]
         ) ?>

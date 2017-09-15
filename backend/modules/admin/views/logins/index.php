@@ -68,7 +68,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'headerOptions' => array('style' => 'width: 120px;'),
             ],
             [
-                'label' => 'Имя',
+                'label' => 'Имя AD',
                 'attribute' => 'first_name',
                 'value' => 'first_name',
                 'headerOptions' => array('style' => 'width: 120px;'),
