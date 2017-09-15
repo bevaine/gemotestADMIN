@@ -34,7 +34,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'patient_fio',
             'pay_type',
             'total',
-
+            'sender_name',
             // 'cost',
             // 'base_doc_id',
             // 'base_doc_type',
@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'login_type',
             // 'login_fio',
             // 'sender_id',
-            // 'sender_name',
+
             // 'discount_card',
             // 'discount_id',
             // 'discount_name',

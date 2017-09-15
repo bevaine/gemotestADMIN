@@ -68,11 +68,11 @@ class NAdUsers extends \yii\db\ActiveRecord
     {
         return [
             'ID' => 'ID',
-            'last_name' => 'Фамилия',
-            'first_name' => 'Имя',
-            'middle_name' => 'Отчество',
+            'last_name' => 'Фамилия AD',
+            'first_name' => 'Имя AD',
+            'middle_name' => 'Отчество AD',
             'AD_name' => 'Ad Name',
-            'AD_position' => 'Должность',
+            'AD_position' => 'Должность AD',
             'AD_email' => 'Email',
             'table_number' => 'Table Number',
             'subdivision' => 'Subdivision',

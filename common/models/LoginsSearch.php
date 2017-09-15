@@ -4,6 +4,7 @@ namespace common\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
+use yii\data\SqlDataProvider;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -12,7 +13,6 @@ use yii\helpers\ArrayHelper;
 
 class LoginsSearch extends Logins
 {
-
     public $ad_login;
     public $DateBlocked;
 
@@ -45,30 +45,13 @@ class LoginsSearch extends Logins
      */
     public function search($params)
     {
-        //$query = Logins::find()
-        $query = Logins::find()
-            //->with('adUsersNew');
-            //->select('n_ad_Users.*')
-            ->join('FULL JOIN', 'n_ad_Users','[Logins].[aid] = [n_ad_Users].[gs_id] AND [Logins].[UserType] = [n_ad_Users].[gs_usertype]')
-            ->join('LEFT JOIN', 'n_ad_Useraccounts', '[n_ad_Users].[gs_key] = [n_ad_Useraccounts].[gs_id] AND [n_ad_Users].[last_name] = [n_ad_Useraccounts].[last_name] AND [n_ad_Users].[first_name] = [n_ad_Useraccounts].[first_name] AND [n_ad_Users].[middle_name] = [n_ad_Useraccounts].[middle_name]');
-
-        //$query = Logins::find()->with('n_ad_Users','n_ad_Useraccounts');
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
-
         $this->load($params);
 
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
+        $query = Logins::find()
+            ->joinWith(['adUsersNew'], false)
+            ->joinWith(['adUserAccounts'], false)
+            ->select('Logins.*, n_ad_Users.*, n_ad_Useraccounts.ad_login as loginAD, n_ad_Useraccounts.ad_pass as passAD');
 
-        //$query->where(['IS NOT', '[Logins].[aid]', null]);
-
-        // grid filtering conditions
         $query->andFilterWhere([
             'aid' => $this->aid,
             'IsOperator' => $this->IsOperator,
@@ -94,6 +77,7 @@ class LoginsSearch extends Logins
             'show_preanalytic' => $this->show_preanalytic,
             'parentAid' => $this->parentAid,
             'GarantLetter' => $this->GarantLetter,
+            'Key' => $this->Key,
         ]);
 
         if ($this->DateEnd == 1) {
@@ -112,7 +96,7 @@ class LoginsSearch extends Logins
             ->andFilterWhere(['like', 'Pass', $this->Pass])
             ->andFilterWhere(['like', 'Name', $this->Name])
             ->andFilterWhere(['like', 'Email', $this->Email])
-            ->andFilterWhere(['like', 'Key', $this->Key])
+            //->andFilterWhere(['like', 'Key', $this->Key])
             ->andFilterWhere(['like', 'Logo', $this->Logo])
             ->andFilterWhere(['like', 'LogoText', $this->LogoText])
             ->andFilterWhere(['like', 'LogoText2', $this->LogoText2])
@@ -127,6 +111,10 @@ class LoginsSearch extends Logins
             ->andFilterWhere(['like', 'n_ad_Users.middle_name', $this->middle_name])
             ->andFilterWhere(['like', 'n_ad_Users.AD_position', $this->AD_position])
             ->andFilterWhere(['like', 'n_ad_Useraccounts.ad_login', $this->ad_login]);
+
+        $dataProvider = new SqlDataProvider([
+            'sql' => $query->createCommand()->getRawSql(),
+        ]);
 
         return $dataProvider;
     }

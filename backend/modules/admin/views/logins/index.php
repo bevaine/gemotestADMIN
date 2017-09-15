@@ -1,15 +1,12 @@
 <?php
 
 use yii\helpers\Html;
-//use yii\grid\GridView;
 use kartik\grid\GridView;
-use kartik\grid\SerialColumn;
+use common\models\Logins;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\LoginsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
-//print_r($dataProvider);
 
 $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = $this->title;
@@ -24,6 +21,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+//        'rowOptions' => function ($model) {
+//            if (array_key_exists($model['UserType'], \common\models\Logins::getTypesArray())) {
+//                return ['style' => 'color:white;background-color:'.Logins::getColorTypes()[$model['UserType']]];
+//            } else return NULL;
+//        },
         'striped'=>true,
         'columns' => [
             ['class' => 'kartik\grid\SerialColumn'],
@@ -31,13 +33,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'headerOptions' => array('style' => 'width: 75px;'),
                 'attribute' => 'aid',
             ],
-//            [
-//                'label' => 'Фамилия',
-//                'name' => 'last_name',
-//                'attribute' => 'Logins.last_name',
-//                'value' => 'last_name',
-//                'headerOptions' => array('style' => 'width: 120px;'),
-//            ],
             [
                 'headerOptions' => array('style' => 'width: 75px;'),
                 'attribute' => 'Key',
@@ -48,15 +43,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => \common\models\Logins::getTypesArray(),
                 'format' => 'text',
                 'value' => function ($model) {
-                    if (array_key_exists($model->UserType, \common\models\Logins::getTypesArray())) {
-                        return \common\models\Logins::getTypesArray()[$model->UserType];
+                    if (array_key_exists($model['UserType'], \common\models\Logins::getTypesArray())) {
+                        return \common\models\Logins::getTypesArray()[$model['UserType']];
                     } else return NULL;
                 }
             ],
             [
                 'attribute' => 'Name',
                 'value' => function ($model) {
-                    return strlen($model->Name) > 65 ? substr($model->Name,0, 65 )."..." : $model->Name;
+                    return strlen($model['Name']) > 65 ? substr($model['Name'],0, 65 )."..." : $model['Name'];
                 }
             ],
             [
@@ -68,30 +63,29 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => 'Pass',
             ],
             [
-                'label' => 'Фамилия',
+                'label' => 'Фамилия AD',
                 'attribute' => 'last_name',
-                'value' => 'adUsersNew.last_name',
                 'headerOptions' => array('style' => 'width: 120px;'),
             ],
             [
                 'label' => 'Имя',
                 'attribute' => 'first_name',
-                'value' => 'adUsersNew.first_name',
+                'value' => 'first_name',
                 'headerOptions' => array('style' => 'width: 120px;'),
             ],
             [
-                'label' => 'Отчество',
+                'label' => 'Отчество AD',
                 'attribute' => 'middle_name',
-                'value' => 'adUsersNew.middle_name',
+                'value' => 'middle_name',
                 'headerOptions' => array('style' => 'width: 120px;'),
             ],
             [
-                'label' => 'Должность',
+                'label' => 'Должность AD',
                 'attribute' => 'AD_position',
                 'value' => function ($model) {
                     /** @var \common\models\LoginsSearch $model */
-                    if ($model->adUsersNew) {
-                        $AD_position = $model->adUsersNew->AD_position;
+                    if (!empty($model['AD_position'])) {
+                        $AD_position = $model['AD_position'];
                         return strlen($AD_position) > 35 ? substr($AD_position, 0, 35) . "..." : $AD_position;
                     } else return NULL;
                 },
@@ -100,151 +94,23 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'label' => 'Логин AD',
                 'attribute' => 'ad_login',
-                'value' => 'adUsersNew.adUserAccounts.ad_login',
+                'value' => 'loginAD',
                 'headerOptions' => array('style' => 'width: 100px;'),
             ],
             [
                 'label' => 'Пароль AD',
-                'value' => 'adUsersNew.adUserAccounts.ad_pass',
+                'value' => 'passAD',
                 'headerOptions' => array('style' => 'width: 100px;'),
             ],
-            [
-                'label' => 'Фамилия',
-                'headerOptions' => array('style' => 'width: 120px;'),
-                'attribute'=>'last_name',
-                'value' => function ($model) use ($searchModel) {
-                    /** @var \common\models\LoginsSearch $model */
-                    $findName = $model->getAdUsers()
-                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
-                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
-                    if ($findName->count() == 1) {
-                        return $findName->one()->last_name;
-                    } elseif ($findName->count() > 1) {
-                        return Html::tag('span', Html::encode('(несколько)'),
-                            ['style' => 'font-style: italic; color: red']);
-                    } else return null;
-                },
-                'format' => 'html',
-            ],
-//            [
-//                'label' => 'Имя',
-//                'headerOptions' => array('style' => 'width: 120px;'),
-//                'attribute'=>'first_name',
-//                'value' => function ($model) use ($searchModel) {
-//                    /** @var \common\models\LoginsSearch $model */
-//                    $findName = $model->getAdUsers()
-//                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-//                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-//                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
-//                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
-//                    if ($findName->count() == 1) {
-//                        return $findName->one()->first_name;
-//                    } elseif ($findName->count() > 1) {
-//                        return Html::tag('span', Html::encode('(несколько)'),
-//                            ['style' => 'font-style: italic; color: red']);
-//                    } else return null;
-//                },
-//                'format' => 'html',
-//            ],
-//            [
-//                'label' => 'Отчество1',
-//                'attribute' => 'adUsersNew.last_name'
-//            ],
-//            [
-//                'label' => 'Отчество',
-//                'headerOptions' => array('style' => 'width: 120px;'),
-//                'attribute'=>'middle_name',
-//                'value' => function ($model) use ($searchModel) {
-//                    /** @var \common\models\LoginsSearch $model */
-//                    $findName = $model->getAdUsers()
-//                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-//                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-//                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
-//                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
-//                    if ($findName->count() == 1) {
-//                        return $findName->one()->middle_name;
-//                    } elseif ($findName->count() > 1) {
-//                        return Html::tag('span', Html::encode('(несколько)'),
-//                        ['style' => 'font-style: italic; color: red']);
-//                    } else return null;
-//                },
-//                'format' => 'html',
-//            ],
-//            [
-//                'label' => 'Должность',
-//                'headerOptions' => array('style' => 'width: 100px;'),
-//                'attribute'=>'AD_position',
-//                'value' => function ($model) use ($searchModel) {
-//                    /** @var \common\models\LoginsSearch $model */
-//                    $findName = $model->getAdUsers()
-//                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-//                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-//                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
-//                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
-//                    if ($findName->count() == 1) {
-//                        $AD_position = $findName->one()->AD_position;
-//                        return strlen($AD_position) > 35 ? substr($AD_position, 0, 35) . "..." : $AD_position;
-//                    } elseif ($findName->count() > 1) return Html::tag('span', Html::encode('(несколько)'),
-//                            ['style' => 'font-style: italic; color: red']
-//                        );
-//                    else return null;
-//                },
-//                'format' => 'html',
-//            ],
-//
-//            [
-//                'label' => 'Логин AD',
-//                'headerOptions' => array('style' => 'width: 100px;'),
-//                'attribute'=>'ad_login',
-//                'value' => function ($model) use ($searchModel) {
-//                    /** @var \common\models\LoginsSearch $model */
-//                    $findName = $model->getAdUsers()
-//                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-//                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-//                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
-//                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
-//                    if ($findName->count() == 1) {
-//                        return $findName->one()->adUserAccounts->ad_login;
-//                    } elseif ($findName->count() > 1) {
-//                        return Html::tag('span', Html::encode('(несколько)'),
-//                            ['style' => 'font-style: italic; color: red']);
-//                    } else return null;
-//                },
-//                'format' => 'html',
-//            ],
-//            [
-//                'label' => 'Пароль AD',
-//                'headerOptions' => array('style' => 'width: 100px;'),
-//                'attribute'=>'ad_pass',
-//                'value' => function ($model) use ($searchModel) {
-//                    /** @var \common\models\LoginsSearch $model */
-//                    $findName = $model->getAdUsers()
-//                        ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-//                        ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-//                        ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name])
-//                        ->andFilterWhere(['like', 'AD_position', $searchModel->AD_position]);
-//                    if ($findName->count() == 1) {
-//                        return $findName->one()->adUserAccounts->ad_pass;
-//                    } elseif ($findName->count() > 1) {
-//                        return Html::tag('span', Html::encode('(несколько)'),
-//                            ['style' => 'font-style: italic; color: red']);
-//                    } else return null;
-//                },
-//                'format' => 'html',
-//            ],
-            //'CACHE_Login',
             [
                 'label' => 'Доступ к УЗ',
                 'headerOptions' => array('style' => 'width: 100px; text-align: center;'),
                 'filter' => \common\models\Logins::getStatusesArray(),
                 'attribute' => 'DateEnd',
                 'format' => 'raw',
-                'value' => function ($model, $key, $index, $column) {
+                'value' => function ($model) {
                     /** @var \common\models\LoginsSearch $model */
-                    /** @var \yii\grid\DataColumn $column */
-                    $value = $model->{$column->attribute};
+                    $value = $model['DateEnd'];
                     if (empty($value) || strtotime($value) > time()) {
                         $name = 'Активен';
                         $class = 'success';
@@ -262,10 +128,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => \common\models\Logins::getStatusesArray(),
                 'attribute' => 'block_register',
                 'format' => 'raw',
-                'value' => function ($model, $key, $index, $column) {
+                'value' => function ($model) {
                     /** @var \common\models\LoginsSearch $model */
-                    /** @var \yii\grid\DataColumn $column */
-                    $value = $model->{$column->attribute};
+                    $value = $model['block_register'];
                     if (empty($value) || strtotime($value) > time()) {
                         $name = 'Активен';
                         $class = 'success';
@@ -279,33 +144,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
-                'buttons' => [
-                    'view' => function ($url, $model) use ($searchModel) {
-                        /** @var \common\models\LoginsSearch $model */
-                        $arrReturn = ['admin/logins/view', 'id' => $model['aid']];
-                        $findName = $model->getAdUsers()
-                            ->andFilterWhere(['like', 'last_name', $searchModel->last_name])
-                            ->andFilterWhere(['like', 'first_name', $searchModel->first_name])
-                            ->andFilterWhere(['like', 'middle_name', $searchModel->middle_name]);
-
-                        if ($findName->count() == 1) {
-                            if (!empty($findName->one()->last_name))
-                                $arrReturn = array_merge($arrReturn, ['last_name' => $findName->one()->last_name]);
-                            if (!empty($findName->one()->first_name))
-                                $arrReturn = array_merge($arrReturn, ['first_name' => $findName->one()->first_name]);
-                            if (!empty($findName->one()->middle_name))
-                                $arrReturn = array_merge($arrReturn, ['middle_name' => $findName->one()->middle_name]);
-                        }
-
-                        $customurl = Yii::$app->getUrlManager()->createUrl($arrReturn);
-
-                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $customurl,
-                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
-                    }
-                ],
                 'template' => '{view} {update}'
             ]
         ],
     ]); ?>
 </div>
-

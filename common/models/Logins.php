@@ -141,7 +141,7 @@ class Logins extends \yii\db\ActiveRecord
             'last_name' => 'last_name',
             'first_name' => 'first_name',
             'middle_name' => 'middle_name',
-        ])->via('adUsers');
+        ])->via('adUsersNew');
     }
 
     /**
@@ -161,15 +161,15 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getAdUsersNew()
     {
-        return $this->hasOne(NAdUsers::className(), [
+        return $this->hasMany(NAdUsers::className(), [
             'gs_id' => 'aid',
             'gs_key' => 'Key',
             'gs_usertype' => 'UserType',
         ])
-            ->andFilterWhere(['like', 'last_name', $this->last_name])
-            ->andFilterWhere(['like', 'first_name', $this->first_name])
-            ->andFilterWhere(['like', 'middle_name', $this->middle_name])
-            ->andFilterWhere(['like', 'AD_position', $this->AD_position]);
+        ->andFilterWhere(['like', 'last_name', $this->last_name])
+        ->andFilterWhere(['like', 'first_name', $this->first_name])
+        ->andFilterWhere(['like', 'middle_name', $this->middle_name])
+        ->andFilterWhere(['like', 'AD_position', $this->AD_position]);
     }
 
     /**
@@ -200,6 +200,22 @@ class Logins extends \yii\db\ActiveRecord
             '8' => 'Франчайзи',
             '9' => 'Ген. директор',
             '13' => 'Фин. менеджер',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getColorTypes() {
+        return [
+            '1' => 'green',
+            '3' => 'red',
+            '4' => 'blue',
+            '5' => 'grey',
+            '7' => 'a5e3ff',
+            '8' => 'orange',
+            '9' => 'grey',
+            '13' => 'grey',
         ];
     }
 }
