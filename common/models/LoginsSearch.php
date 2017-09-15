@@ -48,8 +48,8 @@ class LoginsSearch extends Logins
         $this->load($params);
 
         $query = Logins::find()
-            ->joinWith(['adUsersNew'], false)
-            ->joinWith(['adUserAccounts'], false)
+            ->joinWith(['adUsersMany'], false)
+            ->joinWith(['adUserAccountsMany'], false)
             ->select('Logins.*, n_ad_Users.*, n_ad_Useraccounts.ad_login as loginAD, n_ad_Useraccounts.ad_pass as passAD');
 
         $query->andFilterWhere([

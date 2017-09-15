@@ -144,6 +144,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $arrReturn = ['admin/logins/view', 'id' => $model['aid'], 'ad' => $model['ID']];
+                        $customurl = Yii::$app->getUrlManager()->createUrl($arrReturn);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                    }
+                ],
                 'template' => '{view} {update}'
             ]
         ],

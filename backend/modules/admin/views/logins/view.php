@@ -20,10 +20,6 @@ if (empty($model->block_register) || strtotime($model->block_register) > time())
     $blockRegister = false;
 }
 
-$findName = $model->getAdUsers()
-    ->andFilterWhere(['=', 'last_name', Yii::$app->request->get('last_name')])
-    ->andFilterWhere(['=', 'first_name', Yii::$app->request->get('first_name')])
-    ->andFilterWhere(['=', 'middle_name', Yii::$app->request->get('middle_name')]);
 ?>
 
 <div class="logins-view">
@@ -32,13 +28,7 @@ $findName = $model->getAdUsers()
 
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->aid], ['class' => 'btn btn-primary']) ?>
-<!--        --><?//= Html::a('Удалить', ['delete', 'id' => $model->aid], [
-//            'class' => 'btn btn-danger',
-//            'data' => [
-//                'confirm' => 'Вы уверены, что хотите удалить?',
-//                'method' => 'post',
-//            ],
-//        ]) ?>
+
         <?= Html::a($blockDateEnd ? 'Включить УЗ' : 'Отключить УЗ',
             [
                 'block-account',
@@ -75,58 +65,28 @@ $findName = $model->getAdUsers()
             'Login',
             'Pass',
             [
-                'attribute' => 'adUsers.last_name',
-                'value' => function ($model) use ($findName) {
-                    /** @var \common\models\Logins $model  */
-                    if ($findName->count() == 1) {
-                        return $findName->one()->last_name;
-                    } else return null;
-                }
+                'label' => 'Фамилия AD',
+                'value' => $model->adUsersOne->last_name
             ],
             [
-                'attribute' => 'adUsers.first_name',
-                'value' => function ($model) use ($findName) {
-                    /** @var \common\models\Logins $model  */
-                    if ($findName->count() == 1) {
-                        return $findName->one()->first_name;
-                    } else return null;
-                }
+                'label' => 'Имя AD',
+                'value' => $model->adUsersOne->first_name
             ],
             [
-                'attribute' => 'adUsers.middle_name',
-                'value' => function ($model) use ($findName) {
-                    /** @var \common\models\Logins $model  */
-                    if ($findName->count() == 1) {
-                        return $findName->one()->middle_name;
-                    } else return null;
-                }
+                'label' => 'Отчество AD',
+                'value' => $model->adUsersOne->middle_name
             ],
             [
-                'attribute' => 'adUsers.AD_position',
-                'value' => function ($model) use ($findName) {
-                    /** @var \common\models\Logins $model  */
-                    if ($findName->count() == 1) {
-                        return $findName->one()->AD_position;
-                    } else return null;
-                }
+                'label' => 'Должность AD',
+                'value' => $model->adUsersOne->AD_position
             ],
             [
-                'attribute' => 'adUserAccounts.ad_login',
-                'value' => function ($model) use ($findName) {
-                    /** @var \common\models\Logins $model  */
-                    if ($findName->count() == 1) {
-                        return $findName->one()->adUserAccounts->ad_login;
-                    } else return null;
-                }
+                'label' => 'Логин AD',
+                'value' => $model->adUserAccountsOne->ad_login
             ],
             [
-                'attribute' => 'adUserAccounts.ad_pass',
-                'value' => function ($model) use ($findName) {
-                    /** @var \common\models\Logins $model  */
-                    if ($findName->count() == 1) {
-                        return $findName->one()->adUserAccounts->ad_pass;
-                    } else return null;
-                }
+                'label' => 'Пароль AD',
+                'value' => $model->adUserAccountsOne->ad_pass
             ],
             'Email:email',
             'Logo',

@@ -54,19 +54,21 @@ class LoginsController extends Controller
      * @param string $id
      * @return mixed
      */
-    public function actionView($id)
+    public function actionView($id, $ad = null)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($id, $ad),
         ]);
     }
 
+    /**
+     * @return string|\yii\web\Response
+     */
     public function actionCreateOrg ()
     {
         $model = new AddOrgForm();
         if ($model->load(Yii::$app->request->post()))
         {
-
             return $this->redirect(['view', 'id' => $model->aid]);
         } else {
             return $this->render('createOrg', [
@@ -75,6 +77,9 @@ class LoginsController extends Controller
         }
     }
 
+    /**
+     * @return string
+     */
     public function actionCreateNAdUsers()
     {
         $model = new NAdUsers();
@@ -169,23 +174,28 @@ class LoginsController extends Controller
      */
     public function actionUpdate($id)
     {
-        $modelLogins = $this->findModel($id);
+        $model = $this->findModel($id);
 
-        if ($modelLogins->load(Yii::$app->request->post()) && $modelLogins->save())
+        if ($model->load(Yii::$app->request->post()) && $model->save())
         {
-            $adUsersLogins = $this->findModel($id)->adUsers;
+            $adUsersLogins = $model->adUsers;
             if ($adUsersLogins) {
                 if ($adUsersLogins->load(Yii::$app->request->post())) {
                     $adUsersLogins->save();
                 }
             }
-            return $this->redirect(['view', 'id' => $modelLogins->aid]);
+            return $this->redirect(['view', 'id' => $model->aid]);
         }
         return $this->render('update', [
-            'model' => $modelLogins,
+            'model' => $model,
         ]);
     }
 
+    /**
+     * @param $id
+     * @param $action
+     * @return string
+     */
     public function actionBlockAccount($id, $action)
     {
         $model = $this->findModel($id);
@@ -205,6 +215,11 @@ class LoginsController extends Controller
         ]);
     }
 
+    /**
+     * @param $id
+     * @param $action
+     * @return string
+     */
     public function actionBlockRegister($id, $action)
     {
         $model = $this->findModel($id);
@@ -228,12 +243,14 @@ class LoginsController extends Controller
      * Finds the Logins model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
+     * @param string $idAD
      * @return Logins the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id, $idAD = null)
     {
         if (($model = Logins::findOne(['aid' => $id])) !== null) {
+            $model->idAD = $idAD;
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

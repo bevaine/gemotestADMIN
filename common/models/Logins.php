@@ -49,9 +49,10 @@ use common\components\helpers\ActiveSyncHelper;
  * @property string $parentAid
  * @property integer $GarantLetter
  * @property Operators $operators
- * @property NAdUsers $adUsers
- * @property NAdUsers $adUsersNew
- * @property NAdUserAccounts $adUserAccounts
+ * @property NAdUsers $adUsersMany
+ * @property NAdUsers $adUsersOne
+ * @property NAdUserAccounts $adUserAccountsMany
+ * @property NAdUserAccounts $adUserAccountsOne
  */
 class Logins extends \yii\db\ActiveRecord
 {
@@ -62,7 +63,11 @@ class Logins extends \yii\db\ActiveRecord
     public $first_name;
     public $middle_name;
     public $AD_position;
+    public $idAD;
 
+    /**
+     * @return string
+     */
     public static function tableName()
     {
         return 'Logins';
@@ -134,32 +139,33 @@ class Logins extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdUserAccounts()
+    public function getAdUserAccountsMany()
     {
-        return $this->hasOne(NAdUseraccounts::className(), [
+        return $this->adUsersMany ? $this->hasOne(NAdUseraccounts::className(), [
             'gs_id' => 'gs_key',
             'last_name' => 'last_name',
             'first_name' => 'first_name',
             'middle_name' => 'middle_name',
-        ])->via('adUsersNew');
+        ])->via('adUsersMany') : null;
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdUsers()
+    public function getAdUserAccountsOne()
     {
-        return $this->hasOne(NAdUsers::className(), [
-            'gs_id' => 'aid',
-            'gs_key' => 'Key',
-            'gs_usertype' => 'UserType',
-        ]);
+        return $this->adUsersOne ? $this->hasOne(NAdUseraccounts::className(), [
+            'gs_id' => 'gs_key',
+            'last_name' => 'last_name',
+            'first_name' => 'first_name',
+            'middle_name' => 'middle_name',
+        ])->via('adUsersOne') : null;
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdUsersNew()
+    public function getAdUsersMany()
     {
         return $this->hasMany(NAdUsers::className(), [
             'gs_id' => 'aid',
@@ -170,6 +176,19 @@ class Logins extends \yii\db\ActiveRecord
         ->andFilterWhere(['like', 'first_name', $this->first_name])
         ->andFilterWhere(['like', 'middle_name', $this->middle_name])
         ->andFilterWhere(['like', 'AD_position', $this->AD_position]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdUsersOne()
+    {
+        return !empty($this->idAD) ? $this->hasOne(NAdUsers::className(), [
+            'gs_id' => 'aid',
+            'gs_key' => 'Key',
+            'gs_usertype' => 'UserType',
+        ])
+        ->andFilterWhere(['ID' => $this->idAD]) : null;
     }
 
     /**
