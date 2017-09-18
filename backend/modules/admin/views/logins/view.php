@@ -66,27 +66,27 @@ if (empty($model->block_register) || strtotime($model->block_register) > time())
             'Pass',
             [
                 'label' => 'Фамилия AD',
-                'value' => $model->adUsersOne ? $model->adUsersOne->last_name : null
+                'attribute' => 'adUsersOne.last_name',
             ],
             [
                 'label' => 'Имя AD',
-                'value' => $model->adUsersOne ? $model->adUsersOne->first_name : null
+                'attribute' => 'adUsersOne.first_name',
             ],
             [
                 'label' => 'Отчество AD',
-                'value' => $model->adUsersOne ? $model->adUsersOne->middle_name : null
+                'attribute' => 'adUsersOne.middle_name',
             ],
             [
                 'label' => 'Должность AD',
-                'value' => $model->adUsersOne ? $model->adUsersOne->AD_position : null
+                'attribute' => 'adUsersOne.AD_position',
             ],
             [
                 'label' => 'Логин AD',
-                'value' => $model->adUserAccountsOne ? $model->adUserAccountsOne->ad_login : null
+                'attribute' => 'adUserAccountsOne.ad_login',
             ],
             [
                 'label' => 'Пароль AD',
-                'value' => $model->adUserAccountsOne ? $model->adUserAccountsOne->ad_pass : null
+                'attribute' => 'adUserAccountsOne.ad_pass',
             ],
             'Email:email',
             'Logo',
