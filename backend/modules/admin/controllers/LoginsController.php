@@ -107,6 +107,11 @@ class LoginsController extends Controller
     {
         $model = new AddUserForm();
         $model->scenario = 'addUser';
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
+
         if ($model->load(Yii::$app->request->post()))
         {
             $activeSyncHelper = new ActiveSyncHelper();

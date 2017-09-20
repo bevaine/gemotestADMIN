@@ -37,12 +37,18 @@
                         'url' => '#',
                         'items' => [
                             ['label' => 'Смены', 'icon' => 'file-code-o', 'url' => ['/admin/workshift'],],
+                            ['label' => 'Заказы', 'icon' => 'file-code-o', 'url' => ['/admin/orders'],],
                             ['label' => 'Платежи', 'icon' => 'dashboard', 'url' => ['/admin/pay'],],
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
                             ['label' => 'Таблицы', 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
                                     ['label' => 'NAdUsers', 'icon' => 'dashboard', 'url' => ['/admin/logins/create-n-ad-users'],],
+                                ]
+                            ],
+                            ['label' => 'Операции', 'icon' => 'circle-o', 'url' => '#', 'items' =>
+                                [
+                                    ['label' => 'Сбой инхронизации', 'icon' => 'dashboard', 'url' => 'http://labc:57772/csp/syncutils/sumain.csp',],
                                 ]
                             ],
 //                            [

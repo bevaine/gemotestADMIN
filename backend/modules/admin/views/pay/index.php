@@ -23,7 +23,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
             'id',
             'date',
             'order_num',
@@ -34,6 +33,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'patient_fio',
             'pay_type',
             'total',
+            'sender_id',
             'sender_name',
             // 'cost',
             // 'base_doc_id',
@@ -45,8 +45,6 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'login_key',
             // 'login_type',
             // 'login_fio',
-            // 'sender_id',
-
             // 'discount_card',
             // 'discount_id',
             // 'discount_name',
@@ -59,7 +57,6 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'free_pay',
             // 'app_version',
             // 'pay_type_original',
-
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
