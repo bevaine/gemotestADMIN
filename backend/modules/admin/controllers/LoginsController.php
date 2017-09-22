@@ -66,15 +66,57 @@ class LoginsController extends Controller
      */
     public function actionCreateOrg ()
     {
-        $model = new AddOrgForm();
-        if ($model->load(Yii::$app->request->post()))
-        {
-            return $this->redirect(['view', 'id' => $model->aid]);
-        } else {
-            return $this->render('createOrg', [
-                'model' => $model,
-            ]);
+        $model = new AddUserForm();
+        $model->scenario = 'addUserOrg';
+
+        if ($model->load(Yii::$app->request->post())) {
+
         }
+        return $this->render('createOrg', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionCreateDoc ()
+    {
+        $model = new AddUserForm();
+        $model->scenario = 'addUserDoc';
+
+        if ($model->load(Yii::$app->request->post())) {
+
+        }
+        return $this->render('createDoc', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionCreateFranch ()
+    {
+        $model = new AddUserForm();
+        $model->scenario = 'addUserFranch';
+
+        if ($model->load(Yii::$app->request->post())) {
+            $activeSyncHelper = new ActiveSyncHelper();
+            $activeSyncHelper->key = $model->key;
+            $activeSyncHelper->type = 8;
+            $activeSyncHelper->nurse = $model->nurse;
+            $activeSyncHelper->lastName = $model->lastName;
+            $activeSyncHelper->firstName = $model->firstName;
+            $activeSyncHelper->middleName = $model->middleName;
+            $activeSyncHelper->department = $model->department;
+            $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
+            $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
+        }
+
+        return $this->render('createFranch', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -108,62 +150,50 @@ class LoginsController extends Controller
         $model = new AddUserForm();
         $model->scenario = 'addUser';
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-
         if ($model->load(Yii::$app->request->post()))
         {
             $activeSyncHelper = new ActiveSyncHelper();
+            $activeSyncHelper->key = $model->key;
+            $activeSyncHelper->type = $model->type;
             $activeSyncHelper->nurse = $model->nurse;
-            $activeSyncHelper->department = $model->department;
             $activeSyncHelper->lastName = $model->lastName;
             $activeSyncHelper->firstName = $model->firstName;
             $activeSyncHelper->middleName = $model->middleName;
-            $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
+            $activeSyncHelper->department = $model->department;
             $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
-            //todo если УЗ AD существует
-            $newUserData = $activeSyncHelper->checkAccount();
-            if (!$newUserData) {
-                if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
-                    !is_null(Yii::$app->request->post('hiddenEmailList'))
+            $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
+
+
+            if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
+                !is_null(Yii::$app->request->post('hiddenEmailList'))
+            ) {
+                $activeSyncHelper->accountName = Yii::$app->request->post('radioAccountsList');
+                $arrEmails = Yii::$app->request->post('hiddenEmailList');
+                if (!empty($activeSyncHelper->accountName)
+                    && array_key_exists($activeSyncHelper->accountName, $arrEmails)
                 ) {
-                    $activeSyncHelper->accountName = Yii::$app->request->post('radioAccountsList');
-                    $arrEmails = Yii::$app->request->post('hiddenEmailList');
-                    if (!empty($activeSyncHelper->accountName)
-                        && array_key_exists($activeSyncHelper->accountName, $arrEmails)
-                    ) {
-                        $activeSyncHelper->emailAD = $arrEmails[$activeSyncHelper->accountName];
-                    }
-                    //todo если находим то сбрасываем пароль в AD
-                    $newPasswordAd = $activeSyncHelper->resetPasswordAD($activeSyncHelper->accountName);
-                    if ($newPasswordAd && !empty($activeSyncHelper->accountName)) {
-                        $activeSyncHelper->passwordAD = $newPasswordAd;
-                        $newUserData['login'] = $activeSyncHelper->accountName;
-                        $newUserData['password'] = $activeSyncHelper->passwordAD;
-                        $newUserData['state'] = 'new';
-                    }
-                } else {
-                    $addNewUser = $activeSyncHelper->addUserAD();
-                    if (!$addNewUser) {
-                        $message = '<p>Не удалось создать УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
-                        Yii::$app->session->setFlash('error', $message);
-                    }
+                    $activeSyncHelper->emailAD = $arrEmails[$activeSyncHelper->accountName];
                 }
-                $newUserData = $activeSyncHelper->addNewUser();
-            }
-            if ($newUserData) {
-                if ($newUserData['state'] == 'new') {
-                    $style = 'success';
-                    $message = '<p>Успешно добавлена УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
+                //todo добавление УЗ
+                $newUserData = $activeSyncHelper->checkAccount();
+                if ($newUserData) {
+                    if ($newUserData['state'] == 'new') {
+                        $style = 'success';
+                        $message = '<p>Успешно добавлена УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
+                    } else {
+                        $style = 'warning';
+                        $message = '<p>У пользователя <b>'.$activeSyncHelper->fullName.'</b> уже есть УЗ для авторизации через AD</p>';
+                    }
+                    if (!empty($newUserData['login'] && $newUserData['password'])) {
+                        $message .= '<p>Данные для входа в GomoSystem:<p>';
+                        $message .= '<br>Логин: ' . $newUserData['login'];
+                        $message .= '<br>Пароль: ' . $newUserData['password'];
+                    }
+                    Yii::$app->session->setFlash($style, $message);
                 } else {
-                    $style = 'warning';
-                    $message = '<p>У пользователя <b>'.$activeSyncHelper->fullName.'</b> уже есть УЗ в GemoSystem</p>';
+                    $message = '<p>Не удалось создать УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
+                    Yii::$app->session->setFlash('error', $message);
                 }
-                $message .= '<p>Данные для входа в GomoSystem:<p>';
-                $message .= '<br>Логин: '.$newUserData['login'];
-                $message .= '<br>Пароль: '.$newUserData['password'];
-                Yii::$app->session->setFlash($style, $message);
             }
         }
         return $this->render('create', [
@@ -279,8 +309,8 @@ class LoginsController extends Controller
         $activeSyncHelper->middleName = $middle_name;
         $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
 
-        $checkAccount = $activeSyncHelper->checkAccount();
-        if ($checkAccount) exit('null');
+        //$checkAccount = $activeSyncHelper->checkAccount();
+        //if ($checkAccount) exit('null');
 
         if (!in_array($activeSyncHelper->department, [4, 5]))
         {

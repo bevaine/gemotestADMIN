@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <ul class="nav nav-tabs">
                 <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Пользователи</a></li>
                 <li class=""><a href="<?php echo Url::to(["logins/create-org"]) ?>">Юр. лица</a></li>
-                <li class=""><a href="<?php echo Url::to(["logins/create-doc"]) ?>">Врачи</a></li>
+                <li class=""><a href="<?php echo Url::to(["logins/create-doc"]) ?>">Врач. иное</a></li>
                 <li class=""><a href="<?php echo Url::to(["logins/create-franch"]) ?>">Франчайзи</a></li>
             </ul>
 
@@ -68,6 +68,11 @@ $this->params['breadcrumbs'][] = $this->title;
                             </div>
                             <div class="col-lg-4">
                                 <div class="form-group">
+                                    <?= $form->field($model, 'type')->dropDownlist(\common\models\AddUserForm::getTypesArray()) ?>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="form-group">
                                     <?= $form->field($model, 'nurse')->dropDownlist(\common\models\AddUserForm::getNurses()) ?>
                                 </div>
                             </div>
@@ -79,10 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
 
                         <div class="form-group">
-                            <?php
-                            echo "Пока не работает!";
-                            //Html::Button('Создать',['class' => 'btn btn-success'])
-                            ?>
+                            <?= Html::Button('Создать',['class' => 'btn btn-success']) ?>
                         </div>
 
                         <?php ActiveForm::end(); ?>

@@ -13,6 +13,8 @@ use yii\base\Model;
 
 class AddUserForm extends Model
 {
+    public $key;
+    public $type;
     public $department;
     public $nurse;
     public $lastName;
@@ -20,9 +22,15 @@ class AddUserForm extends Model
     public $middleName;
     public $operatorofficestatus;
     public $radioAccountsList;
+    public $name;
+    public $login;
+    public $blankText;
+    public $email;
 
-    CONST SCENARIO_ADD = 'addUser';
-    CONST SCENARIO_FIND = 'findUser';
+    CONST SCENARIO_ADD_USER = 'addUser';
+    CONST SCENARIO_ADD_DOC = 'addUserDoc';
+    CONST SCENARIO_ADD_ORG = 'addUserOrg';
+    CONST SCENARIO_ADD_FR = 'addUserFranch';
 
     /**
      * @return array
@@ -30,8 +38,10 @@ class AddUserForm extends Model
     public function scenarios()
     {
         return [
-            self::SCENARIO_ADD => ['department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
-            self::SCENARIO_FIND => ['lastName', 'firstName', 'middleName'],
+            self::SCENARIO_ADD_USER => ['department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
+            self::SCENARIO_ADD_DOC => ['lastName', 'firstName', 'middleName'],
+            self::SCENARIO_ADD_ORG => ['name', 'key', 'login', 'blankText', 'email'],
+            self::SCENARIO_ADD_FR => ['key', 'lastName', 'firstName', 'middleName'],
         ];
     }
 
@@ -41,12 +51,14 @@ class AddUserForm extends Model
     public function rules()
     {
         return [
-            [['department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'], 'required', 'on' => 'addUser'],
-            [['lastName', 'firstName', 'middleName'], 'required', 'on' => 'findUser'],
+            [['lastName', 'firstName', 'middleName', 'operatorofficestatus', 'department', 'nurse'], 'required', 'on' => 'addUser'],
+            [['lastName', 'firstName', 'middleName'], 'required', 'on' => 'addUserDoc'],
+            [['name', 'key', 'login', 'blankText', 'email'], 'required', 'on' => 'addUserOrg'],
+            [['lastName', 'firstName', 'middleName', 'key'], 'required', 'on' => 'addUserFranch'],
+            [['lastName', 'firstName', 'middleName'], 'string'],
+            [['department', 'nurse', 'key'], 'integer'],
             ['department', 'in', 'range' => array_keys(self::getDepartments())],
             ['nurse', 'in', 'range' => array_keys(self::getNurses())],
-            [['lastName', 'firsName', 'middleName'], 'string'],
-            [['department', 'nurse'], 'integer']
         ];
     }
 
@@ -56,12 +68,18 @@ class AddUserForm extends Model
     public function attributeLabels()
     {
         return [
-            'department' => 'Тип департамента',
+            'department' => 'Права пользователя',
             'nurse' => 'Доступ к модулю биомат.',
             'lastName' => 'Фамилия',
             'firstName' => 'Имя',
             'middleName' => 'Отчество',
-            'operatorofficestatus' => 'Должность'
+            'operatorofficestatus' => 'Должность',
+            'type' => 'Тип пользователя',
+            'name' => 'Название организации',
+            'key' => 'Ключ контрагента',
+            'login' => 'Логин',
+            'blankText' => 'Адрес организации',
+            'email' => 'Email'
         ];
     }
 
@@ -71,15 +89,31 @@ class AddUserForm extends Model
     public static function getDepartments()
     {
         return [
-            7 => 'Без прав',
-            0 => 'CЛО',
+            0 => 'Cобственные отделения',
             1 => 'Контакт центр',
-            2 => 'Продажи\\Региональный менеджер',
+            2 => 'Продажи\\Региональный менеджер\\Лабораторный техник',
             3 => 'Развитие\\ДУОЛО\\Фин. сопровождение договоров\\Бухгалтерия\\',
-            4 => 'ОКИП',
+            4 => 'Отдел клиентской информационной поддержки',
             5 => 'Мед регистратор',
             6 => 'Клиент-менеджер',
+            7 => 'Без прав',
             8 => 'Врач-консультант'
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getTypesArray() {
+        return [
+            '7' => 'Собств. лаб. отд.', //вход через AD
+            '1' => 'Администр.',        //вход через AD
+            '5' => 'Врач консул.',      //вход через AD
+            '9' => 'Ген. директор',     //вход через AD
+            '13' => 'Фин. менеджер',    //вход через Logins
+            //'3' => 'Юр. лица',          //вход через Logins
+            //'4' => 'Врач иное.',        //вход через Logins
+            //'8' => 'Франчайзи',         //вход через AD
         ];
     }
 
@@ -93,5 +127,18 @@ class AddUserForm extends Model
             1 => 'Да',
             2 => 'Выездная МС'
         ];
+    }
+
+    /**
+     * Список для select
+     */
+    public static function getKeysList()
+    {
+        $modules = [];
+        $object = Logins::find()->where(['UserType' => '8'])->orderBy(['Name' => 'desc'])->all();
+        foreach ($object as $model) {
+            $modules[$model->Key] = $model->Name;
+        }
+        return $modules;
     }
 }

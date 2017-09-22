@@ -5,7 +5,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\AddOrgForm */
+/* @var $model common\models\AddUserForm */
 /* @var $form yii\widgets\ActiveForm */
 
 $this->title = 'Создание юридического лица';
@@ -17,7 +17,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <ul class="nav nav-tabs">
             <li class=""><a href="<?php echo Url::to(["logins/create"]) ?>">Пользователи</a></li>
             <li class=""><a href="<?php echo Url::to(["logins/create-org"]) ?>">Юр. лица</a></li>
-            <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Врачи</a></li>
+            <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Врач. иное</a></li>
             <li class=""><a href="<?php echo Url::to(["logins/create-franch"]) ?>">Франчайзи</a></li>
         </ul>
 
@@ -29,17 +29,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <?= $form->field($model, 'name')->textInput() ?>
+                                <?= $form->field($model, 'lastName')->textInput() ?>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <?= $form->field($model, 'key')->textInput() ?>
+                                <?= $form->field($model, 'firstName')->textInput() ?>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <?= $form->field($model, 'login')->textInput() ?>
+                                <?= $form->field($model, 'middleName')->textInput() ?>
                             </div>
                         </div>
                     </div>

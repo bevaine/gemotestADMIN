@@ -16,9 +16,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class=""><a href="<?php echo Url::to(["logins/create"]) ?>">Пользователи</a></li>
-            <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Юр. лица</a></li>
+            <li class=""><a href="<?php echo Url::to(["logins/create-org"]) ?>">Юр. лица</a></li>
             <li class=""><a href="<?php echo Url::to(["logins/create-doc"]) ?>">Врач. иное</a></li>
-            <li class=""><a href="<?php echo Url::to(["logins/create-franch"]) ?>">Франчайзи</a></li>
+            <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Франчайзи</a></li>
         </ul>
 
         <div class="tab-content">
@@ -29,31 +29,24 @@ $this->params['breadcrumbs'][] = $this->title;
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <?= $form->field($model, 'name')->textInput() ?>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <?= $form->field($model, 'key')->textInput() ?>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="form-group">
-                                <?= $form->field($model, 'login')->textInput() ?>
+                                <?= $form->field($model, 'key')->dropDownlist(\common\models\AddUserForm::getKeysList(), ['prompt' => '---', 'disabled' => false]); ?>
                             </div>
                         </div>
                     </div>
-
-
                     <div class="row">
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <?= $form->field($model, 'email')->textInput() ?>
+                                <?= $form->field($model, 'lastName')->textInput() ?>
                             </div>
                         </div>
                         <div class="col-lg-4">
                             <div class="form-group">
-                                <?= $form->field($model, 'blankText')->textarea() ?>
+                                <?= $form->field($model, 'firstName')->textInput() ?>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="form-group">
+                                <?= $form->field($model, 'middleName')->textInput() ?>
                             </div>
                         </div>
                     </div>

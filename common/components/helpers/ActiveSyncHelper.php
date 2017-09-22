@@ -40,38 +40,447 @@ class ActiveSyncHelper
     public $passwordAD;
     public $pathAD;
     public $department;
+    public $cacheId;
+    public $cachePass;
+    public $type;
     public $operatorofficestatus;
     public $nurse;
     public $aid;
     public $login;
+    public $key;
+
+    /**
+     * @return array|null|\yii\db\ActiveRecord
+     */
+    public function checkLoginAccount()
+    {
+        return $loginSearch = Logins::find()
+            ->andFilterWhere(['like', 'Name', $this->fullName])
+            ->andFilterWhere(['UserType' => $this->department])
+            ->one();
+    }
+
+    /**
+     * @return array|null|\yii\db\ActiveRecord
+     */
+    public function checkFranchazyAccount()
+    {
+        return $loginSearch = Logins::find()
+            ->andFilterWhere(['Key' => $this->key])
+            ->andFilterWhere(['UserType' => 8])
+            ->one();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function checkFranchazyUser()
+    {
+        /**
+         * @var Logins $loginSearch
+         */
+        $loginSearch = Logins::find()
+            ->andFilterWhere(['like', 'Name', $this->fullName])
+            ->andFilterWhere(['Key' => $this->key])
+            ->andFilterWhere(['UserType' => 8])
+            ->one();
+
+        if (!$loginSearch) return false;
+
+        return [
+            'aid' => $loginSearch->aid,
+            'login' => $loginSearch->Login,
+            'password' => $loginSearch->Pass,
+            'state' => 'old'
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function addCheckOperators()
+    {
+        /**
+         * @var Operators $findUsersOperators
+         * @var Operators $cacheId
+         */
+        if (empty($this->firstName)
+            || empty($this->middleName)
+            || empty($this->department)
+            || empty($this->lastName))
+            return false;
+
+        //todo проверяем существует ли запись в Operators
+        $objectOperators = Operators::find()->where([
+            'Name' => $this->firstName." ".$this->middleName,
+            'LastName' => $this->lastName
+        ])->one();
+
+        //todo если нет, то добавление в Operators
+        if (!$objectOperators) {
+            $cacheId = Operators::find()
+                ->select('CACHE_OperatorID')
+                ->orderBy('AID DESC')
+                ->one();
+
+            $this->cacheId = strval($cacheId->CACHE_OperatorID) + 1;
+            $this->cachePass = Yii::$app->getSecurity()->generateRandomString(8);
+            $objectOperators = new Operators();
+            $objectOperators->CACHE_Login = $this->accountName;
+            $objectOperators->Name = $this->firstName." ".$this->middleName;
+            $objectOperators->LastName = $this->lastName;
+            $objectOperators->DateIns = date("Y-m-d G:i:s:000");
+            $objectOperators->CACHE_OperatorID = strval($this->cacheId);
+            $objectOperators->OperatorOfficeStatus = $this->operatorofficestatus;
+            $objectOperators->Pass = $this->cachePass;
+            $objectOperators->Active = 1;
+            $objectOperators->CanRegister = 1;
+            $objectOperators->InputOrderRM = 1;
+            $objectOperators->mto_editor = 0;
+
+            if (!$objectOperators->save()) {
+                Yii::getLogger()->log(['$objectOperators->save()'=>$objectOperators->errors], 1, 'binary');
+                return false;
+            } else {
+                Yii::getLogger()->log(['$objectOperators->save()'=>$objectOperators], 1, 'binary');
+            }
+        }
+
+        $loginId = $objectOperators->AID;
+        $this->aid = 3000000 + $loginId;
+        if ($this->department == 5) $this->login = 'medr'.$loginId;
+        else $this->login = 'reg'.$loginId;
+        return true;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function addCheckLogins()
+    {
+        /**
+         * @var Logins $objectUsersLogins
+         */
+        $state = '';
+        if (empty($this->fullName)) return false;
+
+        //todo проверяем существует ли запись в Logins
+        $objectUsersLogins = Logins::find()->where([
+            'like', 'Name', $this->fullName
+        ])->one();
+
+        if ($objectUsersLogins)
+        {
+            //todo разблокируем учетную запись
+            $state = 'old';
+            $this->unblockAccount($objectUsersLogins->aid);
+        } else
+        {
+            //todo добавляем новую запись в Logins
+            if (empty($this->aid)
+                || empty($this->login)
+                || empty($this->cacheId)
+                || empty($this->cachePass)
+                || empty($this->department)
+            )
+
+            $state = 'new';
+            $logo = 'logos/LogoGemotest.gif';
+            $logoText = '107031 Москва, Рождественский бульвар д.21, ст.2^*^тел. (495) 532-13-13, 8(800) 550-13-13^*^www.gemotest.ru';
+
+            $objectUsersLogins = new Logins();
+            $objectUsersLogins->aid = $this->aid;
+            $objectUsersLogins->Login = $this->login;
+            $objectUsersLogins->Pass = $this->cachePass;
+            $objectUsersLogins->Name = $this->cacheId . '.' . $this->operatorofficestatus . ':' . $this->fullName;
+            $objectUsersLogins->Email = $this->emailAD;
+            $objectUsersLogins->Key = strval($this->cacheId);
+            $objectUsersLogins->UserType = $this->department == 5 ? 5 : 7;
+            $objectUsersLogins->CACHE_Login = $this->accountName;
+            $objectUsersLogins->last_update_password = date("Y-m-d G:i:s:000");
+            $objectUsersLogins->Logo = $logo;
+            $objectUsersLogins->LogoText = $logoText;
+            $objectUsersLogins->tbl = 'Operators';
+            $objectUsersLogins->IsAdmin = 0;
+            $objectUsersLogins->IsOperator = 1;
+            $objectUsersLogins->LogoText2 = '';
+            $objectUsersLogins->LogoType = '';
+            $objectUsersLogins->LogoWidth = '';
+            $objectUsersLogins->TextPaddingLeft = '';
+            $objectUsersLogins->OpenExcel = 0;
+            $objectUsersLogins->EngVersion = 0;
+            $objectUsersLogins->IsDoctor = 2;
+            $objectUsersLogins->InputOrder = 1;
+            $objectUsersLogins->PriceID = 0;
+            $objectUsersLogins->CanRegister = 1;
+            $objectUsersLogins->InputOrderRM = 1;
+            $objectUsersLogins->OrderEdit = 0;
+            $objectUsersLogins->goscontract = 0;
+            $objectUsersLogins->FizType = 0;
+            $objectUsersLogins->mto_editor = 0;
+
+            if (!$objectUsersLogins->save()) {
+                Yii::getLogger()->log(['$objectUsersLogins->save()' => $objectUsersLogins->errors], 1, 'binary');
+                return false;
+            } else {
+                Yii::getLogger()->log(['$objectUsersLogins->save()' => $objectUsersLogins], 1, 'binary');
+            }
+        }
+
+        return [
+            'aid' => $objectUsersLogins->aid,
+            'login' => $objectUsersLogins->Login,
+            'password' => $objectUsersLogins->Pass,
+            'state' => $state
+        ];
+    }
+
+    /**
+     * @return bool
+     */
+    public function addNewAdUserAccount()
+    {
+        if (empty($this->accountName)|| empty($this->passwordAD)) return false;
+
+        $accountLab = "lab\\".$this->accountName;
+        if (!empty($this->accountName)) {
+            $objectUserAccountsAD = NAdUseraccounts::findOne(['ad_login' => $accountLab]);
+            if ($objectUserAccountsAD) {
+                $objectUserAccountsAD->ad_pass = $this->passwordAD;
+                if (!$objectUserAccountsAD->save()) {
+                    Yii::getLogger()->log(['$objectUserAccountsAD->save()'=>$objectUserAccountsAD->errors], 1, 'binary');
+                } else {
+                    return true;
+                }
+            }
+        }
+
+        if (empty($this->lastName)
+            || empty($this->firstName)
+            || empty($this->middleName)
+            || empty($this->cacheId)
+        ) return false;
+
+        $objectUserAccountsAD = new NAdUseraccounts();
+        $objectUserAccountsAD->last_name = $this->lastName;
+        $objectUserAccountsAD->first_name = $this->firstName;
+        $objectUserAccountsAD->middle_name = $this->middleName;
+        $objectUserAccountsAD->gs_type = self::TYPE_LO;
+        $objectUserAccountsAD->gs_id = strval($this->cacheId);
+        $objectUserAccountsAD->org_name = '';
+        $objectUserAccountsAD->ad_login = $accountLab;
+        $objectUserAccountsAD->ad_pass = $this->passwordAD;
+
+        if (!$objectUserAccountsAD->save()) {
+            Yii::getLogger()->log(['$objectUserAccountsAD->save()'=>$objectUserAccountsAD->errors], 1, 'binary');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function addLpassUsers()
+    {
+        $objectLpASs = new LpASs();
+        $objectLpASs->ukey = strval($this->cacheId);
+        $objectLpASs->utype = strval(7);
+        $objectLpASs->login = $this->login;
+        $objectLpASs->pass = $this->cachePass;
+        $objectLpASs->dateins = date("Y-m-d G:i:s:000");
+        $objectLpASs->iukey = strval(0);
+        $objectLpASs->iutype = strval(0);
+        $objectLpASs->active = strval(1);
+
+        if (!$objectLpASs->save()) {
+            Yii::getLogger()->log(['ActiveSyncController:objectLpASs'=>$objectLpASs->errors], 1, 'binary');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function addNewAdUsers()
+    {
+        if (!empty($this->accountName)) {
+            $objectUserAD = NAdUsers::findOne(['AD_login' => $this->accountName]);
+            if ($objectUserAD) return true;
+        } else return false;
+
+        if (empty($this->lastName)
+            || empty($this->firstName)
+            || empty($this->middleName)
+            || empty($this->fullName)
+            || empty($this->operatorofficestatus)
+            || empty($this->aid)
+            || empty($this->key)
+            || empty($this->department)
+        ) return false;
+
+        $objectUserAD = new NAdUsers();
+        $objectUserAD->last_name = $this->lastName;
+        $objectUserAD->first_name = $this->firstName;
+        $objectUserAD->middle_name = $this->middleName;
+        $objectUserAD->AD_name = $this->fullName;
+        $objectUserAD->AD_position = $this->operatorofficestatus;
+        $objectUserAD->AD_email = $this->emailAD;
+        $objectUserAD->gs_id = $this->aid;
+        $objectUserAD->gs_key = $this->key;
+        $objectUserAD->gs_usertype = $this->department;
+        $objectUserAD->AD_login = $this->accountName;
+        $objectUserAD->allow_gs = 1;
+        $objectUserAD->active = 1;
+        $objectUserAD->AD_active = 1;
+        $objectUserAD->auth_ldap_only = ($this->department == 2) ? 0 : 1;
+
+        if (!$objectUserAD->save()) {
+            Yii::getLogger()->log(['$objectUserAD->save()'=>$objectUserAD->errors], 1, 'binary');
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * @return mixed
      */
     public function checkAccount()
     {
-        //todo проверяем существует ли таблица связи
-        $findUsersAD = NAdUsers::findOne([
-            'last_name' => $this->lastName,
-            'first_name' => $this->firstName,
-            'middle_name' => $this->middleName
-        ]);
+        /**
+         * @var Logins $findUserLogin
+         * @var Logins $loginsObject
+         */
+        $state = '';
+        if ($this->type == 8 && !empty($this->key)) {
 
-        if ($findUsersAD) {
-            Yii::getLogger()->log(['ActiveSyncController' => "В таблице связей AD данный пользователь уже есть!"], 1, 'binary');
-            $findUserAdAccounts = NAdUseraccounts::findOne([
-                'gs_id' => $findUsersAD->gs_key,
-            ]);
-            if ($findUserAdAccounts) {
+            //todo если франчайзи (только проверяем запись в Logins)
+            $findUserLogin = $this->checkFranchazyAccount();
+            if (!$findUserLogin) {
+                $message = '<p>У данного контрагента нет УЗ, невозможно добавить <b>' . $this->fullName . '</b></p>';
+                Yii::$app->session->setFlash('error', $message);
+                return false;
+            }
+
+            if ($findUserFranchazy = $this->checkFranchazyUser()) {
+                return $findUserFranchazy;
+            } else {
+
+            }
+            $this->emailAD = $findUserLogin->Email;
+            $this->aid = $findUserLogin->aid;
+
+
+
+        //} elseif (in_array($this->type, [3, 4, 13])) { //todo если Юр. лица/Врач иное./Фин. менеджер (проверяем/создаем только в Logins)
+        } elseif (in_array($this->department, [4, 5])) { //todo если Отдел клиентской информационной поддержки/Мед регистратор
+
+            if ($this->addCheckOperators()) {
+                if ($return = $this->addCheckLogins() && $this->addLpassUsers()) {
+                    return $return;
+                }
+            }
+        //} elseif (in_array($this->type, [1, 5, 7, 9])) {
+        } elseif (in_array($this->department, [0, 1, 2, 3, 6, 7, 8])) {
+
+            //todo если Администр./Врач консул./Собств. лаб. отд./Ген. директор (проверяем/создаем в Logins и adUsers)
+            if ($this->addCheckOperators() && $loginsObject = $this->addCheckLogins()) {
+
+                if ($loginsObject->adUsersOne && !empty($loginsObject->adUsersOne->AD_login)) {
+                    $state = 'old';
+                    $this->accountName = $loginsObject->adUsersOne->AD_login;
+                }
+
+//                    //todo если у пользователь есть запись в adUser - сбрасываем пароль
+//
+//                    $newPasswordAd = $this->resetPasswordAD($this->accountName);
+//
+//                    if ($newPasswordAd) {
+//                        $this->passwordAD = $newPasswordAd;
+//                        $message = '<p>Изменен пароль УЗ для <b>' . $this->fullName . '</b> в AD </p>';
+//                        Yii::$app->session->setFlash('warning', $message);
+//                        return false;
+//                    }
+//
+//                    if (!$loginsObject->adUserAccountsOne) {
+//                        $this->addNewAdUserAccount();
+//                    }
+//                } else {
+//
+//                    //todo если у пользователь нет записи в adUser - добавляем
+//                    $state = 'new';
+//                    $addNewAdUserAccount = false;
+//                    $addNewUser = $this->addUserAD();
+//                    if (!$addNewUser) {
+//                        $message = '<p>Не удалось создать УЗ для <b>' . $this->fullName . '</b> в AD</p>';
+//                        Yii::$app->session->setFlash('error', $message);
+//                        return false;
+//                    }
+//
+//                    //todo добавление таблицы связи с AD
+//                    if (!$loginsObject->adUserAccountsOne) {
+//                        $addNewAdUserAccount = $this->addNewAdUserAccount();
+//                    }
+//
+//                    $addNewAdUser = $this->addNewAdUsers();
+//                    if (!$addNewAdUser || !$addNewAdUserAccount) {
+//                        $message = '<p>Не удалось создать таблицу связи с AD для <b>' . $this->fullName . '</b></p>';
+//                        Yii::$app->session->setFlash('error', $message);
+//                        return false;
+//                    }
+//                }
+
                 return [
-                    'aid' => $findUsersAD->logins->aid,
-                    'login' => $findUserAdAccounts->ad_login,
-                    'password' => $findUserAdAccounts->ad_pass,
-                    'state' => 'old'
+                    'aid' => $loginsObject->aid,
+                    'login' => $this->accountName,
+                    'password' => $this->passwordAD,
+                    'state' => $state
                 ];
             }
         }
         return false;
+    }
+
+    public function createAdUserAcc()
+    {
+        if (!empty($this->accountName)) {
+            //todo если находим то сбрасываем пароль в AD
+            $newPasswordAd = $this->resetPasswordAD($this->accountName);
+            if ($newPasswordAd) {
+                $message = '<p>Изменен пароль УЗ для <b>' . $this->fullName . '</b> в AD </p>';
+                Yii::$app->session->setFlash('warning', $message);
+            }
+        } else {
+            //todo если нет УЗ в AD - создаем
+            $addNewUser = $this->addUserAD();
+            if (!$addNewUser) {
+                $message = '<p>Не удалось создать УЗ для <b>' . $this->fullName . '</b> в AD</p>';
+                Yii::$app->session->setFlash('error', $message);
+                return false;
+            }
+        }
+        if ($this->addNewAdUsers() && $this->addNewAdUserAccount()) {
+
+            if (empty($this->aid)
+                || empty($this->accountName)
+                || empty($this->passwordAD)
+            ) return false;
+
+            return [
+                'aid' => $this->aid,
+                'login' => $this->accountName,
+                'password' => $this->passwordAD,
+                'state' => 'new'
+            ];
+        } else {
+            $message = '<p>Не удалось создать/изменить УЗ для <b>' . $this->fullName . '</b> в таблице AD</p>';
+            Yii::$app->session->setFlash('error', $message);
+            return false;
+        }
     }
 
     /**
@@ -92,7 +501,7 @@ class ActiveSyncHelper
         ])->one();
 
         if (!$findUsersOperators) {
-            $cacheId =  Operators::find()
+            $cacheId = Operators::find()
                 ->select('CACHE_OperatorID')
                 ->orderBy('AID DESC')
                 ->one();
@@ -227,9 +636,7 @@ class ActiveSyncHelper
             }
         }
 
-        if (!$this->addPermissions($this->aid, $this->department, $this->nurse)) {
-            Yii::getLogger()->log(['ActiveSyncController'=>'Не удалось применить права для пользователя!'], 1, 'binary');
-        }
+
 
         if (in_array($this->department, [4,5])) {
             if (empty($this->login) || empty($cachePass)) return false;
