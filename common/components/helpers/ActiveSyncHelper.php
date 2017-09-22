@@ -74,7 +74,7 @@ class ActiveSyncHelper
     /**
      * @return mixed
      */
-    public function checkFranchazyUser()
+    public function addFranchazyUser()
     {
         /**
          * @var Logins $loginSearch
@@ -104,11 +104,10 @@ class ActiveSyncHelper
          * @var Operators $findUsersOperators
          * @var Operators $cacheId
          */
-        if (empty($this->firstName)
+        if (empty($this->lastName)
+            || empty($this->firstName)
             || empty($this->middleName)
-            || empty($this->department)
-            || empty($this->lastName))
-            return false;
+        ) return false;
 
         //todo проверяем существует ли запись в Operators
         $objectOperators = Operators::find()->where([
@@ -181,7 +180,6 @@ class ActiveSyncHelper
                 || empty($this->login)
                 || empty($this->cacheId)
                 || empty($this->cachePass)
-                || empty($this->department)
             )
 
             $state = 'new';
@@ -240,18 +238,16 @@ class ActiveSyncHelper
      */
     public function addNewAdUserAccount()
     {
-        if (empty($this->accountName)|| empty($this->passwordAD)) return false;
+        if (empty($this->accountName) || empty($this->passwordAD)) return false;
 
         $accountLab = "lab\\".$this->accountName;
-        if (!empty($this->accountName)) {
-            $objectUserAccountsAD = NAdUseraccounts::findOne(['ad_login' => $accountLab]);
-            if ($objectUserAccountsAD) {
-                $objectUserAccountsAD->ad_pass = $this->passwordAD;
-                if (!$objectUserAccountsAD->save()) {
-                    Yii::getLogger()->log(['$objectUserAccountsAD->save()'=>$objectUserAccountsAD->errors], 1, 'binary');
-                } else {
-                    return true;
-                }
+        $objectUserAccountsAD = NAdUseraccounts::findOne(['ad_login' => $accountLab]);
+        if ($objectUserAccountsAD) {
+            $objectUserAccountsAD->ad_pass = $this->passwordAD;
+            if (!$objectUserAccountsAD->save()) {
+                Yii::getLogger()->log(['$objectUserAccountsAD->save()'=>$objectUserAccountsAD->errors], 1, 'binary');
+            } else {
+                return true;
             }
         }
 
@@ -318,8 +314,7 @@ class ActiveSyncHelper
             || empty($this->fullName)
             || empty($this->operatorofficestatus)
             || empty($this->aid)
-            || empty($this->key)
-            || empty($this->department)
+            || empty($this->cacheId)
         ) return false;
 
         $objectUserAD = new NAdUsers();
@@ -330,8 +325,8 @@ class ActiveSyncHelper
         $objectUserAD->AD_position = $this->operatorofficestatus;
         $objectUserAD->AD_email = $this->emailAD;
         $objectUserAD->gs_id = $this->aid;
-        $objectUserAD->gs_key = $this->key;
-        $objectUserAD->gs_usertype = $this->department;
+        $objectUserAD->gs_key = strval($this->cacheId);
+        $objectUserAD->gs_usertype = $this->type;
         $objectUserAD->AD_login = $this->accountName;
         $objectUserAD->allow_gs = 1;
         $objectUserAD->active = 1;
@@ -355,7 +350,6 @@ class ActiveSyncHelper
          * @var Logins $findUserLogin
          * @var Logins $loginsObject
          */
-        $state = '';
         if ($this->type == 8 && !empty($this->key)) {
 
             //todo если франчайзи (только проверяем запись в Logins)
@@ -366,80 +360,29 @@ class ActiveSyncHelper
                 return false;
             }
 
-            if ($findUserFranchazy = $this->checkFranchazyUser()) {
-                return $findUserFranchazy;
-            } else {
-
-            }
             $this->emailAD = $findUserLogin->Email;
             $this->aid = $findUserLogin->aid;
+            return $this->createAdUserAcc();
 
+        } elseif (in_array($this->department, [4, 5])) {
 
-
-        //} elseif (in_array($this->type, [3, 4, 13])) { //todo если Юр. лица/Врач иное./Фин. менеджер (проверяем/создаем только в Logins)
-        } elseif (in_array($this->department, [4, 5])) { //todo если Отдел клиентской информационной поддержки/Мед регистратор
-
+            //todo если Отдел клиентской информационной поддержки/Мед регистратор
             if ($this->addCheckOperators()) {
-                if ($return = $this->addCheckLogins() && $this->addLpassUsers()) {
-                    return $return;
+                if ($returnLogins = $this->addCheckLogins() && $this->addLpassUsers()) {
+                    return $returnLogins;
                 }
             }
-        //} elseif (in_array($this->type, [1, 5, 7, 9])) {
+
         } elseif (in_array($this->department, [0, 1, 2, 3, 6, 7, 8])) {
 
             //todo если Администр./Врач консул./Собств. лаб. отд./Ген. директор (проверяем/создаем в Logins и adUsers)
+
             if ($this->addCheckOperators() && $loginsObject = $this->addCheckLogins()) {
 
                 if ($loginsObject->adUsersOne && !empty($loginsObject->adUsersOne->AD_login)) {
-                    $state = 'old';
                     $this->accountName = $loginsObject->adUsersOne->AD_login;
                 }
-
-//                    //todo если у пользователь есть запись в adUser - сбрасываем пароль
-//
-//                    $newPasswordAd = $this->resetPasswordAD($this->accountName);
-//
-//                    if ($newPasswordAd) {
-//                        $this->passwordAD = $newPasswordAd;
-//                        $message = '<p>Изменен пароль УЗ для <b>' . $this->fullName . '</b> в AD </p>';
-//                        Yii::$app->session->setFlash('warning', $message);
-//                        return false;
-//                    }
-//
-//                    if (!$loginsObject->adUserAccountsOne) {
-//                        $this->addNewAdUserAccount();
-//                    }
-//                } else {
-//
-//                    //todo если у пользователь нет записи в adUser - добавляем
-//                    $state = 'new';
-//                    $addNewAdUserAccount = false;
-//                    $addNewUser = $this->addUserAD();
-//                    if (!$addNewUser) {
-//                        $message = '<p>Не удалось создать УЗ для <b>' . $this->fullName . '</b> в AD</p>';
-//                        Yii::$app->session->setFlash('error', $message);
-//                        return false;
-//                    }
-//
-//                    //todo добавление таблицы связи с AD
-//                    if (!$loginsObject->adUserAccountsOne) {
-//                        $addNewAdUserAccount = $this->addNewAdUserAccount();
-//                    }
-//
-//                    $addNewAdUser = $this->addNewAdUsers();
-//                    if (!$addNewAdUser || !$addNewAdUserAccount) {
-//                        $message = '<p>Не удалось создать таблицу связи с AD для <b>' . $this->fullName . '</b></p>';
-//                        Yii::$app->session->setFlash('error', $message);
-//                        return false;
-//                    }
-//                }
-
-                return [
-                    'aid' => $loginsObject->aid,
-                    'login' => $this->accountName,
-                    'password' => $this->passwordAD,
-                    'state' => $state
-                ];
+                return $this->createAdUserAcc();
             }
         }
         return false;
@@ -448,6 +391,7 @@ class ActiveSyncHelper
     public function createAdUserAcc()
     {
         if (!empty($this->accountName)) {
+
             //todo если находим то сбрасываем пароль в AD
             $newPasswordAd = $this->resetPasswordAD($this->accountName);
             if ($newPasswordAd) {
@@ -455,6 +399,7 @@ class ActiveSyncHelper
                 Yii::$app->session->setFlash('warning', $message);
             }
         } else {
+
             //todo если нет УЗ в AD - создаем
             $addNewUser = $this->addUserAD();
             if (!$addNewUser) {
@@ -463,7 +408,8 @@ class ActiveSyncHelper
                 return false;
             }
         }
-        if ($this->addNewAdUsers() && $this->addNewAdUserAccount()) {
+
+        if ($this->addNewAdUserAccount() && $this->addNewAdUsers()) {
 
             if (empty($this->aid)
                 || empty($this->accountName)
@@ -789,6 +735,7 @@ class ActiveSyncHelper
         }
         //todo создаем нового пользователя в AD
         $arrAccountAD = $this->addNewUserAd();
+
         if (!$arrAccountAD) return false;
         else {
             $this->accountName = $arrAccountAD['SamAccountName'];

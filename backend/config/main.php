@@ -68,7 +68,9 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => [
+            'rules'=>[
+                'GET /admin/logins/create/<param>' => '/admin/logins/create',
+                'POST /admin/logins/create/<param>' => '/admin/logins/create',
             ],
         ],
     ],

@@ -145,24 +145,60 @@ class LoginsController extends Controller
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($param)
     {
         $model = new AddUserForm();
-        $model->scenario = 'addUser';
+        $activeSyncHelper = new ActiveSyncHelper();
+        switch ($param) {
+            case 'user':
+                $model->scenario = 'addUser';
+                break;
+            case 'org':
+                $model->scenario = 'addUserOrg';
+                break;
+            case 'doc':
+                $model->scenario = 'addUserDoc';
+                break;
+            case 'franch':
+                $model->scenario = 'addUserFranch';
+                break;
+        }
+
+        //print_r($activeSyncHelper);
 
         if ($model->load(Yii::$app->request->post()))
         {
-            $activeSyncHelper = new ActiveSyncHelper();
-            $activeSyncHelper->key = $model->key;
-            $activeSyncHelper->type = $model->type;
-            $activeSyncHelper->nurse = $model->nurse;
-            $activeSyncHelper->lastName = $model->lastName;
-            $activeSyncHelper->firstName = $model->firstName;
-            $activeSyncHelper->middleName = $model->middleName;
-            $activeSyncHelper->department = $model->department;
-            $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
-            $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
+            if ($param == 'user') {
+                $activeSyncHelper->key = $model->key;
+                $activeSyncHelper->type = $model->type;
+                $activeSyncHelper->nurse = $model->nurse;
+                $activeSyncHelper->lastName = $model->lastName;
+                $activeSyncHelper->firstName = $model->firstName;
+                $activeSyncHelper->middleName = $model->middleName;
+                $activeSyncHelper->department = $model->department;
+                $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
+            } elseif ($param == 'franch') {
+                $activeSyncHelper->type = 8;
+                $activeSyncHelper->key = $model->key;
+                $activeSyncHelper->lastName = $model->lastName;
+                $activeSyncHelper->firstName = $model->firstName;
+                $activeSyncHelper->middleName = $model->middleName;
+            } elseif ($param == 'org') {
+                $activeSyncHelper->type = 3;
+                $activeSyncHelper->key = $model->key;
+                $activeSyncHelper->lastName = $model->lastName;
+                $activeSyncHelper->firstName = $model->firstName;
+                $activeSyncHelper->middleName = $model->middleName;
+            } elseif ($param == 'doc') {
+                $activeSyncHelper->type = 4;
+                $activeSyncHelper->lastName = $model->lastName;
+                $activeSyncHelper->firstName = $model->firstName;
+                $activeSyncHelper->middleName = $model->middleName;
+            }
 
+
+
+            $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
 
             if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
                 !is_null(Yii::$app->request->post('hiddenEmailList'))
@@ -174,30 +210,35 @@ class LoginsController extends Controller
                 ) {
                     $activeSyncHelper->emailAD = $arrEmails[$activeSyncHelper->accountName];
                 }
-                //todo добавление УЗ
-                $newUserData = $activeSyncHelper->checkAccount();
-                if ($newUserData) {
-                    if ($newUserData['state'] == 'new') {
-                        $style = 'success';
-                        $message = '<p>Успешно добавлена УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
-                    } else {
-                        $style = 'warning';
-                        $message = '<p>У пользователя <b>'.$activeSyncHelper->fullName.'</b> уже есть УЗ для авторизации через AD</p>';
-                    }
-                    if (!empty($newUserData['login'] && $newUserData['password'])) {
-                        $message .= '<p>Данные для входа в GomoSystem:<p>';
-                        $message .= '<br>Логин: ' . $newUserData['login'];
-                        $message .= '<br>Пароль: ' . $newUserData['password'];
-                    }
-                    Yii::$app->session->setFlash($style, $message);
-                } else {
-                    $message = '<p>Не удалось создать УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
-                    Yii::$app->session->setFlash('error', $message);
-                }
             }
+
+            //todo добавление УЗ
+            $newUserData = $activeSyncHelper->checkAccount();
+            if ($newUserData) {
+                if ($newUserData['state'] == 'new') {
+                    $style = 'success';
+                    $message = '<p>Успешно добавлена УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
+                } else {
+                    $style = 'warning';
+                    $message = '<p>У пользователя <b>'.$activeSyncHelper->fullName.'</b> уже есть УЗ для авторизации через AD</p>';
+                }
+                if (!empty($newUserData['login'] && $newUserData['password'])) {
+                    $message .= '<p>Данные для входа в GomoSystem:<p>';
+                    $message .= '<br>Логин: ' . $newUserData['login'];
+                    $message .= '<br>Пароль: ' . $newUserData['password'];
+                }
+                Yii::$app->session->setFlash($style, $message);
+            } else {
+                $message = '<p>Не удалось создать УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
+                Yii::$app->session->setFlash('error', $message);
+            }
+
         }
+        print_r($model->errors);
+
         return $this->render('create', [
             'model' => $model,
+            'action' => $param
         ]);
     }
 

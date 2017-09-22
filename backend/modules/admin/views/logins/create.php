@@ -7,6 +7,7 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model common\models\AddUserForm */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $action string */
 
 $this->title = 'Создание пользователя';
 $this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' => ['index']];
@@ -15,10 +16,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="logins-create">
         <div class="nav-tabs-custom">
             <ul class="nav nav-tabs">
-                <li class="active"><a href="#tab_1" data-toggle="tab" aria-expanded="true">Пользователи</a></li>
-                <li class=""><a href="<?php echo Url::to(["logins/create-org"]) ?>">Юр. лица</a></li>
-                <li class=""><a href="<?php echo Url::to(["logins/create-doc"]) ?>">Врач. иное</a></li>
-                <li class=""><a href="<?php echo Url::to(["logins/create-franch"]) ?>">Франчайзи</a></li>
+                <li class="<?= ($action == 'user') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/user"]) ?>">Пользователи</a></li>
+                <li class="<?= ($action == 'org') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/org"]) ?>">Юр. лица</a></li>
+                <li class="<?= ($action == 'doc') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/doc"]) ?>">Врач. иное</a></li>
+                <li class="<?= ($action == 'franch') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/franch"]) ?>">Франчайзи</a></li>
             </ul>
 
             <div class="tab-content">
@@ -27,61 +28,144 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <?php $form = ActiveForm::begin(['id'=>'form-input']); ?>
 
-                        <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header" id="modal-header"></div>
-                                    <div class="modal-body" id="modal-body"></div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-                                        <?= Html::submitButton('Выбрать', ['class' => 'btn btn-success']) ?>
+                        <?php if ($action == 'user') : ?>
+
+                            <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header" id="modal-header"></div>
+                                        <div class="modal-body" id="modal-body"></div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                                            <?= Html::submitButton('Выбрать', ['class' => 'btn btn-success']) ?>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div name="account-hide" id="account-hide"></div>
+                            <div name="account-hide" id="account-hide"></div>
 
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <?= $form->field($model, 'lastName')->textInput() ?>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'lastName')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'firstName')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'middleName')->textInput() ?>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <?= $form->field($model, 'firstName')->textInput() ?>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <?= $form->field($model, 'middleName')->textInput() ?>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <?= $form->field($model, 'department')->dropDownlist(\common\models\AddUserForm::getDepartments()) ?>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'department')->dropDownlist(\common\models\AddUserForm::getDepartments()) ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'type')->dropDownlist(\common\models\AddUserForm::getTypesArray()) ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'nurse')->dropDownlist(\common\models\AddUserForm::getNurses()) ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <?= $form->field($model, 'type')->dropDownlist(\common\models\AddUserForm::getTypesArray()) ?>
+                        <?php endif; ?>
+
+                        <?php if ($action == 'org') : ?>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'name')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'key')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'login')->textInput() ?>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <?= $form->field($model, 'nurse')->dropDownlist(\common\models\AddUserForm::getNurses()) ?>
+
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'email')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'blankText')->textarea() ?>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
+                        <?php endif; ?>
+
+                        <?php if ($action == 'doc') : ?>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'lastName')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'firstName')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'middleName')->textInput() ?>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        <?php endif; ?>
+
+                        <?php if ($action == 'franch') : ?>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'key')->dropDownlist(\common\models\AddUserForm::getKeysList(), ['prompt' => '---', 'disabled' => false]); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'lastName')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'firstName')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'middleName')->textInput() ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
 
                         <div class="form-group">
                             <?= Html::Button('Создать',['class' => 'btn btn-success']) ?>

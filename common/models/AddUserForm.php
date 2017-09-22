@@ -38,7 +38,7 @@ class AddUserForm extends Model
     public function scenarios()
     {
         return [
-            self::SCENARIO_ADD_USER => ['department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
+            self::SCENARIO_ADD_USER => ['type', 'department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
             self::SCENARIO_ADD_DOC => ['lastName', 'firstName', 'middleName'],
             self::SCENARIO_ADD_ORG => ['name', 'key', 'login', 'blankText', 'email'],
             self::SCENARIO_ADD_FR => ['key', 'lastName', 'firstName', 'middleName'],
@@ -51,7 +51,7 @@ class AddUserForm extends Model
     public function rules()
     {
         return [
-            [['lastName', 'firstName', 'middleName', 'operatorofficestatus', 'department', 'nurse'], 'required', 'on' => 'addUser'],
+            [['type', 'lastName', 'firstName', 'middleName', 'operatorofficestatus', 'department', 'nurse'], 'required', 'on' => 'addUser'],
             [['lastName', 'firstName', 'middleName'], 'required', 'on' => 'addUserDoc'],
             [['name', 'key', 'login', 'blankText', 'email'], 'required', 'on' => 'addUserOrg'],
             [['lastName', 'firstName', 'middleName', 'key'], 'required', 'on' => 'addUserFranch'],
