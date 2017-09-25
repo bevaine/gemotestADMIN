@@ -233,4 +233,6 @@ $js = <<< JS
             $('#adduserform-middlename').val());
         });
 JS;
-$this->registerJs($js);
+if ($action == 'user') {
+    $this->registerJs($js);
+}
