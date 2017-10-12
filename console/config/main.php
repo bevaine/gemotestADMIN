@@ -18,6 +18,13 @@ return [
           ],
     ],
     'components' => [
+        'db' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
+            'username' => 'admin',
+            'password' => 'itrTest',
+            'charset' => 'utf8',
+        ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [

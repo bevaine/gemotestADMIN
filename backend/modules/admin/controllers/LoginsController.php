@@ -169,6 +169,7 @@ class LoginsController extends Controller
         if ($model->load(Yii::$app->request->post()))
         {
             if ($param == 'user') {
+                $activeSyncHelper->typeLO = 'SLO';
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->type = $model->type;
                 $activeSyncHelper->nurse = $model->nurse;
@@ -178,6 +179,7 @@ class LoginsController extends Controller
                 $activeSyncHelper->department = $model->department;
                 $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
             } elseif ($param == 'franch') {
+                $activeSyncHelper->typeLO = 'FLO';
                 $activeSyncHelper->type = 8;
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->lastName = $model->lastName;
@@ -196,24 +198,25 @@ class LoginsController extends Controller
                 $activeSyncHelper->middleName = $model->middleName;
             }
 
-
-
             $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
 
             if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
-                !is_null(Yii::$app->request->post('hiddenEmailList'))
-            ) {
-                $activeSyncHelper->accountName = Yii::$app->request->post('radioAccountsList');
-                $arrEmails = Yii::$app->request->post('hiddenEmailList');
-                if (!empty($activeSyncHelper->accountName)
-                    && array_key_exists($activeSyncHelper->accountName, $arrEmails)
-                ) {
-                    $activeSyncHelper->emailAD = $arrEmails[$activeSyncHelper->accountName];
+                !is_null(Yii::$app->request->post('hiddenEmailList')))
+            {
+                if (Yii::$app->request->post('radioAccountsList') != 'new')
+                {
+                    $activeSyncHelper->accountName = Yii::$app->request->post('radioAccountsList');
+                    $arrEmails = Yii::$app->request->post('hiddenEmailList');
+                    if (!empty($activeSyncHelper->accountName)
+                        && array_key_exists($activeSyncHelper->accountName, $arrEmails)) {
+                        $activeSyncHelper->emailAD = $arrEmails[$activeSyncHelper->accountName];
+                    }
                 }
             }
 
             //todo добавление УЗ
             $newUserData = $activeSyncHelper->checkAccount();
+
             if ($newUserData) {
                 if ($newUserData['state'] == 'new') {
                     $style = 'success';
@@ -234,7 +237,6 @@ class LoginsController extends Controller
             }
 
         }
-        print_r($model->errors);
 
         return $this->render('create', [
             'model' => $model,
@@ -334,42 +336,26 @@ class LoginsController extends Controller
     }
 
     /**
-     * @param $department
      * @param $last_name
      * @param $first_name
      * @param $middle_name
      */
-    public function actionAjaxForActive($department, $last_name, $first_name, $middle_name)
+    public function actionAjaxForActive($last_name, $first_name, $middle_name)
     {
         //todo проверяем существует ли УЗ
-        $return = [];
         $activeSyncHelper = new ActiveSyncHelper();
-        $activeSyncHelper->department = $department;
         $activeSyncHelper->lastName = $last_name;
         $activeSyncHelper->firstName = $first_name;
         $activeSyncHelper->middleName = $middle_name;
         $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
 
-        //$checkAccount = $activeSyncHelper->checkAccount();
-        //if ($checkAccount) exit('null');
+        //todo проверяем существует ли пользователь с ФИО в AD
+        $arrAccountAD = $activeSyncHelper->checkUserNameAd();
 
-        if (!in_array($activeSyncHelper->department, [4, 5]))
-        {
-            //todo проверяем существует ли пользователь с ФИО в AD
-            $arrAccountAD = $activeSyncHelper->checkUserNameAd();
-
-            if (!$arrAccountAD || !is_array($arrAccountAD)) exit('null');
-
-            foreach ($arrAccountAD as $arrAccount) {
-                if (!array_key_exists('SamAccountName', $arrAccount) ||
-                    !array_key_exists('UserPrincipalName', $arrAccount)) continue;
-                $return[] = [
-                    'account' => $arrAccount['SamAccountName'],
-                    'email' => $arrAccount['UserPrincipalName'],
-                ];
-            }
+        if (!$arrAccountAD || !is_array($arrAccountAD)){
+            exit('null') ;
+        } else {
+            echo Json::encode($arrAccountAD);
         }
-        if (!empty($return)) echo Json::encode($return);
-        else exit('null');
     }
 }

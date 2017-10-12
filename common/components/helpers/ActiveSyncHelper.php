@@ -30,6 +30,10 @@ class ActiveSyncHelper
 {
     CONST TYPE_LO = "SLO";
     CONST POWER_SHELL_PATH = "C:\Windows\System32\WindowsPowerShell\\v1.0\powershell.exe -Command";
+    CONST LDAP_SERVER = '192.168.108.3';
+    CONST LDAP_LOGIN = 'dymchenko.adm@lab.gemotest.ru';
+    CONST LDAP_PASSW = '2Hszfaussw';
+    CONST LDAP_DN = "DC=lab,DC=gemotest,DC=ru";
 
     public $lastName;
     public $firstName;
@@ -48,6 +52,7 @@ class ActiveSyncHelper
     public $aid;
     public $login;
     public $key;
+    public $typeLO;
 
     /**
      * @return array|null|\yii\db\ActiveRecord
@@ -261,7 +266,7 @@ class ActiveSyncHelper
         $objectUserAccountsAD->last_name = $this->lastName;
         $objectUserAccountsAD->first_name = $this->firstName;
         $objectUserAccountsAD->middle_name = $this->middleName;
-        $objectUserAccountsAD->gs_type = self::TYPE_LO;
+        $objectUserAccountsAD->gs_type = $this->typeLO;
         $objectUserAccountsAD->gs_id = strval($this->cacheId);
         $objectUserAccountsAD->org_name = '';
         $objectUserAccountsAD->ad_login = $accountLab;
@@ -555,7 +560,7 @@ class ActiveSyncHelper
             $objectUserAccountsAD->last_name = $this->lastName;
             $objectUserAccountsAD->first_name = $this->firstName;
             $objectUserAccountsAD->middle_name = $this->middleName;
-            $objectUserAccountsAD->gs_type = self::TYPE_LO;
+            $objectUserAccountsAD->gs_type = $this->typeLO;
             $objectUserAccountsAD->gs_id = strval($cacheId);
             $objectUserAccountsAD->org_name = '';
             $objectUserAccountsAD->ad_login = "lab\\".$this->accountName;
@@ -769,70 +774,179 @@ class ActiveSyncHelper
         $email = $this->accountName."@lab.gemotest.ru";
         $fullName = iconv("UTF-8","cp1251", $this->fullName);
         $password = self::generatePasswordAD();
+        $ADgroup = "CN=".$this->accountName.",OU=".$this->typeLO." Users,OU=SSO,OU=gUsers,DC=lab,DC=gemotest,DC=ru";
 
-        $ADgroup = "OU=".self::TYPE_LO." Users,OU=SSO,OU=gUsers,DC=lab,DC=gemotest,DC=ru";
-        $ADnewUser = " New-ADUser";
-        $ADnewUser .= " -Name \"".$fullName."\"";
-        $ADnewUser .= " -DisplayName \"".$fullName."\"";
-        $ADnewUser .= " -SamAccountName \"".$this->accountName."\"";
-        $ADnewUser .= " -UserPrincipalName \"".$email."\"";
-        $ADnewUser .= " -GivenName \"".iconv("UTF-8","cp1251", $this->firstName)."\"";
-        $ADnewUser .= " -Surname \"".iconv("UTF-8","cp1251", $this->lastName);
-        $ADnewUser .= " (".iconv("UTF-8","cp1251",$this->operatorofficestatus).")\"";
-        $ADnewUser .= " -Path \"".$ADgroup."\"";
-        $ADnewUser .= " -Enabled \$true";
-        $ADnewUser .= " -AccountPassword";
-        $ADnewUser .= " (ConvertTo-SecureString -string \"".$password."\" -AsPlainText -force)";
+        $newPassword = "\"" . $password . "\"";
+        $len = strlen($newPassword);
+        $newPassw = "";
+
+        for($i=0;$i<$len;$i++) {
+            $newPassw .= "{$newPassword{$i}}\000";
+        }
+        $pwdtxt = 'As1234567';
+        $ldaprecord["cn"] = $this->accountName; //логин
+        $ldaprecord["sn"] = $this->lastName.' ('.$this->operatorofficestatus.')'; //фами
+        $ldaprecord["givenname"] = $this->firstName; //имя
+        $ldaprecord["sAMAccountName"] = $this->accountName;; //логин
+        $ldaprecord['userPrincipalName'] = $email;  //емаил
+        $ldaprecord["objectClass"] = "user";
+        $ldaprecord["displayname"] = $this->typeLO == 'FLO' ? $fullName.' '.$this->key : $fullName; //ФИО
+        //$ldaprecord["userPassword"] = $password; //пароль
+        //$ldaprecord["unicodepwd"] = $newPassw;
+        $ldaprecord["unicodepwd"] = iconv("UTF-8", "UTF-16LE", '"' . $pwdtxt . '"');
+        $ldaprecord["userAccountControl"] = "544"; //доступ
+        //$ldaprecord['path'] = $ADgroup;
+
+        //$ADgroup = "cn={$ldaprecord['cn']},ou=SLO Users,ou=SSO,ou=gUsers,dc=lab,dc=gemotest,dc=ru";
+
+//        $ldaprecord['cn'] = $this->accountName;
+//        $ldaprecord["sn"] = "User";
+//        $ldaprecord['givenname'] = $this->firstName;
+//        $ldaprecord['samaccountname'] = $this->accountName;
+//        $ldaprecord['userprincipalname'] = $email;
+//        $ldaprecord["objectClass"] = "user";
+//        $ldaprecord['displayname'] = $fullName;
+//        $ldaprecord["unicodepwd"] = $password;
+//        $ldaprecord["userAccountControl"] = "544";
+///
+//
+//        $ldaprecord['name'] = $this->typeLO == 'FLO' ? $fullName.' '.$this->key : $fullName;
+//        $ldaprecord['surname'] = $this->lastName.' ('.$this->operatorofficestatus.')';
+//
+
+
+        print_r($ldaprecord);
+        //exit;
+
+        //try {
+
+            ldap_set_option(NULL, LDAP_OPT_DEBUG_LEVEL, 7);
+
+            putenv('LDAPTLS_REQCERT=never') or die('Failed to setup the env');
+            $ldapconn = ldap_connect('ldap://sw-dc-05.lab.gemotest.ru', 636);
+            //$ldapconn = ldap_connect(self::LDAP_SERVER);
+            ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ldapconn, LDAP_OPT_REFERRALS, 0);
+
+            if (!$ldapconn) return false;
+            $ldapbind = ldap_bind($ldapconn, self::LDAP_LOGIN, self::LDAP_PASSW);
+            if (!$ldapbind) return false;
+
+            $output = ldap_add($ldapconn, $ADgroup, $ldaprecord);
+
+            if ($output) {
+                return [
+                    'SamAccountName' => $this->accountName,
+                    'UserPrincipalName' => $email,
+                    'AccountPassword' => $password
+                ];
+            } else {
+                return false;
+            }
+
+        //} catch (Exception $e) {
+        //    Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
+        //    return false;
+        //}
+    }
+
+    /**
+     * @return mixed
+     */
+    public function checkUserNameAd()
+    {
+        //todo проверяем на полное совпадение имени пользователя
+        $arrAccounts = [];
+        $ADcheckUser = "(displayname=*".$this->fullName."*)";
+        $justthese = array("displayname", "samaccountname", "userprincipalname");
 
         try {
-            $output = shell_exec(addslashes(self::POWER_SHELL_PATH . $ADnewUser));
+            $ldapconn = ldap_connect(self::LDAP_SERVER);
+            ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ldapconn, LDAP_OPT_REFERRALS, 0);
+
+            if (!$ldapconn) return false;
+
+            $ldapbind = ldap_bind($ldapconn, self::LDAP_LOGIN, self::LDAP_PASSW);
+
+            if (!$ldapbind) return false;
+
+            $sr = ldap_search($ldapconn, self::LDAP_DN, $ADcheckUser, $justthese);
+            $info = ldap_get_entries($ldapconn, $sr);
+            ldap_close($ldapconn);
+
+            if (!$info || $info['count'] == 0)  return false;
+
+            for ($i = 0; $i < $info['count']; $i++) {
+                $arrAccounts[] = [
+                    'account' => $info[$i]['samaccountname'][0],
+                    'name' => $info[$i]['displayname'][0],
+                    'email' => $info[$i]['userprincipalname'][0],
+                ];
+            }
+
         } catch (Exception $e) {
             Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
             return false;
         }
 
-        if ($output === NULL) {
-            return [
-                'SamAccountName' => $this->accountName,
-                'UserPrincipalName' => $email,
-                'AccountPassword' => $password
-            ];
-        } else {
+        return empty($arrAccounts) ? false : $arrAccounts;
+    }
+
+    /**
+     * @return bool
+     */
+    public function checkUserAccountAd()
+    {
+        //todo проверяем на совпадение УЗ AD
+        $ADcheckUser = "(samaccountname=*".$this->accountName."*)";
+        $justthese = array("samaccountname");
+
+        try {
+            $ldapconn = ldap_connect(self::LDAP_SERVER);
+            ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ldapconn, LDAP_OPT_REFERRALS, 0);
+
+            if (!$ldapconn) return false;
+
+            $ldapbind = ldap_bind($ldapconn, self::LDAP_LOGIN, self::LDAP_PASSW);
+
+            if (!$ldapbind) return false;
+
+            $sr = ldap_search($ldapconn, self::LDAP_DN, $ADcheckUser, $justthese);
+            $info = ldap_get_entries($ldapconn, $sr);
+            ldap_close($ldapconn);
+
+            if (!$info || $info['count'] == 0)  return false;
+            else return true;
+
+        } catch (Exception $e) {
+            Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
             return false;
         }
     }
 
-    public function connectLDAP() {
-        // используется ldap-привязка
-        $ldaprdn  = 'dymchenko.adm@lab.gemotest.ru';     // ldap rdn или dn
-        $ldappass = '2Hszfaussw';  // ассоциированный пароль
-
-        // соединение с сервером
-        $ldapconn = ldap_connect("192.168.108.3")
-        or die("Не могу соединиться с сервером LDAP.");
-
-        if ($ldapconn) {
-
-            // привязка к ldap-серверу
-            $ldapbind = ldap_bind($ldapconn, $ldaprdn, $ldappass);
-
-            $dn = "DC=lab,DC=gemotest,DC=ru";
-            $sr = ldap_search($ldapconn, $dn, "CH=*");
-            print_r($sr);
-
-            // проверка привязки
-            if ($ldapbind) {
-                echo "LDAP-привязка успешна...";
-            } else {
-                echo "LDAP-привязка не удалась...";
-            }
-
+    /**
+     * @return bool
+     */
+    public function checkUserAccountAdWin()
+    {
+        //todo проверяем на совпадение УЗ AD
+        $ADcheckUser = " Get-ADUser -filter {SamAccountName -like \"".$this->accountName."\"}";
+        try {
+            $output = shell_exec(addslashes(self::POWER_SHELL_PATH . $ADcheckUser));
+        } catch (Exception $e) {
+            Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
+            return false;
         }
+        if ($output === NULL) return false;
+        else return true;
     }
+
     /**
      * @return array|bool
      */
-    public function checkUserNameAd()
+    public function checkUserNameAdWin()
     {
         //todo проверяем на полное совпадение имени пользователя
         $ADcheckUser = " Get-ADUser -filter {Name -like \"*" . iconv("UTF-8", "cp1251", $this->fullName) . "*\"}";
@@ -846,23 +960,6 @@ class ActiveSyncHelper
             return $this->parseAccountSearch($output);
         }
         return false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function checkUserAccountAd()
-    {
-        //todo проверяем на совпадение УЗ AD
-        $ADcheckUser = " Get-ADUser -filter {SamAccountName -like \"".$this->accountName."\"}";
-        try {
-            $output = shell_exec(addslashes(self::POWER_SHELL_PATH . $ADcheckUser));
-        } catch (Exception $e) {
-            Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
-            return false;
-        }
-        if ($output === NULL) return false;
-        else return true;
     }
 
     /**
@@ -911,7 +1008,8 @@ class ActiveSyncHelper
             foreach ($arrReturn as $keyName => $arrValue) {
                 if (is_array($arrValue)) {
                     foreach ($arrValue as $key => $value)
-                        $arrOut[$key][$keyName] = $value;
+                        $arrOut[$key][$keyName] = mb_convert_encoding($value,"UTF-8","cp1251");
+                        //$arrOut[$key][$keyName] = iconv("windows-1251", "UTF-8", $value);
                 }
             }
         }

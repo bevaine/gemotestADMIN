@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
     <div class="logins-create">
         <div class="nav-tabs-custom">
+
             <ul class="nav nav-tabs">
                 <li class="<?= ($action == 'user') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/user"]) ?>">Пользователи</a></li>
                 <li class="<?= ($action == 'org') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/org"]) ?>">Юр. лица</a></li>
@@ -28,22 +29,22 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <?php $form = ActiveForm::begin(['id'=>'form-input']); ?>
 
-                        <?php if ($action == 'user') : ?>
-
-                            <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header" id="modal-header"></div>
-                                        <div class="modal-body" id="modal-body"></div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-                                            <?= Html::submitButton('Выбрать', ['class' => 'btn btn-success']) ?>
-                                        </div>
+                        <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header" id="modal-header"></div>
+                                    <div class="modal-body" id="modal-body"></div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                                        <?= Html::submitButton('Выбрать', ['class' => 'btn btn-success']) ?>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div name="account-hide" id="account-hide"></div>
+                        <div name="account-hide" id="account-hide"></div>
+
+                        <?php if ($action == 'user') : ?>
 
                             <div class="row">
                                 <div class="col-lg-4">
@@ -168,7 +169,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         <?php endif; ?>
 
                         <div class="form-group">
-                            <?= Html::Button('Создать',['class' => 'btn btn-success']) ?>
+                            <?php
+                            if ($action == 'user' || $action == 'franch') {
+                                echo Html::Button('Создать', ['class' => 'btn btn-success']);
+                            } else {
+                                echo Html::submitButton('Создать', ['class' => 'btn btn-success']);
+                            }
+                            ?>
                         </div>
 
                         <?php ActiveForm::end(); ?>
@@ -179,60 +186,61 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
     <script>
-        function checkAD (department, last_name, first_name, middle_name)
+        function checkAD (department = null, last_name, first_name, middle_name)
         {
-            $.ajax({
-                url: '/admin/logins/ajax-for-active',
-                data: {
-                    department:department,
-                    last_name:last_name,
-                    first_name:first_name,
-                    middle_name: middle_name
-                },
-                success: function (res) {
-                    if (res === 'null') {
-                        $("#form-input").submit();
-                    } else {
-                        res = JSON.parse(res);
-                        console.log(res.length);
-                        if (res.length > 1) {
-                            var html = "";
-                            var htm_header = "";
-                            for(var i = 0; i < res.length; i++){
-                                html += '<label><input type="radio" name="radioAccountsList" value="'+res[i].account+'">'+res[i].account+' (email: '+res[i].email+')</label>';
-                                html += '<input type="hidden" name="hiddenEmailList['+res[i].account+']" value="'+res[i].email+'">';
-                            }
-                            htm_header = '<p>У пользователя ';
-                            htm_header += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b>';
-                            htm_header += ' несколько УЗ в Active Directory</p>';
-                            htm_header += 'Выбирите аккаунт AD на основании которого нужно создать УЗ Gomotest';
-                            $('#modal-header').html(htm_header);
-                            $('#modal-body').html(html);
-                            $('#deactivate-user').modal('show');
-                        } else if(res.length === 1) {
-                            var html1 = "";
-                            html1 += '<input type="hidden" name="radioAccountsList" value="'+res[0].account+'">';
-                            html1 += '<input type="hidden" name="hiddenEmailList['+res[0].account+']" value="'+res[0].email+'">';
-                            $('#account-hide').html(html1);
+            if (department === '4' || department === '5') {
+                $("#form-input").submit();
+            } else {
+                $.ajax({
+                    url: '/admin/logins/ajax-for-active',
+                    data: {
+                        last_name: last_name,
+                        first_name: first_name,
+                        middle_name: middle_name
+                    },
+                    success: function (res) {
+                        if (res === 'null') {
                             $("#form-input").submit();
                         } else {
-                            $("#form-input").submit();
+                            res = JSON.parse(res);
+                            //console.log(res.length);
+                            if (res.length > 0) {
+                                var html = "";
+                                var htm_header = "";
+                                for (var i = 0; i < res.length; i++) {
+                                    var dataUser = res[i].name + '<br>(' + res[i].account + ', email: ' + res[i].email + ')';
+                                    html += '<label><input type="radio" name="radioAccountsList" value="' + res[i].account + '">' + dataUser +'</label>';
+                                    html += '<input type="hidden" name="hiddenEmailList[' + res[i].account + ']" value="' + res[i].email + '">';
+                                }
+                                html += '<p><label><input type="radio" name="radioAccountsList" value="new">Создать новую учетную запись</label></p>';
+                                htm_header += '<p>У пользователя ';
+                                htm_header += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b>';
+                                htm_header += ' несколько УЗ в Active Directory</p>';
+                                htm_header += 'Выбирите аккаунт AD на основании которого нужно создать УЗ Gomotest';
+                                $('#modal-header').html(htm_header);
+                                $('#modal-body').html(html);
+                                $('#deactivate-user').modal('show');
+                            } else {
+                                $("#form-input").submit();
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
     </script>
 <?php
-$js = <<< JS
-    $(".btn-success").click(function() { 
-        checkAD(
-            $('#adduserform-department').val(),
-            $('#adduserform-lastname').val(),
-            $('#adduserform-firstname').val(),
-            $('#adduserform-middlename').val());
-        });
+
+if ($action == 'user' || $action == 'franch') {
+    $js = <<< JS
+        $(".btn-success").click(function() { 
+            checkAD(
+                $('#adduserform-department').val(),
+                $('#adduserform-lastname').val(),
+                $('#adduserform-firstname').val(),
+                $('#adduserform-middlename').val());
+            });
 JS;
-if ($action == 'user') {
+
     $this->registerJs($js);
 }

@@ -5,7 +5,7 @@ use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
-use common\models\LoginForm;
+use budyaga\users\models\forms\LoginForm;
 
 /**
  * Site controller
@@ -22,11 +22,17 @@ class SiteController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['login'],
                         'allow' => true,
+                        'roles' => ['?'],
                     ],
                     [
-                        'actions' => ['logout', 'index'],
+                        'actions' => [],
+                        'allow' => false,
+                        'roles' => ['?'],
+                    ],
+                        [
+                        'actions' => [],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -39,6 +45,18 @@ class SiteController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function actionError()
+    {
+        /* @var \HttpException $exception */
+        $exception = \Yii::$app->getErrorHandler()->exception;
+
+        return $this->render('errors/888' . $exception->statusCode, [
+            'name' => '',
+            'message' => $exception->getMessage(),
+            'exception' => $exception,
+        ]);
     }
 
     /**
