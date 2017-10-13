@@ -8,8 +8,12 @@ use kartik\icons\Icon;
         <?= dmstr\widgets\Menu::widget(
             [
                 'options' => ['class' => 'sidebar-menu'],
+
                 'items' => [
-                    ['label' => 'Меню', 'options' => ['class' => 'header']],
+                    [
+                    'label' => 'Меню',
+                    'active' => Yii::$app->user->can('administrator'),
+                    'options' => ['class' => 'header']],
                     [
                         'label' => 'Гемотест',
                         'icon' => 'share',
@@ -42,7 +46,7 @@ use kartik\icons\Icon;
                             ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
                             [
                                 'label' => 'Пользователи',
-                                'active' => Yii::$app->user->can('administrator'),
+                                //'active' => Yii::$app->user->can('administrator'),
                                 'icon' => 'circle-o',
                                 'url' => '#',
                                 'items' => [
