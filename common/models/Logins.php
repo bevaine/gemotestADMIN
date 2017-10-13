@@ -56,14 +56,6 @@ use common\components\helpers\ActiveSyncHelper;
  */
 class Logins extends \yii\db\ActiveRecord
 {
-
-    /**
-     * @return null|object
-     */
-    public static function getDb() {
-        return Yii::$app->get('GemoTestDB');
-    }
-
     /**
      * @inheritdoc
      */
@@ -72,6 +64,13 @@ class Logins extends \yii\db\ActiveRecord
     public $middle_name;
     public $AD_position;
     public $idAD;
+
+    /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
 
     /**
      * @return string

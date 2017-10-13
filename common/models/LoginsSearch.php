@@ -122,6 +122,7 @@ class LoginsSearch extends Logins
 
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),
+            'db' => 'GemoTestDB'
         ]);
 
         return $dataProvider;
