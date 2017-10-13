@@ -6,6 +6,7 @@ use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\data\SqlDataProvider;
 use yii\helpers\ArrayHelper;
+use Yii;
 
 /**
  * LoginsSearch represents the model behind the search form about `common\models\Logins`.
@@ -15,6 +16,13 @@ class LoginsSearch extends Logins
 {
     public $ad_login;
     public $DateBlocked;
+
+    /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
 
     /**
      * @inheritdoc

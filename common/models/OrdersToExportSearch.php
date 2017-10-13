@@ -13,6 +13,13 @@ use common\models\OrdersToExport;
 class OrdersToExportSearch extends OrdersToExport
 {
     /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()

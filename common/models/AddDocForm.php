@@ -9,8 +9,14 @@
 namespace common\models;
 
 use yii\base\Model;
+use Yii;
 
 class AddDocForm extends Model
 {
-
+    /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
 }

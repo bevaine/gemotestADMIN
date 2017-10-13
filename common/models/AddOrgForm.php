@@ -9,6 +9,7 @@
 namespace common\models;
 
 use yii\base\Model;
+use Yii;
 
 class AddOrgForm extends Model
 {
@@ -17,6 +18,13 @@ class AddOrgForm extends Model
     public $login;
     public $blankText;
     public $email;
+
+    /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
 
     /**
      * @return array

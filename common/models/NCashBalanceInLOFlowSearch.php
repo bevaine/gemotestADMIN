@@ -12,6 +12,14 @@ use common\models\NCashBalanceInLOFlow;
  */
 class NCashBalanceInLOFlowSearch extends NCashBalanceInLOFlow
 {
+
+    /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
+
     /**
      * @inheritdoc
      */

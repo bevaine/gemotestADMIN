@@ -9,7 +9,7 @@
 namespace common\models;
 
 use yii\base\Model;
-
+use Yii;
 
 class AddUserForm extends Model
 {
@@ -31,6 +31,13 @@ class AddUserForm extends Model
     CONST SCENARIO_ADD_DOC = 'addUserDoc';
     CONST SCENARIO_ADD_ORG = 'addUserOrg';
     CONST SCENARIO_ADD_FR = 'addUserFranch';
+
+    /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
 
     /**
      * @return array

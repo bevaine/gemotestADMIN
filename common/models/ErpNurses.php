@@ -17,6 +17,13 @@ use Yii;
 class ErpNurses extends \yii\db\ActiveRecord
 {
     /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
+
+    /**
      * @inheritdoc
      */
     public static function tableName()

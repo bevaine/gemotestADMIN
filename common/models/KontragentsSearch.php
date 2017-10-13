@@ -13,6 +13,13 @@ use common\models\Kontragents;
 class KontragentsSearch extends Kontragents
 {
     /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()

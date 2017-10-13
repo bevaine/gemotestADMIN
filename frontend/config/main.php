@@ -115,7 +115,6 @@ return [
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
-            'db' => 'Localdb',
         ],
     ],
     'params' => $params,

@@ -13,6 +13,13 @@ use common\models\NPay;
 class NPaySearch extends NPay
 {
     /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()

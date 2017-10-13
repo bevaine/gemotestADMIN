@@ -30,7 +30,6 @@ return [
             'targets' => [
                 'db'=>[
                     'class' => 'yii\log\DbTarget',
-                    'db' => 'Localdb',
                     'levels' => ['error', 'warning'],
                     'except'=>['yii\web\HttpException:*', 'yii\i18n\I18N\*'],
                     'prefix'=>function () {

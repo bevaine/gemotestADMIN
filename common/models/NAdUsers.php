@@ -34,6 +34,13 @@ use yii\helpers\ArrayHelper;
 class NAdUsers extends \yii\db\ActiveRecord
 {
     /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
+
+    /**
      * @return array
      */
     public static function PrimaryKey()

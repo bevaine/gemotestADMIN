@@ -13,6 +13,13 @@ use common\models\NWorkshift;
 class NWorkshiftSearch extends NWorkshift
 {
     /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('GemoTestDB');
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()

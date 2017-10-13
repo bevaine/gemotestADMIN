@@ -96,7 +96,6 @@ return [
             'targets' => [
                 'db'=>[
                     'class' => 'yii\log\DbTarget',
-                    'db' => 'Localdb',
                     'levels' => ['error', 'warning'],
                     'except'=>['yii\web\HttpException:*', 'yii\i18n\I18N\*'],
                     'prefix'=>function () {
@@ -132,7 +131,13 @@ return [
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
-            'db' => 'Localdb',
+            'db' => [
+                'class' => 'yii\db\Connection',
+                'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
+                'username' => 'admin',
+                'password' => 'itrTest',
+                'charset' => 'utf8',
+            ],
         ],
     ],
     'params' => $params,
