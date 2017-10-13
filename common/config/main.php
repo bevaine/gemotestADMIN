@@ -1,5 +1,6 @@
 <?php
 return [
+    'language' => 'ru',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
         'cache' => [
@@ -13,15 +14,17 @@ return [
             'translations' => [
                 'app'=>[
                     'class' => 'yii\i18n\PhpMessageSource',
-                    'basePath'=>'@common/messages'
+                    'basePath'=>'\budyaga\yii2-users\messages'
                 ],
                 '*'=> [
                     'class' => 'yii\i18n\PhpMessageSource',
-                    'basePath'=>'@common/messages',
+                    'basePath'=>'\budyaga\yii2-users\messages',
                     'fileMap'=>[
-                        'common'=>'common.php',
+                        'common'=>'users.php',
+                        'backend'=>'users.php',
+                        'frontend'=>'users.php',
                     ],
-                    'on missingTranslation' => ['\backend\modules\i18n\Module', 'missingTranslation']
+                    //'on missingTranslation' => ['\backend\modules\i18n\Module', 'missingTranslation']
                 ],
             ],
         ],
