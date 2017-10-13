@@ -114,22 +114,22 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-//        'urlManager' => [
-//            'enablePrettyUrl' => true,
-//            'showScriptName' => false,
-//            'rules' => [
-//                '/signup' => '/user/user/signup',
-//                '/login' => '/site/login',
-//                '/logout' => '/user/user/logout',
-//                '/requestPasswordReset' => '/user/user/request-password-reset',
-//                '/resetPassword' => '/user/user/reset-password',
-//                '/profile' => '/user/user/profile',
-//                '/retryConfirmEmail' => '/user/user/retry-confirm-email',
-//                '/confirmEmail' => '/user/user/confirm-email',
-//                '/unbind/<id:[\w\-]+>' => '/user/auth/unbind',
-//                '/oauth/<authclient:[\w\-]+>' => '/user/auth/index'
-//            ],
-//        ],
+        'urlManager' => [
+            'enablePrettyUrl' => true,
+            'showScriptName' => false,
+            'rules' => [
+                '/signup' => '/user/user/signup',
+                '/login' => '/site/login',
+                '/logout' => '/user/user/logout',
+                '/requestPasswordReset' => '/user/user/request-password-reset',
+                '/resetPassword' => '/user/user/reset-password',
+                '/profile' => '/user/user/profile',
+                '/retryConfirmEmail' => '/user/user/retry-confirm-email',
+                '/confirmEmail' => '/user/user/confirm-email',
+                '/unbind/<id:[\w\-]+>' => '/user/auth/unbind',
+                '/oauth/<authclient:[\w\-]+>' => '/user/auth/index'
+            ],
+        ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
             'db' => 'Localdb',
