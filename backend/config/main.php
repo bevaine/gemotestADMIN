@@ -131,13 +131,6 @@ return [
         ],
         'authManager' => [
             'class' => 'yii\rbac\DbManager',
-            'db' => [
-                'class' => 'yii\db\Connection',
-                'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
-                'username' => 'admin',
-                'password' => 'itrTest',
-                'charset' => 'utf8',
-            ],
         ],
     ],
     'params' => $params,
