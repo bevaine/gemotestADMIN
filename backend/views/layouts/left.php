@@ -12,12 +12,13 @@ use kartik\icons\Icon;
                 'items' => [
                     [
                     'label' => 'Меню',
-                    'active' => Yii::$app->user->can('administrator'),
+
                     'options' => ['class' => 'header']],
                     [
                         'label' => 'Гемотест',
                         'icon' => 'share',
                         'url' => '#',
+                        'active' => Yii::$app->user->can('administrator'),
                         'items' => [
                             ['label' => 'Смены', 'icon' => 'file-code-o', 'url' => ['/admin/workshift'],],
                             ['label' => 'Заказы', 'icon' => 'file-code-o', 'url' => ['/admin/orders'],],
@@ -41,6 +42,7 @@ use kartik\icons\Icon;
                         'label' => 'Служебные',
                         'icon' => 'share',
                         'url' => '#',
+                        'active' => Yii::$app->user->can('administrator'),
                         'items' => [
                             ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                             ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
