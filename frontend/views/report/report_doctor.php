@@ -115,7 +115,7 @@ $this->registerJsFile('/js/jquery.tokeninput.js');
                 'dataProvider' => $dataProvider,
                 'columns' => $gridColumns,
                 //'encoding' => 'windows-1251',
-                'target' => ExportMenu::TARGET_BLANK,
+                'target' => ExportMenu::TARGET_POPUP,
                 'showConfirmAlert'=>true,
                 'timeout' => 1000,
                 'exportConfig' => [
@@ -123,8 +123,8 @@ $this->registerJsFile('/js/jquery.tokeninput.js');
 //                    ExportMenu::FORMAT_HTML=> true,
 //                    ExportMenu::FORMAT_TEXT => true,
                     ExportMenu::FORMAT_PDF => false,
-//                    ExportMenu::FORMAT_EXCEL => false,
-//                    ExportMenu::FORMAT_EXCEL_X => [],
+                    ExportMenu::FORMAT_EXCEL => false,
+                    ExportMenu::FORMAT_EXCEL_X => false,
                 ],
             ]);
             ?>
