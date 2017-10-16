@@ -6,19 +6,19 @@ namespace frontend\controllers;
 use Yii;
 use common\models\Logins;
 use yii\web\Controller;
-use yii\web\NotFoundHttpException;
+use yii\web\ForbiddenHttpException;
 use common\models\OrdersToExportSearch;
 
 class ReportController extends Controller
 {
     // Отчёт по перевесам
     /**
-     * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
      */
     function actionDoctorReport()
     {
         if (!Yii::$app->user->can('Report.DoctorsOrders')) {
-            throw new NotFoundHttpException('В доступе отказано');
+            throw new ForbiddenHttpException('В доступе отказано');
         }
 
         $searchModel = new OrdersToExportSearch();
@@ -33,12 +33,12 @@ class ReportController extends Controller
 
     /**
      * @param null $q
-     * @throws NotFoundHttpException
+     * @throws ForbiddenHttpException
      */
     public function actionAjaxDoctorList($q = null)
     {
         if (!Yii::$app->user->can('Report.DoctorsOrders')) {
-            throw new NotFoundHttpException('В доступе отказано');
+            throw new ForbiddenHttpException('В доступе отказано');
         }
 
         if (!empty($q)) {

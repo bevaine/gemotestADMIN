@@ -1,11 +1,11 @@
 <?php
-use kartik\icons\Icon;
+use dmstr\widgets\Menu;
 ?>
 <aside class="main-sidebar">
 
     <section class="sidebar">
 
-        <?= dmstr\widgets\Menu::widget(
+        <?= Menu::widget(
             [
                 'options' => ['class' => 'sidebar-menu'],
                 'items' => [
