@@ -82,6 +82,9 @@ use Yii;
  * @property integer $create_user_id
  * @property integer $register_user_id
  * @property string $sync_with_lc_date
+ * @property string $date_to;
+ * @property string $date_from;
+ *
  */
 class OrdersToExport extends \yii\db\ActiveRecord
 {
@@ -196,5 +199,13 @@ class OrdersToExport extends \yii\db\ActiveRecord
             'register_user_id' => 'Register User ID',
             'sync_with_lc_date' => 'Sync With Lc Date',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLogins()
+    {
+        return $this->hasOne(Logins::className(), ['Key' => 'OrderDoctorID']);
     }
 }

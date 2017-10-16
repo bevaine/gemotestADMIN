@@ -28,7 +28,9 @@
         "kartik-v/yii2-widget-datetimepicker": "*",
         "kartik-v/yii2-grid": "@dev",
         "kartik-v/yii2-icons": "@dev",
-        "budyaga/yii2-users": "*"
+        "budyaga/yii2-users": "*",
+        "kartik-v/yii2-export": "*",
+        "trntv/yii2-datetime-widget": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

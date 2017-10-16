@@ -101,16 +101,16 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                '/user/signup' => '/user/user/signup',
-                '/user/login' => '/site/login',
-                '/user/logout' => '/user/user/logout',
-                '/user/requestPasswordReset' => '/user/user/request-password-reset',
-                '/user/resetPassword' => '/user/user/reset-password',
-                '/user/profile' => '/user/user/profile',
-                '/user/retryConfirmEmail' => '/user/user/retry-confirm-email',
-                '/user/confirmEmail' => '/user/user/confirm-email',
-                '/user/unbind/<id:[\w\-]+>' => '/user/auth/unbind',
-                '/user/oauth/<authclient:[\w\-]+>' => '/user/auth/index'
+                '/signup' => '/user/user/signup',
+                '/login' => '/site/login',
+                '/logout' => '/user/user/logout',
+                '/requestPasswordReset' => '/user/user/request-password-reset',
+                '/resetPassword' => '/user/user/reset-password',
+                '/profile' => '/user/user/profile',
+                '/retryConfirmEmail' => '/user/user/retry-confirm-email',
+                '/confirmEmail' => '/user/user/confirm-email',
+                '/unbind/<id:[\w\-]+>' => '/user/auth/unbind',
+                '/oauth/<authclient:[\w\-]+>' => '/user/auth/index'
             ],
         ],
         'authManager' => [
