@@ -1,6 +1,5 @@
 <?php
 
-
 namespace frontend\controllers;
 
 use Yii;
@@ -17,6 +16,8 @@ class ReportController extends Controller
      */
     function actionDoctorReport()
     {
+        set_time_limit(0);
+
         if (!Yii::$app->user->can('Report.DoctorsOrders')) {
             throw new ForbiddenHttpException('В доступе отказано');
         }
