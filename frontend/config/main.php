@@ -17,6 +17,9 @@ return [
             'userPhotoUrl' => 'http://example.com/uploads/user/photo',
             'userPhotoPath' => '@frontend/web/uploads/user/photo'
         ],
+        'gridview' =>  [
+            'class' => '\kartik\grid\Module'
+        ],
     ],
     'components' => [
         'request' => [
