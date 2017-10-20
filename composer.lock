@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "515e8b1bc9df4b109b57e52a46eb3c47",
+    "content-hash": "0269ec22ab97d4baa281332967f3e17b",
     "packages": [
         {
             "name": "2amigos/yii2-date-picker-widget",
@@ -106,6 +106,53 @@
                 "web"
             ],
             "time": "2017-10-09T16:32:18+00:00"
+        },
+        {
+            "name": "arturoliveira/yii2-excelview",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://bitbucket.org/artur_oliveira/yii2-excelview.git",
+                "reference": "80124fd9865c08c3d382c1559873098f5b668818"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://bitbucket.org/artur_oliveira/yii2-excelview/get/80124fd9865c08c3d382c1559873098f5b668818.zip",
+                "reference": "80124fd9865c08c3d382c1559873098f5b668818",
+                "shasum": ""
+            },
+            "require": {
+                "kartik-v/yii2-grid": "*",
+                "phpoffice/phpexcel": "1.8.0",
+                "yiisoft/yii2": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "arturoliveira\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Artur Oliveira",
+                    "email": "artur.oliveira@gmail.com"
+                }
+            ],
+            "description": "ExcelView",
+            "keywords": [
+                "OpenXML",
+                "excel",
+                "extension",
+                "spreadsheet",
+                "xls",
+                "xlsx",
+                "yii2"
+            ],
+            "time": "2014-10-16T17:06:43+00:00"
         },
         {
             "name": "bower-asset/bootstrap",
@@ -414,7 +461,8 @@
                 "jquery",
                 "mask",
                 "plugins"
-            ]
+            ],
+            "time": "2017-10-16T09:33:03+00:00"
         },
         {
             "name": "bower-asset/moment",
@@ -1652,16 +1700,16 @@
         },
         {
             "name": "phpoffice/phpexcel",
-            "version": "1.8.1",
+            "version": "1.8.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPOffice/PHPExcel.git",
-                "reference": "372c7cbb695a6f6f1e62649381aeaa37e7e70b32"
+                "reference": "e69a5e4d0ffa7fb6f171859e0a04346e580df30b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPOffice/PHPExcel/zipball/372c7cbb695a6f6f1e62649381aeaa37e7e70b32",
-                "reference": "372c7cbb695a6f6f1e62649381aeaa37e7e70b32",
+                "url": "https://api.github.com/repos/PHPOffice/PHPExcel/zipball/e69a5e4d0ffa7fb6f171859e0a04346e580df30b",
+                "reference": "e69a5e4d0ffa7fb6f171859e0a04346e580df30b",
                 "shasum": ""
             },
             "require": {
@@ -1705,7 +1753,7 @@
                 "xls",
                 "xlsx"
             ],
-            "time": "2015-05-01T07:00:55+00:00"
+            "time": "2014-03-02T15:22:49+00:00"
         },
         {
             "name": "rmrevin/yii2-fontawesome",
@@ -3334,6 +3382,7 @@
         },
         {
             "name": "phpunit/phpunit",
+<<<<<<< HEAD
             "version": "6.4.2",
             "source": {
                 "type": "git",
@@ -3344,6 +3393,18 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ae6e2e062ff55263c7b04374c190aca45872b26a",
                 "reference": "ae6e2e062ff55263c7b04374c190aca45872b26a",
+=======
+            "version": "6.4.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sebastianbergmann/phpunit.git",
+                "reference": "06b28548fd2b4a20c3cd6e247dc86331a7d4db13"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/06b28548fd2b4a20c3cd6e247dc86331a7d4db13",
+                "reference": "06b28548fd2b4a20c3cd6e247dc86331a7d4db13",
+>>>>>>> f3eebd66392dfdd68e8dfd77ed3b69bf60f67b2c
                 "shasum": ""
             },
             "require": {
@@ -3414,7 +3475,11 @@
                 "testing",
                 "xunit"
             ],
+<<<<<<< HEAD
             "time": "2017-10-15T06:16:19+00:00"
+=======
+            "time": "2017-10-16T13:18:59+00:00"
+>>>>>>> f3eebd66392dfdd68e8dfd77ed3b69bf60f67b2c
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -4580,16 +4645,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.5.0",
+            "version": "v1.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803"
+                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
-                "reference": "7c8fae0ac1d216eb54349e6a8baa57d515fe8803",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
+                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
                 "shasum": ""
             },
             "require": {
@@ -4601,7 +4666,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.5-dev"
+                    "dev-master": "1.6-dev"
                 }
             },
             "autoload": {
@@ -4635,7 +4700,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2017-06-14T15:44:48+00:00"
+            "time": "2017-10-11T12:05:26+00:00"
         },
         {
             "name": "symfony/yaml",

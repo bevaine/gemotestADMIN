@@ -16,15 +16,13 @@ class ReportController extends Controller
      */
     function actionDoctorReport()
     {
-        set_time_limit(0);
-
         if (!Yii::$app->user->can('Report.DoctorsOrders')) {
             throw new ForbiddenHttpException('В доступе отказано');
         }
 
         $searchModel = new OrdersToExportSearch();
 
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, true);
 
         return $this->render('report_doctor', [
             'searchModel' => $searchModel,
