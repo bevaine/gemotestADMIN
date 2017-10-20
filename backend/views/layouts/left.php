@@ -11,6 +11,7 @@
                         'label' => 'Гемотест',
                         'icon' => 'share',
                         'url' => '#',
+                        'active' => true,
                         'items' => [
                             ['label' => 'Смены', 'icon' => 'file-code-o', 'url' => ['/admin/workshift'],],
                             ['label' => 'Заказы', 'icon' => 'file-code-o', 'url' => ['/admin/orders'],],
@@ -20,12 +21,12 @@
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
                             ['label' => 'Таблицы', 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
-                                    ['label' => 'NAdUsers', 'icon' => 'dashboard', 'url' => ['/admin/logins/create-n-ad-users'],],
+                                    ['label' => 'NAdUsers', 'active' => true, 'icon' => 'dashboard', 'url' => ['/admin/logins/create-n-ad-users'],],
                                 ]
                             ],
                             ['label' => 'Операции', 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
-                                    ['label' => 'Сбой инхронизации', 'icon' => 'dashboard', 'url' => 'http://labc:57772/csp/syncutils/sumain.csp',],
+                                    ['label' => 'Сбой инхронизации', 'active' => true, 'icon' => 'dashboard', 'url' => 'http://labc:57772/csp/syncutils/sumain.csp',],
                                 ]
                             ],
                         ],

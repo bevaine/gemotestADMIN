@@ -45,13 +45,11 @@ class OrdersToExportSearch extends OrdersToExport
     }
 
     /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
+     * @param $params
+     * @param bool $report
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $report = false)
     {
         $query = OrdersToExport::find();
 
@@ -63,28 +61,31 @@ class OrdersToExportSearch extends OrdersToExport
             return $dataProvider;
         }
 
-        $query->joinWith('logins');
+        if ($report) {
 
-        $query->andFilterWhere(['order_num' => $this->order_num])
-            ->andFilterWhere(['like', 'OrderKontragentID', $this->OrderKontragentID]);
+            $query->joinWith('logins');
 
-        $query->andFilterWhere(["[Status]" => 2])
-            ->andFilterWhere(["UserType" => 4]);
+            $query->andFilterWhere(["Status" => 2]);
+            $query->andFilterWhere(["UserType" => 4]);
 
-        if (!empty($this->date_from)) {
-            $query->andFilterWhere(['>=', 'datereg', date("Y-m-d 00:00:00.000", strtotime($this->date_from))]);
+            if (!empty($this->date_from)) {
+                $query->andFilterWhere(['>=', 'datereg', date("Y-m-d 00:00:00.000", strtotime($this->date_from))]);
+            }
+
+            if (!empty($this->date_to)) {
+                $query->andFilterWhere(['<=', 'datereg', date("Y-m-d 23:59:59.000", strtotime($this->date_to))]);
+            }
+
+            if (!empty($this->keys)) {
+                $query->andFilterWhere(['in', 'OrderDoctorID', explode(',', $this->keys)]);
+            }
+
+            $query->orderBy(['[Name]' => SORT_DESC])->orderBy(['datereg' => SORT_DESC]);
+
         }
 
-        if (!empty($this->date_to)) {
-            $query->andFilterWhere(['<=', 'datereg', date("Y-m-d 23:59:59.000", strtotime($this->date_to))]);
-        }
-
-        if (!empty($this->keys)) {
-            $query->andFilterWhere(['in', 'OrderDoctorID', explode(',', $this->keys)]);
-        }
-
-        $query->orderBy(['[Name]' => SORT_DESC])
-            ->orderBy(['datereg' => SORT_DESC]);
+        $query->andFilterWhere(['order_num' => $this->order_num]);
+        $query->andFilterWhere(['like', 'OrderKontragentID', $this->OrderKontragentID]);
 
         return $dataProvider;
     }

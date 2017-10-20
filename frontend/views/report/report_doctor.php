@@ -44,6 +44,18 @@ $this->registerJsFile('/js/jquery.tokeninput.js');
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 
+<script type="text/javascript">
+    (function($){
+        $(document).ready(function() {
+            $("#demo-input").tokenInput("ajax-doctor-list", {
+                hintText: "Введите код или ФИО врача",
+                noResultsText: "Врач не найден!",
+                searchingText: "Выполняется поиск.."
+            });
+        });
+    })(jQuery);
+</script>
+
 <div class="user-requests-form">
 
     <div class="box box-solid box-default">
@@ -63,19 +75,6 @@ $this->registerJsFile('/js/jquery.tokeninput.js');
                     <div class="form-group doctor">
                         <label>Врач:</label><br>
                         <?= Html::input('text', 'OrdersToExportSearch[keys]', '', ['id' => 'demo-input', 'style' => 'width:100px']) ?>
-                        <div id="searchForm">
-                            <script type="text/javascript">
-                                (function($){
-                                    $(document).ready(function() {
-                                        $("#demo-input").tokenInput("ajax-doctor-list", {
-                                            hintText: "Введите код или ФИО врача",
-                                            noResultsText: "Врач не найден!",
-                                            searchingText: "Выполняется поиск.."
-                                        });
-                                    });
-                                })(jQuery);
-                            </script>
-                        </div>
                     </div>
 
                     <div class="form-group date">
@@ -135,6 +134,11 @@ $this->registerJsFile('/js/jquery.tokeninput.js');
             'filterModel' => $searchModel,
             'showPageSummary' => true,
             'striped' => false,
+            'export' => false,
+            'panel'=>[
+                'type'=>'primary',
+                'heading'=>'Отчет по перевесам врачей'
+            ],
             'columns' => [
                 ['class'=>'kartik\grid\SerialColumn'],
                 [
