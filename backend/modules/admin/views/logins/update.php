@@ -18,14 +18,16 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 
     <?= $form->field($model, 'aid')->textInput(['readonly' => true]) ?>
 
-    <? if ($model->adUsersOne) {
+    <?php
+    if ($model->adUsersOne) {
         echo $form->field($model->adUsersOne, 'last_name')->textInput();
         echo $form->field($model->adUsersOne, 'first_name')->textInput();
         echo $form->field($model->adUsersOne, 'middle_name')->textInput();
         echo $form->field($model->adUsersOne, 'AD_position')->textInput();
     } ?>
 
-    <? if ($model->adUserAccountsOne) {
+    <?php
+    if ($model->adUserAccountsOne) {
         echo $form->field($model->adUserAccountsOne, 'ad_login')->textInput(['readonly' => true]);
         echo $form->field($model->adUserAccountsOne, 'ad_pass')->textInput(['readonly' => true]);
     } ?>
