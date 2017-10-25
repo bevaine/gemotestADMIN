@@ -21,7 +21,7 @@
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
                             ['label' => 'Таблицы', 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
-                                    ['label' => 'NAdUsers', 'active' => true, 'icon' => 'dashboard', 'url' => ['/admin/logins/create-n-ad-users'],],
+                                    ['label' => 'NAdUsers', 'active' => true, 'icon' => 'dashboard', 'url' => ['/admin/n-ad-users'],],
                                 ]
                             ],
                             ['label' => 'Операции', 'icon' => 'circle-o', 'url' => '#', 'items' =>

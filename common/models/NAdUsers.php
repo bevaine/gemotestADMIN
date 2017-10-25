@@ -30,6 +30,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $auth_ldap_only
  * @property Logins $logins
  * @property NAdUserAccounts $adUserAccounts
+ * @property t23 $publicEmployee
  */
 class NAdUsers extends \yii\db\ActiveRecord
 {
@@ -128,6 +129,19 @@ class NAdUsers extends \yii\db\ActiveRecord
             'last_name' => 'last_name',
             'first_name' => 'first_name',
             'middle_name' => 'middle_name',
+        ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPublicEmployee()
+    {
+        return $this->hasOne(t23::className(), [
+            //'gs_id' => 'gs_key',
+            'q5' => 'last_name',
+            'q3' => 'first_name',
+            'q4' => 'middle_name',
         ]);
     }
 

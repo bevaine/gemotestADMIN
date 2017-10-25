@@ -147,11 +147,25 @@ $this->params['breadcrumbs'][] = $this->title;
                 'buttons' => [
                     'view' => function ($url, $model) {
                         /** @var \common\models\LoginsSearch $model */
-                        $arrReturn = ['admin/logins/view', 'id' => $model['aid'], 'ad' => $model['ID']];
-                        $customurl = Yii::$app->getUrlManager()->createUrl($arrReturn);
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'admin/logins/view',
+                            'id' => $model['aid'],
+                            'ad' => $model['ID']
+                        ]);
                         return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $customurl,
                             ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
-                    }
+                    },
+                    'update' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'admin/logins/view',
+                            'id' => $model['aid'],
+                            'ad' => $model['ID']
+                        ]);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                    },
+
                 ],
                 'template' => '{view} {update}'
             ]
