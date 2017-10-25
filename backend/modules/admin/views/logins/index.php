@@ -158,7 +158,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'update' => function ($url, $model) {
                         /** @var \common\models\LoginsSearch $model */
                         $customurl = Yii::$app->getUrlManager()->createUrl([
-                            'admin/logins/view',
+                            'admin/logins/update',
                             'id' => $model['aid'],
                             'ad' => $model['ID']
                         ]);
