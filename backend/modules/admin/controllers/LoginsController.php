@@ -256,7 +256,7 @@ class LoginsController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save())
         {
-            $adUsersLogins = $model->adUsers;
+            $adUsersLogins = $model->adUsersOne;
             if ($adUsersLogins) {
                 if ($adUsersLogins->load(Yii::$app->request->post())) {
                     $adUsersLogins->save();

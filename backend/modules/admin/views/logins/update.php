@@ -18,17 +18,17 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 
     <?= $form->field($model, 'aid')->textInput(['readonly' => true]) ?>
 
-<!--    --><?// if ($model->adUserAccounts) {
-//        $form->field($model->adUsers, 'last_name')->textInput();
-//        $form->field($model->adUsers, 'first_name')->textInput();
-//        $form->field($model->adUsers, 'middle_name')->textInput();
-//        $form->field($model->adUsers, 'AD_position')->textInput();
-//    } ?>
-<!---->
-<!--    --><?// if ($model->adUserAccounts) {
-//        echo $form->field($model->adUserAccounts, 'ad_login')->textInput(['readonly' => true]);
-//        echo $form->field($model->adUserAccounts, 'ad_pass')->textInput(['readonly' => true]);
-//    } ?>
+    <? if ($model->adUsersOne) {
+        echo $form->field($model->adUsersOne, 'last_name')->textInput();
+        echo $form->field($model->adUsersOne, 'first_name')->textInput();
+        echo $form->field($model->adUsersOne, 'middle_name')->textInput();
+        echo $form->field($model->adUsersOne, 'AD_position')->textInput();
+    } ?>
+
+    <? if ($model->adUserAccountsOne) {
+        echo $form->field($model->adUserAccountsOne, 'ad_login')->textInput(['readonly' => true]);
+        echo $form->field($model->adUserAccountsOne, 'ad_pass')->textInput(['readonly' => true]);
+    } ?>
 
     <?= $form->field($model, 'Login')->textInput(['readonly' => true]) ?>
 
