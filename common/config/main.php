@@ -3,11 +3,18 @@ return [
     'language' => 'ru',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
+        'formatter'  => [
+            'defaultTimeZone' => 'Europe/Moscow',
+            'timeZone'        => 'Europe/Moscow',
+            'dateFormat'      => 'dd.MM.Y',
+            'timeFormat'      => 'HH:mm:ss',
+            'datetimeFormat'  => 'yyyy-MM-dd HH:mm:ss'
+        ],
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
-            'username' => 'admin',
-            'password' => 'itrTest',
+            'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
+            'username' => 'importfromcache',
+            'password' => 'import',
             'charset' => 'utf8',
         ],
         'GemoTestDB' => [
@@ -15,6 +22,13 @@ return [
             'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
             'username' => 'importfromcache',
             'password' => 'import',
+            'charset' => 'utf8',
+        ],
+        'db1' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
+            'username' => 'admin',
+            'password' => 'itrTest',
             'charset' => 'utf8',
         ],
         'mailer' => [
