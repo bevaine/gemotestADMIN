@@ -90,7 +90,7 @@ if (!empty($ad)) {
                             return '<span class="text-info"><b>Active Directory</b></span>';
                         }
                     }
-                    return 'Связь с AD отсутствует';
+                    return '<span class="text-danger"><b>Связь с AD отсутствует</b></span>';
                 },
                 'options' => ['class' => 'table table-striped table-bordered detail-view']
             ],
