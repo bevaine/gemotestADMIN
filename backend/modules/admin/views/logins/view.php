@@ -41,6 +41,7 @@ if (!empty($ad)) {
 
         <?= Html::a($blockDateEnd ? 'Включить УЗ' : 'Отключить УЗ',
             [
+                'view',
                 'id' => $model->aid,
                 'ad' => $ad,
                 'action' => 'block-account',
@@ -50,6 +51,7 @@ if (!empty($ad)) {
         ?>
         <?= Html::a($blockRegister ? 'Вкл. рег. заказов' : 'Откл. рег. заказов',
             [
+                'view',
                 'id' => $model->aid,
                 'ad' => $ad,
                 'action' => 'block-register',
@@ -59,6 +61,7 @@ if (!empty($ad)) {
         ?>
         <?= Html::a($activeGS ? 'Откл. авториз. GS' : 'Вкл. авториз. GS',
             [
+                'view',
                 'id' => $model->aid,
                 'ad' => $ad,
                 'action' => 'active-gs',
