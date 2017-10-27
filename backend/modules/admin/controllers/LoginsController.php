@@ -50,14 +50,56 @@ class LoginsController extends Controller
     }
 
     /**
-     * Displays a single Logins model.
-     * @param string $id
-     * @return mixed
+     * @param $id
+     * @param null $ad
+     * @param null $action
+     * @param null $status
+     * @return string
      */
-    public function actionView($id, $ad = null)
+    public function actionView($id, $ad = null, $action = null, $status = null)
     {
+        $model = $this->findModel($id, $ad);
+
+        switch ($action) {
+            case 'block-account':
+                if ($status == 'block') {
+                    $model->DateEnd = date("Y-m-d G:i:s:000", time());
+                } elseif ($status == 'active') {
+                    $model->DateEnd = NULL;
+                }
+                if (!$model->save()) {
+                    Yii::getLogger()->log(['$model->DateEnd'=>$model->errors], 1, 'binary');
+                }
+                break;
+            case 'block-register':
+                if ($status == 'block') {
+                    $model->block_register = date("Y-m-d G:i:s:000", time());
+                } elseif ($status == 'active') {
+                    $model->block_register = NULL;
+                }
+                if (!$model->save()) {
+                    Yii::getLogger()->log(['$model->block_register'=>$model->errors], 1, 'binary');
+                }
+                break;
+            case 'active-gs':
+                if ($model->adUsersOne) {
+                    $modelAdUser = $model->adUsersOne;
+                    if ($status == 'block') {
+                        $modelAdUser->auth_ldap_only = 1;
+                    } elseif ($status == 'active') {
+                        $modelAdUser->auth_ldap_only = 0;
+                    }
+                    if ($modelAdUser->save()) {
+                        Yii::getLogger()->log(['$modelAdUser->auth_ldap_only'=>$modelAdUser->errors], 1, 'binary');
+                    }
+                    $modelAdUser->save();
+                }
+                break;
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id, $ad),
+            'model' => $model,
+            'ad' => $ad
         ]);
     }
 
@@ -256,8 +298,7 @@ class LoginsController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save())
         {
-            $adUsersLogins = $model->adUsersOne;
-            if ($adUsersLogins) {
+            if ($adUsersLogins = $model->adUsersOne) {
                 if ($adUsersLogins->load(Yii::$app->request->post())) {
                     $adUsersLogins->save();
                 }
@@ -269,53 +310,7 @@ class LoginsController extends Controller
         ]);
     }
 
-    /**
-     * @param $id
-     * @param $action
-     * @return string
-     */
-    public function actionBlockAccount($id, $action)
-    {
-        $model = $this->findModel($id);
 
-        if ($model) {
-            if ($action == 'block') {
-                $model->DateEnd = date("Y-m-d G:i:s:000", time());
-            } elseif ($action == 'active') {
-                $model->DateEnd = NULL;
-            }
-            if (!$model->save()) {
-                Yii::getLogger()->log(['$model->DateEnd'=>$model->errors], 1, 'binary');
-            }
-        }
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * @param $id
-     * @param $action
-     * @return string
-     */
-    public function actionBlockRegister($id, $action)
-    {
-        $model = $this->findModel($id);
-
-        if ($model) {
-            if ($action == 'block') {
-                $model->block_register = date("Y-m-d G:i:s:000", time());
-            } elseif ($action == 'active') {
-                $model->block_register = NULL;
-            }
-            if (!$model->save()) {
-                Yii::getLogger()->log(['$model->block_register'=>$model->errors], 1, 'binary');
-            }
-        }
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
 
     /**
      * Finds the Logins model based on its primary key value.

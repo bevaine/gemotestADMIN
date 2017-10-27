@@ -4,14 +4,17 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
+/* @var $ad integer */
 /* @var $model common\models\Logins */
 
 $this->title = $model->Name;
 $this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
+$display = '';
 $blockDateEnd = true;
 $blockRegister = true;
+$activeGS = true;
 
 if (empty($model->DateEnd) || strtotime($model->DateEnd) > time()) {
     $blockDateEnd = false;
@@ -19,8 +22,15 @@ if (empty($model->DateEnd) || strtotime($model->DateEnd) > time()) {
 if (empty($model->block_register) || strtotime($model->block_register) > time()) {
     $blockRegister = false;
 }
-
+if (!empty($ad)) {
+    if ($model->adUsersOne->auth_ldap_only == 1) {
+        $activeGS = false;
+    }
+} else {
+    $display = 'none;';
+}
 ?>
+
 
 <div class="logins-view">
 
@@ -31,19 +41,33 @@ if (empty($model->block_register) || strtotime($model->block_register) > time())
 
         <?= Html::a($blockDateEnd ? 'Включить УЗ' : 'Отключить УЗ',
             [
-                'block-account',
                 'id' => $model->aid,
-                'action' => $blockDateEnd ? 'active' : 'block'
+                'ad' => $ad,
+                'action' => 'block-account',
+                'status' => $blockDateEnd ? 'active' : 'block'
             ],
             ['class' => $blockDateEnd ? 'btn btn-success' : 'btn btn-danger']);
         ?>
         <?= Html::a($blockRegister ? 'Вкл. рег. заказов' : 'Откл. рег. заказов',
             [
-                'block-register',
                 'id' => $model->aid,
-                'action' => $blockRegister ? 'active' : 'block'
+                'ad' => $ad,
+                'action' => 'block-register',
+                'status' => $blockRegister ? 'active' : 'block'
             ],
             ['class' => $blockRegister ? 'btn btn-success' : 'btn btn-warning']);
+        ?>
+        <?= Html::a($activeGS ? 'Откл. авториз. GS' : 'Вкл. авториз. GS',
+            [
+                'id' => $model->aid,
+                'ad' => $ad,
+                'action' => 'active-gs',
+                'status' => $activeGS ? 'block' : 'active' ,
+            ],
+            [
+                'class' => $activeGS ? 'btn btn-success' : 'btn btn-danger',
+                'style' => 'display: '.$display
+            ]);
         ?>
     </p>
 
@@ -102,8 +126,9 @@ if (empty($model->block_register) || strtotime($model->block_register) > time())
                 'attribute' => 'DateEnd',
                 'format' => 'html',
                 'value' => function($model){
+                    /** @var $model \common\models\Logins */
                     if (empty($model->DateEnd)) return NULL;
-                    $date = date("d.m.Y G:i:s", strtotime($model->DateEnd));
+                    $date = Yii::$app->formatter->asDatetime(substr($model->DateEnd, 0,-4), 'full');
                     if (empty($model->DateEnd) || strtotime($model->DateEnd) > time()) {
                         $style = "success";
                     } else {
@@ -116,8 +141,9 @@ if (empty($model->block_register) || strtotime($model->block_register) > time())
                 'attribute' => 'block_register',
                 'format' => 'html',
                 'value' => function($model){
+                    /** @var $model \common\models\Logins */
                     if (empty($model->block_register)) return NULL;
-                    $date = date("d.m.Y G:i:s", strtotime($model->block_register));
+                    $date = Yii::$app->formatter->asDatetime(substr($model->block_register, 0,-4), 'full');
                     if (empty($model->block_register) || strtotime($model->block_register) > time()) {
                         $style = "success";
                     } else {
