@@ -56,7 +56,7 @@ class LoginsController extends Controller
      * @param null $status
      * @return string
      */
-    public function actionView($id, $ad = null, $action = null, $status = null)
+    public function actionView($id, $ad = '', $action = '', $status = '')
     {
         $model = $this->findModel($id, $ad);
 
