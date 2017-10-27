@@ -12,9 +12,9 @@ return [
         ],
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
-            'username' => 'importfromcache',
-            'password' => 'import',
+            'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
+            'username' => 'admin',
+            'password' => 'itrTest',
             'charset' => 'utf8',
         ],
         'GemoTestDB' => [
