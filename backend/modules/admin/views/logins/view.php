@@ -68,7 +68,7 @@ if (!empty($ad)) {
                 'status' => $activeGS ? 'block' : 'active' ,
             ],
             [
-                'class' => $activeGS ? 'btn btn-success' : 'btn btn-danger',
+                'class' => $activeGS ? 'btn btn-success' : 'btn btn-info',
                 'style' => 'display: '.$display
             ]);
         ?>
@@ -77,6 +77,23 @@ if (!empty($ad)) {
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
+            [
+                'label' => 'Авторизация через',
+                'attribute' => 'adUsersOne.auth_ldap_only',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    /** @var \common\models\Logins $model  */
+                    if ($model->adUsersOne) {
+                        if ($model->adUsersOne->auth_ldap_only == 0) {
+                            return '<span class="text-success"><b>GemoSystem</b></span>';
+                        } elseif ($model->adUsersOne->auth_ldap_only == 1) {
+                            return '<span class="text-info"><b>Active Directory</b></span>';
+                        }
+                    }
+                    return 'Связь с AD отсутствует';
+                },
+                'options' => ['class' => 'table table-striped table-bordered detail-view']
+            ],
             'aid',
             'Name',
             'Key',
