@@ -37,7 +37,7 @@ if (!empty($ad)) {
     <h1><?php //Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Редактировать', ['update', 'id' => $model->aid], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Редактировать', ['update', 'id' => $model->aid, 'ad' => $ad], ['class' => 'btn btn-primary']) ?>
 
         <?= Html::a($blockDateEnd ? 'Включить УЗ' : 'Отключить УЗ',
             [

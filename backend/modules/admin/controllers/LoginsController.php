@@ -291,8 +291,9 @@ class LoginsController extends Controller
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
+     * @param $ad
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id, $ad = '')
     {
         $model = $this->findModel($id);
 
@@ -303,7 +304,11 @@ class LoginsController extends Controller
                     $adUsersLogins->save();
                 }
             }
-            return $this->redirect(['view', 'id' => $model->aid]);
+            return $this->redirect([
+                'view',
+                'id' => $model->aid,
+                'ad' => $ad
+            ]);
         }
         return $this->render('update', [
             'model' => $model,
