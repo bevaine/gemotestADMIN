@@ -53,6 +53,7 @@ use common\components\helpers\ActiveSyncHelper;
  * @property NAdUsers $adUsersOne
  * @property NAdUserAccounts $adUserAccountsMany
  * @property NAdUserAccounts $adUserAccountsOne
+ * @property integer $idAD
  */
 class Logins extends \yii\db\ActiveRecord
 {
@@ -146,43 +147,27 @@ class Logins extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdUserAccountsMany()
-    {
-        return $this->adUsersMany ? $this->hasOne(NAdUseraccounts::className(), [
-            'gs_id' => 'gs_key',
-            'last_name' => 'last_name',
-            'first_name' => 'first_name',
-            'middle_name' => 'middle_name',
-        ])->via('adUsersMany') : null;
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAdUserAccountsOne()
-    {
-        return $this->adUsersOne ? $this->hasOne(NAdUseraccounts::className(), [
-            'gs_id' => 'gs_key',
-            'last_name' => 'last_name',
-            'first_name' => 'first_name',
-            'middle_name' => 'middle_name',
-        ])->via('adUsersOne') : null;
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getAdUsersMany()
     {
         return $this->hasMany(NAdUsers::className(), [
             'gs_id' => 'aid',
             'gs_key' => 'Key',
             'gs_usertype' => 'UserType',
-        ])
-        ->andFilterWhere(['like', 'last_name', $this->last_name])
-        ->andFilterWhere(['like', 'first_name', $this->first_name])
-        ->andFilterWhere(['like', 'middle_name', $this->middle_name])
-        ->andFilterWhere(['like', 'AD_position', $this->AD_position]);
+        ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdUserAccountsMany()
+    {
+        return $this->adUsersMany ? $this->hasMany(NAdUseraccounts::className(), [])
+            ->andOnCondition('\'lab\\\' + [n_ad_Users].[AD_login] = [n_ad_Useraccounts].[ad_login]')
+            ->andOnCondition('[n_ad_Useraccounts].[gs_type] = CASE
+                    WHEN [Logins].[UserType] = 8 THEN \'FLO\'
+                    ELSE \'SLO\' 
+                    END')
+            : null;
     }
 
     /**
@@ -190,11 +175,19 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getAdUsersOne()
     {
-        return !empty($this->idAD) ? $this->hasOne(NAdUsers::className(), [
-            'gs_id' => 'aid',
-            'gs_key' => 'Key',
-            'gs_usertype' => 'UserType',
-        ])->andFilterWhere(['ID' => $this->idAD]) : null;
+        return !empty($this->idAD) ? NAdUsers::find()
+            ->where(['[n_ad_Users].[ID]' => $this->idAD])
+            : null;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdUserAccountsOne()
+    {
+        return $this->adUsersOne ? NAdUseraccounts::find()
+            ->where(['ad_login' => 'lab\\'.$this->adUsersOne->AD_login])
+            : null;
     }
 
     /**

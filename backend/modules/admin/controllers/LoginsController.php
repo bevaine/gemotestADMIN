@@ -51,9 +51,9 @@ class LoginsController extends Controller
 
     /**
      * @param $id
-     * @param null $ad
-     * @param null $action
-     * @param null $status
+     * @param string $ad
+     * @param string $action
+     * @param string $status
      * @return string
      */
     public function actionView($id, $ad = '', $action = '', $status = '')

@@ -25,7 +25,7 @@
                                 [
                                     [
                                         'label' => 'NAdUsers',
-                                        //'active' => true,
+                                        'active' => true,
                                         'icon' => 'dashboard',
                                         'url' => ['/admin/n-ad-users'],
                                     ],

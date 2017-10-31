@@ -135,6 +135,16 @@ class NAdUsers extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getAdUserAccountsOne()
+    {
+        return
+            $this->hasOne(NAdUseraccounts::className(), ['gs_id' => 'gs_key'])
+            ->OnCondition('\'lab\\\' + [n_ad_Users].[AD_login] = [n_ad_Useraccounts].[ad_login]');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getPublicEmployee()
     {
         return $this->hasOne(t23::className(), [

@@ -99,8 +99,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => 'Пароль AD',
-                'value' => 'passAD',
-                'headerOptions' => array('style' => 'width: 100px;'),
+                'value' => function ($model) {
+                    /** @var \common\models\LoginsSearch $model */
+                    $default = 'Стандартный';
+                    $value = $model['passAD'];
+                    return stripos($value, $default) !== false ? $default : $value;
+                }
             ],
             [
                 'label' => 'Доступ к УЗ',
