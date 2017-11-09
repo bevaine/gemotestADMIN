@@ -195,7 +195,7 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getDirectorInfo()
     {
-        return $this->hasOne(directorFlo::className(), ['login' => 'Login']);
+        return $this->hasOne(DirectorFlo::className(), ['login' => 'Login']);
     }
 
     /**
