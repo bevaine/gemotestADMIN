@@ -5,11 +5,12 @@ use yii\widgets\ActiveForm;
 use kartik\datetime\DateTimePicker;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\Logins */
+/* @var $model common\models\LoginsSearch */
+/* @var $ad integer */
 
 $this->title = 'Редактирование: ' . $model->Name;
 $this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->Name, 'url' => ['view', 'id' => $model->aid]];
+$this->params['breadcrumbs'][] = ['label' => $model->Name, 'url' => ['view', 'id' => $model->aid, 'ad' => $ad]];
 $this->params['breadcrumbs'][] = 'Редактирование';
 ?>
 <div class="logins-update">

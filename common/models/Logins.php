@@ -53,6 +53,8 @@ use common\components\helpers\ActiveSyncHelper;
  * @property NAdUsers $adUsersOne
  * @property NAdUserAccounts $adUserAccountsMany
  * @property NAdUserAccounts $adUserAccountsOne
+ * @property DirectorFlo $directorFlo
+ * @property DirectorFlo $directorInfo
  * @property integer $idAD
  */
 class Logins extends \yii\db\ActiveRecord
@@ -168,6 +170,32 @@ class Logins extends \yii\db\ActiveRecord
                     ELSE \'SLO\' 
                     END')
             : null;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDirectorFlo()
+    {
+        return $this->hasOne(DirectorFlo::className(), [])
+            ->andOnCondition('[Logins].[login] = [DirectorFlo].[login]');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDirectorFloSender()
+    {
+        return $this->hasOne(DirectorFloSender::className(), [])
+            ->andOnCondition('[DirectorFloSender].[director_id] = [DirectorFlo].[id]');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDirectorInfo()
+    {
+        return $this->hasOne(directorFlo::className(), ['login' => 'Login']);
     }
 
     /**

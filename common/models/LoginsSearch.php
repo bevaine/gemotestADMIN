@@ -58,7 +58,15 @@ class LoginsSearch extends Logins
         $query = Logins::find()
             ->joinWith(['adUsersMany'], false)
             ->joinWith(['adUserAccountsMany'], false)
-            ->select('Logins.*, n_ad_Users.*, n_ad_Useraccounts.ad_login as loginAD, n_ad_Useraccounts.ad_pass as passAD');
+            ->joinWith(['directorFlo'], false)
+            ->joinWith(['directorFloSender'], false)
+            ->select('Logins.*, 
+                n_ad_Users.*,
+                DirectorFlo.id as directorID, 
+                DirectorFloSender.sender_key as directorKey,
+                n_ad_Useraccounts.ad_login as loginAD, 
+                n_ad_Useraccounts.ad_pass as passAD'
+            );
 
         $query->andFilterWhere([
             'aid' => $this->aid,
@@ -85,8 +93,12 @@ class LoginsSearch extends Logins
             'show_preanalytic' => $this->show_preanalytic,
             'parentAid' => $this->parentAid,
             'GarantLetter' => $this->GarantLetter,
-            'Key' => $this->Key,
+            //'Key' => $this->Key,
         ]);
+
+        if (!empty($this->Key)) {
+            $query->andWhere('([Logins].[Key] = :key) OR ([DirectorFloSender].[sender_key] = :key)', [':key' => $this->Key]);
+        }
 
         if ($this->DateEnd == 1) {
             $query->andWhere(['OR', ['>', 'DateEnd', date("Y-m-d G:i:s:000", time())], ['DateEnd' => NULL]]);
@@ -100,11 +112,10 @@ class LoginsSearch extends Logins
             $query->andFilterWhere(['<=', 'block_register', date("Y-m-d G:i:s:000", time())]);
         }
 
-        $query->andFilterWhere(['like', 'Login', $this->Login])
+        $query->andFilterWhere(['like', '[Logins].[Login]', $this->Login])
             ->andFilterWhere(['like', 'Pass', $this->Pass])
             ->andFilterWhere(['like', 'Name', $this->Name])
             ->andFilterWhere(['like', 'Email', $this->Email])
-            //->andFilterWhere(['like', 'Key', $this->Key])
             ->andFilterWhere(['like', 'Logo', $this->Logo])
             ->andFilterWhere(['like', 'LogoText', $this->LogoText])
             ->andFilterWhere(['like', 'LogoText2', $this->LogoText2])
@@ -122,7 +133,17 @@ class LoginsSearch extends Logins
 
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),
-            'db' => 'GemoTestDB'
+            'db' => 'GemoTestDB',
+            'sort' => [
+                'attributes' => [
+                    'UserType' => [
+                        'default' => SORT_ASC,
+                    ],
+                    'Name' => [
+                        'default' => SORT_ASC,
+                    ],
+                ],
+            ],
         ]);
 
         return $dataProvider;

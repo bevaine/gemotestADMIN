@@ -109,6 +109,23 @@ if (!empty($ad)) {
             'Login',
             'Pass',
             [
+                'label' => 'Логин AD',
+                'value' => !empty($model->adUsersOne->AD_login) ?  'lab\\'.$model->adUsersOne->AD_login : null
+            ],
+            [
+                'label' => 'Почта (директор)',
+                'attribute' => 'directorInfo.email',
+                'visible' => $model->UserType == 9 ? true : false
+            ],
+            [
+                'label' => 'Моб. номер (директор)',
+                'attribute' => 'directorInfo.phoneNumber',
+            ],
+            [
+                'label' => 'Пароль AD',
+                'attribute' => 'adUserAccountsOne.ad_pass',
+                'visible' => $model->UserType == 9 ? true : false
+            ],            [
                 'label' => 'Фамилия AD',
                 'attribute' => 'adUsersOne.last_name',
             ],
@@ -123,14 +140,6 @@ if (!empty($ad)) {
             [
                 'label' => 'Должность AD',
                 'attribute' => 'adUsersOne.AD_position',
-            ],
-            [
-                'label' => 'Логин AD',
-                'attribute' => 'adUserAccountsOne.ad_login',
-            ],
-            [
-                'label' => 'Пароль AD',
-                'attribute' => 'adUserAccountsOne.ad_pass',
             ],
             'Email:email',
             'Logo',

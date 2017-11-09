@@ -32,9 +32,31 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'headerOptions' => array('style' => 'width: 75px;'),
                 'attribute' => 'aid',
+                'value' => function($model) {
+                    /** @var \common\models\LoginsSearch $model */
+                    return Html::a(
+                        $model['aid'],
+                        'https://office.gemotest.ru/administrator/index.php?r=auth/assignment/view&id='.$model['aid'],
+                        [
+                            'title' => $model['aid'],
+                            'target' => '_blank'
+                        ]
+                    );
+                },
+                'format' => 'raw',
             ],
             [
                 'headerOptions' => array('style' => 'width: 75px;'),
+                'value' => function ($model) {
+                    /** @var \common\models\LoginsSearch $model */
+                    if (array_key_exists($model['UserType'], \common\models\Logins::getTypesArray())) {
+                        if ($model['UserType'] == 9 && !empty($model['directorKey'])) {
+                            return $model['Key'].' ('.$model['directorKey'].')';
+                        } else {
+                            return $model['Key'];
+                        }
+                    } else return NULL;
+                },
                 'attribute' => 'Key',
             ],
             [
@@ -43,6 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' => \common\models\Logins::getTypesArray(),
                 'format' => 'text',
                 'value' => function ($model) {
+                    /** @var \common\models\LoginsSearch $model */
                     if (array_key_exists($model['UserType'], \common\models\Logins::getTypesArray())) {
                         return \common\models\Logins::getTypesArray()[$model['UserType']];
                     } else return NULL;
@@ -93,8 +116,11 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => 'Логин AD',
-                'attribute' => 'ad_login',
-                'value' => 'loginAD',
+                'attribute' => 'AD_login',
+                'value' => function ($model) {
+                    /** @var \common\models\LoginsSearch $model */
+                    return !empty($model["AD_login"]) ? 'lab\\'.$model["AD_login"] : null;
+                },
                 'headerOptions' => array('style' => 'width: 100px;'),
             ],
             [

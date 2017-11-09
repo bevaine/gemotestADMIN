@@ -312,6 +312,7 @@ class LoginsController extends Controller
         }
         return $this->render('update', [
             'model' => $model,
+            'ad' => $ad
         ]);
     }
 

@@ -42,12 +42,13 @@
                         'label' => 'Служебные',
                         'icon' => 'share',
                         'url' => '#',
+                        'active' => true,
                         'items' => [
                             ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                             ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
                             [
                                 'label' => 'Пользователи',
-                                'active' => Yii::$app->user->can('administrator'),
+                                //'active' => Yii::$app->user->can('administrator'),
                                 'icon' => 'circle-o',
                                 'url' => '#',
                                 'items' => [
