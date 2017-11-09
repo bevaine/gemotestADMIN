@@ -110,7 +110,7 @@ if (!empty($ad)) {
             'Pass',
             [
                 'label' => 'Логин AD',
-                'value' => !empty($model->adUsersOne->AD_login) ?  'lab\\'.$model->adUsersOne->AD_login : null
+                'value' => !empty($model->adUsersOne->AD_login) ? 'lab\\'.$model->adUsersOne->AD_login : null
             ],
             [
                 'label' => 'Почта (директор)',
@@ -120,11 +120,11 @@ if (!empty($ad)) {
             [
                 'label' => 'Моб. номер (директор)',
                 'attribute' => 'directorInfo.phoneNumber',
+                'visible' => $model->UserType == 9 ? true : false
             ],
             [
                 'label' => 'Пароль AD',
                 'attribute' => 'adUserAccountsOne.ad_pass',
-                'visible' => $model->UserType == 9 ? true : false
             ],            [
                 'label' => 'Фамилия AD',
                 'attribute' => 'adUsersOne.last_name',
