@@ -48,7 +48,7 @@
                             ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
                             [
                                 'label' => 'Пользователи',
-                                //'active' => Yii::$app->user->can('administrator'),
+                                'active' => true,
                                 'icon' => 'circle-o',
                                 'url' => '#',
                                 'items' => [

@@ -24,13 +24,6 @@ return [
             'password' => 'import',
             'charset' => 'utf8',
         ],
-        'db1' => [
-            'class' => 'yii\db\Connection',
-            'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
-            'username' => 'admin',
-            'password' => 'itrTest',
-            'charset' => 'utf8',
-        ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             'viewPath' => '@common/mail',

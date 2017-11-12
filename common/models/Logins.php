@@ -190,6 +190,20 @@ class Logins extends \yii\db\ActiveRecord
             ->andOnCondition('[DirectorFloSender].[director_id] = [DirectorFlo].[id]');
     }
 
+
+    /**
+     * @param $userType
+     * @param $userKey
+     * @return static
+     */
+    public static function getUserByKey($userType, $userKey)
+    {
+        return self::findOne([
+            'UserType' => $userType,
+            'Key' => $userKey
+        ]);
+    }
+
     /**
      * @return \yii\db\ActiveQuery
      */

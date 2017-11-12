@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use common\models\Logins;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\OrdersToExport */
@@ -36,12 +37,54 @@ $this->params['breadcrumbs'][] = $this->title;
             'DateIns',
             'LastUpdate',
             'DateReg',
-            'TypeUserIns',
-            'KeyUserIns',
-            'TypeUserReg',
-            'KeyUserReg',
-            'TypeUserDel',
-            'KeyUserDel',
+            [
+                'attribute' => 'TypeUserIns',
+                'value' => function ($model) {
+                    /** @var \common\models\OrdersToExport $model  */
+                    if (array_key_exists($model->TypeUserIns, \common\models\Logins::getTypesArray())) {
+                        return \common\models\Logins::getTypesArray()[$model->TypeUserIns];
+                    } else return $model->TypeUserIns;
+                }
+            ],
+            [
+                'attribute' => 'KeyUserIns',
+                'value' => function ($model) {
+                    /** @var \common\models\OrdersToExport $model  */
+                    return Logins::getUserByKey($model->TypeUserIns, $model->KeyUserIns)->Name;
+                }
+            ],
+            [
+                'attribute' => 'TypeUserReg',
+                'value' => function ($model) {
+                    /** @var \common\models\OrdersToExport $model  */
+                    if (array_key_exists($model->TypeUserReg, \common\models\Logins::getTypesArray())) {
+                        return \common\models\Logins::getTypesArray()[$model->TypeUserReg];
+                    } else return $model->TypeUserReg;
+                }
+            ],
+            [
+                'attribute' => 'KeyUserReg',
+                'value' => function ($model) {
+                    /** @var \common\models\OrdersToExport $model  */
+                    return Logins::getUserByKey($model->TypeUserReg, $model->KeyUserReg)->Name;
+                }
+            ],
+            [
+                'attribute' => 'TypeUserDel',
+                'value' => function ($model) {
+                    /** @var \common\models\OrdersToExport $model  */
+                    if (array_key_exists($model->TypeUserDel, \common\models\Logins::getTypesArray())) {
+                        return \common\models\Logins::getTypesArray()[$model->TypeUserDel];
+                    } else return $model->TypeUserDel;
+                }
+            ],
+            [
+                'attribute' => 'KeyUserDel',
+                'value' => function ($model) {
+                    /** @var \common\models\OrdersToExport $model  */
+                    return Logins::getUserByKey($model->TypeUserDel, $model->KeyUserDel)->Name;
+                }
+            ],
             'DateDel',
             'CacheOrderID',
             'OrderCost',
