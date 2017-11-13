@@ -165,11 +165,11 @@ class Logins extends \yii\db\ActiveRecord
     {
         return $this->adUsersMany ? $this->hasMany(NAdUseraccounts::className(), [])
             ->andOnCondition('\'lab\\\' + [n_ad_Users].[AD_login] = [n_ad_Useraccounts].[ad_login]')
-            ->andOnCondition('[n_ad_Useraccounts].[gs_type] = CASE
-                    WHEN [Logins].[UserType] = 8 THEN \'FLO\'
-                    ELSE \'SLO\' 
-                    END')
-            : null;
+//            ->andOnCondition('[n_ad_Useraccounts].[gs_type] = CASE
+//                    WHEN [Logins].[UserType] = 8 THEN \'FLO\'
+//                    ELSE \'SLO\'
+//                    END')
+           : null;
     }
 
     /**
