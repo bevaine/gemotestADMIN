@@ -10,6 +10,13 @@ return [
             'timeFormat'      => 'HH:mm:ss',
             'datetimeFormat'  => 'yyyy-MM-dd HH:mm:ss'
         ],
+        'userDB' => [
+            'class' => 'yii\db\Connection',
+            'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
+            'username' => 'admin',
+            'password' => 'itrTest',
+            'charset' => 'utf8',
+        ],
         'db' => [
             'class' => 'yii\db\Connection',
             'dsn' => 'pgsql:host=localhost;port=5432;dbname=work',
@@ -18,6 +25,7 @@ return [
             'charset' => 'utf8',
         ],
         'GemoTestDB' => [
+        //'db' => [
             'class' => 'yii\db\Connection',
             'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
             'username' => 'importfromcache',

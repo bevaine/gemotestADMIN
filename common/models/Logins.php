@@ -153,8 +153,8 @@ class Logins extends \yii\db\ActiveRecord
     {
         return $this->hasMany(NAdUsers::className(), [
             'gs_id' => 'aid',
-            'gs_key' => 'Key',
             'gs_usertype' => 'UserType',
+            //'gs_key' => 'Key',
         ]);
     }
 

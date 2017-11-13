@@ -15,6 +15,28 @@
                         'url' => '#',
                         //'active' => true,
                         'items' => [
+                            ['label' => 'Смены', 'icon' => 'circle-o', 'url' => '#', 'items' =>
+                                [
+                                    [
+                                        'label' => 'Смены',
+                                        'active' => true,
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/workshift'],
+                                    ],
+                                    [
+                                        'label' => 'Доб. в смене',
+                                        'active' => true,
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/branch-staff'],
+                                    ],
+                                    [
+                                        'label' => 'Взятие БМ',
+                                        'active' => true,
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/input-order-zabor'],
+                                    ]
+                                ]
+                            ],
                             ['label' => 'Смены', 'icon' => 'file-code-o', 'url' => ['/admin/workshift'],],
                             ['label' => 'Заказы', 'icon' => 'file-code-o', 'url' => ['/admin/orders'],],
                             ['label' => 'Платежи', 'icon' => 'dashboard', 'url' => ['/admin/pay'],],
