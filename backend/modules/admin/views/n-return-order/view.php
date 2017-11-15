@@ -7,8 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\NReturnOrder */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Nreturn Orders', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = ['label' => 'Возврат ЛИС', 'url' => ['index']];
 ?>
 <div class="nreturn-order-view">
 

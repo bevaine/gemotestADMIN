@@ -8,7 +8,6 @@ use yii\helpers\Html;
 
 $this->title = 'Создать Возврат ЛИС';
 $this->params['breadcrumbs'][] = ['label' => 'Возврат ЛИС', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="nreturn-order-create">
 
