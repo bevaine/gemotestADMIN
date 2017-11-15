@@ -37,7 +37,34 @@
                                     ]
                                 ]
                             ],
-                            ['label' => 'Смены', 'icon' => 'file-code-o', 'url' => ['/admin/workshift'],],
+                            ['label' => 'Возвраты', 'icon' => 'circle-o', 'url' => '#', 'items' =>
+                                [
+                                    [
+                                        'label' => 'Возврат ЛИС',
+                                        'active' => true,
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/n-return-order'],
+                                    ],
+                                    [
+                                        'label' => 'Воз. ЛИС (без номен.)',
+                                        'active' => true,
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/n-return-without-item'],
+                                    ],
+                                    [
+                                        'label' => 'Возврат МИС',
+                                        'active' => true,
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/med-return-order'],
+                                    ],
+                                    [
+                                        'label' => 'Воз. МИС (без номен.)',
+                                        'active' => true,
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/med-return-without-item'],
+                                    ],
+                                ]
+                            ],
                             ['label' => 'Заказы', 'icon' => 'file-code-o', 'url' => ['/admin/orders'],],
                             ['label' => 'Платежи', 'icon' => 'dashboard', 'url' => ['/admin/pay'],],
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
