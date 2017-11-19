@@ -50,9 +50,9 @@ use common\components\helpers\ActiveSyncHelper;
  * @property integer $GarantLetter
  * @property Operators $operators
  * @property NAdUsers $adUsersMany
- * @property NAdUsers $adUsersOne
+ * @property NAdUsers $adUsers
  * @property NAdUserAccounts $adUserAccountsMany
- * @property NAdUserAccounts $adUserAccountsOne
+ * @property NAdUserAccounts $adUserAccounts
  * @property DirectorFlo $directorFlo
  * @property DirectorFlo $directorInfo
  * @property integer $idAD
@@ -149,32 +149,6 @@ class Logins extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdUsersMany()
-    {
-        return $this->hasMany(NAdUsers::className(), [
-            'gs_id' => 'aid',
-            'gs_usertype' => 'UserType',
-            //'gs_key' => 'Key',
-        ]);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAdUserAccountsMany()
-    {
-        return $this->adUsersMany ? $this->hasMany(NAdUseraccounts::className(), [])
-            ->andOnCondition('\'lab\\\' + [n_ad_Users].[AD_login] = [n_ad_Useraccounts].[ad_login]')
-//            ->andOnCondition('[n_ad_Useraccounts].[gs_type] = CASE
-//                    WHEN [Logins].[UserType] = 8 THEN \'FLO\'
-//                    ELSE \'SLO\'
-//                    END')
-           : null;
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getDirectorFlo()
     {
         return $this->hasOne(DirectorFlo::className(), [])
@@ -189,7 +163,6 @@ class Logins extends \yii\db\ActiveRecord
         return $this->hasOne(DirectorFloSender::className(), [])
             ->andOnCondition('[DirectorFloSender].[director_id] = [DirectorFlo].[id]');
     }
-
 
     /**
      * @param $userType
@@ -212,23 +185,54 @@ class Logins extends \yii\db\ActiveRecord
         return $this->hasOne(DirectorFlo::className(), ['login' => 'Login']);
     }
 
+
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdUsersOne()
+    public function getAdUsersMany()
     {
-        return !empty($this->idAD) ? NAdUsers::find()
-            ->where(['[n_ad_Users].[ID]' => $this->idAD])
+        return $this->hasMany(NAdUsers::className(), [
+            'gs_id' => 'aid',
+            'gs_usertype' => 'UserType',
+        ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdUsers()
+    {
+        if (!empty($this->idAD)) {
+            return NAdUsers::find()->where(['[n_ad_Users].[ID]' => $this->idAD]);
+        }
+
+        return $this->hasOne(NAdUsers::className(), [
+            'gs_id' => 'aid',
+            'gs_usertype' => 'UserType'
+        ]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAdUserAccountsMany()
+    {
+        return $this->adUsersMany ? $this->hasMany(NAdUseraccounts::className(), [])
+            ->andOnCondition('\'lab\\\' + [n_ad_Users].[AD_login] = [n_ad_Useraccounts].[ad_login]')
+//            ->andOnCondition('[n_ad_Useraccounts].[gs_type] = CASE
+//                    WHEN [Logins].[UserType] = 8 THEN \'FLO\'
+//                    ELSE \'SLO\'
+//                    END')
             : null;
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdUserAccountsOne()
+    public function getAdUserAccounts()
     {
-        return $this->adUsersOne ? NAdUseraccounts::find()
-            ->where(['ad_login' => 'lab\\'.$this->adUsersOne->AD_login])
+        return $this->adUsers ? NAdUseraccounts::find()
+            ->where(['ad_login' => 'lab\\'.$this->adUsers->AD_login])
             : null;
     }
 

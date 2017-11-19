@@ -23,7 +23,7 @@ if (empty($model->block_register) || strtotime($model->block_register) > time())
     $blockRegister = false;
 }
 if (!empty($ad)) {
-    if ($model->adUsersOne->auth_ldap_only == 1) {
+    if ($model->adUsers->auth_ldap_only == 1) {
         $activeGS = false;
     }
 } else {
@@ -79,14 +79,14 @@ if (!empty($ad)) {
         'attributes' => [
             [
                 'label' => 'Авторизация через',
-                'attribute' => 'adUsersOne.auth_ldap_only',
+                'attribute' => 'adUsers.auth_ldap_only',
                 'format' => 'raw',
                 'value' => function ($model) {
                     /** @var \common\models\Logins $model  */
-                    if ($model->adUsersOne) {
-                        if ($model->adUsersOne->auth_ldap_only == 0) {
+                    if ($model->adUsers) {
+                        if ($model->adUsers->auth_ldap_only == 0) {
                             return '<span class="text-success"><b>GemoSystem</b></span>';
-                        } elseif ($model->adUsersOne->auth_ldap_only == 1) {
+                        } elseif ($model->adUsers->auth_ldap_only == 1) {
                             return '<span class="text-info"><b>Active Directory</b></span>';
                         }
                     }
@@ -110,7 +110,27 @@ if (!empty($ad)) {
             'Pass',
             [
                 'label' => 'Логин AD',
-                'value' => !empty($model->adUsersOne->AD_login) ? 'lab\\'.$model->adUsersOne->AD_login : null
+                'value' => !empty($model->adUsers->AD_login) ? 'lab\\'.$model->adUsers->AD_login : null
+            ],
+
+            [
+                'label' => 'Пароль AD',
+                'attribute' => 'adUserAccounts.ad_pass',
+            ],            [
+                'label' => 'Фамилия AD',
+                'attribute' => 'adUsers.last_name',
+            ],
+            [
+                'label' => 'Имя AD',
+                'attribute' => 'adUsers.first_name',
+            ],
+            [
+                'label' => 'Отчество AD',
+                'attribute' => 'adUsers.middle_name',
+            ],
+            [
+                'label' => 'Должность AD',
+                'attribute' => 'adUsers.AD_position',
             ],
             [
                 'label' => 'Почта (директор)',
@@ -121,25 +141,6 @@ if (!empty($ad)) {
                 'label' => 'Моб. номер (директор)',
                 'attribute' => 'directorInfo.phoneNumber',
                 'visible' => $model->UserType == 9 ? true : false
-            ],
-            [
-                'label' => 'Пароль AD',
-                'attribute' => 'adUserAccountsOne.ad_pass',
-            ],            [
-                'label' => 'Фамилия AD',
-                'attribute' => 'adUsersOne.last_name',
-            ],
-            [
-                'label' => 'Имя AD',
-                'attribute' => 'adUsersOne.first_name',
-            ],
-            [
-                'label' => 'Отчество AD',
-                'attribute' => 'adUsersOne.middle_name',
-            ],
-            [
-                'label' => 'Должность AD',
-                'attribute' => 'adUsersOne.AD_position',
             ],
             'Email:email',
             'Logo',

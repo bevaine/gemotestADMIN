@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="logins-index">
 
     <p>
-        <?php //Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
+        <?php Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([

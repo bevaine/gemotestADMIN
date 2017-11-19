@@ -123,12 +123,21 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        echo strpos('ldap_add(): Add: Constraint violation', 'Add: Constraint violation') !== false;
+        exit;
+
+
+        echo $this->translit($this->firstName.".".
+            substr($this->middleName,0,1).".".$this->lastName);
         $ActiveSyncHelper = new ActiveSyncHelper();
+        print_r($ActiveSyncHelper->resetPasswordAD('test777.test777'));
+        exit;
+
         $ActiveSyncHelper->fullName = 'sdfsd dsfs dsdf';
-        $ActiveSyncHelper->accountName = 'test4';
+        $ActiveSyncHelper->accountName = 'test7';
         $ActiveSyncHelper->typeLO = "SLO";
-        $ActiveSyncHelper->firstName = "test4";
-        $ActiveSyncHelper->lastName = "test4";
+        $ActiveSyncHelper->firstName = "test7";
+        $ActiveSyncHelper->lastName = "test7";
         $ActiveSyncHelper->operatorofficestatus = "sdfsd";
         print_r($ActiveSyncHelper->addNewUserAd());
         exit;

@@ -82,8 +82,8 @@ class LoginsController extends Controller
                 }
                 break;
             case 'active-gs':
-                if ($model->adUsersOne) {
-                    $modelAdUser = $model->adUsersOne;
+                if ($model->adUsers) {
+                    $modelAdUser = $model->adUsers;
                     if ($status == 'block') {
                         $modelAdUser->auth_ldap_only = 1;
                     } elseif ($status == 'active') {
@@ -260,15 +260,17 @@ class LoginsController extends Controller
             $newUserData = $activeSyncHelper->checkAccount();
 
             if ($newUserData) {
-                if ($newUserData['state'] == 'new') {
+                $message = '';
+                $style = '';
+                if ($activeSyncHelper->state == 'new') {
                     $style = 'success';
                     $message = '<p>Успешно добавлена УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
-                } else {
+                } elseif ($activeSyncHelper->state == 'old') {
                     $style = 'warning';
                     $message = '<p>У пользователя <b>'.$activeSyncHelper->fullName.'</b> уже есть УЗ для авторизации через AD</p>';
                 }
                 if (!empty($newUserData['login'] && $newUserData['password'])) {
-                    $message .= '<p>Данные для входа в GomoSystem:<p>';
+                    $message .= '<p>Данные для входа в GemoSystem:<p>';
                     $message .= '<br>Логин: ' . $newUserData['login'];
                     $message .= '<br>Пароль: ' . $newUserData['password'];
                 }
@@ -299,7 +301,7 @@ class LoginsController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save())
         {
-            if ($adUsersLogins = $model->adUsersOne) {
+            if ($adUsersLogins = $model->adUsers) {
                 if ($adUsersLogins->load(Yii::$app->request->post())) {
                     $adUsersLogins->save();
                 }
