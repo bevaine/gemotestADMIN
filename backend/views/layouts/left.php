@@ -15,53 +15,65 @@
                         'url' => '#',
                         //'active' => true,
                         'items' => [
-                            ['label' => 'Смены', 'icon' => 'circle-o', 'url' => '#', 'items' =>
+                            ['label' => 'Смены', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
                                     [
                                         'label' => 'Смены',
-                                        'active' => true,
                                         'icon' => 'dashboard',
                                         'url' => ['/admin/workshift'],
                                     ],
                                     [
                                         'label' => 'Доб. в смене',
-                                        'active' => true,
                                         'icon' => 'dashboard',
                                         'url' => ['/admin/branch-staff'],
                                     ],
                                     [
                                         'label' => 'Взятие БМ',
-                                        'active' => true,
                                         'icon' => 'dashboard',
                                         'url' => ['/admin/input-order-zabor'],
                                     ]
                                 ]
                             ],
-                            ['label' => 'Возвраты', 'icon' => 'circle-o', 'url' => '#', 'items' =>
-                                [
+                            [
+                                'label' => 'Возвраты',
+                                'icon' => 'circle-o',
+                                'url' => '#',
+                                'items' => [
                                     [
-                                        'label' => 'Возврат ЛИС',
+                                        'label' => 'Лабораторные',
                                         'active' => true,
                                         'icon' => 'dashboard',
-                                        'url' => ['/admin/n-return-order'],
+                                        'url' => [''],
+                                        'items' => [
+                                            [
+                                                'label' => 'Возвраты',
+                                                'icon' => 'dashboard',
+                                                'url' => ['/admin/n-return-order'],
+                                            ],
+                                            [
+                                                'label' => 'Без номенклатуры',
+                                                'icon' => 'dashboard',
+                                                'url' => ['/admin/n-return-without-item'],
+                                            ],
+                                        ]
                                     ],
                                     [
-                                        'label' => 'Воз. ЛИС (без номен.)',
+                                        'label' => 'Медицинские',
                                         'active' => true,
                                         'icon' => 'dashboard',
-                                        'url' => ['/admin/n-return-without-item'],
-                                    ],
-                                    [
-                                        'label' => 'Возврат МИС',
-                                        'active' => true,
-                                        'icon' => 'dashboard',
-                                        'url' => ['/admin/med-return-order'],
-                                    ],
-                                    [
-                                        'label' => 'Воз. МИС (без номен.)',
-                                        'active' => true,
-                                        'icon' => 'dashboard',
-                                        'url' => ['/admin/med-return-without-item'],
+                                        'url' => [''],
+                                        'items' => [
+                                            [
+                                                'label' => 'Возвраты',
+                                                'icon' => 'dashboard',
+                                                'url' => ['/admin/med-return-order'],
+                                            ],
+                                            [
+                                                'label' => 'Без номенклатуры',
+                                                'icon' => 'dashboard',
+                                                'url' => ['/admin/med-return-without-item'],
+                                            ],
+                                        ]
                                     ],
                                 ]
                             ],
@@ -70,11 +82,11 @@
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
                             ['label' => 'Контрагенты', 'icon' => 'dashboard', 'url' => ['/admin/kontragents'],],
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
-                            ['label' => 'Таблицы', 'icon' => 'circle-o', 'url' => '#', 'items' =>
+                            ['label' => 'Таблицы', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
                                     [
                                         'label' => 'NAdUsers',
-                                        'active' => true,
+
                                         'icon' => 'dashboard',
                                         'url' => ['/admin/n-ad-users'],
                                     ],
@@ -82,7 +94,7 @@
                             ],
                             ['label' => 'Операции', 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
-                                    ['label' => 'Сбой инхронизации', 'active' => true, 'icon' => 'dashboard', 'url' => 'http://labc:57772/csp/syncutils/sumain.csp',],
+                                    ['label' => 'Сбой инхронизации', 'icon' => 'dashboard', 'url' => 'http://labc:57772/csp/syncutils/sumain.csp',],
                                 ]
                             ],
                         ],
@@ -91,13 +103,13 @@
                         'label' => 'Служебные',
                         'icon' => 'share',
                         'url' => '#',
-                        'active' => true,
+                        //'active' => true,
                         'items' => [
                             ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                             ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
                             [
                                 'label' => 'Пользователи',
-                                'active' => true,
+                                //'active' => true,
                                 'icon' => 'circle-o',
                                 'url' => '#',
                                 'items' => [
