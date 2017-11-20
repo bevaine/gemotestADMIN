@@ -187,7 +187,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             if ($action == 'user' || $action == 'franch') {
                                 echo Html::Button('Создать', ['class' => 'btn btn-success']);
                             } else {
-                                echo Html::submitButton('Создать', ['class' => 'btn btn-success']);
+                                //echo Html::submitButton('Создать', ['class' => 'btn btn-success']);
                             }
                             ?>
                         </div>
