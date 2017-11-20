@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
+use common\models\Doctors;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\AddUserForm */
@@ -19,7 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <ul class="nav nav-tabs">
                 <li class="<?= ($action == 'user') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/user"]) ?>">Пользователи</a></li>
                 <li class="<?= ($action == 'org') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/org"]) ?>">Юр. лица</a></li>
-                <li class="<?= ($action == 'doc') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/doc"]) ?>">Врач. иное</a></li>
+                <li class="<?= ($action == 'doc') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/doc"]) ?>">Врач конс.</a></li>
                 <li class="<?= ($action == 'franch') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/franch"]) ?>">Франчайзи</a></li>
             </ul>
 
@@ -123,6 +124,14 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <?php if ($action == 'doc') : ?>
                             <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?php
+                                        $getDoctorsList = Doctors::getDoctorsList();
+                                        echo $form->field($model, 'key')->dropDownlist($getDoctorsList['arrValues'], $getDoctorsList['arrOptions'])
+                                        ?>
+                                    </div>
+                                </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <?= $form->field($model, 'lastName')->textInput() ?>

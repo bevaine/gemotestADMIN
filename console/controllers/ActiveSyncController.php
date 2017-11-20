@@ -123,6 +123,9 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        print_r(\common\models\Doctors::getDoctorsList());
+        exit;
+
         echo strpos('ldap_add(): Add: Constraint violation', 'Add: Constraint violation') !== false;
         exit;
 

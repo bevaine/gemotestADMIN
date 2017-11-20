@@ -25,6 +25,7 @@ return [
             'charset' => 'utf8',
         ],
         'GemoTestDB' => [
+        //'db' => [
             'class' => 'yii\db\Connection',
             'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
             'username' => 'importfromcache',

@@ -466,7 +466,7 @@ class ActiveSyncHelper
             if (!$this->addUserAdTables()) return false;
 
             //todo добавление ролей для пользователя
-            //if (!$this->addPermissions($this->aid, $this->department, $this->nurse)) return false;
+            if (!$this->addPermissions($this->aid, $this->department, $this->nurse)) return false;
 
             if (!empty($this->aid) &&
                 !empty($this->loginAD) &&
@@ -634,12 +634,15 @@ class ActiveSyncHelper
             foreach ($permissions[$department] as $permission) {
                 $rowInsert[] = [$permission, $aid, 'N;'];
             }
-
             try {
-                Yii::$app->db->createCommand()->batchInsert(
+                $connection = 'GemoTestDB';
+                $db = Yii::$app->$connection;
+
+                $db->createCommand()->batchInsert(
                     NAuthASsignment::tableName(),
                     ['itemname', 'userid', 'data'],
-                    $rowInsert)->execute();
+                    $rowInsert
+                )->execute();
             } catch (Exception $e) {
                 Yii::getLogger()->log([
                     'ActiveSyncController->batchInsert'=>$e->getMessage()
