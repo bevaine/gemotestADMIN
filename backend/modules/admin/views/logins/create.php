@@ -148,6 +148,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <?= $form->field($model, 'key')->dropDownlist(\common\models\AddUserForm::getKeysList(), ['prompt' => '---', 'disabled' => false]); ?>
                                     </div>
                                 </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
+                                    </div>
+                                </div>
                             </div>
                             <div class="row">
                                 <div class="col-lg-4">

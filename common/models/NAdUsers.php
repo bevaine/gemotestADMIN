@@ -30,6 +30,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $auth_ldap_only
  * @property Logins $logins
  * @property NAdUserAccounts $adUserAccounts
+ * @property NAdUserAccounts $adUserAccountsOne
  * @property t23 $publicEmployee
  */
 class NAdUsers extends \yii\db\ActiveRecord
@@ -130,6 +131,15 @@ class NAdUsers extends \yii\db\ActiveRecord
             'first_name' => 'first_name',
             'middle_name' => 'middle_name',
         ]);
+    }
+
+    /**
+     * @param $account
+     * @return static
+     */
+    static function findAdAccount($account)
+    {
+        return self::findOne(['AD_login' => $account]);
     }
 
     /**

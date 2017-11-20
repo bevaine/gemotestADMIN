@@ -213,6 +213,15 @@ class Logins extends \yii\db\ActiveRecord
     }
 
     /**
+     * @param $AdLogin
+     * @return static
+     */
+    public function getCheckAdLogin($AdLogin)
+    {
+        return self::findOne(['AD_login' => $AdLogin]);
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getAdUserAccountsMany()

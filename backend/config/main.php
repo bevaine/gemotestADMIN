@@ -126,7 +126,8 @@ return [
                 '/retryConfirmEmail' => '/user/user/retry-confirm-email',
                 '/confirmEmail' => '/user/user/confirm-email',
                 '/unbind/<id:[\w\-]+>' => '/user/auth/unbind',
-                '/oauth/<authclient:[\w\-]+>' => '/user/auth/index'
+                '/oauth/<authclient:[\w\-]+>' => '/user/auth/index',
+                'GET /admin/logins/create/<param>' => '/admin/logins/create',
             ],
         ],
         'authManager' => [

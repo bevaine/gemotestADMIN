@@ -5,7 +5,7 @@ namespace common\models;
 use Yii;
 
 /**
- * This is the model class for table "n_AuthASsignment".
+ * This is the model class for table "n_AuthAssignment".
  *
  * @property string $itemname
  * @property string $userid
@@ -26,7 +26,7 @@ class NAuthASsignment extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'n_AuthASsignment';
+        return 'n_AuthAssignment';
     }
 
     /**

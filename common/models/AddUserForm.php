@@ -48,7 +48,7 @@ class AddUserForm extends Model
             self::SCENARIO_ADD_USER => ['type', 'department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
             self::SCENARIO_ADD_DOC => ['lastName', 'firstName', 'middleName'],
             self::SCENARIO_ADD_ORG => ['name', 'key', 'login', 'blankText', 'email'],
-            self::SCENARIO_ADD_FR => ['key', 'lastName', 'firstName', 'middleName'],
+            self::SCENARIO_ADD_FR => ['key', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
         ];
     }
 

@@ -183,11 +183,10 @@ class LoginsController extends Controller
     }
 
     /**
-     * Creates a new AddUserForm model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param string $param
+     * @return string
      */
-    public function actionCreate($param)
+    public function actionCreate($param = 'user')
     {
         $model = new AddUserForm();
         $activeSyncHelper = new ActiveSyncHelper();
@@ -206,8 +205,6 @@ class LoginsController extends Controller
                 break;
         }
 
-        //print_r($activeSyncHelper);
-
         if ($model->load(Yii::$app->request->post()))
         {
             if ($param == 'user') {
@@ -224,9 +221,11 @@ class LoginsController extends Controller
                 $activeSyncHelper->typeLO = 'FLO';
                 $activeSyncHelper->type = 8;
                 $activeSyncHelper->key = $model->key;
+                $activeSyncHelper->cacheId = $model->key;
                 $activeSyncHelper->lastName = $model->lastName;
                 $activeSyncHelper->firstName = $model->firstName;
                 $activeSyncHelper->middleName = $model->middleName;
+                $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
             } elseif ($param == 'org') {
                 $activeSyncHelper->type = 3;
                 $activeSyncHelper->key = $model->key;

@@ -29,6 +29,14 @@ class NAdUseraccounts extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return array
+     */
+    public static function PrimaryKey()
+    {
+        return ['ID'];
+    }
+
+    /**
      * @inheritdoc
      */
     public static function tableName()
@@ -63,6 +71,15 @@ class NAdUseraccounts extends \yii\db\ActiveRecord
             'ad_login' => 'Логин AD',
             'ad_pass' => 'Пароль AD',
         ];
+    }
+
+    /**
+     * @param $account
+     * @return static
+     */
+    static function findAdUserAccount($account)
+    {
+        return self::findOne(['ad_login' => $account]);
     }
 
     /**
