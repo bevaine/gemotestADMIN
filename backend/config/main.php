@@ -128,6 +128,7 @@ return [
                 '/unbind/<id:[\w\-]+>' => '/user/auth/unbind',
                 '/oauth/<authclient:[\w\-]+>' => '/user/auth/index',
                 'GET /admin/logins/create/<param>' => '/admin/logins/create',
+                'POST /admin/logins/create/<param>' => '/admin/logins/create'
             ],
         ],
         'authManager' => [

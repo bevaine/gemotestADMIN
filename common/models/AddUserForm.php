@@ -27,6 +27,8 @@ class AddUserForm extends Model
     public $login;
     public $blankText;
     public $email;
+    public $docId;
+    public $specId;
 
     CONST SCENARIO_ADD_USER = 'addUser';
     CONST SCENARIO_ADD_DOC = 'addUserDoc';
@@ -47,7 +49,7 @@ class AddUserForm extends Model
     {
         return [
             self::SCENARIO_ADD_USER => ['type', 'department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
-            self::SCENARIO_ADD_DOC => ['lastName', 'firstName', 'middleName'],
+            self::SCENARIO_ADD_DOC => ['docId', 'specId'],
             self::SCENARIO_ADD_ORG => ['name', 'key', 'login', 'blankText', 'email'],
             self::SCENARIO_ADD_FR => ['key', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
         ];
@@ -60,7 +62,7 @@ class AddUserForm extends Model
     {
         return [
             [['type', 'lastName', 'firstName', 'middleName', 'operatorofficestatus', 'department', 'nurse'], 'required', 'on' => 'addUser'],
-            [['lastName', 'firstName', 'middleName'], 'required', 'on' => 'addUserDoc'],
+            [['docId', 'specId'], 'required', 'on' => 'addUserDoc'],
             [['name', 'key', 'login', 'blankText', 'email'], 'required', 'on' => 'addUserOrg'],
             [['lastName', 'firstName', 'middleName', 'key'], 'required', 'on' => 'addUserFranch'],
             [['lastName', 'firstName', 'middleName'], 'string'],
@@ -87,7 +89,9 @@ class AddUserForm extends Model
             'key' => 'Ключ контрагента',
             'login' => 'Логин',
             'blankText' => 'Адрес организации',
-            'email' => 'Email'
+            'email' => 'Email',
+            'docId' => 'Доктор',
+            'specId' => 'Специализация'
         ];
     }
 

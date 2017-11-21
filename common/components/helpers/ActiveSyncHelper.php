@@ -48,6 +48,8 @@ use yii\db\ActiveRecord;
  * @property string  $state
  * @property string  $displayName
  * @property string  $cnName
+ * @property string  $docId
+ * @property string  $specId
  */
 
 class ActiveSyncHelper
@@ -83,6 +85,8 @@ class ActiveSyncHelper
     public $state;
     public $displayName;
     public $cnName;
+    public $docId;
+    public $specId;
 
     /**
     * @return array|null|\yii\db\ActiveRecord
@@ -408,8 +412,15 @@ class ActiveSyncHelper
          * @var Logins $findUserLogin
          * @var Logins $loginsObject
          */
+
+        //todo если доктор-консультант
+        if ($this->type == 4) {
+
+            if (empty($this->docId) || empty($this->specId)) return false;
+
+
         //todo если франчайзи (только проверяем запись в Logins)
-        if ($this->type == 8 && !empty($this->key)) {
+        } elseif ($this->type == 8 && !empty($this->key)) {
 
             //todo добавляем/сбрасываем пароль для УЗ AD
             if (!$this->createAdUserAcc()) return false;

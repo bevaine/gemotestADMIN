@@ -94,7 +94,7 @@
                             ],
                             ['label' => 'Операции', 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
-                                    ['label' => 'Сбой инхронизации', 'icon' => 'dashboard', 'url' => 'http://labc:57772/csp/syncutils/sumain.csp',],
+                                    ['label' => 'Сбой инхронизации', 'active' => true, 'icon' => 'dashboard', 'url' => 'http://labc:57772/csp/syncutils/sumain.csp',],
                                 ]
                             ],
                         ],

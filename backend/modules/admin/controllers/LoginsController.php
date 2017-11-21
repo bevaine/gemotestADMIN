@@ -234,9 +234,8 @@ class LoginsController extends Controller
                 $activeSyncHelper->middleName = $model->middleName;
             } elseif ($param == 'doc') {
                 $activeSyncHelper->type = 4;
-                $activeSyncHelper->lastName = $model->lastName;
-                $activeSyncHelper->firstName = $model->firstName;
-                $activeSyncHelper->middleName = $model->middleName;
+                $activeSyncHelper->docId = $model->docId;
+                $activeSyncHelper->specId = $model->specId;
             }
 
             $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;

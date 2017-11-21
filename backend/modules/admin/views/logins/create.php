@@ -128,23 +128,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class="form-group">
                                         <?php
                                         $getDoctorsList = Doctors::getDoctorsList();
-                                        echo $form->field($model, 'key')->dropDownlist($getDoctorsList['arrValues'], $getDoctorsList['arrOptions'])
+                                        echo $form->field($model, 'docId')->dropDownlist($getDoctorsList['arrValues'], array_merge(['prompt' => '---', 'disabled' => false], $getDoctorsList['arrOptions']))
                                         ?>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <?= $form->field($model, 'lastName')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'firstName')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'middleName')->textInput() ?>
+                                        <?= $form->field($model, 'specId')->dropDownlist(\common\models\SprDoctorSpec::getKeysList(), ['prompt' => '---', 'disabled' => false]); ?>
                                     </div>
                                 </div>
                             </div>
@@ -184,7 +174,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                         <div class="form-group">
                             <?php
-                            if ($action == 'user' || $action == 'franch') {
+                            if ($action == 'user' || $action == 'franch' || $action == 'doc') {
                                 echo Html::Button('Создать', ['class' => 'btn btn-success']);
                             } else {
                                 //echo Html::submitButton('Создать', ['class' => 'btn btn-success']);
