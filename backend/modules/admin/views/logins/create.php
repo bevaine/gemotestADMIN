@@ -19,7 +19,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <ul class="nav nav-tabs">
                 <li class="<?= ($action == 'user') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/user"]) ?>">Пользователи</a></li>
-                <li class="<?= ($action == 'org') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/org"]) ?>">Юр. лица</a></li>
                 <li class="<?= ($action == 'doc') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/doc"]) ?>">Врач конс.</a></li>
                 <li class="<?= ($action == 'franch') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/franch"]) ?>">Франчайзи</a></li>
             </ul>
@@ -73,50 +72,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <?= $form->field($model, 'type')->dropDownlist(\common\models\AddUserForm::getTypesArray()) ?>
+                                        <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <?= $form->field($model, 'nurse')->dropDownlist(\common\models\AddUserForm::getNurses()) ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <?php if ($action == 'org') : ?>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'name')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'key')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'login')->textInput() ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'email')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'blankText')->textarea() ?>
                                     </div>
                                 </div>
                             </div>
@@ -190,7 +151,7 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
     <script>
-        function checkAD (department = null, last_name, first_name, middle_name)
+        function checkAD (department = null, key_doc, last_name, first_name, middle_name)
         {
             if (department === '4' || department === '5') {
                 $("#form-input").submit();
@@ -198,6 +159,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 $.ajax({
                     url: '/admin/logins/ajax-for-active',
                     data: {
+                        doc_id: key_doc,
                         last_name: last_name,
                         first_name: first_name,
                         middle_name: middle_name
@@ -207,7 +169,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             $("#form-input").submit();
                         } else {
                             res = JSON.parse(res);
-                            //console.log(res.length);
+                            console.log(res.length);
                             if (res.length > 0) {
                                 var html = "";
                                 var htm_header = "";
@@ -235,11 +197,12 @@ $this->params['breadcrumbs'][] = $this->title;
     </script>
 <?php
 
-if ($action == 'user' || $action == 'franch') {
+if ($action == 'user' || $action == 'franch' || $action == 'doc'  ) {
     $js = <<< JS
         $(".btn-success").click(function() { 
             checkAD(
                 $('#adduserform-department').val(),
+                $('#adduserform-docid').val(),
                 $('#adduserform-lastname').val(),
                 $('#adduserform-firstname').val(),
                 $('#adduserform-middlename').val());

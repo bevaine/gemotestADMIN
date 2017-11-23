@@ -10,6 +10,8 @@ namespace common\components\helpers;
 
 use Yii;
 use Exception;
+use common\models\Doctors;
+use common\models\SprDoctorSpec;
 use common\models\ErpNurses;
 use common\models\ErpUsers;
 use common\models\Logins;
@@ -19,7 +21,6 @@ use common\models\NAdUsers;
 use common\models\NAuthASsignment;
 use common\models\NNurse;
 use common\models\Operators;
-use yii\db\ActiveRecord;
 
 /**
  * Class ActiveSyncHelper
@@ -48,18 +49,17 @@ use yii\db\ActiveRecord;
  * @property string  $state
  * @property string  $displayName
  * @property string  $cnName
- * @property string  $docId
  * @property string  $specId
  */
 
 class ActiveSyncHelper
 {
-    CONST TYPE_LO = "SLO";
-    CONST POWER_SHELL_PATH = "C:\Windows\System32\WindowsPowerShell\\v1.0\powershell.exe -Command";
     CONST LDAP_SERVER = '192.168.108.3';
     CONST LDAP_LOGIN = 'dymchenko.adm@lab.gemotest.ru';
     CONST LDAP_PASSW = '2Hszfaussw';
     CONST LDAP_DN = "DC=lab,DC=gemotest,DC=ru";
+    CONST LOGO_TEXT = '107031 Москва, Рождественский бульвар д.21, ст.2^*^тел. (495) 532-13-13, 8(800) 550-13-13^*^www.gemotest.ru';
+    CONST LOGO_IMG = 'logos/LogoGemotest.gif';
 
     public $lastName;
     public $firstName;
@@ -85,7 +85,6 @@ class ActiveSyncHelper
     public $state;
     public $displayName;
     public $cnName;
-    public $docId;
     public $specId;
 
     /**
@@ -100,14 +99,33 @@ class ActiveSyncHelper
     }
 
     /**
-     * @return array|null|\yii\db\ActiveRecord
+     * @return boolean
      */
     public function checkFranchazyAccount()
     {
-        return $loginSearch = Logins::find()
+        if (empty($this->key)
+        ) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addUserAD'=>'addCheckOperators: Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
+
+        /** @var $loginSearch Logins */
+        $loginSearch = Logins::find()
             ->andFilterWhere(['Key' => $this->key])
             ->andFilterWhere(['UserType' => 8])
             ->one();
+
+        if ($loginSearch) {
+            $this->emailAD = $loginSearch->Email;
+            $this->aid = $loginSearch->aid;
+            return true;
+        } else {
+            $message = '<p>У данного контрагента нет УЗ, невозможно добавить <b>' . $this->fullName . '</b></p>';
+            Yii::$app->session->setFlash('error', $message);
+            return false;
+        }
     }
 
     /**
@@ -155,6 +173,11 @@ class ActiveSyncHelper
         ];
     }
 
+    public function setLoginDoctor()
+    {
+        $this->aid = 1000000 + strval($this->key);
+        $this->loginGS = 'reg'.$this->key;
+    }
     /**
      * @return bool
      */
@@ -167,19 +190,21 @@ class ActiveSyncHelper
         if (empty($this->lastName)
             || empty($this->firstName)
             || empty($this->middleName)
-        ) return false;
+        ) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addUserAD'=>'addCheckOperators: Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
 
         //todo проверяем существует ли запись в Operators
         if (!$objectOperators = $this->checkOperatorAccount()) {
 
-            //todo если нет, то добавление в Operators
-            $cacheId = Operators::find()
-                ->select('CACHE_OperatorID')
-                ->orderBy('AID DESC')
-                ->one();
+            $this->setCachePass();
 
-            $this->cacheId = strval($cacheId->CACHE_OperatorID) + 1;
-            $this->cachePass = Yii::$app->getSecurity()->generateRandomString(8);
+            $this->setLastOperatorCacheId();
+
+            //todo если нет, то добавление в Operators
             $objectOperators = new Operators();
             $objectOperators->CACHE_Login = $this->accountName;
             $objectOperators->Name = $this->firstName." ".$this->middleName;
@@ -193,11 +218,20 @@ class ActiveSyncHelper
             $objectOperators->InputOrderRM = 1;
             $objectOperators->mto_editor = 0;
 
+            $objectOperators->MedReg = ($this->department == 5) ? 1 : 0;
+            $objectOperators->mto = in_array($this->department, [2,3,5,6]) ? 1 : 0;
+            $objectOperators->OrderEdit = in_array($this->department, [3,4,6]) ? 1 : 0;
+            $objectOperators->ClientMen = in_array($this->department, [3,4,6]) ? 1 : 0;
+
             if (!$objectOperators->save()) {
-                Yii::getLogger()->log(['$objectOperators->save()'=>$objectOperators->errors], 1, 'binary');
+                Yii::getLogger()->log([
+                    '$objectOperators->save()'=>$objectOperators->errors
+                ], 1, 'binary');
                 return false;
             } else {
-                Yii::getLogger()->log(['$objectOperators->save()'=>$objectOperators], 1, 'binary');
+                Yii::getLogger()->log([
+                    '$objectOperators->save()'=>$objectOperators
+                ], 1, 'binary');
             }
         }
 
@@ -209,12 +243,30 @@ class ActiveSyncHelper
         return true;
     }
 
+    private function setLastOperatorCacheId() {
+        /** @var  $cacheId Operators */
+        $cacheId = Operators::find()
+            ->select('CACHE_OperatorID')
+            ->orderBy('AID DESC')
+            ->one();
+        $this->cacheId = strval($cacheId->CACHE_OperatorID) + 1;
+    }
+
+    private function setCachePass() {
+        $this->cachePass = Yii::$app->getSecurity()->generateRandomString(8);
+    }
+
     /**
      * @return mixed
      */
     public function addCheckLogins()
     {
-        if (empty($this->fullName) || empty($this->cacheId)) return false;
+        if (empty($this->fullName) || empty($this->cacheId)) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addUserAD'=>'addCheckLogins: Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
 
         //todo проверяем существует ли запись в Logins
         /** @var  $objectUsersLogins Logins*/
@@ -230,24 +282,30 @@ class ActiveSyncHelper
                 || empty($this->loginGS)
                 || empty($this->cacheId)
                 || empty($this->cachePass)
-            ) return false;
+            ) {
+                Yii::getLogger()->log([
+                    'ActiveSyncController=>addUserAD'=>'addCheckLogins: Одно из обязательных полей пустое!'
+                ], 1, 'binary');
+                return false;
+            }
 
             $this->state = 'new';
-            $logo = 'logos/LogoGemotest.gif';
-            $logoText = '107031 Москва, Рождественский бульвар д.21, ст.2^*^тел. (495) 532-13-13, 8(800) 550-13-13^*^www.gemotest.ru';
+            $loginName = $this->cacheId;
+            if (!empty($this->operatorofficestatus)) $loginName .= '.' . $this->operatorofficestatus;
+            $loginName .= "." . $this->fullName;
 
             $objectUsersLogins = new Logins();
             $objectUsersLogins->aid = $this->aid;
             $objectUsersLogins->Login = $this->loginGS;
             $objectUsersLogins->Pass = $this->cachePass;
-            $objectUsersLogins->Name = $this->cacheId . '.' . $this->operatorofficestatus . ':' . $this->fullName;
+            $objectUsersLogins->Name = $loginName;
             $objectUsersLogins->Email = $this->emailAD;
             $objectUsersLogins->Key = strval($this->cacheId);
             $objectUsersLogins->UserType = $this->type;
             $objectUsersLogins->CACHE_Login = $this->accountName;
             $objectUsersLogins->last_update_password = date("Y-m-d G:i:s:000");
-            $objectUsersLogins->Logo = $logo;
-            $objectUsersLogins->LogoText = $logoText;
+            $objectUsersLogins->Logo = self::LOGO_IMG ;
+            $objectUsersLogins->LogoText = self::LOGO_TEXT;
             $objectUsersLogins->tbl = 'Operators';
             $objectUsersLogins->IsAdmin = 0;
             $objectUsersLogins->IsOperator = 1;
@@ -257,22 +315,31 @@ class ActiveSyncHelper
             $objectUsersLogins->TextPaddingLeft = '';
             $objectUsersLogins->OpenExcel = 0;
             $objectUsersLogins->EngVersion = 0;
-            $objectUsersLogins->IsDoctor = 2;
             $objectUsersLogins->InputOrder = 1;
             $objectUsersLogins->PriceID = 0;
             $objectUsersLogins->CanRegister = 1;
-            $objectUsersLogins->InputOrderRM = 1;
-            $objectUsersLogins->OrderEdit = 0;
             $objectUsersLogins->goscontract = 0;
             $objectUsersLogins->FizType = 0;
             $objectUsersLogins->mto_editor = 0;
 
+            $objectUsersLogins->IsDoctor = ($this->department == 8) ? 0 : 2;
+            $objectUsersLogins->InputOrderRM = ($this->department == 8) ? 0 : 1;
+            $objectUsersLogins->OrderEdit = ($this->department == 8) ? 1 : 0;
+            $objectUsersLogins->MedReg = ($this->department == 5) ? 1 : 0;
+            $objectUsersLogins->mto = in_array($this->department, [2,3,5,6]) ? 1 : 0;
+            $objectUsersLogins->clientmen = in_array($this->department, [3,4,6]) ? 1 : 0;
+            $objectUsersLogins->show_preanalytic = in_array($this->department, [4,5]) ? 1 : 0;
+
             if (!$objectUsersLogins->save()) {
-                Yii::getLogger()->log(['$objectUsersLogins->save()' => $objectUsersLogins->errors], 1, 'binary');
+                Yii::getLogger()->log([
+                    '$objectUsersLogins->save()' => $objectUsersLogins->errors
+                ], 1, 'binary');
                 return false;
             } else {
                 $this->state = 'new';
-                Yii::getLogger()->log(['$objectUsersLogins->save()' => $objectUsersLogins], 1, 'binary');
+                Yii::getLogger()->log([
+                    '$objectUsersLogins->save()' => $objectUsersLogins
+                ], 1, 'binary');
             }
         }
 
@@ -287,9 +354,12 @@ class ActiveSyncHelper
      */
     public function addNewAdUserAccount()
     {
-        if (empty($this->accountName)
-            || empty($this->passwordAD)
-        ) return false;
+        if (empty($this->accountName) || empty($this->passwordAD)) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addUserAD'=>'Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
 
         $this->loginAD = "lab\\".$this->accountName;
         $objectUserAccountsAD = NAdUseraccounts::findAdUserAccount($this->loginAD);
@@ -309,7 +379,12 @@ class ActiveSyncHelper
             || empty($this->firstName)
             || empty($this->middleName)
             || empty($this->cacheId)
-        ) return false;
+        ) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addUserAD'=>'addNewAdUserAccount: Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
 
         $objectUserAccountsAD = new NAdUseraccounts();
         $objectUserAccountsAD->last_name = $this->lastName;
@@ -349,7 +424,12 @@ class ActiveSyncHelper
             || empty($this->fullName)
             || empty($this->aid)
             || empty($this->cacheId)
-        ) return false;
+        ) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addUserAD'=>'addNewAdUsers: Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
 
         $objectUserAD = new NAdUsers();
         $objectUserAD->last_name = $this->lastName;
@@ -385,9 +465,25 @@ class ActiveSyncHelper
      */
     public function addLpassUsers()
     {
+        if (empty($this->cacheId)
+            || empty($this->type)
+            || empty($this->loginGS)
+            || empty($this->cachePass)
+        ) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addLpassUsers'=>'Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
+
+        if (LpASs::findOne([
+            'ukey' => strval($this->cacheId),
+            'utype' => $this->type
+            ])) return true;
+
         $objectLpASs = new LpASs();
         $objectLpASs->ukey = strval($this->cacheId);
-        $objectLpASs->utype = strval(7);
+        $objectLpASs->utype = strval($this->type);
         $objectLpASs->login = $this->loginGS;
         $objectLpASs->pass = $this->cachePass;
         $objectLpASs->dateins = date("Y-m-d G:i:s:000");
@@ -396,10 +492,48 @@ class ActiveSyncHelper
         $objectLpASs->active = strval(1);
 
         if (!$objectLpASs->save()) {
-            Yii::getLogger()->log(['ActiveSyncController:objectLpASs'=>$objectLpASs->errors], 1, 'binary');
+            Yii::getLogger()->log([
+                'ActiveSyncController:objectLpASs'=>$objectLpASs->errors
+            ], 1, 'binary');
+            return false;
+        } else {
+            Yii::getLogger()->log([
+                '$objectLpASs->save()' => $objectLpASs
+            ], 1, 'binary');
+        }
+
+        return true;
+    }
+
+    private function setDoctorObjectParams() {
+
+        if (empty($this->key) || empty($this->specId)) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>setDoctorObjectParams'=>'Одно из обязательных полей пустое!'
+            ], 1, 'binary');
             return false;
         }
 
+        $doctorModel = Doctors::findOne([
+            'CACHE_DocID' => $this->key,
+            'Is_Cons' => '4'
+        ]);
+
+        if (!$doctorModel) return false;
+
+        $loginId = $doctorModel->AID;
+        $expName = explode(" ", $doctorModel->Name);
+
+        $this->aid = 1000000 + $loginId;
+        $this->loginGS = 'v'.$doctorModel->CACHE_DocID;
+        $this->lastName = $doctorModel->LastName;
+        $this->firstName = $expName[0];
+        if (!empty($expName[1])) $this->middleName = $expName[1];
+        $this->fullName = $this->lastName . " " . $this->firstName . " " . $this->middleName;
+
+        if (array_key_exists($this->specId, SprDoctorSpec::getKeysList())) {
+            $this->operatorofficestatus = SprDoctorSpec::getKeysList()[$this->specId];
+        }
         return true;
     }
 
@@ -410,29 +544,52 @@ class ActiveSyncHelper
     {
         /**
          * @var Logins $findUserLogin
-         * @var Logins $loginsObject
          */
+        //print_r($this);
+        //exit;
+        if ($this->type == 5) {
+            //todo если доктор-консультант
 
-        //todo если доктор-консультант
-        if ($this->type == 4) {
+            //todo генеруруем/задаем пароль для входа в GS
+            $this->setCachePass();
 
-            if (empty($this->docId) || empty($this->specId)) return false;
+            //todo присваиваем значения переменным
+            if (!$this->setDoctorObjectParams()) return false;
 
+            //todo добавляем/сбрасываем пароль для УЗ AD
+            if (!$this->createAdUserAcc()) return false;
 
-        //todo если франчайзи (только проверяем запись в Logins)
-        } elseif ($this->type == 8 && !empty($this->key)) {
+            //todo проверяем/добавляем запись в Logins
+            if (!$this->addCheckLogins()) return false;
+
+            //todo проверяем/добавляем запись в таблицы AD
+            if (!$this->addUserAdTables()) return false;
+
+            //todo проверяем/добавляем запись в таблицы AD
+            if (!$this->addLpassUsers()) return false;
+
+            //todo добавление ролей для пользователя
+            if (!$this->addPermissions()) return false;
+
+            if (!empty($this->aid) &&
+                !empty($this->loginAD) &&
+                !empty($this->passwordAD)
+            ){
+                return [
+                    'aid' => $this->aid,
+                    'login' => $this->loginAD,
+                    'password' => $this->passwordAD,
+                    'state' => $this->state,
+                ];
+            }
+        } elseif ($this->type == 8) {
+            //todo если франчайзи (только проверяем запись в Logins)
 
             //todo добавляем/сбрасываем пароль для УЗ AD
             if (!$this->createAdUserAcc()) return false;
 
             //todo проверяем есть ли УЗ у франчайзи
-            if (!$findUserLogin = $this->checkFranchazyAccount()) {
-                $message = '<p>У данного контрагента нет УЗ, невозможно добавить <b>' . $this->fullName . '</b></p>';
-                Yii::$app->session->setFlash('error', $message);
-                return false;
-            }
-            $this->emailAD = $findUserLogin->Email;
-            $this->aid = $findUserLogin->aid;
+            if (!$this->checkFranchazyAccount()) return false;
 
             //todo проверяем/добавляем запись в таблицы AD
             if (!$this->addUserAdTables()) return false;
@@ -448,11 +605,67 @@ class ActiveSyncHelper
                     'state' => $this->state,
                 ];
             }
-        //todo если Отдел клиентской информационной поддержки/Мед регистратор
-        } elseif (in_array($this->department, [4, 5])) {
+        } elseif ($this->type == 7) {
 
-            if ($this->addCheckOperators()) {
-                if ($this->addCheckLogins() && $this->addLpassUsers()) {
+            if (in_array($this->department, [21, 22])) $this->department = 2;
+            if (in_array($this->department, [31, 32, 33])) $this->department = 3;
+            //if ($this->department == 0) $this->nurse = 1;
+
+            if (in_array($this->department, [0, 1, 2, 3, 6, 7, 8])) {
+                //todo если Администр./Врач консул./Собств. лаб. отд./Ген. директор (проверяем/создаем в Logins и adUsers)
+
+                //todo добавляем/сбрасываем пароль для УЗ AD
+                if (!$this->createAdUserAcc()) return false;
+
+                //todo проверяем/добавляем запись в Operators
+                if (!$this->addCheckOperators()) return false;
+
+                //todo проверяем/добавляем запись в Logins
+                if (!$this->addCheckLogins()) return false;
+
+                //todo проверяем/добавляем запись в таблицы AD
+                if (!$this->addUserAdTables()) return false;
+
+                //todo добавление пользователя в другие таблицы в соотвествии с ролью
+                if (!$this->addDepartmentRules()) return false;
+
+                //todo добавление ролей для пользователя
+                if (!$this->addPermissions()) return false;
+
+                if (!empty($this->aid) &&
+                    !empty($this->loginAD) &&
+                    !empty($this->passwordAD)
+                ) {
+                    return [
+                        'aid' => $this->aid,
+                        'login' => $this->loginAD,
+                        'password' => $this->passwordAD,
+                        'state' => $this->state,
+                    ];
+                }
+
+            } elseif (in_array($this->department, [4, 5])) {
+                //todo если Отдел клиентской информационной поддержки/Мед регистратор
+
+                //todo проверяем/добавляем запись в Operators
+                if (!$this->addCheckOperators()) return false;
+
+                //todo проверяем/добавляем запись в Logins
+                if (!$this->addCheckLogins()) return false;
+
+                //todo проверяем/добавляем запись в lpASs
+                if (!$this->addLpassUsers()) return false;
+
+                //todo добавление пользователя в другие таблицы в соотвествии с ролью
+                if (!$this->addDepartmentRules()) return false;
+
+                //todo добавление ролей для пользователя
+                if (!$this->addPermissions()) return false;
+
+                if (!empty($this->aid) &&
+                    !empty($this->loginGS) &&
+                    !empty($this->passwordGS)
+                ) {
                     return [
                         'aid' => $this->aid,
                         'login' => $this->loginGS,
@@ -461,37 +674,27 @@ class ActiveSyncHelper
                     ];
                 }
             }
-        //todo если Администр./Врач консул./Собств. лаб. отд./Ген. директор (проверяем/создаем в Logins и adUsers)
-        } elseif (in_array($this->department, [0, 1, 2, 3, 6, 7, 8])) {
-
-            //todo добавляем/сбрасываем пароль для УЗ AD
-            if (!$this->createAdUserAcc()) return false;
-
-            //todo проверяем/добавляем запись в Operators
-            if (!$this->addCheckOperators()) return false;
-
-            //todo проверяем/добавляем запись в Logins
-            if (!$loginsObject = $this->addCheckLogins()) return false;
-
-            //todo проверяем/добавляем запись в таблицы AD
-            if (!$this->addUserAdTables()) return false;
-
-            //todo добавление ролей для пользователя
-            if (!$this->addPermissions($this->aid, $this->department, $this->nurse)) return false;
-
-            if (!empty($this->aid) &&
-                !empty($this->loginAD) &&
-                !empty($this->passwordAD)
-            ){
-                return [
-                    'aid' => $this->aid,
-                    'login' => $this->loginAD,
-                    'password' => $this->passwordAD,
-                    'state' => $this->state,
-                ];
-            }
         }
         return false;
+    }
+
+    /**
+     * @return bool
+     */
+    private function addDepartmentRules()
+    {
+        if (!in_array($this->department, [1, 2, 3, 5, 6])) {
+
+            if (in_array($this->nurse, [1, 2])) {
+                if (!$this->addCheckNNurse()) return false;
+            }
+
+            if ($this->nurse == 2) {
+                if (!$this->addCheckErpUsers()) return false;
+                if (!$this->addCheckErpNurses()) return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -521,6 +724,9 @@ class ActiveSyncHelper
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function createAdUserAcc()
     {
         if (!empty($this->accountName)) {
@@ -543,12 +749,126 @@ class ActiveSyncHelper
     }
 
     /**
-     * @param $aid
-     * @param $department
-     * @param $nurse
      * @return bool
      */
-    public static function addPermissions($aid, $department, $nurse)
+    private function addCheckNNurse()
+    {
+        if (empty($this->firstName)
+            || empty($this->lastName)
+            || empty($this->middleName)
+        ) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addCheckNNurse'=>'Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
+
+        if (NNurse::findOne([
+            'first_name' => $this->firstName,
+            'last_name' => $this->lastName,
+            'middle_name' => $this->middleName
+        ])) return true;
+
+        $objectNurse = new NNurse();
+        $objectNurse->first_name = $this->firstName;
+        $objectNurse->last_name = $this->lastName;
+        $objectNurse->middle_name = $this->middleName;
+        $objectNurse->active = 1;
+        $objectNurse->save();
+
+        if (!$objectNurse->save()) {
+            Yii::getLogger()->log([
+                'ActiveSyncController:objectNurse'=>$objectNurse->errors
+            ], 1, 'binary');
+            return false;
+        } else {
+            Yii::getLogger()->log([
+                '$objectNurse->save()' => $objectNurse
+            ], 1, 'binary');
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function addCheckErpUsers()
+    {
+        if (empty($this->loginGS)
+            || empty($this->loginAD)
+            || empty($this->fullName)
+        ) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addCheckErpUsers'=>'Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
+
+        if (ErpUsers::findOne(['login' => $this->loginAD,])) return true;
+
+        $objectErpUsers = new ErpUsers();
+        $objectErpUsers->group_id = 11;
+        $objectErpUsers->name = $this->fullName;
+        $objectErpUsers->login = $this->loginAD;
+        $objectErpUsers->skynet_login = $this->loginGS;
+        $objectErpUsers->password = 'd9b1d7db4cd6e70935368a1efb10e377';
+        $objectErpUsers->status = 1;
+        $objectErpUsers->save();
+
+        if (!$objectErpUsers->save()) {
+            Yii::getLogger()->log([
+                'ActiveSyncController:objectErpUsers'=>$objectErpUsers->errors
+            ], 1, 'binary');
+            return false;
+        } else {
+            Yii::getLogger()->log([
+                '$objectErpUsers->save()' => $objectErpUsers
+            ], 1, 'binary');
+        }
+        return true;
+    }
+
+    public function addCheckErpNurses()
+    {
+        if (empty($this->loginGS)
+            || empty($this->loginAD)
+            || empty($this->fullName)
+        ) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addCheckErpUsers'=>'Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
+
+        $nurseId = ErpUsers::find()
+            ->select('id')
+            ->where(['group_id' => 11])
+            ->orderBy('id DESC')
+            ->one();
+
+        $objectErpNurses = new ErpNurses();
+        $objectErpNurses->user_id = $nurseId;
+        $objectErpNurses->nurse_email = $this->emailAD;
+        $objectErpNurses->nurse_phone = '';
+        $objectErpNurses->nurse_key = $this->key;
+
+        if (!$objectErpNurses->save()) {
+            Yii::getLogger()->log([
+                'ActiveSyncController:objectErpNurses'=>$objectErpNurses->errors
+            ], 1, 'binary');
+            return false;
+        } else {
+            Yii::getLogger()->log([
+                '$objectErpNurses->save()' => $objectErpNurses
+            ], 1, 'binary');
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    private function addPermissions()
     {
         /* $nurse
          * 0 - нет,
@@ -565,90 +885,44 @@ class ActiveSyncHelper
          * 6 - клиент менеджер
          * 7 - без прав
         */
-        $searchLogin = Logins::findOne(['aid' => $aid]);
-        if (!$searchLogin) return false;
 
-        $searchLogin->MedReg = ($department == 5) ? 1 : 0;
-        $searchLogin->mto = in_array($department, [2,3,5,6]) ? 1 : 0;
-        $searchLogin->clientmen = in_array($department, [3,4,6]) ? 1 : 0;
-        $searchLogin->show_preanalytic = in_array($department, [4,5]) ? 1 : 0;
-
-        $searchLogin->operators->MedReg = ($department == 5) ? 1 : 0;
-        $searchLogin->operators->mto = in_array($department, [2,3,5,6]) ? 1 : 0;
-        $searchLogin->operators->OrderEdit = in_array($department, [3,4,6]) ? 1 : 0;
-        $searchLogin->operators->ClientMen = in_array($department, [3,4,6]) ? 1 : 0;
-
-        $fullName = $searchLogin->adUsers->last_name." ".$searchLogin->adUsers->first_name." ".$searchLogin->adUsers->middle_name;
-
-        if (!in_array($department, [1,2,3,5,6])) {
-            if (in_array($nurse,[1,2])) {
-                $objectNurse = new NNurse();
-                $objectNurse->first_name = $searchLogin->adUsers->first_name;
-                $objectNurse->last_name = $searchLogin->adUsers->last_name;
-                $objectNurse->middle_name = $searchLogin->adUsers->middle_name;
-                $objectNurse->active = 1;
-                $objectNurse->save();
-            }
-            if ($nurse == 2) {
-                $objectErpUsers = new ErpUsers();
-                $objectErpUsers->group_id = 11;
-                $objectErpUsers->name = $fullName;
-                $objectErpUsers->login = $searchLogin->operators->CACHE_Login;
-                $objectErpUsers->password = 'd9b1d7db4cd6e70935368a1efb10e377';
-                $objectErpUsers->status = 1;
-                $objectErpUsers->skynet_login = $searchLogin->Login;
-                $objectErpUsers->save();
-
-                $nurseId = ErpUsers::find()
-                    ->select('id')
-                    ->where(['group_id' => 11])
-                    ->orderBy('id DESC')
-                    ->one();
-                $objectErpNurses = new ErpNurses();
-                $objectErpNurses->user_id = $nurseId;
-                $objectErpNurses->nurse_email = '';
-                $objectErpNurses->nurse_phone = '';
-                $objectErpNurses->nurse_key = $aid;
-            }
-        }
-
-        if (!$searchLogin->save()) {
-            Yii::getLogger()->log(['ActiveSyncController:'=>$searchLogin->errors], 1, 'binary');
+        if (empty($this->aid)) {
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addPermissions'=>'Одно из обязательных полей пустое!'
+            ], 1, 'binary');
             return false;
         }
 
-        //todo сбрасываем права для данного пользователя
         $permissions = [
-            '0' => ['mis','workshift.allow','MisManager','Operator','Registrar','Report.Workshift.Kkm','SkynetEstimationOrder'],
-            '1' => ['admin','Administrator.Callcenter.index','mis','MisManager','Operator','Registrar','SkynetEstimationOrder'],
-            '2' => ['Operator','Registrar'],
-            '3' => ['admin','ClientManager','db_gemotest','directorFlo','franchisees_account','LisAdmin','mis','MisManager','Operator','Report.*','ReportOrders.*','ReportPrices.*'],
-            '4' => ['admin','ClientManager','finance_manager','management_all_offices','Operator','Registrar','Report.Inoe','ReportOrders.Contingents','SkynetEstimationOrder'],
-            '5' => ['Operator','ClientManager','MedRegistrar','Report.Inoe','PreanalyticaManager'],
-            '6' => ['admin','Administrator.Callcenter.index','bonuses_view','cancelBm_view','ClientManager','discount_all_rights','kurs_view','mis','MisManager','Operator','Registrar','Report.MsZabor','Report.PollPatients','Report.Rep41','ReportOrders.Detail','ReportOrders.SummaryMonth','ReportPrices.Archive','ReportPrices.ByDate','ReportPrices.Detail','ReportPrices.History','SkynetEstimationOrder'],
-            '7' => [],
-            '8' => ['admin','Administrator.Callcenter.index','mis','MisManager','Operator','Registrar','SkynetEstimationOrder']
+            '7' => [], //todo без прав
+            '0' => ['mis','workshift.allow','MisManager','Operator','Registrar','Report.Workshift.Kkm','SkynetEstimationOrder'],//Cобственные отделения'
+            '1' => ['admin','Administrator.Callcenter.index','mis','MisManager','Operator','Registrar','SkynetEstimationOrder'],//Контакт центр
+            '2' => ['Operator','Registrar'],//Продажи
+            '3' => ['admin','ClientManager','db_gemotest','directorFlo','franchisees_account','LisAdmin','mis','MisManager','Operator','Report.*','ReportOrders.*','ReportPrices.*'],//Развитие
+            '4' => ['admin','ClientManager','finance_manager','management_all_offices','Operator','Registrar','Report.Inoe','ReportOrders.Contingents','SkynetEstimationOrder'],//Отдел клиентской инф. поддержки
+            '5' => ['Operator','ClientManager','MedRegistrar','Report.Inoe','PreanalyticaManager'],//Мед регистратор
+            '6' => ['admin','Administrator.Callcenter.index','bonuses_view','cancelBm_view','ClientManager','discount_all_rights','kurs_view','mis','MisManager','Operator','Registrar','Report.MsZabor','Report.PollPatients','Report.Rep41','ReportOrders.Detail','ReportOrders.SummaryMonth','ReportPrices.Archive','ReportPrices.ByDate','ReportPrices.Detail','ReportPrices.History','SkynetEstimationOrder'],//Клиент-менеджер
+            '8' => ['admin','Administrator.Callcenter.index','mis','MisManager','Operator','Registrar','SkynetEstimationOrder'],//todo доктор-консультант
         ];
 
+        if (!array_key_exists($this->department, $permissions)) return false;
+
         //todo удаляем все роли у пользователя
-        $searchAssignment = NAuthASsignment::deleteAll(['userid' => $aid]);
+        $searchAssignment = NAuthASsignment::deleteAll(['userid' => $this->aid]);
         if (!$searchAssignment) {
             Yii::getLogger()->log(['ActiveSyncController:searchAssignment'=>'Не удалось удалить права!'], 1, 'binary');
             return false;
         }
 
         //todo присвоение прав пользователю
-        if (!array_key_exists($department, $permissions)) return false;
-
-        if (count($permissions[$department]) > 0) {
+        if (count($permissions[$this->department]) > 0) {
             $rowInsert = [];
-            foreach ($permissions[$department] as $permission) {
-                $rowInsert[] = [$permission, $aid, 'N;'];
+            foreach ($permissions[$this->department] as $permission) {
+                $rowInsert[] = [$permission, $this->aid, 'N;'];
             }
             try {
                 $connection = 'GemoTestDB';
                 $db = Yii::$app->$connection;
-
                 $db->createCommand()->batchInsert(
                     NAuthASsignment::tableName(),
                     ['itemname', 'userid', 'data'],
@@ -670,13 +944,34 @@ class ActiveSyncHelper
     public function addUserAD()
     {
         //todo проверяем существует и подобный логин в AD
-        $this->accountName = $this->translit($this->firstName.".".$this->lastName);
-        $this->displayName = $this->fullName." (".$this->operatorofficestatus.")";
+        if (empty($this->lastName
+            || empty($this->firstName))
+            || empty($this->middleName)
+            || empty($this->fullName)
+        ){
+            Yii::getLogger()->log([
+                'ActiveSyncController=>addUserAD'=>'Одно из обязательных полей пустое!'
+            ], 1, 'binary');
+            return false;
+        }
 
-        if ($this->typeLO == 'FLO') {
-            $this->cnName = $this->fullName.' '.$this->key;
+        $this->cnName = $this->fullName;
+        $this->displayName = $this->fullName;
+
+        if ($this->type == 8)  {
+            $this->accountName = $this->key;
+            $this->accountName .= ".".substr($this->translit($this->firstName),0,1);
+            $this->accountName .= ".".$this->translit($this->lastName);
         } else {
-            $this->cnName = $this->fullName;
+            $this->accountName .= $this->translit($this->firstName . "." . $this->lastName);
+        }
+
+        if (!empty($this->operatorofficestatus)) {
+            $this->displayName = $this->fullName . " (" . $this->operatorofficestatus . ")";
+        }
+
+        if ($this->typeLO == 'FLO' && !empty($this->key)) {
+            $this->cnName = $this->fullName.' '.$this->key;
         }
 
         if ($this->checkUserAccountAd())
@@ -685,7 +980,7 @@ class ActiveSyncHelper
             $this->accountName = $this->translit($this->firstName);
             $this->accountName .= ".".substr($this->translit($this->middleName),0,1);
             $this->accountName .= ".".$this->translit($this->lastName);
-            if ($this->typeLO != 'FLO') {
+            if ($this->typeLO != 'FLO' && !empty($this->operatorofficestatus)) {
                 $this->cnName = $this->fullName." (".$this->operatorofficestatus.")";
             }
         }
@@ -928,61 +1223,6 @@ class ActiveSyncHelper
     }
 
     /**
-     * @param $accountName
-     * @return mixed
-     */
-    public function resetPasswordADWin($accountName)
-    {
-        //todo сбрасываем пароль для учетной записи
-        $newPassword = self::generatePasswordAD();
-        $ADcheckUser = " Set-ADAccountPassword -Identity \"".$accountName."\"";
-        $ADcheckUser .= " -NewPassword";
-        $ADcheckUser .= " (ConvertTo-SecureString -string \"".$newPassword."\" -AsPlainText -force)";
-        try {
-            $output = shell_exec(addslashes(self::POWER_SHELL_PATH . $ADcheckUser));
-        } catch (Exception $e) {
-            return false;
-        }
-        return $output === NULL ? $newPassword : false;
-    }
-
-    /**
-     * @return bool
-     */
-    public function checkUserAccountAdWin()
-    {
-        //todo проверяем на совпадение УЗ AD
-        $ADcheckUser = " Get-ADUser -filter {SamAccountName -like \"".$this->accountName."\"}";
-        try {
-            $output = shell_exec(addslashes(self::POWER_SHELL_PATH . $ADcheckUser));
-        } catch (Exception $e) {
-            Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
-            return false;
-        }
-        if ($output === NULL) return false;
-        else return true;
-    }
-
-    /**
-     * @return array|bool
-     */
-    public function checkUserNameAdWin()
-    {
-        //todo проверяем на полное совпадение имени пользователя
-        $ADcheckUser = " Get-ADUser -filter {Name -like \"*" . iconv("UTF-8", "cp1251", $this->fullName) . "*\"}";
-        try {
-            exec(addslashes(self::POWER_SHELL_PATH . $ADcheckUser), $output);
-        } catch (Exception $e) {
-            Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
-            return false;
-        }
-        if (!empty($output)) {
-            return $this->parseAccountSearch($output);
-        }
-        return false;
-    }
-
-    /**
      * @param $aid
      * @return bool
      */
@@ -1009,35 +1249,6 @@ class ActiveSyncHelper
     public static function generatePasswordAD()
     {
         return str_shuffle(Yii::$app->getSecurity()->generateRandomString(8).rand(1, 9));
-    }
-
-    /**
-     * @param $array
-     * @return array|bool
-     */
-    public function parseAccountSearch($array) {
-        $arrReturn = [];
-        $arrOut = [];
-        foreach ($array as $str)
-        {
-            $expStr = explode(":", $str);
-            if (count($expStr) > 1) {
-                $arrReturn[trim($expStr[0])][] = trim($expStr[1]);
-            }
-        }
-
-        if (!empty($arrReturn) && is_array($arrReturn)) {
-            foreach ($arrReturn as $keyName => $arrValue) {
-                if (is_array($arrValue)) {
-                    foreach ($arrValue as $key => $value)
-                        $arrOut[$key][$keyName] = mb_convert_encoding($value,"UTF-8","cp1251");
-                        //$arrOut[$key][$keyName] = iconv("windows-1251", "UTF-8", $value);
-                }
-            }
-        }
-
-        if (!empty($arrOut)) return $arrOut;
-        else return false;
     }
 
     /**

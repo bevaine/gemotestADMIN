@@ -55,7 +55,8 @@ class Doctors extends \yii\db\ActiveRecord
     /**
      * @return null|object
      */
-    public static function getDb() {
+    public static function getDb()
+    {
         return Yii::$app->get('GemoTestDB');
     }
 
@@ -129,52 +130,11 @@ class Doctors extends \yii\db\ActiveRecord
      */
     public function getLogins()
     {
-        return $this->hasMany(Logins::className(), ['key' => 'CACHE_DocID'])->where(['UserType' => '5']);
+        return $this->hasMany(Logins::className(), ['key' => 'CACHE_DocID'])
+            ->andOnCondition('[Logins].[UserType] = 5');
     }
 
-    /**
-     * Список для select
-     */
-    public static function getDoctorsList1()
-    {
-        $modules = [];
-        $query = Doctors::find()
-            ->joinWith(['logins'], false)
-            ->select('Doctors.*,Logins.aid as GsID')
-            ->where(['is_Cons' => 4]);
-
-        $dataProvider = new SqlDataProvider([
-            'sql' => $query->createCommand()->getRawSql(),
-            'db' => 'GemoTestDB',
-            'sort' => [
-                'attributes' => [
-                    'DateIns' =>[
-                        'default' => SORT_ASC,
-                        'asc' => ['DateIns' => SORT_ASC],
-                        'desc' => ['DateIns' => SORT_DESC],
-                    ],
-                ],
-            ],
-            'pagination' => false,
-        ]);
-
-        /** @var Doctors $model */
-        foreach ($dataProvider->getModels() as $model) {
-            $strTxt = "";
-            $disable = true;
-            if (empty($model['GsID'])) {
-                $disable = false;
-            } else {
-                $strTxt = " - уже есть";
-            }
-
-            $modules[$model['CACHE_DocID']] = $model['LastName']." ".$model['Name'];
-        }
-        return $modules;
-
-    }
-
-    /**
+     /**
      * @return array
      */
     public static function getDoctorsList()
@@ -183,9 +143,9 @@ class Doctors extends \yii\db\ActiveRecord
         $values = [];
 
         $query = Doctors::find()
-            ->joinWith(['logins'], false)
-            ->select('Doctors.*,Logins.aid as GsID')
-            ->where(['is_Cons' => 4]);
+            ->joinWith(['logins'], false, 'FULL JOIN')
+            ->select('Doctors.*,Logins.aid as GsID, Logins.UserType')
+            ->where(['Is_Cons' => 4]);
 
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),

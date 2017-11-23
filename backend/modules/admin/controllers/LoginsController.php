@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\controllers;
 
+use common\models\SprDoctorSpec;
 use Yii;
 use common\models\AddOrgForm;
 use common\models\AddUserForm;
@@ -13,6 +14,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use common\components\helpers\ActiveSyncHelper;
 use common\models\NAdUsers;
+use common\models\Doctors;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -128,8 +130,11 @@ class LoginsController extends Controller
         $model->scenario = 'addUserDoc';
 
         if ($model->load(Yii::$app->request->post())) {
-
+            $activeSyncHelper = new ActiveSyncHelper();
+            $activeSyncHelper->docId = $model->docId;
+            $activeSyncHelper->specId = $model->specId;
         }
+
         return $this->render('createDoc', [
             'model' => $model,
         ]);
@@ -208,9 +213,9 @@ class LoginsController extends Controller
         if ($model->load(Yii::$app->request->post()))
         {
             if ($param == 'user') {
-                $activeSyncHelper->typeLO = 'SLO';
+                $activeSyncHelper->type = 7;
                 $activeSyncHelper->key = $model->key;
-                $activeSyncHelper->type = $model->type;
+                $activeSyncHelper->typeLO = 'SLO';
                 $activeSyncHelper->nurse = $model->nurse;
                 $activeSyncHelper->lastName = $model->lastName;
                 $activeSyncHelper->firstName = $model->firstName;
@@ -218,8 +223,8 @@ class LoginsController extends Controller
                 $activeSyncHelper->department = $model->department;
                 $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
             } elseif ($param == 'franch') {
-                $activeSyncHelper->typeLO = 'FLO';
                 $activeSyncHelper->type = 8;
+                $activeSyncHelper->typeLO = 'FLO';
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->cacheId = $model->key;
                 $activeSyncHelper->lastName = $model->lastName;
@@ -233,8 +238,11 @@ class LoginsController extends Controller
                 $activeSyncHelper->firstName = $model->firstName;
                 $activeSyncHelper->middleName = $model->middleName;
             } elseif ($param == 'doc') {
-                $activeSyncHelper->type = 4;
-                $activeSyncHelper->docId = $model->docId;
+                $activeSyncHelper->type = 5;
+                $activeSyncHelper->department = 8;
+                $activeSyncHelper->key = $model->docId;
+                $activeSyncHelper->typeLO = 'SLO';
+                $activeSyncHelper->cacheId = $model->docId;
                 $activeSyncHelper->specId = $model->specId;
             }
 
@@ -316,8 +324,6 @@ class LoginsController extends Controller
         ]);
     }
 
-
-
     /**
      * Finds the Logins model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -340,14 +346,31 @@ class LoginsController extends Controller
      * @param $last_name
      * @param $first_name
      * @param $middle_name
+     * @param $doc_id
      */
-    public function actionAjaxForActive($last_name, $first_name, $middle_name)
+    public function actionAjaxForActive($doc_id = null, $last_name = null, $first_name = null, $middle_name = null)
     {
         //todo проверяем существует ли УЗ
         $activeSyncHelper = new ActiveSyncHelper();
-        $activeSyncHelper->lastName = $last_name;
-        $activeSyncHelper->firstName = $first_name;
-        $activeSyncHelper->middleName = $middle_name;
+
+        if (!empty($doc_id)) {
+            $doctorModel = Doctors::findOne([
+                'CACHE_DocID' => $doc_id,
+                'Is_Cons' => '4'
+            ]);
+
+            if (!$doctorModel) exit('null') ;
+
+            $activeSyncHelper->lastName = $doctorModel->LastName;
+            $expName = explode(" ", $doctorModel->Name);
+            $activeSyncHelper->firstName = $expName[0];
+            if (!empty($expName[1])) $activeSyncHelper->middleName = $expName[1];
+        } else {
+            $activeSyncHelper->lastName = $last_name;
+            $activeSyncHelper->firstName = $first_name;
+            $activeSyncHelper->middleName = $middle_name;
+        }
+
         $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
 
         //todo проверяем существует ли пользователь с ФИО в AD

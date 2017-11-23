@@ -47,7 +47,7 @@ class NAdUsers extends \yii\db\ActiveRecord
      */
     public static function PrimaryKey()
     {
-        return ['gs_id'];
+        return ['ID'];
     }
 
     /**
