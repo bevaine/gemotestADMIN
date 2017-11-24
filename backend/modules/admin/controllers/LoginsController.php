@@ -8,6 +8,7 @@ use common\models\AddOrgForm;
 use common\models\AddUserForm;
 use common\models\Logins;
 use common\models\LoginsSearch;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -15,6 +16,7 @@ use yii\helpers\Json;
 use common\components\helpers\ActiveSyncHelper;
 use common\models\NAdUsers;
 use common\models\Doctors;
+use yii\helpers\Html;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -262,18 +264,29 @@ class LoginsController extends Controller
                 }
             }
 
+            if (in_array($activeSyncHelper->department, [21, 22])) $activeSyncHelper->department = 2;
+            if (in_array($activeSyncHelper->department, [31, 32, 33])) $activeSyncHelper->department = 3;
+            //if ($this->department == 0) $this->nurse = 1;
+
             //todo добавление УЗ
             $newUserData = $activeSyncHelper->checkAccount();
 
             if ($newUserData) {
                 $message = '';
                 $style = '';
+                $url = \yii\helpers\Url::toRoute([
+                    './logins/view',
+                    'id' => $newUserData['aid'],
+                    'ad' => $newUserData['adID']
+                ]);
+                $url = Html::a($activeSyncHelper->fullName, $url, ['title' => $activeSyncHelper->fullName, 'target' => '_blank']);
+
                 if ($activeSyncHelper->state == 'new') {
                     $style = 'success';
-                    $message = '<p>Успешно добавлена УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
+                    $message = '<p>Успешно добавлена УЗ для <b>'.$url.'</b> в GemoSystem</p>';
                 } elseif ($activeSyncHelper->state == 'old') {
                     $style = 'warning';
-                    $message = '<p>У пользователя <b>'.$activeSyncHelper->fullName.'</b> уже есть УЗ для авторизации через AD</p>';
+                    $message = '<p>У пользователя <b>'.$url.'</b> уже есть УЗ для авторизации через AD</p>';
                 }
                 if (!empty($newUserData['login'] && $newUserData['password'])) {
                     $message .= '<p>Данные для входа в GemoSystem:<p>';
@@ -375,6 +388,10 @@ class LoginsController extends Controller
 
         //todo проверяем существует ли пользователь с ФИО в AD
         $arrAccountAD = $activeSyncHelper->checkUserNameAd();
+//
+//        if (is_array($arrAccountAD) && count($arrAccountAD) > 1) {
+//            $arrAccounts = ArrayHelper::getColumn($arrAccountAD, 'account');
+//        }
 
         if (!$arrAccountAD || !is_array($arrAccountAD)){
             exit('null') ;

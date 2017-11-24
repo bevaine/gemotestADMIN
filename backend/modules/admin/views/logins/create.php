@@ -169,13 +169,20 @@ $this->params['breadcrumbs'][] = $this->title;
                             $("#form-input").submit();
                         } else {
                             res = JSON.parse(res);
-                            console.log(res.length);
+                            //console.log(res.length);
                             if (res.length > 0) {
                                 var html = "";
                                 var htm_header = "";
                                 for (var i = 0; i < res.length; i++) {
-                                    var dataUser = res[i].name + '<br>(' + res[i].account + ', email: ' + res[i].email + ')';
-                                    html += '<label><input type="radio" name="radioAccountsList" value="' + res[i].account + '">' + dataUser +'</label>';
+                                    var style = "";
+                                    var txtComment = "";
+                                    if (res[i].active === 1) {
+                                        console.log(res[i].active);
+                                        style = ' style="color:#ec1c24;font-weight:bold;" ';
+                                        txtComment = ' - уже используется';
+                                    }
+                                    var dataUser = res[i].name + '<br>(' + res[i].account + ', email: ' + res[i].email + ')' + txtComment;
+                                    html += '<label' + style + '><input type="radio" name="radioAccountsList" value="' + res[i].account + '">' + dataUser +'</label>';
                                     html += '<input type="hidden" name="hiddenEmailList[' + res[i].account + ']" value="' + res[i].email + '">';
                                 }
                                 html += '<p><label><input type="radio" name="radioAccountsList" value="new">Создать новую учетную запись</label></p>';

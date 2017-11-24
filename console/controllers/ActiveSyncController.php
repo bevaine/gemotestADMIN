@@ -123,6 +123,23 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        $activeSyncHelper = new ActiveSyncHelper();
+
+        $activeSyncHelper->fullName = 'Дымченко Евгений Викторович';
+
+        //todo проверяем существует ли пользователь с ФИО в AD
+        $arrAccountAD = $activeSyncHelper->checkUserNameAd();
+
+        print_r($arrAccountAD);
+
+        if (is_array($arrAccountAD) && count($arrAccountAD) > 1) {
+            $arrAccounts = ArrayHelper::getColumn($arrAccountAD, 'account');
+            print_r($arrAccounts);
+        }
+
+        //print_r($arrAccountAD);
+        exit;
+
         print_r(\common\models\Doctors::getDoctorsList());
         exit;
 
