@@ -277,7 +277,7 @@ class LoginsController extends Controller
                 $url = \yii\helpers\Url::toRoute([
                     './logins/view',
                     'id' => $newUserData['aid'],
-                    'ad' => $newUserData['adID']
+                    'ad' => $newUserData['ad']
                 ]);
                 $url = Html::a($activeSyncHelper->fullName, $url, ['title' => $activeSyncHelper->fullName, 'target' => '_blank']);
 
@@ -388,10 +388,6 @@ class LoginsController extends Controller
 
         //todo проверяем существует ли пользователь с ФИО в AD
         $arrAccountAD = $activeSyncHelper->checkUserNameAd();
-//
-//        if (is_array($arrAccountAD) && count($arrAccountAD) > 1) {
-//            $arrAccounts = ArrayHelper::getColumn($arrAccountAD, 'account');
-//        }
 
         if (!$arrAccountAD || !is_array($arrAccountAD)){
             exit('null') ;

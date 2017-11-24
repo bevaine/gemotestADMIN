@@ -22,7 +22,7 @@ if (empty($model->DateEnd) || strtotime($model->DateEnd) > time()) {
 if (empty($model->block_register) || strtotime($model->block_register) > time()) {
     $blockRegister = false;
 }
-if (!empty($ad)) {
+if ($model->adUsers) {
     if ($model->adUsers->auth_ldap_only == 1) {
         $activeGS = false;
     }
