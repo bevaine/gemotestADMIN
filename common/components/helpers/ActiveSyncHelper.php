@@ -60,6 +60,8 @@ class ActiveSyncHelper
     CONST LDAP_LOGIN = 'dymchenko.adm@lab.gemotest.ru';
     CONST LDAP_PASSW = '2Hszfaussw';
     CONST LDAP_DN = "DC=lab,DC=gemotest,DC=ru";
+    CONST LDAP_URL = "ldaps://sw-dc-05.lab.gemotest.ru";
+    CONST LDAP_PORT = 636;
     CONST LOGO_TEXT = '107031 Москва, Рождественский бульвар д.21, ст.2^*^тел. (495) 532-13-13, 8(800) 550-13-13^*^www.gemotest.ru';
     CONST LOGO_IMG = 'logos/LogoGemotest.gif';
 
@@ -1054,7 +1056,7 @@ class ActiveSyncHelper
 
         try {
 
-            $ldapconn = ldap_connect('ldaps://sw-dc-05.lab.gemotest.ru', 636);
+            $ldapconn = ldap_connect(self::LDAP_URL, self::LDAP_PORT);
             if (!$ldapconn) return false;
 
             ldap_set_option($ldapconn, LDAP_OPT_DEBUG_LEVEL, 7);
@@ -1112,7 +1114,7 @@ class ActiveSyncHelper
         try {
 
             $ADgroup = "CN=".$ldaprecord["CN"].",OU=".$this->typeLO." Users,OU=SSO,OU=gUsers,DC=lab,DC=gemotest,DC=ru";
-            $ldapconn = ldap_connect('ldaps://sw-dc-05.lab.gemotest.ru', 636);
+            $ldapconn = ldap_connect(self::LDAP_URL, self::LDAP_PORT);
             if (!$ldapconn) return false;
 
             ldap_set_option($ldapconn, LDAP_OPT_DEBUG_LEVEL, 7);
@@ -1141,12 +1143,12 @@ class ActiveSyncHelper
         } catch (Exception $e) {
             if (strpos($e->getMessage(), 'Add: Already exists') !== false) {
                 $message = '<p>Не удалось создать УЗ в AD для <b> ' . $this->cnName. '</b>';
-                $message .= ' т.к. данный пользователь с таким именем уже есть, либо не синхронизированы контроллеры домена! Повторите попытку позже!</p>';
+                $message .= ' т.к. данный пользователь с таким <b>именем</b> уже есть, либо не синхронизированы контроллеры домена! Повторите попытку позже!</p>';
                     Yii::$app->session->setFlash('warning', $message);
             }
             if (strpos($e->getMessage(), 'Add: Constraint violation') !== false) {
                 $message = '<p>Не удалось создать УЗ в AD для <b> ' . $this->accountName. '</b>';
-                $message .= ' т.к. данный пользователь с таким логином уже есть, либо не синхронизированы контроллеры домена! Повторите попытку позже!</p>';
+                $message .= ' т.к. данный пользователь с таким <b>логином</b> уже есть, либо не синхронизированы контроллеры домена! Повторите попытку позже!</p>';
                 Yii::$app->session->setFlash('warning', $message);
             }
             Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
