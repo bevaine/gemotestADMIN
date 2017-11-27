@@ -12,6 +12,26 @@ use yii\base\Model;
 use common\models\Doctors;
 use Yii;
 
+/**
+ * Class AddUserForm
+ * @package common\models
+ * @property string $key;
+ * @property string  $type;
+ * @property string  $department;
+ * @property string  $nurse;
+ * @property string  $lastName;
+ * @property string  $firstName;
+ * @property string  $middleName;
+ * @property string  $operatorofficestatus;
+ * @property string  $radioAccountsList;
+ * @property string  $name;
+ * @property string  $login;
+ * @property string  $blankText;
+ * @property string  $email;
+ * @property string  $docId;
+ * @property string  $specId;
+ */
+
 class AddUserForm extends Model
 {
     public $key;

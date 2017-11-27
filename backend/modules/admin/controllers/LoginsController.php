@@ -2,21 +2,19 @@
 
 namespace app\modules\admin\controllers;
 
-use common\models\SprDoctorSpec;
 use Yii;
-use common\models\AddOrgForm;
-use common\models\AddUserForm;
-use common\models\Logins;
-use common\models\LoginsSearch;
-use yii\helpers\ArrayHelper;
+use yii\log\Logger;
 use yii\web\Controller;
+use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
+use common\models\AddUserForm;
+use common\models\Logins;
+use common\models\LoginsSearch;
 use common\components\helpers\ActiveSyncHelper;
 use common\models\NAdUsers;
 use common\models\Doctors;
-use yii\helpers\Html;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -272,33 +270,35 @@ class LoginsController extends Controller
             $newUserData = $activeSyncHelper->checkAccount();
 
             if ($newUserData) {
-                $message = '';
+
                 $style = '';
+                $message = '';
+                !empty($activeSyncHelper->idAD) ? $auth = 'AD' : $auth = 'GemoSystem';
+
                 $url = \yii\helpers\Url::toRoute([
                     './logins/view',
-                    'id' => $newUserData['aid'],
-                    'ad' => $newUserData['ad']
+                    'id' => $activeSyncHelper->aid,
+                    'ad' => $activeSyncHelper->idAD
                 ]);
-                $url = Html::a($activeSyncHelper->fullName, $url, ['title' => $activeSyncHelper->fullName, 'target' => '_blank']);
-
+                $url = Html::a($activeSyncHelper->fullName, $url, [
+                    'title' => $activeSyncHelper->fullName,
+                    'target' => '_blank'
+                ]);
                 if ($activeSyncHelper->state == 'new') {
-                    $style = 'success';
-                    $message = '<p>Успешно добавлена УЗ для <b>'.$url.'</b> в GemoSystem</p>';
+                    !empty($activeSyncHelper->idAD) ? $style = 'info' : $style = 'success';
+                    $message = '<p>Успешно добавлена УЗ для <b>'.$url.'</b> авторизации через '.$auth.'</p>';
                 } elseif ($activeSyncHelper->state == 'old') {
                     $style = 'warning';
-                    $message = '<p>У пользователя <b>'.$url.'</b> уже есть УЗ для авторизации через AD</p>';
+                    $message = '<p>У пользователя <b>'.$url.'</b> уже есть УЗ для авторизации через '.$auth.'</p>';
                 }
-                if (!empty($newUserData['login'] && $newUserData['password'])) {
-                    $message .= '<p>Данные для входа в GemoSystem:<p>';
-                    $message .= '<br>Логин: ' . $newUserData['login'];
-                    $message .= '<br>Пароль: ' . $newUserData['password'];
-                }
+                $message .= '<p>Данные для входа в GemoSystem:<p>';
+                $message .= '<br>Логин: ' . $activeSyncHelper->login;
+                $message .= '<br>Пароль: ' . $activeSyncHelper->password;
                 Yii::$app->session->setFlash($style, $message);
             } else {
-                $message = '<p>Не удалось создать УЗ для <b>'.$activeSyncHelper->fullName.'</b> в GemoSystem</p>';
+                $message = '<p>Не удалось создать УЗ для <b>'.$activeSyncHelper->fullName.'</b> авторизации в GemoSystem</p>';
                 Yii::$app->session->setFlash('error', $message);
             }
-
         }
 
         return $this->render('create', [

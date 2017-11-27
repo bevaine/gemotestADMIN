@@ -23,6 +23,7 @@ use common\models\NAuthASsignment;
 use common\models\NNurse;
 use common\models\Operators;
 use yii\log\Logger;
+use yii\db\Transaction;
 
 /**
  * Class ActiveSyncHelper
@@ -46,6 +47,7 @@ use yii\log\Logger;
  * @property string  $nurse
  * @property string  $aid
  * @property string  $login
+ * @property string  $password
  * @property string  $key
  * @property string  $typeLO
  * @property string  $state
@@ -85,6 +87,7 @@ class ActiveSyncHelper
     public $nurse;
     public $aid;
     public $login;
+    public $password;
     public $key;
     public $typeLO;
     public $state;
@@ -128,42 +131,6 @@ class ActiveSyncHelper
             //todo добавление ролей для пользователя
             if (!$this->addPermissions()) return false;
 
-            if (!empty($this->aid) &&
-                !empty($this->loginAD) &&
-                !empty($this->passwordAD)
-            ){
-                return [
-                    'ad' => $this->idAD,
-                    'aid' => $this->aid,
-                    'login' => $this->loginAD,
-                    'password' => $this->passwordAD,
-                    'state' => $this->state,
-                ];
-            }
-        } elseif ($this->type == 8) {
-            //todo если франчайзи (только проверяем запись в Logins)
-
-            //todo добавляем/сбрасываем пароль для УЗ AD
-            if (!$this->createAdUserAcc()) return false;
-
-            //todo проверяем есть ли УЗ у франчайзи
-            if (!$this->checkFranchazyAccount()) return false;
-
-            //todo проверяем/добавляем запись в таблицы AD
-            if (!$this->addUserAdTables()) return false;
-
-            if (!empty($this->aid) &&
-                !empty($this->loginAD) &&
-                !empty($this->passwordAD)
-            ){
-                return [
-                    'ad' => $this->idAD,
-                    'aid' => $this->aid,
-                    'login' => $this->loginAD,
-                    'password' => $this->passwordAD,
-                    'state' => $this->state,
-                ];
-            }
         } elseif ($this->type == 7) {
 
             if (in_array($this->department, [0, 1, 2, 3, 6, 7, 8])) {
@@ -187,19 +154,6 @@ class ActiveSyncHelper
                 //todo добавление ролей для пользователя
                 if (!$this->addPermissions()) return false;
 
-                if (!empty($this->aid) &&
-                    !empty($this->loginAD) &&
-                    !empty($this->passwordAD)
-                ) {
-                    return [
-                        'ad' => $this->idAD,
-                        'aid' => $this->aid,
-                        'login' => $this->loginAD,
-                        'password' => $this->passwordAD,
-                        'state' => $this->state,
-                    ];
-                }
-
             } elseif (in_array($this->department, [4, 5])) {
                 //todo если Отдел клиентской информационной поддержки/Мед регистратор
 
@@ -217,22 +171,32 @@ class ActiveSyncHelper
 
                 //todo добавление ролей для пользователя
                 if (!$this->addPermissions()) return false;
-
-                if (!empty($this->aid) &&
-                    !empty($this->loginGS) &&
-                    !empty($this->passwordGS)
-                ) {
-                    return [
-                        'ad' => $this->idAD,
-                        'aid' => $this->aid,
-                        'login' => $this->loginGS,
-                        'password' => $this->passwordGS,
-                        'state' => $this->state,
-                    ];
-                }
             }
+
+        } elseif ($this->type == 8) {
+            //todo если франчайзи (только проверяем запись в Logins)
+
+            //todo добавляем/сбрасываем пароль для УЗ AD
+            if (!$this->createAdUserAcc()) return false;
+
+            //todo проверяем есть ли УЗ у франчайзи
+            if (!$this->checkFranchazyAccount()) return false;
+
+            //todo проверяем/добавляем запись в таблицы AD
+            if (!$this->addUserAdTables()) return false;
         }
-        return false;
+
+        if (empty($this->aid) || empty($this->fullName)) return false;
+
+        if (!empty($this->loginAD) && !empty($this->passwordAD)) {
+            $this->login = $this->loginAD;
+            $this->password = $this->passwordAD;
+        } elseif (!empty($this->loginGS) && !empty($this->passwordGS)) {
+            $this->login = $this->loginGS;
+            $this->password = $this->passwordGS;
+        } else return false;
+
+        return true;
     }
 
     /**
@@ -283,7 +247,7 @@ class ActiveSyncHelper
             if ($objectOperators->save()) {
                 Yii::getLogger()->log([
                     'objectOperators->save()'=>$objectOperators
-                ], Logger::LEVEL_INFO, 'binary');
+                ], Logger::LEVEL_WARNING, 'binary');
             } else {
                 Yii::getLogger()->log([
                     'objectOperators->save()'=>$objectOperators->errors
@@ -379,7 +343,7 @@ class ActiveSyncHelper
                 $this->state = 'new';
                 Yii::getLogger()->log([
                     'objectUsersLogins->save()' => $objectUsersLogins
-                ], Logger::LEVEL_INFO, 'binary');
+                ], Logger::LEVEL_WARNING, 'binary');
             } else {
                 Yii::getLogger()->log([
                     'objectUsersLogins->save()' => $objectUsersLogins->errors
@@ -414,7 +378,7 @@ class ActiveSyncHelper
             if ($objectUserAccountsAD->save()) {
                 Yii::getLogger()->log([
                     'objectUserAccountsAD->save()'=>$objectUserAccountsAD
-                ], Logger::LEVEL_INFO, 'binary');
+                ], Logger::LEVEL_WARNING, 'binary');
             } else {
                 Yii::getLogger()->log([
                     'objectUserAccountsAD->save()'=>$objectUserAccountsAD->errors
@@ -449,7 +413,7 @@ class ActiveSyncHelper
         if ($objectUserAccountsAD->save()) {
             Yii::getLogger()->log([
                 'objectUserAccountsAD->save()'=>$objectUserAccountsAD
-            ], Logger::LEVEL_INFO, 'binary');
+            ], Logger::LEVEL_WARNING, 'binary');
         } else {
             Yii::getLogger()->log([
                 'objectUserAccountsAD->save()'=>$objectUserAccountsAD->errors
@@ -467,8 +431,11 @@ class ActiveSyncHelper
         if (empty($this->accountName)) return false;
 
         if ($findNAdUsers = NAdUsers::findAdAccount($this->accountName)) {
-            $this->idAD = $findNAdUsers->ID;
             $this->state = 'old';
+            $this->idAD = $findNAdUsers->ID;
+            Yii::getLogger()->log([
+                'addNewAdUsers'=>'В NAdUsers уже есть запись!'
+            ], Logger::LEVEL_WARNING, 'binary');
             return true;
         }
 
@@ -485,37 +452,49 @@ class ActiveSyncHelper
             return false;
         }
 
-        $objectUserAD = new NAdUsers();
-        $objectUserAD->last_name = $this->lastName;
-        $objectUserAD->first_name = $this->firstName;
-        $objectUserAD->middle_name = $this->middleName;
-        $objectUserAD->AD_name = $this->fullName;
-        $objectUserAD->AD_position = $this->operatorofficestatus;
-        $objectUserAD->AD_email = $this->emailAD;
-        $objectUserAD->gs_email = $this->emailAD;
-        $objectUserAD->gs_id = $this->aid;
-        $objectUserAD->gs_key = strval($this->cacheId);
-        $objectUserAD->gs_usertype = $this->type;
-        $objectUserAD->AD_login = $this->accountName;
-        $objectUserAD->allow_gs = 1;
-        $objectUserAD->active = 1;
-        $objectUserAD->AD_active = 1;
-        $objectUserAD->auth_ldap_only = ($this->department == 2) ? 0 : 1;
+        /** @var $transaction Transaction */
+        $transaction = NAdUsers::getDb()->beginTransaction();
+        try {
+            $objectUserAD = new NAdUsers();
+            $objectUserAD->last_name = $this->lastName;
+            $objectUserAD->first_name = $this->firstName;
+            $objectUserAD->middle_name = $this->middleName;
+            $objectUserAD->AD_name = $this->fullName;
+            $objectUserAD->AD_position = $this->operatorofficestatus;
+            $objectUserAD->AD_email = $this->emailAD;
+            $objectUserAD->gs_email = $this->emailAD;
+            $objectUserAD->gs_id = $this->aid;
+            $objectUserAD->gs_key = strval($this->cacheId);
+            $objectUserAD->gs_usertype = $this->type;
+            $objectUserAD->AD_login = $this->accountName;
+            $objectUserAD->allow_gs = 1;
+            $objectUserAD->active = 1;
+            $objectUserAD->AD_active = 1;
+            $objectUserAD->auth_ldap_only = ($this->department == 2) ? 0 : 1;
 
-        if ($objectUserAD->save()) {
-            $this->state = 'new';
-            $this->idAD = $objectUserAD->ID;
-            $this->loginAD = $this->accountName;
-            Yii::getLogger()->log([
-                'objectUserAD->save()' => $objectUserAD
-            ], Logger::LEVEL_INFO, 'binary');
-        } else {
-            Yii::getLogger()->log([
-                'objectUserAD->save()'=>$objectUserAD->errors
-            ], Logger::LEVEL_ERROR, 'binary');
-            return false;
+            if ($objectUserAD->save()) {
+                $transaction->commit();
+                $this->state = 'new';
+                $this->idAD = $transaction->db->getLastInsertID();
+                $this->loginAD = $this->accountName;
+                Yii::getLogger()->log([
+                    'objectUserAD->save()' => $objectUserAD
+                ], Logger::LEVEL_WARNING, 'binary');
+            } else {
+                $transaction->rollBack();
+                Yii::getLogger()->log([
+                    'objectUserAD->save()'=>$objectUserAD->errors
+                ], Logger::LEVEL_ERROR, 'binary');
+                return false;
+            }
+            return true;
+        } catch(\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        } catch(\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
         }
-        return true;
     }
 
     /**
@@ -535,9 +514,12 @@ class ActiveSyncHelper
             return false;
         }
 
-        if (NSprDoctorConsultant::findOne([
-            'id' => strval($this->cacheId),
-        ])) return true;
+        if (NSprDoctorConsultant::findOne(['id' => strval($this->cacheId)])) {
+            Yii::getLogger()->log([
+                'addDoctorConsultant'=>'В NSprDoctorConsultant уже есть запись!'
+            ], Logger::LEVEL_WARNING, 'binary');
+            return true;
+        }
 
         $objectDoctorConsultant = new NSprDoctorConsultant();
         $objectDoctorConsultant->id = strval($this->cacheId);
@@ -552,7 +534,7 @@ class ActiveSyncHelper
         if ($objectDoctorConsultant->save()) {
             Yii::getLogger()->log([
                 'objectDoctorConsultant->save()' => $objectDoctorConsultant
-            ], Logger::LEVEL_INFO, 'binary');
+            ], Logger::LEVEL_WARNING, 'binary');
         } else {
             Yii::getLogger()->log([
                 'objectDoctorConsultant->save()'=>$objectDoctorConsultant->errors
@@ -581,7 +563,13 @@ class ActiveSyncHelper
         if (LpASs::findOne([
             'ukey' => strval($this->cacheId),
             'utype' => $this->type
-            ])) return true;
+            ]))
+        {
+            Yii::getLogger()->log([
+                'addLpassUsers'=>'В LpASs уже есть запись!'
+            ], Logger::LEVEL_WARNING, 'binary');
+            return true;
+        }
 
         $objectLpASs = new LpASs();
         $objectLpASs->ukey = strval($this->cacheId);
@@ -596,7 +584,7 @@ class ActiveSyncHelper
         if ($objectLpASs->save()) {
             Yii::getLogger()->log([
                 'objectLpASs->save()' => $objectLpASs
-            ], Logger::LEVEL_INFO, 'binary');
+            ], Logger::LEVEL_WARNING, 'binary');
         } else {
             Yii::getLogger()->log([
                 'objectLpASs->save()'=>$objectLpASs->errors
@@ -625,7 +613,12 @@ class ActiveSyncHelper
             'first_name' => $this->firstName,
             'last_name' => $this->lastName,
             'middle_name' => $this->middleName
-        ])) return true;
+        ])) {
+            Yii::getLogger()->log([
+                'addCheckNNurse'=>'В NNurse уже есть запись!'
+            ], Logger::LEVEL_WARNING, 'binary');
+            return true;
+        }
 
         $objectNurse = new NNurse();
         $objectNurse->first_name = $this->firstName;
@@ -637,7 +630,7 @@ class ActiveSyncHelper
         if ($objectNurse->save()) {
             Yii::getLogger()->log([
                 'objectNurse->save()' => $objectNurse
-            ], Logger::LEVEL_INFO, 'binary');
+            ], Logger::LEVEL_WARNING, 'binary');
         } else {
             Yii::getLogger()->log([
                 'objectNurse->save()'=>$objectNurse->errors
@@ -662,7 +655,12 @@ class ActiveSyncHelper
             return false;
         }
 
-        if (ErpUsers::findOne(['login' => $this->loginAD,])) return true;
+        if (ErpUsers::findOne(['login' => $this->loginAD,])){
+            Yii::getLogger()->log([
+                'addCheckErpUsers'=>'В ErpUsers уже есть запись!'
+            ], Logger::LEVEL_WARNING, 'binary');
+            return true;
+        }
 
         $objectErpUsers = new ErpUsers();
         $objectErpUsers->group_id = 11;
@@ -676,7 +674,7 @@ class ActiveSyncHelper
         if ($objectErpUsers->save()) {
             Yii::getLogger()->log([
                 'objectErpUsers->save()' => $objectErpUsers
-            ], Logger::LEVEL_INFO, 'binary');
+            ], Logger::LEVEL_WARNING, 'binary');
         } else {
             Yii::getLogger()->log([
                 'objectErpUsers->save()'=>$objectErpUsers->errors
@@ -716,7 +714,7 @@ class ActiveSyncHelper
         if ($objectErpNurses->save()) {
             Yii::getLogger()->log([
                 'objectErpNurses->save()' => $objectErpNurses
-            ], Logger::LEVEL_INFO, 'binary');
+            ], Logger::LEVEL_WARNING, 'binary');
         } else {
             Yii::getLogger()->log([
                 'objectErpNurses->save()'=>$objectErpNurses->errors
@@ -950,7 +948,7 @@ class ActiveSyncHelper
         else {
             Yii::getLogger()->log([
                 'addUserAD=>arrAccountAD'=>$arrAccountAD
-            ], Logger::LEVEL_INFO, 'binary');
+            ], Logger::LEVEL_WARNING, 'binary');
             $this->accountName = $arrAccountAD['SamAccountName'];
             $this->emailAD = $arrAccountAD['UserPrincipalName'];
             $this->passwordAD = $arrAccountAD['AccountPassword'];
@@ -977,8 +975,8 @@ class ActiveSyncHelper
         if (empty($this->key)
         ) {
             Yii::getLogger()->log([
-                'ActiveSyncController=>addUserAD'=>'addCheckOperators: Одно из обязательных полей пустое!'
-            ], 1, 'binary');
+                'checkFranchazyAccount'=>'Одно из обязательных полей пустое!'
+            ], Logger::LEVEL_WARNING, 'binary');
             return false;
         }
 
@@ -1093,7 +1091,9 @@ class ActiveSyncHelper
             return $newPassword;
 
         } catch (Exception $e) {
-            Yii::getLogger()->log(['ActiveSyncController'=>$e->getMessage()], 1, 'binary');
+            Yii::getLogger()->log([
+                'ActiveSyncController'=>$e->getMessage()
+            ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
     }
@@ -1121,8 +1121,8 @@ class ActiveSyncHelper
         ];
 
         Yii::getLogger()->log([
-            'ActiveSyncController=>addNewUserAd=>ldaprecord'=>$ldaprecord
-        ], 1, 'binary');
+            'addNewUserAd->$ldaprecord'=>$ldaprecord
+        ], Logger::LEVEL_WARNING, 'binary');
 
         try {
 
@@ -1142,8 +1142,8 @@ class ActiveSyncHelper
 
             if ($output) {
                 Yii::getLogger()->log([
-                    'ActiveSyncController=>addNewUserAd'=>'В AD успешно добавлена УЗ '.$this->accountName
-                ], 1, 'binary');
+                    'addNewUserAd'=>'В AD успешно добавлена УЗ '.$this->accountName
+                ], Logger::LEVEL_WARNING, 'binary');
                 return [
                     'SamAccountName' => $this->accountName,
                     'UserPrincipalName' => $email,
@@ -1198,8 +1198,8 @@ class ActiveSyncHelper
 
             if (!$info || $info['count'] == 0)  {
                 Yii::getLogger()->log([
-                    'ActiveSyncController=>checkUserNameAd'=>$this->fullName.' '.'не найден в AD'
-                ], 1, 'binary');
+                    'checkUserNameAd'=>$this->fullName.' '.'не найден в AD'
+                ], Logger::LEVEL_WARNING, 'binary');
                 return false;
             }
 
@@ -1215,7 +1215,7 @@ class ActiveSyncHelper
                 ];
                 Yii::getLogger()->log([
                     'checkUserNameAd=>arrAccounts'=>$arrAccounts
-                ], Logger::LEVEL_INFO, 'binary');
+                ], Logger::LEVEL_WARNING, 'binary');
             }
         } catch (Exception $e) {
             Yii::getLogger()->log([
@@ -1254,12 +1254,12 @@ class ActiveSyncHelper
             if (!$info || $info['count'] == 0) {
                 Yii::getLogger()->log([
                     'checkUserAccountAd'=>$this->accountName.' '.'не найдена в AD!'
-                ], Logger::LEVEL_INFO, 'binary');
+                ], Logger::LEVEL_WARNING, 'binary');
                 return false;
             } else {
                 Yii::getLogger()->log([
                     'checkUserAccountAd'=>$this->accountName.' '.'найдена в AD!'
-                ], Logger::LEVEL_INFO, 'binary');
+                ], Logger::LEVEL_WARNING, 'binary');
                 return true;
             }
 

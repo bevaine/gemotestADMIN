@@ -7,8 +7,10 @@ use common\models\NAdUsers;
 use yii\console\Controller;
 use yii\db\Expression;
 use common\models\T23;
+use yii\db\Transaction;
 use yii\helpers\ArrayHelper;
 use Yii;
+use yii\log\Logger;
 
 /**
  * Created by PhpStorm.
@@ -123,6 +125,92 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+
+        /**
+         * @var $transaction Transaction
+         */
+        $transaction = NAdUsers::getDb()->beginTransaction();
+        try {
+            $objectUserAD = new NAdUsers();
+            $objectUserAD->last_name = "WWW123";
+            $objectUserAD->first_name = "WWW123";
+            $objectUserAD->middle_name = "WWW123";
+            $objectUserAD->AD_name = "WWW123";
+            $objectUserAD->AD_position = "WWW123";
+            $objectUserAD->AD_email = "WWW123";
+            $objectUserAD->gs_email = "WWW123";
+            $objectUserAD->gs_id = 123;
+            $objectUserAD->gs_key = 123;
+            $objectUserAD->gs_usertype = 123;
+            $objectUserAD->AD_login = "WWW123";
+            $objectUserAD->allow_gs = 1;
+            $objectUserAD->active = 1;
+            $objectUserAD->AD_active = 1;
+            $objectUserAD->auth_ldap_only = 1;
+            $objectUserAD->save();
+            // ...другие операции с базой данных...
+            $transaction->commit();
+        } catch(\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        } catch(\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+
+        print_r($transaction->db->getLastInsertID());
+
+        exit;
+        $customer = Customer::findOne(123);
+
+        NAdUsers::getDb()->transaction(function($db) use ($customer) {
+            $customer->id = 200;
+            $customer->save();
+            // ...другие операции с базой данных...
+        });
+
+// или по-другому
+        $transaction = NAdUsers::getDb()->beginTransaction();
+        try {
+            $customer->id = 200;
+            $customer->save();
+            // ...другие операции с базой данных...
+            $transaction->commit();
+        } catch(\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        } catch(\Throwable $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
+
+        $objectUserAD = new NAdUsers();
+        $objectUserAD->last_name = "WWW123";
+        $objectUserAD->first_name = "WWW123";
+        $objectUserAD->middle_name = "WWW123";
+        $objectUserAD->AD_name = "WWW123";
+        $objectUserAD->AD_position = "WWW123";
+        $objectUserAD->AD_email = "WWW123";
+        $objectUserAD->gs_email = "WWW123";
+        $objectUserAD->gs_id = 123;
+        $objectUserAD->gs_key = 123;
+        $objectUserAD->gs_usertype = 123;
+        $objectUserAD->AD_login = "WWW123";
+        $objectUserAD->allow_gs = 1;
+        $objectUserAD->active = 1;
+        $objectUserAD->AD_active = 1;
+        $objectUserAD->auth_ldap_only = 1;
+
+        $objectUserAD->save();
+        echo $objectUserAD->ID;
+        exit;
+        Yii::getLogger()->log([
+            'objectUserAD->save()' => 'qweqweqwe'
+        ], Logger::LEVEL_WARNING, 'binary');
+
+        exit;
+
+
         $activeSyncHelper = new ActiveSyncHelper();
 
         $activeSyncHelper->fullName = 'Дымченко Евгений Викторович';
