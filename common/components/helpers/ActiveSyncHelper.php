@@ -301,7 +301,7 @@ class ActiveSyncHelper
             if (!empty($this->operatorofficestatus)) {
                 $loginName .= '.' . $this->operatorofficestatus;
             }
-            $loginName .= "." . $this->fullName;
+            $loginName .= ":" . $this->fullName;
 
             $objectUsersLogins = new Logins();
             $objectUsersLogins->aid = $this->aid;
@@ -424,7 +424,9 @@ class ActiveSyncHelper
     }
 
     /**
-     * @return mixed
+     * @return bool
+     * @throws Exception
+     * @throws \Throwable
      */
     public function addNewAdUsers()
     {
@@ -1178,8 +1180,8 @@ class ActiveSyncHelper
     {
         //todo проверяем на полное совпадение имени пользователя
         $arrAccounts = [];
-        $ADcheckUser = "(displayname=*".$this->fullName."*)";
-        $justthese = array("displayname", "samaccountname", "userprincipalname");
+        $ADcheckUser = "(name=*".$this->fullName."*)";
+        $justthese = array("displayname", "samaccountname", "userprincipalname", 'cn', 'name');
 
         try {
             $ldapconn = ldap_connect(self::LDAP_SERVER);
