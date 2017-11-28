@@ -271,7 +271,7 @@ class ActiveSyncHelper
     {
         if (empty($this->fullName) || empty($this->cacheId)) {
             Yii::getLogger()->log([
-                'addCheckLogins'=>'Одно из обязательных полей пустое!'
+                'addCheckLogins1'=>'Одно из обязательных полей пустое!'
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -291,7 +291,7 @@ class ActiveSyncHelper
                 || empty($this->cachePass)
             ) {
                 Yii::getLogger()->log([
-                    'addCheckLogins'=>'Одно из обязательных полей пустое!'
+                    'addCheckLogins2'=>'Одно из обязательных полей пустое!'
                 ], Logger::LEVEL_ERROR, 'binary');
                 return false;
             }

@@ -32,7 +32,8 @@
         "kartik-v/yii2-export": "*",
         "trntv/yii2-datetime-widget": "^1.0",
         "phpoffice/phpexcel": "*",
-        "arturoliveira/yii2-excelview": "*"
+        "arturoliveira/yii2-excelview": "*",
+        "meysampg/yii2-treeview": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

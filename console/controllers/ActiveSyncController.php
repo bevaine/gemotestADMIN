@@ -126,6 +126,13 @@ class ActiveSyncController extends Controller
     public function actionTest ()
     {
 
+        Yii::getLogger()->log([
+            'objectUserAD->save()' => 'qweqweqwe'
+        ], Logger::LEVEL_WARNING, 'binary');
+
+        exit;
+
+
         /**
          * @var $transaction Transaction
          */
@@ -204,11 +211,7 @@ class ActiveSyncController extends Controller
         $objectUserAD->save();
         echo $objectUserAD->ID;
         exit;
-        Yii::getLogger()->log([
-            'objectUserAD->save()' => 'qweqweqwe'
-        ], Logger::LEVEL_WARNING, 'binary');
 
-        exit;
 
 
         $activeSyncHelper = new ActiveSyncHelper();
