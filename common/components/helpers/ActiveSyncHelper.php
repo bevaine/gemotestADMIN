@@ -60,9 +60,9 @@ use yii\db\Transaction;
 
 class ActiveSyncHelper
 {
-    CONST LDAP_PORT     = 636;
+    CONST LDAP_PORT     =  636;
     CONST LDAP_SERVER   = '192.168.108.3';
-    CONST LDAP_URL      = "ldaps://sw-dc-05.lab.gemotest.ru";
+    CONST LDAP_URL      = "ldaps://sw-dc-03.lab.gemotest.ru";
     CONST LDAP_LOGIN    = 'dymchenko.adm@lab.gemotest.ru';
     CONST LDAP_PASSW    = '2Hszfaussw';
     CONST LDAP_DN       = "DC=lab,DC=gemotest,DC=ru";
