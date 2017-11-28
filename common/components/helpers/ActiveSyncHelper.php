@@ -214,7 +214,10 @@ class ActiveSyncHelper
             || empty($this->middleName)
         ) {
             Yii::getLogger()->log([
-                'addCheckOperators'=>'Одно из обязательных полей пустое!'
+                'addCheckOperators'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -272,7 +275,7 @@ class ActiveSyncHelper
             Yii::getLogger()->log([
                 'addCheckLogins1'=>[
                     'Одно из обязательных полей пустое!',
-                    $this
+                    ArrayHelper::toArray($this)
                 ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
@@ -370,7 +373,10 @@ class ActiveSyncHelper
     {
         if (empty($this->accountName) || empty($this->passwordAD)) {
             Yii::getLogger()->log([
-                'addNewAdUserAccount'=>'Одно из обязательных полей пустое!'
+                'addNewAdUserAccount'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -399,7 +405,10 @@ class ActiveSyncHelper
             || empty($this->cacheId)
         ) {
             Yii::getLogger()->log([
-                'addNewAdUserAccount'=>'Одно из обязательных полей пустое!'
+                'addNewAdUserAccount'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -454,7 +463,10 @@ class ActiveSyncHelper
             || empty($this->cacheId)
         ) {
             Yii::getLogger()->log([
-                'addNewAdUsers'=>'Одно из обязательных полей пустое!'
+                'addNewAdUsers'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -516,7 +528,10 @@ class ActiveSyncHelper
             || empty($this->loginGS)
         ) {
             Yii::getLogger()->log([
-                'addDoctorConsultant'=>'Одно из обязательных полей пустое!'
+                'addDoctorConsultant'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -562,7 +577,10 @@ class ActiveSyncHelper
             || empty($this->cachePass)
         ) {
             Yii::getLogger()->log([
-                'addLpassUsers'=>'Одно из обязательных полей пустое!'
+                'addLpassUsers'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -611,7 +629,10 @@ class ActiveSyncHelper
             || empty($this->middleName)
         ) {
             Yii::getLogger()->log([
-                'addCheckNNurse'=>'Одно из обязательных полей пустое!'
+                'addCheckNNurse'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -657,7 +678,10 @@ class ActiveSyncHelper
             || empty($this->fullName)
         ) {
             Yii::getLogger()->log([
-                'addCheckErpUsers'=>'Одно из обязательных полей пустое!'
+                'addCheckErpUsers'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -701,7 +725,10 @@ class ActiveSyncHelper
             || empty($this->fullName)
         ) {
             Yii::getLogger()->log([
-                'addCheckErpNurses'=>'Одно из обязательных полей пустое!'
+                'addCheckErpNurses'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -738,7 +765,10 @@ class ActiveSyncHelper
 
         if (empty($this->key) || empty($this->specId)) {
             Yii::getLogger()->log([
-                'setDoctorObjectParams'=>'Одно из обязательных полей пустое!'
+                'setDoctorObjectParams'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -843,7 +873,10 @@ class ActiveSyncHelper
     {
         if (empty($this->aid)) {
             Yii::getLogger()->log([
-                'ActiveSyncController=>addPermissions'=>'Одно из обязательных полей пустое!'
+                'ActiveSyncController=>addPermissions'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -908,7 +941,10 @@ class ActiveSyncHelper
             || empty($this->fullName)
         ){
             Yii::getLogger()->log([
-                'addUserAD'=>'Одно из обязательных полей пустое!'
+                'addUserAD'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -982,7 +1018,10 @@ class ActiveSyncHelper
         if (empty($this->key)
         ) {
             Yii::getLogger()->log([
-                'checkFranchazyAccount'=>'Одно из обязательных полей пустое!'
+                'checkFranchazyAccount'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
             ], Logger::LEVEL_WARNING, 'binary');
             return false;
         }
