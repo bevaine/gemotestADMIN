@@ -373,7 +373,7 @@ class ActiveSyncHelper
     {
         if (empty($this->accountName) || empty($this->passwordAD)) {
             Yii::getLogger()->log([
-                'addNewAdUserAccount'=>[
+                'addNewAdUserAccount1'=>[
                     'Одно из обязательных полей пустое!',
                     ArrayHelper::toArray($this)
                 ]
@@ -385,6 +385,10 @@ class ActiveSyncHelper
         $objectUserAccountsAD = NAdUseraccounts::findAdUserAccount($this->loginAD);
 
         if ($objectUserAccountsAD) {
+            Yii::getLogger()->log([
+                'addNewAdUserAccount=>objectUserAccountsAD'=>'В NAdUseraccounts уже есть запись!'
+            ], Logger::LEVEL_WARNING, 'binary');
+
             $objectUserAccountsAD->ad_pass = $this->passwordAD;
             if ($objectUserAccountsAD->save()) {
                 Yii::getLogger()->log([
@@ -405,7 +409,7 @@ class ActiveSyncHelper
             || empty($this->cacheId)
         ) {
             Yii::getLogger()->log([
-                'addNewAdUserAccount'=>[
+                'addNewAdUserAccount2'=>[
                     'Одно из обязательных полей пустое!',
                     ArrayHelper::toArray($this)
                 ]
