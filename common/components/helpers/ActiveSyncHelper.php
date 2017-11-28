@@ -22,6 +22,7 @@ use common\models\NAdUsers;
 use common\models\NAuthASsignment;
 use common\models\NNurse;
 use common\models\Operators;
+use yii\helpers\ArrayHelper;
 use yii\log\Logger;
 use yii\db\Transaction;
 
@@ -104,11 +105,11 @@ class ActiveSyncHelper
         /**
          * @var Logins $findUserLogin
          */
+        //todo генеруруем/задаем пароль для входа в GS
+        $this->setCachePass();
+
         if ($this->type == 5) {
             //todo если доктор-консультант
-
-            //todo генеруруем/задаем пароль для входа в GS
-            $this->setCachePass();
 
             //todo присваиваем значения переменным
             if (!$this->setDoctorObjectParams()) return false;
@@ -221,8 +222,6 @@ class ActiveSyncHelper
         //todo проверяем существует ли запись в Operators
         if (!$objectOperators = $this->checkOperatorAccount()) {
 
-            $this->setCachePass();
-
             $this->setLastOperatorCacheId();
 
             //todo если нет, то добавление в Operators
@@ -271,7 +270,10 @@ class ActiveSyncHelper
     {
         if (empty($this->fullName) || empty($this->cacheId)) {
             Yii::getLogger()->log([
-                'addCheckLogins1'=>'Одно из обязательных полей пустое!'
+                'addCheckLogins1'=>[
+                    'Одно из обязательных полей пустое!',
+                    $this
+                ]
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -291,7 +293,10 @@ class ActiveSyncHelper
                 || empty($this->cachePass)
             ) {
                 Yii::getLogger()->log([
-                    'addCheckLogins2'=>'Одно из обязательных полей пустое!'
+                    'addCheckLogins2'=>[
+                        'Одно из обязательных полей пустое!',
+                        ArrayHelper::toArray($this)
+                    ]
                 ], Logger::LEVEL_ERROR, 'binary');
                 return false;
             }
