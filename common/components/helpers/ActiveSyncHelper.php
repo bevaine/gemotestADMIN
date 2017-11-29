@@ -1067,20 +1067,35 @@ class ActiveSyncHelper
      */
     public function checkOperatorAccount()
     {
+        if (empty($this->firstName) ||
+            empty($this->middleName) ||
+            empty($this->lastName)
+        ) {
+            Yii::getLogger()->log([
+                'checkOperatorAccount'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
+            ], Logger::LEVEL_WARNING, 'binary');
+            return false;
+        }
+
         /** @var  $objectOperators Operators */
         $objectOperators = Operators::find()->where([
             'Name' => $this->firstName." ".$this->middleName,
             'LastName' => $this->lastName
         ])->one();
 
-        if (!empty($objectOperators->CACHE_OperatorID)) {
-            $findLogin = Logins::findOne([
-                'Key' => $objectOperators->CACHE_OperatorID,
-                'UserType' => $this->type
-            ]);
-            if ($findLogin) return $objectOperators;
-        }
-        return false;
+        if (empty($objectOperators->CACHE_OperatorID))
+            return false;
+
+        $findLogin = Logins::findOne([
+            'Key' => $objectOperators->CACHE_OperatorID,
+            'UserType' => $this->type
+        ]);
+
+        if (!$findLogin) return false;
+        else return $objectOperators;
     }
 
     /**
@@ -1088,9 +1103,19 @@ class ActiveSyncHelper
      */
     public function addFranchazyUser()
     {
-        /**
-         * @var Logins $loginSearch
-         */
+        if (empty($this->fullName) ||
+            empty($this->key)
+        ) {
+            Yii::getLogger()->log([
+                'addFranchazyUser'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
+            ], Logger::LEVEL_WARNING, 'binary');
+            return false;
+        }
+
+        /** @var Logins $loginSearch */
         $loginSearch = Logins::find()
             ->andFilterWhere(['like', 'Name', $this->fullName])
             ->andFilterWhere(['Key' => $this->key])
@@ -1107,16 +1132,20 @@ class ActiveSyncHelper
         ];
     }
 
-    private function setLastOperatorCacheId() {
+    private function setLastOperatorCacheId()
+    {
         /** @var  $cacheId Operators */
         $cacheId = Operators::find()
             ->select('CACHE_OperatorID')
             ->orderBy('AID DESC')
             ->one();
-        $this->cacheId = strval($cacheId->CACHE_OperatorID) + 1;
+        if (!empty($cacheId->CACHE_OperatorID)) {
+            $this->cacheId = strval($cacheId->CACHE_OperatorID) + 1;
+        }
     }
 
-    private function setCachePass() {
+    private function setCachePass()
+    {
         $this->cachePass = Yii::$app->getSecurity()->generateRandomString(8);
     }
 

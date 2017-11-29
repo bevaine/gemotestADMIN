@@ -126,6 +126,21 @@ class ActiveSyncController extends Controller
     public function actionTest ()
     {
 
+//        $ldapconn = ldap_connect('192.168.108.3');
+//        ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+//        ldap_set_option($ldapconn, LDAP_OPT_REFERRALS, 0);
+//
+//        if (!$ldapconn) return false;
+//
+//        $ldapbind = ldap_bind($ldapconn, self::LDAP_LOGIN, self::LDAP_PASSW);
+//
+
+        $activeSyncHelper = new ActiveSyncHelper();
+        $activeSyncHelper->accountName = 'Дымченко Евгений Викторович';
+        $activeSyncHelper->checkUserAccountAd();
+        exit;
+
+
         Yii::getLogger()->log([
             'objectUserAD->save()' => 'qweqweqwe'
         ], Logger::LEVEL_WARNING, 'binary');
@@ -214,7 +229,7 @@ class ActiveSyncController extends Controller
 
 
 
-        $activeSyncHelper = new ActiveSyncHelper();
+
 
         $activeSyncHelper->fullName = 'Дымченко Евгений Викторович';
 
