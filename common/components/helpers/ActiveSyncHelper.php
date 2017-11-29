@@ -868,7 +868,10 @@ class ActiveSyncHelper
             $newPasswordAd = $this->resetPasswordAD($this->accountName);
             if ($newPasswordAd) {
                 $this->passwordAD = $newPasswordAd;
-                $message = '<p>Изменен пароль УЗ для <b>' . $this->fullName . '</b> в AD </p>';
+                $message = '<p>Для пользователя <b>' . $this->fullName . '</b> был изменен пароль для входа в Windows!</p>';
+                $message .= '<p>Данные для входа в Windows:<p>';
+                $message .= '<br>Логин: ' . $this->accountName;
+                $message .= '<br>Пароль: ' . $this->passwordAD;
                 Yii::$app->session->setFlash('warning', $message);
             }
         } else {
