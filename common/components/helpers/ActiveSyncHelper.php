@@ -390,6 +390,7 @@ class ActiveSyncHelper
             ], Logger::LEVEL_WARNING, 'binary');
 
             $objectUserAccountsAD->ad_pass = $this->passwordAD;
+
             if ($objectUserAccountsAD->save()) {
                 Yii::getLogger()->log([
                     'objectUserAccountsAD->save()'=>$objectUserAccountsAD
@@ -451,6 +452,17 @@ class ActiveSyncHelper
         if (empty($this->accountName)) return false;
 
         if ($findNAdUsers = NAdUsers::findAdAccount($this->accountName)) {
+
+            if (!empty($this->aid)) $findNAdUsers->gs_id = $this->aid;
+            if (!empty($this->cacheId)) $findNAdUsers->gs_key = $this->cacheId;
+            if (!empty($this->type)) $findNAdUsers->gs_usertype = $this->type;
+
+            if(!$findNAdUsers->save()) {
+                Yii::getLogger()->log([
+                    'objectUserAD->save()' => $findNAdUsers->errors
+                ], Logger::LEVEL_WARNING, 'binary');
+            }
+
             $this->state = 'old';
             $this->idAD = $findNAdUsers->ID;
             Yii::getLogger()->log([

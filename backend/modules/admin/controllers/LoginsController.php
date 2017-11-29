@@ -271,6 +271,10 @@ class LoginsController extends Controller
 
             if ($newUserData) {
 
+                Yii::getLogger()->log([
+                    'УСПЕШНО БЫЛА ДОБАВЛЕНА УЗ ДЛЯ '.$activeSyncHelper->fullName
+                ], Logger::LEVEL_WARNING, 'binary');
+
                 $style = '';
                 $message = '';
                 !empty($activeSyncHelper->idAD) ? $auth = 'AD' : $auth = 'GemoSystem';
@@ -296,6 +300,10 @@ class LoginsController extends Controller
                 $message .= '<br>Пароль: ' . $activeSyncHelper->password;
                 Yii::$app->session->setFlash($style, $message);
             } else {
+                Yii::getLogger()->log([
+                    'ВОЗНИКЛА ОШИБКА ПРИ ДОБАВЛЕНИИ УЗ ДЛЯ '.$activeSyncHelper->fullName
+                ], Logger::LEVEL_ERROR, 'binary');
+
                 $message = '<p>Не удалось создать УЗ для <b>'.$activeSyncHelper->fullName.'</b> авторизации в GemoSystem</p>';
                 Yii::$app->session->setFlash('error', $message);
             }
