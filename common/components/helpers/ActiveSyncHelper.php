@@ -181,12 +181,24 @@ class ActiveSyncHelper
             if (!$this->addUserAdTables()) return false;
         }
 
-        if (empty($this->aid) || empty($this->fullName)) return false;
+        return $this->setLoginPassword();
+    }
 
-        if (!empty($this->loginAD) && !empty($this->passwordAD)) {
+    /**
+     * @return bool
+     */
+    public function setLoginPassword()
+    {
+        if (empty($this->aid)
+            || empty($this->fullName))
+            return false;
+
+        if (!empty($this->loginAD)
+            && !empty($this->passwordAD)) {
             $this->login = $this->loginAD;
             $this->password = $this->passwordAD;
-        } elseif (!empty($this->loginGS) && !empty($this->passwordGS)) {
+        } elseif (!empty($this->loginGS)
+            && !empty($this->passwordGS)) {
             $this->login = $this->loginGS;
             $this->password = $this->passwordGS;
         } else return false;
@@ -901,6 +913,11 @@ class ActiveSyncHelper
             //todo если находим то сбрасываем пароль в AD
             $newPasswordAd = $this->resetPasswordAD($this->accountName);
             if ($newPasswordAd) {
+
+                Yii::getLogger()->log([
+                    'resetPasswordAD'=>'Пароль успешно изменен для '.$this->accountName
+                ], Logger::LEVEL_WARNING, 'binary');
+
                 $this->passwordAD = $newPasswordAd;
                 $message = '<p>Для пользователя <b>' . $this->fullName . '</b> был изменен пароль для входа в Windows!</p>';
                 $message .= '<p>Данные для входа в Windows:<p>';
@@ -1341,10 +1358,13 @@ class ActiveSyncHelper
                     'email' => $info[$i]['userprincipalname'][0],
                     'active' => $active
                 ];
-                Yii::getLogger()->log([
-                    'checkUserNameAd=>arrAccounts'=>$arrAccounts
-                ], Logger::LEVEL_WARNING, 'binary');
+
             }
+
+            Yii::getLogger()->log([
+                'checkUserNameAd=>arrAccounts'=>$arrAccounts
+            ], Logger::LEVEL_WARNING, 'binary');
+
         } catch (Exception $e) {
             Yii::getLogger()->log([
                 'checkUserNameAd'=>$e->getMessage()
