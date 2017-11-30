@@ -33,6 +33,7 @@ return [
             'charset' => 'utf8',
         ],
         'MIS' => [
+        //'db' => [
             'class' => 'yii\db\Connection',
             'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=MIS',
             'username' => 'importfromcache',

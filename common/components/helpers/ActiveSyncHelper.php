@@ -8,6 +8,7 @@
 
 namespace common\components\helpers;
 
+use common\models\medUserCounterparty;
 use common\models\NSprDoctorConsultant;
 use Yii;
 use Exception;
@@ -134,45 +135,38 @@ class ActiveSyncHelper
 
         } elseif ($this->type == 7) {
 
+            //todo роли с авторизацией в AD
             if (in_array($this->department, [0, 1, 2, 3, 6, 7, 8])) {
-                //todo если Администр./Врач консул./Собств. лаб. отд./Ген. директор (проверяем/создаем в Logins и adUsers)
 
                 //todo добавляем/сбрасываем пароль для УЗ AD
                 if (!$this->createAdUserAcc()) return false;
+            }
 
-                //todo проверяем/добавляем запись в Operators
-                if (!$this->addCheckOperators()) return false;
+            //todo проверяем/добавляем запись в Operators
+            if (!$this->addCheckOperators()) return false;
 
-                //todo проверяем/добавляем запись в Logins
-                if (!$this->addCheckLogins()) return false;
+            //todo проверяем/добавляем запись в Logins
+            if (!$this->addCheckLogins()) return false;
+
+            if (in_array($this->department, [0, 1, 2, 3, 6, 7, 8])) {
 
                 //todo проверяем/добавляем запись в таблицы AD
                 if (!$this->addUserAdTables()) return false;
 
-                //todo добавление пользователя в другие таблицы в соотвествии с ролью
-                if (!$this->addDepartmentRules()) return false;
-
-                //todo добавление ролей для пользователя
-                if (!$this->addPermissions()) return false;
-
+             //todo роли без авторизации в AD
             } elseif (in_array($this->department, [4, 5])) {
-                //todo если Отдел клиентской информационной поддержки/Мед регистратор
-
-                //todo проверяем/добавляем запись в Operators
-                if (!$this->addCheckOperators()) return false;
-
-                //todo проверяем/добавляем запись в Logins
-                if (!$this->addCheckLogins()) return false;
 
                 //todo проверяем/добавляем запись в lpASs
                 if (!$this->addLpassUsers()) return false;
-
-                //todo добавление пользователя в другие таблицы в соотвествии с ролью
-                if (!$this->addDepartmentRules()) return false;
-
-                //todo добавление ролей для пользователя
-                if (!$this->addPermissions()) return false;
             }
+            //todo добавление пользователя в другие таблицы в соотвествии с ролью
+            if (!$this->addDepartmentRules()) return false;
+
+            //todo добавление ролей для пользователя
+            if (!$this->addPermissions()) return false;
+
+            //todo добавление пользователя для выбора ЛО
+            if (!$this->addCheckCounterparty()) return false;
 
         } elseif ($this->type == 8) {
             //todo если франчайзи (только проверяем запись в Logins)
@@ -725,6 +719,46 @@ class ActiveSyncHelper
         } else {
             Yii::getLogger()->log([
                 'objectErpUsers->save()'=>$objectErpUsers->errors
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function addCheckCounterparty()
+    {
+        if (empty($this->aid)
+        ) {
+            Yii::getLogger()->log([
+                'addCheckCounterparty'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+
+        if (medUserCounterparty::findOne(['user_id' => $this->aid])){
+            Yii::getLogger()->log([
+                'addCheckCounterparty'=>'В medUserCounterparty уже есть запись!'
+            ], Logger::LEVEL_WARNING, 'binary');
+            return true;
+        }
+
+        $objectUserCounterparty = new medUserCounterparty();
+        $objectUserCounterparty->user_id = $this->aid;
+        $objectUserCounterparty->counterparty_id = 1;
+
+        if ($objectUserCounterparty->save()) {
+            Yii::getLogger()->log([
+                'objectUserCounterparty->save()' => $objectUserCounterparty
+            ], Logger::LEVEL_WARNING, 'binary');
+        } else {
+            Yii::getLogger()->log([
+                'objectUserCounterparty->save()'=>$objectUserCounterparty->errors
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
