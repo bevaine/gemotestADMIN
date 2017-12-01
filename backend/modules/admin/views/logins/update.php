@@ -3,9 +3,11 @@
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\datetime\DateTimePicker;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\LoginsSearch */
+/* @var $model common\models\Logins */
 /* @var $ad integer */
 
 $this->title = 'Редактирование: ' . $model->Name;
@@ -32,6 +34,37 @@ $this->params['breadcrumbs'][] = 'Редактирование';
         echo $form->field($model->adUserAccounts, 'ad_login')->textInput(['readonly' => true]);
         echo $form->field($model->adUserAccounts, 'ad_pass')->textInput(['readonly' => true]);
     } ?>
+
+    <?php
+    $url = \yii\helpers\Url::to(['/admin/logins/ajax-user-data-list']);
+
+    $initScript = <<< SCRIPT
+    function (element, callback) {
+        var id=\$(element).val();
+        if (id !== "") {
+            \$.ajax("{$url}?id=" + id, {
+                dataType: "json"
+            }).done(function(data) { callback(data.results);});
+        }
+    }
+SCRIPT;
+
+    echo $form->field($model, 'aid_donor')->widget(Select2::classname(), [
+        'options' => ['placeholder' => 'ФИО сотрудника'],
+        'pluginOptions' => [
+            'allowClear' => true,
+            'minimumInputLength' => 2,
+            'multiple' => false,
+            'ajax' => [
+                'url' => $url,
+                'dataType' => 'json',
+                'data' => new JsExpression('function(params) { return {search:params.term}; }'),
+                'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
+            ],
+            'initSelection' => new JsExpression($initScript)
+        ],
+    ])->label('Установить права как у:');
+    ?>
 
     <?= $form->field($model, 'Login')->textInput(['readonly' => true]) ?>
 

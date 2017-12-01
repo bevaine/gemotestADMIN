@@ -15,6 +15,7 @@ use common\models\LoginsSearch;
 use common\components\helpers\ActiveSyncHelper;
 use common\models\NAdUsers;
 use common\models\Doctors;
+use yii\db\Query;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -54,49 +55,59 @@ class LoginsController extends Controller
     /**
      * @param $id
      * @param string $ad
-     * @param string $action
-     * @param string $status
      * @return string
      */
-    public function actionView($id, $ad = '', $action = '', $status = '')
+    public function actionView($id, $ad = '')
     {
         $model = $this->findModel($id, $ad);
 
-        switch ($action) {
-            case 'block-account':
-                if ($status == 'block') {
-                    $model->DateEnd = date("Y-m-d G:i:s:000", time());
-                } elseif ($status == 'active') {
-                    $model->DateEnd = NULL;
+        $post = Yii::$app->request->post();
+        if (isset($post['block-account'])) {
+
+            $status = $post['block-account'];
+            if ($status == 'block') {
+                $model->DateEnd = date("Y-m-d G:i:s:000", time());
+            } elseif ($status == 'active') {
+                $model->DateEnd = NULL;
+            }
+            if (!$model->save()) {
+                Yii::getLogger()->log([
+                    'model->DateEnd'=>$model->errors
+                ], Logger::LEVEL_ERROR, 'binary');
+            }
+        } elseif (isset($post['block-register'])) {
+
+            $status = $post['block-register'];
+            if ($status == 'block') {
+                $model->block_register = date("Y-m-d G:i:s:000", time());
+            } elseif ($status == 'active') {
+                $model->block_register = NULL;
+            }
+            if (!$model->save()) {
+                Yii::getLogger()->log([
+                    'model->block_register'=>$model->errors
+                ], Logger::LEVEL_ERROR, 'binary');
+            }
+        } elseif (isset($post['active-gs'])) {
+
+            $status = $post['active-gs'];
+            if ($model->adUsers) {
+                $modelAdUser = $model->adUsers;
+                if ($status == 'active') {
+                    $modelAdUser->auth_ldap_only = 1;
+                } elseif ($status == 'block') {
+                    $modelAdUser->auth_ldap_only = 0;
                 }
-                if (!$model->save()) {
-                    Yii::getLogger()->log(['$model->DateEnd'=>$model->errors], 1, 'binary');
+                if (!$modelAdUser->save()) {
+                    Yii::getLogger()->log([
+                        'modelAdUser->auth_ldap_only'=>$modelAdUser->errors
+                    ], Logger::LEVEL_ERROR, 'binary');
+                } else {
+                    Yii::getLogger()->log([
+                        'modelAdUser->auth_ldap_only'=>$modelAdUser->auth_ldap_only
+                    ], Logger::LEVEL_WARNING, 'binary');
                 }
-                break;
-            case 'block-register':
-                if ($status == 'block') {
-                    $model->block_register = date("Y-m-d G:i:s:000", time());
-                } elseif ($status == 'active') {
-                    $model->block_register = NULL;
-                }
-                if (!$model->save()) {
-                    Yii::getLogger()->log(['$model->block_register'=>$model->errors], 1, 'binary');
-                }
-                break;
-            case 'active-gs':
-                if ($model->adUsers) {
-                    $modelAdUser = $model->adUsers;
-                    if ($status == 'block') {
-                        $modelAdUser->auth_ldap_only = 1;
-                    } elseif ($status == 'active') {
-                        $modelAdUser->auth_ldap_only = 0;
-                    }
-                    if ($modelAdUser->save()) {
-                        Yii::getLogger()->log(['$modelAdUser->auth_ldap_only'=>$modelAdUser->errors], 1, 'binary');
-                    }
-                    $modelAdUser->save();
-                }
-                break;
+            }
         }
 
         return $this->render('view', [
@@ -109,6 +120,22 @@ class LoginsController extends Controller
      * @return string|\yii\web\Response
      */
     public function actionCreateOrg ()
+    {
+        $model = new AddUserForm();
+        $model->scenario = 'addUserOrg';
+
+        if ($model->load(Yii::$app->request->post())) {
+
+        }
+        return $this->render('createOrg', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * @return string|\yii\web\Response
+     */
+    public function actionRules ()
     {
         $model = new AddUserForm();
         $model->scenario = 'addUserOrg';
@@ -402,5 +429,31 @@ class LoginsController extends Controller
         } else {
             echo Json::encode($arrAccountAD);
         }
+    }
+
+    /**
+     * @param null $search
+     * @param null $id
+     */
+    public function actionAjaxUserDataList($search = null, $id = null)
+    {
+        $out = ['more' => false];
+
+        if (!is_null($search)) {
+            $search = mb_strtolower($search, 'UTF-8');
+            $data = Logins::find()->select(['aid, [Name]'])
+                ->where('lower(Name) LIKE \'%' . $search . '%\'')
+                ->andWhere('UserType in (7,5)')
+                ->limit(20)
+                ->all();
+            /** @var Logins $userData */
+            foreach ($data as $userData) {
+                $out['results'][] = ['id' => $userData->aid, 'text' => $userData->Name];
+            }
+        } elseif ($id > 0) {
+            $out['results'] = ['id' => $id, 'text' => Logins::findOne($id)->Name];
+        }
+
+        echo Json::encode($out);
     }
 }

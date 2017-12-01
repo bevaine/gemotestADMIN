@@ -56,6 +56,7 @@ use common\components\helpers\ActiveSyncHelper;
  * @property DirectorFlo $directorFlo
  * @property DirectorFlo $directorInfo
  * @property integer $idAD
+ * @property integer $aid_donor
  */
 class Logins extends \yii\db\ActiveRecord
 {
@@ -67,6 +68,7 @@ class Logins extends \yii\db\ActiveRecord
     public $middle_name;
     public $AD_position;
     public $idAD;
+    public $aid_donor;
 
     /**
      * @return null|object
@@ -90,7 +92,7 @@ class Logins extends \yii\db\ActiveRecord
     {
         return [
             [['aid', 'Key', 'UserType'], 'required'],
-            [['aid', 'IsOperator', 'IsAdmin', 'OpenExcel', 'EngVersion', 'IsDoctor', 'UserType', 'InputOrder', 'PriceID', 'CanRegister', 'InputOrderRM', 'OrderEdit', 'MedReg', 'goscontract', 'FizType', 'clientmen', 'mto', 'mto_editor', 'show_preanalytic', 'parentAid', 'GarantLetter'], 'integer'],
+            [['aid_donor', 'aid', 'IsOperator', 'IsAdmin', 'OpenExcel', 'EngVersion', 'IsDoctor', 'UserType', 'InputOrder', 'PriceID', 'CanRegister', 'InputOrderRM', 'OrderEdit', 'MedReg', 'goscontract', 'FizType', 'clientmen', 'mto', 'mto_editor', 'show_preanalytic', 'parentAid', 'GarantLetter'], 'integer'],
             [['Login', 'Pass', 'Name', 'Email', 'Key', 'Logo', 'LogoText', 'LogoText2', 'LogoType', 'LogoWidth', 'TextPaddingLeft', 'tbl', 'CACHE_Login', 'role'], 'string'],
             [['LastLogin', 'DateBeg', 'DateEnd', 'block_register', 'last_update_password'], 'safe'],
         ];
@@ -144,6 +146,20 @@ class Logins extends \yii\db\ActiveRecord
             'parentAid' => 'Parent Aid',
             'GarantLetter' => 'Garant Letter',
         ];
+    }
+
+    /**
+     * @param bool $insert
+     */
+    public function beforeSave($insert)
+    {
+        if ($itemname = ActiveSyncHelper::addFromDonor($this->aid_donor, $this->aid)) {
+            $nameDonor = self::findOne(['aid' => $this->aid_donor]);
+            $txtName = implode('<br>', $itemname);
+            $message = '<p>Были успешно применены роли как у пользователя <b>' . $nameDonor->Name . '</b>:</p>';
+            $message .= '<p>'.$txtName.'</p>';
+            Yii::$app->session->setFlash('warning', $message);
+        }
     }
 
     /**

@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $ad integer */
@@ -12,19 +13,19 @@ $this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' =
 $this->params['breadcrumbs'][] = $this->title;
 
 $display = '';
-$blockDateEnd = true;
-$blockRegister = true;
-$activeGS = true;
+$blockDateEnd = 'active';
+$blockRegister = 'active';
+$activeGS = 'active';
 
 if (empty($model->DateEnd) || strtotime($model->DateEnd) > time()) {
-    $blockDateEnd = false;
+    $blockDateEnd = 'block';
 }
 if (empty($model->block_register) || strtotime($model->block_register) > time()) {
-    $blockRegister = false;
+    $blockRegister = 'block';
 }
 if ($model->adUsers) {
     if ($model->adUsers->auth_ldap_only == 1) {
-        $activeGS = false;
+        $activeGS = 'block';
     }
 } else {
     $display = 'none;';
@@ -37,41 +38,30 @@ if ($model->adUsers) {
     <h1><?php //Html::encode($this->title) ?></h1>
 
     <p>
+        <?php $form = ActiveForm::begin(['id'=>'form-input','method' => 'post']); ?>
+
         <?= Html::a('Редактировать', ['update', 'id' => $model->aid, 'ad' => $ad], ['class' => 'btn btn-primary']) ?>
 
-        <?= Html::a($blockDateEnd ? 'Включить УЗ' : 'Отключить УЗ',
-            [
-                'view',
-                'id' => $model->aid,
-                'ad' => $ad,
-                'action' => 'block-account',
-                'status' => $blockDateEnd ? 'active' : 'block'
-            ],
-            ['class' => $blockDateEnd ? 'btn btn-success' : 'btn btn-danger']);
-        ?>
-        <?= Html::a($blockRegister ? 'Вкл. рег. заказов' : 'Откл. рег. заказов',
-            [
-                'view',
-                'id' => $model->aid,
-                'ad' => $ad,
-                'action' => 'block-register',
-                'status' => $blockRegister ? 'active' : 'block'
-            ],
-            ['class' => $blockRegister ? 'btn btn-success' : 'btn btn-warning']);
-        ?>
-        <?= Html::a($activeGS ? 'Откл. авториз. GS' : 'Вкл. авториз. GS',
-            [
-                'view',
-                'id' => $model->aid,
-                'ad' => $ad,
-                'action' => 'active-gs',
-                'status' => $activeGS ? 'block' : 'active' ,
-            ],
-            [
-                'class' => $activeGS ? 'btn btn-success' : 'btn btn-info',
-                'style' => 'display: '.$display
-            ]);
-        ?>
+        <?= Html::SubmitButton($blockDateEnd == 'active' ? 'Включить УЗ' : 'Отключить УЗ', [
+            'name' => 'block-account',
+            'class' => $blockDateEnd == 'active' ? 'btn btn-success' : 'btn btn-danger',
+            'value' => $blockDateEnd
+        ]) ?>
+
+        <?= Html::SubmitButton($blockRegister == 'active' ? 'Вкл. рег. заказов' : 'Откл. рег. заказов', [
+            'name' => 'block-register',
+            'class' => $blockRegister == 'active' ? 'btn btn-success' : 'btn btn-warning',
+            'value' => $blockRegister
+        ]) ?>
+
+        <?= Html::SubmitButton($activeGS == 'active' ? 'Откл. авториз. GS' : 'Вкл. авториз. GS', [
+            'name' => 'active-gs',
+            'class' => $activeGS == 'active' ? 'btn btn-success' : 'btn btn-info',
+            'value' => $activeGS,
+            'style' => 'display: '.$display
+        ]) ?>
+
+
     </p>
 
     <?= DetailView::widget([
@@ -210,4 +200,19 @@ if ($model->adUsers) {
         ],
     ]) ?>
 
+    <?php ActiveForm::end(); ?>
+
 </div>
+
+<!--<script>-->
+<!--    $(function(){-->
+<!--        $("a.poster").click(function() { // все ссылки с классом .poster-->
+<!--            var value = $(this).attr("value"); // поле value-->
+<!--            var href = $(this).attr("href"); // поле href - адрес, куда посылать-->
+<!--            $.POST( href, {value: value}, function(data) { // посылаем-->
+<!--                alert( data );-->
+<!--            });-->
+<!--            return false;-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->

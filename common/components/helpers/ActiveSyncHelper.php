@@ -1080,6 +1080,49 @@ class ActiveSyncHelper
             ->one();
     }
 
+    static function addFromDonor($fromAid, $toAid) // c=3
+    {
+        $rowInsertOut = [];
+        if (empty($fromAid) || empty($toAid)) return false;
+
+        //todo удаляем все роли у пользователя
+        $rowInsert = NAuthASsignment::find()->where([
+            'userid' => $fromAid
+        ])->asArray()->all();
+
+        if (is_array($rowInsert) && count($rowInsert) > 0) {
+
+            foreach ($rowInsert as $row) {
+                $row['userid'] = $toAid;
+                $rowInsertOut[] = $row;
+            }
+
+            NAuthASsignment::deleteAll([
+                'userid' => $toAid
+            ]);
+
+            try {
+                $connection = 'GemoTestDB';
+                $db = Yii::$app->$connection;
+                $db->createCommand()->batchInsert(
+                    NAuthASsignment::tableName(),
+                    ['itemname', 'userid', 'bizrule', 'data'],
+                    $rowInsertOut
+                )->execute();
+
+                $rowRules = ArrayHelper::getColumn($rowInsert, 'itemname');
+                return $rowRules;
+
+            } catch (Exception $e) {
+                Yii::getLogger()->log([
+                    'addFromDonor->batchInsert' => $e->getMessage()
+                ], Logger::LEVEL_ERROR, 'binary');
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * @return boolean
      */
