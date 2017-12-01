@@ -1080,10 +1080,9 @@ class ActiveSyncHelper
             ->one();
     }
 
-    static function addFromDonor($fromAid, $toAid) // c=3
+    static function addFromDonor($fromAid, $toAid)
     {
         $rowInsertOut = [];
-        if (empty($fromAid) || empty($toAid)) return false;
 
         //todo удаляем все роли у пользователя
         $rowInsert = NAuthASsignment::find()->where([

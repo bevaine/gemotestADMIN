@@ -19,22 +19,6 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'aid')->textInput(['readonly' => true]) ?>
-
-    <?php
-    if ($model->adUsers) {
-        echo $form->field($model->adUsers, 'last_name')->textInput();
-        echo $form->field($model->adUsers, 'first_name')->textInput();
-        echo $form->field($model->adUsers, 'middle_name')->textInput();
-        echo $form->field($model->adUsers, 'AD_position')->textInput();
-    } ?>
-
-    <?php
-    if ($model->adUserAccounts) {
-        echo $form->field($model->adUserAccounts, 'ad_login')->textInput(['readonly' => true]);
-        echo $form->field($model->adUserAccounts, 'ad_pass')->textInput(['readonly' => true]);
-    } ?>
-
     <?php
     $url = \yii\helpers\Url::to(['/admin/logins/ajax-user-data-list']);
 
@@ -66,6 +50,22 @@ SCRIPT;
     ])->label('Установить права как у:');
     ?>
 
+    <?= $form->field($model, 'aid')->textInput(['readonly' => true]) ?>
+
+    <?php
+    if ($model->adUsers) {
+        echo $form->field($model->adUsers, 'last_name')->textInput();
+        echo $form->field($model->adUsers, 'first_name')->textInput();
+        echo $form->field($model->adUsers, 'middle_name')->textInput();
+        echo $form->field($model->adUsers, 'AD_position')->textInput();
+    } ?>
+
+    <?php
+    if ($model->adUserAccounts) {
+        echo $form->field($model->adUserAccounts, 'ad_login')->textInput(['readonly' => true]);
+        echo $form->field($model->adUserAccounts, 'ad_pass')->textInput(['readonly' => true]);
+    } ?>
+
     <?= $form->field($model, 'Login')->textInput(['readonly' => true]) ?>
 
     <?= $form->field($model, 'Pass')->textInput(['readonly' => true]) ?>
@@ -92,8 +92,7 @@ SCRIPT;
     ]) ?>
 
     <?php
-        echo '<p><label class="control-label">Дата блокировки</label>';
-        echo DateTimePicker::widget([
+        echo $form->field($model, 'DateEnd')->widget(DateTimePicker::className(), [
             'name' => 'Logins[DateEnd]',
             'type' => DateTimePicker::TYPE_INPUT,
             'value' => !empty($model->DateEnd) ? date("Y-m-d G:i:s", strtotime($model->DateEnd)) : '',
@@ -102,8 +101,8 @@ SCRIPT;
                 'format' => 'yyyy-mm-dd hh:ii:ss'
             ]
         ]);
-        echo '</p><p><label class="control-label">Дата запрета рег.</label>';
-        echo DateTimePicker::widget([
+
+        echo $form->field($model, 'block_register')->widget(DateTimePicker::className(), [
             'name' => 'Logins[block_register]',
             'type' => DateTimePicker::TYPE_INPUT,
             'value' => !empty($model->block_register) ? date("Y-m-d G:i:s", strtotime($model->block_register)) : '',
@@ -112,13 +111,12 @@ SCRIPT;
                 'format' => 'yyyy-mm-dd hh:ii:ss'
             ]
         ]);
-        echo '</p>';
     ?>
 
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
     </div>
-
+a3
     <?php ActiveForm::end(); ?>
 
 </div>
