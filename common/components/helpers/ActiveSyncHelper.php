@@ -315,7 +315,7 @@ class ActiveSyncHelper
             if (!empty($this->operatorofficestatus)) {
                 $loginName .= '.' . $this->operatorofficestatus;
             }
-            $loginName .= ":" . $this->fullName;
+            $loginName .= ": " . $this->fullName;
 
             $objectUsersLogins = new Logins();
             $objectUsersLogins->aid = $this->aid;
