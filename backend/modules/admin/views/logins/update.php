@@ -116,7 +116,7 @@ SCRIPT;
     <div class="form-group">
         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-primary']) ?>
     </div>
-a3
+
     <?php ActiveForm::end(); ?>
 
 </div>

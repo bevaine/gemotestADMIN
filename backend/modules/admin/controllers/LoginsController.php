@@ -242,39 +242,39 @@ class LoginsController extends Controller
         {
             if ($param == 'user') {
                 $activeSyncHelper->type = 7;
-                $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->typeLO = 'SLO';
+                $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->nurse = $model->nurse;
-                $activeSyncHelper->lastName = $model->lastName;
-                $activeSyncHelper->firstName = $model->firstName;
-                $activeSyncHelper->middleName = $model->middleName;
+                $activeSyncHelper->lastName = trim($model->lastName);
+                $activeSyncHelper->firstName = trim($model->firstName);
+                $activeSyncHelper->middleName = trim($model->middleName);
                 $activeSyncHelper->department = $model->department;
-                $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
+                $activeSyncHelper->operatorofficestatus = trim($model->operatorofficestatus);
             } elseif ($param == 'franch') {
                 $activeSyncHelper->type = 8;
                 $activeSyncHelper->typeLO = 'FLO';
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->cacheId = $model->key;
-                $activeSyncHelper->lastName = $model->lastName;
-                $activeSyncHelper->firstName = $model->firstName;
-                $activeSyncHelper->middleName = $model->middleName;
-                $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
+                $activeSyncHelper->lastName = trim($model->lastName);
+                $activeSyncHelper->firstName = trim($model->firstName);
+                $activeSyncHelper->middleName = trim($model->middleName);
+                $activeSyncHelper->operatorofficestatus = trim($model->operatorofficestatus);
             } elseif ($param == 'org') {
                 $activeSyncHelper->type = 3;
                 $activeSyncHelper->key = $model->key;
-                $activeSyncHelper->lastName = $model->lastName;
-                $activeSyncHelper->firstName = $model->firstName;
-                $activeSyncHelper->middleName = $model->middleName;
+                $activeSyncHelper->lastName = trim($model->lastName);
+                $activeSyncHelper->firstName = trim($model->firstName);
+                $activeSyncHelper->middleName = trim($model->middleName);
             } elseif ($param == 'doc') {
                 $activeSyncHelper->type = 5;
+                $activeSyncHelper->typeLO = 'SLO';
                 $activeSyncHelper->department = 8;
                 $activeSyncHelper->key = $model->docId;
-                $activeSyncHelper->typeLO = 'SLO';
                 $activeSyncHelper->cacheId = $model->docId;
                 $activeSyncHelper->specId = $model->specId;
             }
 
-            $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
+            $activeSyncHelper->fullName = trim($activeSyncHelper->lastName) . " " . trim($activeSyncHelper->firstName) . " " . trim($activeSyncHelper->middleName);
 
             if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
                 !is_null(Yii::$app->request->post('hiddenEmailList')))
@@ -323,7 +323,12 @@ class LoginsController extends Controller
                     $style = 'warning';
                     $message = '<p>У пользователя <b>'.$url.'</b> уже есть УЗ для авторизации через '.$auth.'</p>';
                 }
-                $message .= '<p>Данные для входа в GemoSystem:<p>';
+                $message .= '<p>Данные для входа в ';
+                $message .= Html::a('GemoSystem', 'https://office.gemotest.ru', [
+                    'title' => 'https://office.gemotest.ru',
+                    'target' => '_blank'
+                ]);
+                $message .= '<p>';
                 $message .= '<br>Логин: ' . $activeSyncHelper->login;
                 $message .= '<br>Пароль: ' . $activeSyncHelper->password;
                 Yii::$app->session->setFlash($style, $message);
