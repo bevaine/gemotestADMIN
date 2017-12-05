@@ -1291,7 +1291,7 @@ class ActiveSyncHelper
     public function addNewUserAd()
     {
         $password = self::generatePasswordAD();
-        $email = $this->accountName."@lab.gemotest.ru";
+        $email = $this->accountName."@gemotest.ru";
 
         $ldaprecord = [
             "CN" => $this->cnName,

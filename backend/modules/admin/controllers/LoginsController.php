@@ -324,7 +324,7 @@ class LoginsController extends Controller
                     $message = '<p>У пользователя <b>'.$url.'</b> уже есть УЗ для авторизации через '.$auth.'</p>';
                 }
                 $message .= '<p>Данные для входа в ';
-                $message .= Html::a('GemoSystem', 'https://office.gemotest.ru', [
+                $message .= Html::a('https://office.gemotest.ru', 'https://office.gemotest.ru', [
                     'title' => 'https://office.gemotest.ru',
                     'target' => '_blank'
                 ]);
