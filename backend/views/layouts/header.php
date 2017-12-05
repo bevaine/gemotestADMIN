@@ -35,7 +35,7 @@ $assets = UsersAsset::register($this);
                             </span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li class="header"><?php echo Yii::t('backend', 'You have {num} log items', ['num' => \common\models\SystemLog::find()->count()]) ?></li>
+                        <li class="header"><?= 'Всего записей ' . \common\models\SystemLog::find()->count(). ' шт.' ?></li>
                         <li>
                             <!-- inner menu: contains the actual data -->
                             <ul class="menu">
@@ -50,7 +50,7 @@ $assets = UsersAsset::register($this);
                             </ul>
                         </li>
                         <li class="footer">
-                            <?php echo Html::a(Yii::t('backend', 'Посмотреть все'), ['/admin/system-log/index']) ?>
+                            <?php echo Html::a('Посмотреть все', ['/admin/system-log/index']) ?>
                         </li>
                     </ul>
                 </li>
