@@ -39,6 +39,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'category',
             'prefix',
             [
+                'attribute' => 'prefix',
+                'value' => function ($model) {
+                    return strlen($model->prefix) > 65 ? substr($model->prefix,0, 65 )."..." : $model->prefix;
+                }
+            ],
+            [
                 'attribute' => 'log_time',
                 'format' => 'datetime',
                 'value' => function ($model) {
