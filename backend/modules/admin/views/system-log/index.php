@@ -7,14 +7,14 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\SystemLogSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'System Logs';
+$this->title = 'Логирование';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="system-log-index">
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?php echo Html::a('Clear', false, ['class' => 'btn btn-danger', 'data-method'=>'delete']) ?>
+        <?php echo Html::a('Очистить', false, ['class' => 'btn btn-danger', 'data-method'=>'delete']) ?>
     </p>
 
     <?php echo GridView::widget([

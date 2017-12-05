@@ -7,13 +7,13 @@ use yii\widgets\DetailView;
 /* @var $model common\models\SystemLog */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'System Logs', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Логирование', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="system-log-view">
 
     <p>
-        <?php echo Html::a(Yii::t('backend', 'Delete'), ['delete', 'id'=>$model->id], ['class' => 'btn btn-danger', 'data'=>['method'=>'post']]) ?>
+        <?php echo Html::a('Удалить', ['delete', 'id'=>$model->id], ['class' => 'btn btn-danger', 'data'=>['method'=>'post']]) ?>
     </p>
 
     <?php echo DetailView::widget([
