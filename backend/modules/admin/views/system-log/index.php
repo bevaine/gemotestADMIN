@@ -37,7 +37,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]
             ],
             'category',
-            'prefix',
             [
                 'attribute' => 'prefix',
                 'value' => function ($model) {
