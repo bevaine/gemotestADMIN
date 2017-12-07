@@ -74,9 +74,9 @@ class LoginsController extends Controller
                 $department = $request['department'];
             }
 
-            if ($action == 'assign' &&
-                is_array($request['list-permission']) &&
-                !empty($request['list-permission']))
+            if ($action == 'assign'
+                && !empty($request['list-permission'])
+                && is_array($request['list-permission']))
             {
                 foreach ($request['list-permission'] as $permission) {
                     $rowInsert[] = [$department, $permission];
@@ -99,9 +99,9 @@ class LoginsController extends Controller
                     ], Logger::LEVEL_ERROR, 'binary');
                 }
 
-            } elseif ($action == 'revoke'&&
-                is_array($request['permission']) &&
-                !empty($request['permission']))
+            } elseif ($action == 'revoke'
+                && !empty($request['permission'])
+                && is_array($request['permission']))
             {
                 foreach ($request['permission'] as $permission) {
                     $arrRows[] = $permission;
