@@ -863,16 +863,16 @@ class ActiveSyncHelper
      */
     private function addDepartmentRules()
     {
-        if (!in_array($this->department, [1, 2, 3, 5, 6])) {
+        //todo если call-центр, клиент-меджер, выездная медсестра
+        if (in_array($this->department, [0, 1, 6])) {
+            //todo добавляем в модуль выездного обслуживания
+            if (!$this->addCheckErpUsers()) return false;
+        }
 
-            if (in_array($this->nurse, [1, 2])) {
-                if (!$this->addCheckNNurse()) return false;
-            }
-
-            if ($this->nurse == 2) {
-                if (!$this->addCheckErpUsers()) return false;
-                if (!$this->addCheckErpNurses()) return false;
-            }
+        //todo выездная медсетра
+        if (!in_array($this->department, [0])
+            && $this->nurse == 1) {
+            if (!$this->addCheckErpNurses()) return false;
         }
         return true;
     }
@@ -921,8 +921,8 @@ class ActiveSyncHelper
                 $this->passwordAD = $newPasswordAd;
                 $message = '<p>Для пользователя <b>' . $this->fullName . '</b> был изменен пароль для входа в Windows!</p>';
                 $message .= '<p>Данные для входа в Windows:<p>';
-                $message .= '<br>Логин: ' . $this->accountName;
-                $message .= '<br>Пароль: ' . $this->passwordAD;
+                $message .= '<br>Логин: <b>' . $this->accountName.'</b>';
+                $message .= '<br>Пароль: <b>' . $this->passwordAD.'</b>';
                 Yii::$app->session->setFlash('warning', $message);
             }
         } else {

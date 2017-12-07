@@ -103,13 +103,13 @@
                         'label' => 'Служебные',
                         'icon' => 'share',
                         'url' => '#',
-                        //'active' => true,
+                        'active' => true,
                         'items' => [
                             ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                             ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],
                             [
                                 'label' => 'Пользователи',
-                                //'active' => true,
+                                'active' => true,
                                 'icon' => 'circle-o',
                                 'url' => '#',
                                 'items' => [

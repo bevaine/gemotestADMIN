@@ -2,20 +2,23 @@
 
 namespace app\modules\admin\controllers;
 
+use common\models\NAuthItem;
+use common\models\Permissions;
+use PHPUnit\Exception;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\log\Logger;
 use yii\web\Controller;
 use yii\helpers\Html;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
-use common\models\AddUserForm;
 use common\models\Logins;
-use common\models\LoginsSearch;
-use common\components\helpers\ActiveSyncHelper;
-use common\models\NAdUsers;
 use common\models\Doctors;
-use yii\db\Query;
+use common\models\LoginsSearch;
+use common\models\AddUserForm;
+use common\components\helpers\ActiveSyncHelper;
+use common\models\PermissionsSearch;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -49,6 +52,76 @@ class LoginsController extends Controller
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all Logins models.
+     * @return mixed
+     */
+    public function actionRoles()
+    {
+        $action = '';
+        $department = '';
+        $arrRows = [];
+        $rowInsert = [];
+
+        if (!empty(Yii::$app->request->post()['Permissions'])) {
+            $request = Yii::$app->request->post()['Permissions'];
+
+            if (!empty($request['action']) && isset($request['department'])) {
+                $action = $request['action'];
+                $department = $request['department'];
+            }
+
+            if ($action == 'assign' &&
+                is_array($request['list-permission']) &&
+                !empty($request['list-permission']))
+            {
+                foreach ($request['list-permission'] as $permission) {
+                    $rowInsert[] = [$department, $permission];
+                    $arrRows[] = $permission;
+                }
+                try {
+                    Permissions::deleteAll([
+                        'AND',
+                        ['department' => $department],
+                        ['in','permission',$arrRows]
+                    ]);
+                    Yii::$app->db->createCommand()->batchInsert(
+                        Permissions::tableName(),
+                        ['department', 'permission'],
+                        $rowInsert
+                    )->execute();
+                } catch (Exception $e) {
+                    Yii::getLogger()->log([
+                        'addPermissions->batchInsert'=>$e->getMessage()
+                    ], Logger::LEVEL_ERROR, 'binary');
+                }
+
+            } elseif ($action == 'revoke'&&
+                is_array($request['permission']) &&
+                !empty($request['permission']))
+            {
+                foreach ($request['permission'] as $permission) {
+                    $arrRows[] = $permission;
+                }
+                try {
+                    Permissions::deleteAll([
+                        'AND',
+                        ['department' => $department],
+                        ['in','permission',$arrRows]
+                    ]);
+                } catch (Exception $e) {
+                    Yii::getLogger()->log([
+                        'addPermissions->batchInsert'=>$e->getMessage()
+                    ], Logger::LEVEL_ERROR, 'binary');
+                }
+            }
+        }
+
+        return $this->render('roles', [
+            'department' => $department
         ]);
     }
 
@@ -118,104 +191,6 @@ class LoginsController extends Controller
     }
 
     /**
-     * @return string|\yii\web\Response
-     */
-    public function actionCreateOrg ()
-    {
-        $model = new AddUserForm();
-        $model->scenario = 'addUserOrg';
-
-        if ($model->load(Yii::$app->request->post())) {
-
-        }
-        return $this->render('createOrg', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * @return string|\yii\web\Response
-     */
-    public function actionRules ()
-    {
-        $model = new AddUserForm();
-        $model->scenario = 'addUserOrg';
-
-        if ($model->load(Yii::$app->request->post())) {
-
-        }
-        return $this->render('createOrg', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * @return string|\yii\web\Response
-     */
-    public function actionCreateDoc ()
-    {
-        $model = new AddUserForm();
-        $model->scenario = 'addUserDoc';
-
-        if ($model->load(Yii::$app->request->post())) {
-            $activeSyncHelper = new ActiveSyncHelper();
-            $activeSyncHelper->docId = $model->docId;
-            $activeSyncHelper->specId = $model->specId;
-        }
-
-        return $this->render('createDoc', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * @return string|\yii\web\Response
-     */
-    public function actionCreateFranch ()
-    {
-        $model = new AddUserForm();
-        $model->scenario = 'addUserFranch';
-
-        if ($model->load(Yii::$app->request->post())) {
-            $activeSyncHelper = new ActiveSyncHelper();
-            $activeSyncHelper->key = $model->key;
-            $activeSyncHelper->type = 8;
-            $activeSyncHelper->nurse = $model->nurse;
-            $activeSyncHelper->lastName = $model->lastName;
-            $activeSyncHelper->firstName = $model->firstName;
-            $activeSyncHelper->middleName = $model->middleName;
-            $activeSyncHelper->department = $model->department;
-            $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
-            $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
-        }
-
-        return $this->render('createFranch', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function actionCreateNAdUsers()
-    {
-        $model = new NAdUsers();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            if ($model->validate()) {
-                // form inputs are valid, do something here
-                Yii::getLogger()->log(['$model'=>$model->errors], 1, 'binary');
-            }
-        } else {
-            Yii::getLogger()->log(['$model'=>$model->errors], 1, 'binary');
-        }
-
-        return $this->render('createNAdUsers', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
      * @param string $param
      * @return string
      */
@@ -223,6 +198,7 @@ class LoginsController extends Controller
     {
         $model = new AddUserForm();
         $activeSyncHelper = new ActiveSyncHelper();
+
         switch ($param) {
             case 'user':
                 $model->scenario = 'addUser';
@@ -244,7 +220,6 @@ class LoginsController extends Controller
                 $activeSyncHelper->type = 7;
                 $activeSyncHelper->typeLO = 'SLO';
                 $activeSyncHelper->key = $model->key;
-                $activeSyncHelper->nurse = $model->nurse;
                 $activeSyncHelper->lastName = trim($model->lastName);
                 $activeSyncHelper->firstName = trim($model->firstName);
                 $activeSyncHelper->middleName = trim($model->middleName);
@@ -274,7 +249,9 @@ class LoginsController extends Controller
                 $activeSyncHelper->specId = $model->specId;
             }
 
-            $activeSyncHelper->fullName = trim($activeSyncHelper->lastName) . " " . trim($activeSyncHelper->firstName) . " " . trim($activeSyncHelper->middleName);
+            $activeSyncHelper->fullName = trim($activeSyncHelper->lastName)
+                . " " . trim($activeSyncHelper->firstName)
+                . " " . trim($activeSyncHelper->middleName);
 
             if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
                 !is_null(Yii::$app->request->post('hiddenEmailList')))
@@ -290,9 +267,16 @@ class LoginsController extends Controller
                 }
             }
 
-            if (in_array($activeSyncHelper->department, [21, 22])) $activeSyncHelper->department = 2;
-            if (in_array($activeSyncHelper->department, [31, 32, 33])) $activeSyncHelper->department = 3;
-            //if ($this->department == 0) $this->nurse = 1;
+            if (in_array($activeSyncHelper->department, [10])) {
+                $activeSyncHelper->department = 0;
+                $activeSyncHelper->nurse = 1;
+            }
+
+            if (in_array($activeSyncHelper->department, [21, 22]))
+                $activeSyncHelper->department = 2;
+
+            if (in_array($activeSyncHelper->department, [31, 32, 33]))
+                $activeSyncHelper->department = 3;
 
             //todo добавление УЗ
             $newUserData = $activeSyncHelper->checkAccount();
@@ -324,13 +308,13 @@ class LoginsController extends Controller
                     $message = '<p>У пользователя <b>'.$url.'</b> уже есть УЗ для авторизации через '.$auth.'</p>';
                 }
                 $message .= '<p>Данные для входа в ';
-                $message .= Html::a('https://office.gemotest.ru', 'https://office.gemotest.ru', [
+                $message .= Html::a('GemoSystem (https://office.gemotest.ru)', 'https://office.gemotest.ru', [
                     'title' => 'https://office.gemotest.ru',
                     'target' => '_blank'
                 ]);
                 $message .= '<p>';
-                $message .= '<br>Логин: ' . $activeSyncHelper->login;
-                $message .= '<br>Пароль: ' . $activeSyncHelper->password;
+                $message .= '<br>Логин: <b>' . $activeSyncHelper->login.'</b>';
+                $message .= '<br>Пароль: <b>' . $activeSyncHelper->password.'</b>';
                 Yii::$app->session->setFlash($style, $message);
             } else {
                 Yii::getLogger()->log([
@@ -425,7 +409,9 @@ class LoginsController extends Controller
             $activeSyncHelper->middleName = $middle_name;
         }
 
-        $activeSyncHelper->fullName = $activeSyncHelper->lastName . " " . $activeSyncHelper->firstName . " " . $activeSyncHelper->middleName;
+        $activeSyncHelper->fullName = $activeSyncHelper->lastName
+            . " " . $activeSyncHelper->firstName
+            . " " . $activeSyncHelper->middleName;
 
         //todo проверяем существует ли пользователь с ФИО в AD
         $arrAccountAD = $activeSyncHelper->checkUserNameAd();
@@ -458,6 +444,29 @@ class LoginsController extends Controller
             }
         } elseif ($id > 0) {
             $out['results'] = ['id' => $id, 'text' => Logins::findOne($id)->Name];
+        }
+
+        echo Json::encode($out);
+    }
+
+
+    /**
+     * @param bool $department
+     */
+    public function actionAjaxListName($department = false)
+    {
+        $out = null;
+
+        if (!is_null($department)) {
+            $data = Permissions::find()
+                ->where(['department' => $department])
+                ->all();
+            if ($data) {
+                /** @var Permissions $userData */
+                foreach ($data as $userData) {
+                    $out['results'][] = ['id' => $userData->permission, 'text' => $userData->name->description];
+                }
+            }
         }
 
         echo Json::encode($out);

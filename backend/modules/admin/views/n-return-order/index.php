@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\NReturnOrderSearch */
@@ -26,7 +26,28 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'parent_id',
             'parent_type',
-            'date',
+            ['class'=>'kartik\grid\SerialColumn'],
+            [
+                'width'=>'150px',
+                'header' => 'Дата',
+                'value' => 'date',
+                'filter' => \kartik\date\DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'date_from',
+                    'attribute2' => 'date_to',
+                    'options' => ['placeholder' => 'Дата начала'],
+                    'options2' => ['placeholder' => 'Дата конца'],
+                    'separator' => 'По',
+                    'readonly' => true,
+                    'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                    'pluginOptions' => [
+                        'format' => 'yyyy-mm-dd',
+                        'autoclose' => true,
+                    ]
+                ]),
+                'format' => 'html', // datetime
+            ],
+            //'date',
             'order_num',
             'status',
             'total',

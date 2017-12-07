@@ -15,6 +15,13 @@ $this->params['breadcrumbs'][] = ['label' => 'Пользователи', 'url' =
 $this->params['breadcrumbs'][] = $this->title;
 ?>
     <div class="logins-create">
+
+        <p>
+        <div align="right">
+        <?= Html::a('Права', ['roles'], ['class' => 'btn btn-primary']) ?>
+        </div>
+        </p>
+
         <div class="nav-tabs-custom">
 
             <ul class="nav nav-tabs">
@@ -49,6 +56,19 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group">
+                                        <?= $form->field($model, 'department')->dropDownlist(\common\models\AddUserForm::getDepartments()) ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
                                         <?= $form->field($model, 'lastName')->textInput() ?>
                                     </div>
                                 </div>
@@ -64,23 +84,6 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'department')->dropDownlist(\common\models\AddUserForm::getDepartments()) ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <?= $form->field($model, 'nurse')->dropDownlist(\common\models\AddUserForm::getNurses()) ?>
-                                    </div>
-                                </div>
-                            </div>
                         <?php endif; ?>
 
                         <?php if ($action == 'doc') : ?>
