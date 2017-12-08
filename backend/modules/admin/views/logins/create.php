@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </div>
 
                                 </div>
-                                    <? //Html::a('', Url::to('roles'), ['class' => 'glyphicon glyphicon-pencil']) ?>
+                                    <?php //Html::a('', Url::to('roles'), ['class' => 'glyphicon glyphicon-pencil']) ?>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
