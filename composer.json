@@ -34,7 +34,8 @@
         "phpoffice/phpexcel": "*",
         "arturoliveira/yii2-excelview": "*",
         "meysampg/yii2-treeview": "*",
-        "kartik-v/yii2-field-range": "*"
+        "kartik-v/yii2-field-range": "*",
+        "kartik-v/yii2-detail-view": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

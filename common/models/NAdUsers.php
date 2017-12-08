@@ -121,19 +121,6 @@ class NAdUsers extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAdUserAccounts()
-    {
-        return $this->hasOne(NAdUseraccounts::className(), [
-            'gs_id' => 'gs_key',
-            'last_name' => 'last_name',
-            'first_name' => 'first_name',
-            'middle_name' => 'middle_name',
-        ]);
-    }
-
-    /**
      * @param $account
      * @return static
      */
@@ -145,11 +132,9 @@ class NAdUsers extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAdUserAccountsOne()
+    public function getAdUserAccounts()
     {
-        return
-            $this->hasOne(NAdUseraccounts::className(), ['gs_id' => 'gs_key'])
-            ->OnCondition('\'lab\\\' + [n_ad_Users].[AD_login] = [n_ad_Useraccounts].[ad_login]');
+        return NAdUseraccounts::find()->where(['ad_login' => 'lab\\'.$this->AD_login]);
     }
 
     /**

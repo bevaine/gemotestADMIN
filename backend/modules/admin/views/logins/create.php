@@ -58,6 +58,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class="form-group">
                                         <?= $form->field($model, 'department')->dropDownlist(\common\models\AddUserForm::getDepartments()) ?>
                                     </div>
+
+                                </div>
+                                <div class="col-lg-0">
+                                    <div class="form-group">
+                                        <?= Html::a('', Url::to('roles'), ['class' => 'glyphicon glyphicon-pencil']) ?>
+                                    </div>
                                 </div>
                                 <div class="col-lg-4">
                                     <div class="form-group">

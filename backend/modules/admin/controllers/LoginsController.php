@@ -2,6 +2,8 @@
 
 namespace app\modules\admin\controllers;
 
+use common\models\NAdUseraccounts;
+use common\models\NAdUsers;
 use common\models\NAuthItem;
 use common\models\Permissions;
 use PHPUnit\Exception;
@@ -53,6 +55,25 @@ class LoginsController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     * @param $ad
+     * @return \yii\web\Response
+     */
+    public function actionDelete($ad)
+    {
+        /** @var NAdUsers $model */
+        if ($model = NAdUsers::findOne($ad)) {
+            $model->delete();
+            if ($adUsersLogins = $model->adUserAccounts) {
+                $adUsersLogins->delete();
+            }
+            $message = 'Пользователь: <b>' . $model->AD_name. '</b> был успешно удален!';
+            Yii::$app->session->setFlash('success', $message);
+        }
+
+        return $this->redirect(['index']);
     }
 
     /**
@@ -341,7 +362,7 @@ class LoginsController extends Controller
      */
     public function actionUpdate($id, $ad = '')
     {
-        $model = $this->findModel($id);
+        $model = $this->findModel($id, $ad);
 
         if ($model->load(Yii::$app->request->post()) && $model->save())
         {
