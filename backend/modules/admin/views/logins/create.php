@@ -16,12 +16,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
     <div class="logins-create">
 
-        <p>
-        <div align="right">
-        <? //Html::a('Права', ['roles'], ['class' => 'btn btn-primary']) ?>
-        </div>
-        </p>
-
         <div class="nav-tabs-custom">
 
             <ul class="nav nav-tabs">
@@ -60,11 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </div>
 
                                 </div>
-<!--                                <div class="col-lg-0">-->
-<!--                                    <div class="form-group">-->
-<!--                                        --><?//= Html::a('', Url::to('roles'), ['class' => 'glyphicon glyphicon-pencil']) ?>
-<!--                                    </div>-->
-<!--                                </div>-->
+                                    <? //Html::a('', Url::to('roles'), ['class' => 'glyphicon glyphicon-pencil']) ?>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
