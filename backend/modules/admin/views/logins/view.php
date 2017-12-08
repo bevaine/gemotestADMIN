@@ -131,7 +131,7 @@ if ($model->adUsers) {
         </div>
     </div>
 
-    <?php if ($model->adUsers || $model->adUserAccounts) : ?>
+    <?php if ($model->adUsers || $model->adUserAccounts) { ?>
 
         <div class="box box-solid box-info">
 
@@ -209,7 +209,7 @@ if ($model->adUsers) {
             </div>
         </div>
 
-    <?php endif; ?>
+    <?php } ?>
 
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->aid, 'ad' => $ad], ['class' => 'btn btn-primary']) ?>
