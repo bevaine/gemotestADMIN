@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <p>
         <div align="right">
-        <?= Html::a('Права', ['roles'], ['class' => 'btn btn-primary']) ?>
+        <? //Html::a('Права', ['roles'], ['class' => 'btn btn-primary']) ?>
         </div>
         </p>
 
@@ -60,11 +60,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                     </div>
 
                                 </div>
-                                <div class="col-lg-0">
-                                    <div class="form-group">
-                                        <?= Html::a('', Url::to('roles'), ['class' => 'glyphicon glyphicon-pencil']) ?>
-                                    </div>
-                                </div>
+<!--                                <div class="col-lg-0">-->
+<!--                                    <div class="form-group">-->
+<!--                                        --><?//= Html::a('', Url::to('roles'), ['class' => 'glyphicon glyphicon-pencil']) ?>
+<!--                                    </div>-->
+<!--                                </div>-->
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
