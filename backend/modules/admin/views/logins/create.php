@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\Url;
 use common\models\Doctors;
+use kartik\select2;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\AddUserForm */
@@ -50,7 +51,25 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <?= $form->field($model, 'department')->dropDownlist(\common\models\AddUserForm::getDepartments()) ?>
+                                        <?php
+                                        echo Html::label('Департамент:');
+                                        echo select2\Select2::widget([
+                                            'model' => $model,
+                                            'data' => \common\models\AddUserForm::getDepartments(),
+                                            'attribute' => 'department',
+                                            'addon' => [
+                                                'prepend' => [
+                                                    'content' => Html::a(
+                                                        '',
+                                                        Url::to('roles'), [
+                                                            'class' => 'glyphicon glyphicon-pencil',
+                                                            'target' => '_blank'
+                                                        ]
+                                                    )
+                                                ],
+                                            ]
+                                        ]);
+                                        ?>
                                     </div>
 
                                 </div>

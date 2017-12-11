@@ -975,7 +975,9 @@ class ActiveSyncHelper
         }
 
         //todo удаляем все роли у пользователя
-        $searchAssignment = NAuthASsignment::deleteAll(['userid' => $this->aid]);
+        $searchAssignment = NAuthASsignment::deleteAll([
+            'userid' => $this->aid
+        ]);
 
         if (!$searchAssignment) {
             Yii::getLogger()->log([
@@ -992,7 +994,11 @@ class ActiveSyncHelper
         if ($findPermissions) {
             $rowInsert = [];
             foreach ($findPermissions as $permission) {
-                $rowInsert[] = [$permission->permission, $this->aid, 'N;'];
+                $rowInsert[] = [
+                    $permission->permission,
+                    $this->aid,
+                    'N;'
+                ];
             }
             try {
                 $connection = 'GemoTestDB';
