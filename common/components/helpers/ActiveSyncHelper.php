@@ -57,6 +57,9 @@ use yii\db\Transaction;
  * @property string  $cnName
  * @property string  $specId
  * @property string  $idAD
+ * @property string  $orgName
+ * @property boolean $resetPassword
+ *
  */
 
 class ActiveSyncHelper
@@ -67,6 +70,8 @@ class ActiveSyncHelper
     CONST LDAP_LOGIN    = 'dymchenko.adm@lab.gemotest.ru';
     CONST LDAP_PASSW    = '2Hszfaussw';
     CONST LDAP_DN       = "DC=lab,DC=gemotest,DC=ru";
+
+    CONST ORG_NAME      = 'ООО "Лаборатория Гемотест"';
     CONST LOGO_TEXT     = '107031 Москва, Рождественский бульвар д.21, ст.2^*^тел. (495) 532-13-13, 8(800) 550-13-13^*^www.gemotest.ru';
     CONST LOGO_IMG      = 'logos/LogoGemotest.gif';
 
@@ -97,6 +102,17 @@ class ActiveSyncHelper
     public $cnName;
     public $specId;
     public $idAD;
+    public $orgName;
+    public $resetPassword;
+
+    /**
+     * ActiveSyncHelper constructor.
+     */
+    public function __construct()
+    {
+       $this->orgName = self::ORG_NAME;
+       $this->resetPassword = false;
+    }
 
     /**
      * @return mixed
@@ -395,7 +411,9 @@ class ActiveSyncHelper
                 'addNewAdUserAccount=>objectUserAccountsAD'=>'В NAdUseraccounts уже есть запись!'
             ], Logger::LEVEL_WARNING, 'binary');
 
-            $objectUserAccountsAD->ad_pass = $this->passwordAD;
+            if ($this->resetPassword) {
+                $objectUserAccountsAD->ad_pass = $this->passwordAD;
+            }
 
             if ($objectUserAccountsAD->save()) {
                 Yii::getLogger()->log([
@@ -431,7 +449,7 @@ class ActiveSyncHelper
         $objectUserAccountsAD->gs_type = $this->typeLO;
         $objectUserAccountsAD->gs_id = strval($this->cacheId);
         $objectUserAccountsAD->gs_position = $this->operatorofficestatus;
-        $objectUserAccountsAD->org_name = 'ООО "Лаборатория Гемотест"';
+        $objectUserAccountsAD->org_name = $this->orgName;
         $objectUserAccountsAD->ad_login = $this->loginAD;
         $objectUserAccountsAD->ad_pass = $this->passwordAD;
 
@@ -910,20 +928,24 @@ class ActiveSyncHelper
     public function createAdUserAcc()
     {
         if (!empty($this->accountName)) {
+
             //todo если находим то сбрасываем пароль в AD
-            $newPasswordAd = $this->resetPasswordAD($this->accountName);
-            if ($newPasswordAd) {
+            $this->passwordAD = '******';
 
-                Yii::getLogger()->log([
-                    'resetPasswordAD'=>'Пароль успешно изменен для '.$this->accountName
-                ], Logger::LEVEL_WARNING, 'binary');
+            if ($this->resetPassword) {
+                $newPasswordAd = $this->resetPasswordAD($this->accountName);
+                if ($newPasswordAd) {
+                    Yii::getLogger()->log([
+                        'resetPasswordAD' => 'Пароль успешно изменен для ' . $this->accountName
+                    ], Logger::LEVEL_WARNING, 'binary');
 
-                $this->passwordAD = $newPasswordAd;
-                $message = '<p>Для пользователя <b>' . $this->fullName . '</b> был изменен пароль для входа в Windows!</p>';
-                $message .= '<p>Данные для входа в Windows:<p>';
-                $message .= '<br>Логин: <b>' . $this->accountName.'</b>';
-                $message .= '<br>Пароль: <b>' . $this->passwordAD.'</b>';
-                Yii::$app->session->setFlash('warning', $message);
+                    $this->passwordAD = $newPasswordAd;
+                    $message = '<p>Для пользователя <b>' . $this->fullName . '</b> был изменен пароль для входа в Windows!</p>';
+                    $message .= '<p>Данные для входа в Windows:<p>';
+                    $message .= '<br>Логин: <b>' . $this->accountName . '</b>';
+                    $message .= '<br>Пароль: <b>' . $this->passwordAD . '</b>';
+                    Yii::$app->session->setFlash('warning', $message);
+                }
             }
         } else {
             //todo если нет УЗ в AD - создаем
@@ -970,9 +992,9 @@ class ActiveSyncHelper
 
         if (!$searchAssignment) {
             Yii::getLogger()->log([
-                'searchAssignment'=>'Не удалось удалить права!'
+                'searchAssignment'=>'Не удалось удалить права!',
+                'userid' => $this->aid
             ], Logger::LEVEL_ERROR, 'binary');
-            return false;
         }
 
         //todo присвоение прав пользователю
@@ -1145,6 +1167,9 @@ class ActiveSyncHelper
             ->one();
 
         if ($loginSearch) {
+            if ($loginSearch->franchazy) {
+                $this->orgName = $loginSearch->franchazy->BlankName;
+            }
             $this->emailAD = $loginSearch->Email;
             $this->aid = $loginSearch->aid;
             return true;

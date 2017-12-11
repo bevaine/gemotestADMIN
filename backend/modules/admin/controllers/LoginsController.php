@@ -281,9 +281,13 @@ class LoginsController extends Controller
                 {
                     $activeSyncHelper->accountName = Yii::$app->request->post('radioAccountsList');
                     $arrEmails = Yii::$app->request->post('hiddenEmailList');
+
                     if (!empty($activeSyncHelper->accountName)
                         && array_key_exists($activeSyncHelper->accountName, $arrEmails)) {
                         $activeSyncHelper->emailAD = $arrEmails[$activeSyncHelper->accountName];
+                    }
+                    if (!is_null(Yii::$app->request->post('checkResetPassword'))) {
+                        $activeSyncHelper->resetPassword = true;
                     }
                 }
             }

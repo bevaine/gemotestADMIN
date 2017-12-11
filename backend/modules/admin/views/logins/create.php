@@ -185,6 +185,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     html += '<input type="hidden" name="hiddenEmailList[' + res[i].account + ']" value="' + res[i].email + '">';
                                 }
                                 html += '<p><label><input type="radio" name="radioAccountsList" value="new">Создать новую учетную запись</label></p>';
+                                html += '<p><label><input type="checkbox" name="checkResetPassword">Сменить пароль</label></p>';
                                 htm_header += '<p>У пользователя ';
                                 htm_header += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b>';
                                 htm_header += ' несколько УЗ в Active Directory</p>';

@@ -57,6 +57,7 @@ use common\components\helpers\ActiveSyncHelper;
  * @property DirectorFlo $directorInfo
  * @property integer $idAD
  * @property integer $aid_donor
+ * @property Franchazy $franchazy
  */
 class Logins extends \yii\db\ActiveRecord
 {
@@ -266,6 +267,14 @@ class Logins extends \yii\db\ActiveRecord
     public function getOperators()
     {
         return $this->hasOne(Operators::className(), ['CACHE_OperatorID' => 'Key']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFranchazy()
+    {
+        return $this->hasOne(Franchazy::className(), ['Key' => 'Key']);
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\components\helpers\ActiveSyncHelper;
+use common\models\Logins;
 use common\models\NAdUsers;
 use yii\console\Controller;
 use yii\db\Expression;
@@ -134,6 +135,11 @@ class ActiveSyncController extends Controller
 //
 //        $ldapbind = ldap_bind($ldapconn, self::LDAP_LOGIN, self::LDAP_PASSW);
 //
+        $model = Logins::findOne(['Key' => '2031']);
+        if ($model->franchazy) {
+            print_r($model->franchazy->BlankName);
+        }
+        exit;
 
         $activeSyncHelper = new ActiveSyncHelper();
         $activeSyncHelper->accountName = 'Дымченко Евгений Викторович';
