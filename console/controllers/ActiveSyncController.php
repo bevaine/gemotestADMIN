@@ -33,20 +33,20 @@ class ActiveSyncController extends Controller
      * @param \yii\base\Module $module
      * @param array $config
      */
-    public function __construct($id, $module, array $config = [])
-    {
-        $this->connection = new \yii\db\Connection([
-            'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
-            'username' => 'importfromcache',
-            'password' => 'import',
-            'charset' => 'utf8',
-        ]);
-
-        $this->connection->open();
-
-        parent::__construct($id, $module, $config);
-
-    }
+//    public function __construct($id, $module, array $config = [])
+//    {
+//        $this->connection = new \yii\db\Connection([
+//            'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
+//            'username' => 'importfromcache',
+//            'password' => 'import',
+//            'charset' => 'utf8',
+//        ]);
+//
+//        $this->connection->open();
+//
+//        parent::__construct($id, $module, $config);
+//
+//    }
 
     public function actionUpdate ()
     {
