@@ -5,6 +5,7 @@ namespace console\controllers;
 use common\components\helpers\ActiveSyncHelper;
 use common\models\Logins;
 use common\models\NAdUsers;
+use common\models\Permissions;
 use yii\console\Controller;
 use yii\db\Expression;
 use common\models\T23;
@@ -12,6 +13,8 @@ use yii\db\Transaction;
 use yii\helpers\ArrayHelper;
 use Yii;
 use yii\log\Logger;
+use common\models\NAuthASsignment;
+use yii\base\Exception;
 
 /**
  * Created by PhpStorm.
@@ -126,6 +129,50 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+
+
+        $permissions = [
+            '7' => [], //todo без прав
+            '0' => ['mis','workshift.allow','MisManager','Operator','Registrar','Report.Workshift.Kkm','SkynetEstimationOrder'],//Cобственные отделения'
+            '10' => ['mis','workshift.allow','MisManager','Operator','Registrar','Report.Workshift.Kkm','SkynetEstimationOrder'],//Cобственные отделения'
+            '1' => ['admin','Administrator.Callcenter.index','mis','MisManager','Operator','Registrar','SkynetEstimationOrder'],//Контакт центр
+            '2' => ['Operator','Registrar'],//Продажи
+            '21' => ['Operator','Registrar'],//Продажи
+            '22' => ['Operator','Registrar'],//Продажи
+            '3' => ['admin','ClientManager','db_gemotest','directorFlo','franchisees_account','LisAdmin','mis','MisManager','Operator','Report.*','ReportOrders.*','ReportPrices.*'],//Развитие
+            '31' => ['admin','ClientManager','db_gemotest','directorFlo','franchisees_account','LisAdmin','mis','MisManager','Operator','Report.*','ReportOrders.*','ReportPrices.*'],//Развитие
+            '32' => ['admin','ClientManager','db_gemotest','directorFlo','franchisees_account','LisAdmin','mis','MisManager','Operator','Report.*','ReportOrders.*','ReportPrices.*'],//Развитие
+            '33' => ['admin','ClientManager','db_gemotest','directorFlo','franchisees_account','LisAdmin','mis','MisManager','Operator','Report.*','ReportOrders.*','ReportPrices.*'],//Развитие
+            '4' => ['admin','ClientManager','finance_manager','management_all_offices','Operator','Registrar','Report.Inoe','ReportOrders.Contingents','SkynetEstimationOrder'],//Отдел клиентской инф. поддержки
+            '5' => ['Operator','ClientManager','MedRegistrar','Report.Inoe','PreanalyticaManager'],//Мед регистратор
+            '6' => ['admin','Administrator.Callcenter.index','bonuses_view','cancelBm_view','ClientManager','discount_all_rights','kurs_view','mis','MisManager','Operator','Registrar','Report.MsZabor','Report.PollPatients','Report.Rep41','ReportOrders.Detail','ReportOrders.SummaryMonth','ReportPrices.Archive','ReportPrices.ByDate','ReportPrices.Detail','ReportPrices.History','SkynetEstimationOrder'],//Клиент-менеджер
+            '8' => ['admin','Administrator.Callcenter.index','mis','MisManager','Operator','Registrar','SkynetEstimationOrder'],//todo доктор-консультант
+
+        ];
+
+        foreach ($permissions as $key => $department) {
+            $rowInsert = [];
+            foreach ($department as $permission) {
+                $rowInsert[] = [$key, $permission];
+            }
+            try {
+                $connection = 'db';
+                $db = Yii::$app->$connection;
+                $db->createCommand()->batchInsert(
+                    Permissions::tableName(),
+                    ['department', 'permission'],
+                    $rowInsert
+                )->execute();
+            } catch (Exception $e) {
+                Yii::getLogger()->log([
+                    'addPermissions->batchInsert'=>$e->getMessage()
+                ], Logger::LEVEL_ERROR, 'binary');
+                return false;
+            }
+        }
+        exit;
+
+
 
 //        $ldapconn = ldap_connect('192.168.108.3');
 //        ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);

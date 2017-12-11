@@ -18,8 +18,17 @@ UsersAsset::register($this);
         <div class="row">
             <div class="col-lg-4">
                 <div class="form-group department">
-                    <?=  Html::label('Права:') ?>
-                    <?= Html::dropDownList('Permissions[department]', $department, \common\models\AddUserForm::getDepartments(), ['class' =>'form-control', 'id' => 'permissions-department']) ?>
+                    <?= Html::label('Права:') ?>
+                    <?= Html::dropDownList(
+                            'Permissions[department]',
+                            $department,
+                            \common\models\AddUserForm::getDepartments(),
+                            [
+                                'options' => [7 => ['disabled' => true]],
+                                'class' =>'form-control',
+                                'id' => 'permissions-department'
+                            ]
+                    ) ?>
                 </div>
             </div>
         </div>

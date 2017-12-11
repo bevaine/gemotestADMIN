@@ -97,7 +97,8 @@ class LoginsController extends Controller
 
             if ($action == 'assign'
                 && !empty($request['list-permission'])
-                && is_array($request['list-permission']))
+                && is_array($request['list-permission'])
+                && $request['department'] != 7)
             {
                 foreach ($request['list-permission'] as $permission) {
                     $rowInsert[] = [$department, $permission];

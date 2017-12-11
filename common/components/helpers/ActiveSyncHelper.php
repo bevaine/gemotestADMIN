@@ -10,6 +10,7 @@ namespace common\components\helpers;
 
 use common\models\medUserCounterparty;
 use common\models\NSprDoctorConsultant;
+use common\models\Permissions;
 use Yii;
 use Exception;
 use common\models\Doctors;
@@ -973,20 +974,6 @@ class ActiveSyncHelper
             return false;
         }
 
-        $permissions = [
-            '7' => [], //todo без прав
-            '0' => ['mis','workshift.allow','MisManager','Operator','Registrar','Report.Workshift.Kkm','SkynetEstimationOrder'],//Cобственные отделения'
-            '1' => ['admin','Administrator.Callcenter.index','mis','MisManager','Operator','Registrar','SkynetEstimationOrder'],//Контакт центр
-            '2' => ['Operator','Registrar'],//Продажи
-            '3' => ['admin','ClientManager','db_gemotest','directorFlo','franchisees_account','LisAdmin','mis','MisManager','Operator','Report.*','ReportOrders.*','ReportPrices.*'],//Развитие
-            '4' => ['admin','ClientManager','finance_manager','management_all_offices','Operator','Registrar','Report.Inoe','ReportOrders.Contingents','SkynetEstimationOrder'],//Отдел клиентской инф. поддержки
-            '5' => ['Operator','ClientManager','MedRegistrar','Report.Inoe','PreanalyticaManager'],//Мед регистратор
-            '6' => ['admin','Administrator.Callcenter.index','bonuses_view','cancelBm_view','ClientManager','discount_all_rights','kurs_view','mis','MisManager','Operator','Registrar','Report.MsZabor','Report.PollPatients','Report.Rep41','ReportOrders.Detail','ReportOrders.SummaryMonth','ReportPrices.Archive','ReportPrices.ByDate','ReportPrices.Detail','ReportPrices.History','SkynetEstimationOrder'],//Клиент-менеджер
-            '8' => ['admin','Administrator.Callcenter.index','mis','MisManager','Operator','Registrar','SkynetEstimationOrder'],//todo доктор-консультант
-        ];
-
-        if (!array_key_exists($this->department, $permissions)) return false;
-
         //todo удаляем все роли у пользователя
         $searchAssignment = NAuthASsignment::deleteAll(['userid' => $this->aid]);
 
@@ -998,10 +985,14 @@ class ActiveSyncHelper
         }
 
         //todo присвоение прав пользователю
-        if (count($permissions[$this->department]) > 0) {
+        $findPermissions = Permissions::findOne([
+            'department' => $this->department
+        ])->toArray();
+
+        if (count($findPermissions) > 0) {
             $rowInsert = [];
-            foreach ($permissions[$this->department] as $permission) {
-                $rowInsert[] = [$permission, $this->aid, 'N;'];
+            foreach ($findPermissions as $permission) {
+                $rowInsert[] = [$permission['permission'], $this->aid, 'N;'];
             }
             try {
                 $connection = 'GemoTestDB';
