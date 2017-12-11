@@ -985,14 +985,14 @@ class ActiveSyncHelper
         }
 
         //todo присвоение прав пользователю
-        $findPermissions = Permissions::findOne([
+        $findPermissions = Permissions::findAll([
             'department' => $this->department
-        ])->toArray();
+        ]);
 
-        if (count($findPermissions) > 0) {
+        if ($findPermissions) {
             $rowInsert = [];
             foreach ($findPermissions as $permission) {
-                $rowInsert[] = [$permission['permission'], $this->aid, 'N;'];
+                $rowInsert[] = [$permission->permission, $this->aid, 'N;'];
             }
             try {
                 $connection = 'GemoTestDB';

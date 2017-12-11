@@ -129,7 +129,32 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        //todo присвоение прав пользователю
+        $findPermissions = Permissions::findAll([
+            'department' => 0
+        ]);
 
+        if ($findPermissions) {
+            $rowInsert = [];
+            foreach ($findPermissions as $permission) {
+                $rowInsert[] = [$permission->permission, '23423423', 'N;'];
+            }
+            try {
+                $connection = 'GemoTestDB';
+                $db = Yii::$app->$connection;
+                $db->createCommand()->batchInsert(
+                    NAuthASsignment::tableName(),
+                    ['itemname', 'userid', 'data'],
+                    $rowInsert
+                )->execute();
+            } catch (Exception $e) {
+                Yii::getLogger()->log([
+                    'addPermissions->batchInsert'=>$e->getMessage()
+                ], Logger::LEVEL_ERROR, 'binary');
+                return false;
+            }
+        }
+        exit;
 
         $permissions = [
             '7' => [], //todo без прав
