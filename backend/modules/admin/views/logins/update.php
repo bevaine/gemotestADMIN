@@ -63,9 +63,9 @@ SCRIPT;
 
             <?= $form->field($model, 'aid')->textInput(['readonly' => true]) ?>
 
-            <?= $form->field($model, 'Login')->textInput(['readonly' => true]) ?>
+            <?= $form->field($model, 'Login')->textInput() ?>
 
-            <?= $form->field($model, 'Pass')->textInput(['readonly' => true]) ?>
+            <?= $form->field($model, 'Pass')->textInput() ?>
 
             <?= $form->field($model, 'Name')->textInput() ?>
 

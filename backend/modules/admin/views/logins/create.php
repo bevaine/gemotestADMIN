@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <?php
-                                        echo Html::label('Департамент:');
+                                        echo Html::label('Департамент');
                                         echo select2\Select2::widget([
                                             'model' => $model,
                                             'data' => \common\models\AddUserForm::getDepartments(),

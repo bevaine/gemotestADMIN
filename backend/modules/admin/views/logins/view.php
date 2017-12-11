@@ -62,7 +62,22 @@ if ($model->adUsers) {
             <?= DetailView::widget([
                 'model' => $model,
                 'attributes' => [
-                    'aid',
+                    [
+                        'headerOptions' => array('style' => 'width: 75px;'),
+                        'attribute' => 'aid',
+                        'value' => function($model) {
+                            /** @var \common\models\LoginsSearch $model */
+                            return Html::a(
+                                $model['aid'].' (назначенные права)',
+                                'https://office.gemotest.ru/administrator/index.php?r=auth/assignment/view&id='.$model['aid'],
+                                [
+                                    'title' => $model['aid'],
+                                    'target' => '_blank'
+                                ]
+                            );
+                        },
+                        'format' => 'raw',
+                    ],
                     'Name',
                     'Key',
                     [

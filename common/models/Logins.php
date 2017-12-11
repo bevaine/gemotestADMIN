@@ -4,6 +4,7 @@ namespace common\models;
 
 use Yii;
 use common\components\helpers\ActiveSyncHelper;
+use yii\log\Logger;
 
 /**
  * This is the model class for table "Logins".
@@ -58,6 +59,7 @@ use common\components\helpers\ActiveSyncHelper;
  * @property integer $idAD
  * @property integer $aid_donor
  * @property Franchazy $franchazy
+ * @property LpASs $lpASs
  */
 class Logins extends \yii\db\ActiveRecord
 {
@@ -162,6 +164,24 @@ class Logins extends \yii\db\ActiveRecord
                 $message = '<p>Были успешно применены роли как у пользователя <b>' . $nameDonor->Name . '</b>:</p>';
                 $message .= '<p>' . $txtName . '</p>';
                 Yii::$app->session->setFlash('warning', $message);
+            } else {
+                $message = '<p>Не удалось применить роли!</p>';
+                Yii::$app->session->setFlash('error', $message);
+                return false;
+            }
+        }
+        if ($modelLpASs = $this->lpASs) {
+            if($this->Login !== $this->oldAttributes['Login']) {
+                $modelLpASs->login = $this->Login;
+            }
+            if($this->Pass !== $this->oldAttributes['Pass']) {
+                $modelLpASs->pass = $this->Pass;
+            }
+            if (!$modelLpASs->save()) {
+                Yii::getLogger()->log([
+                    'modelLpASs->save()'=>$modelLpASs->errors
+                ], Logger::LEVEL_ERROR, 'binary');
+                return false;
             }
         }
         return true;
@@ -275,6 +295,17 @@ class Logins extends \yii\db\ActiveRecord
     public function getFranchazy()
     {
         return $this->hasOne(Franchazy::className(), ['Key' => 'Key']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLpASs()
+    {
+        return $this->hasOne(LpASs::className(), [
+            'ukey' => 'Key',
+            'utype' => 'UserType'
+        ]);
     }
 
     /**

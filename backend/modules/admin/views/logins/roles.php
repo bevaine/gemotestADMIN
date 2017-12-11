@@ -34,7 +34,7 @@ UsersAsset::register($this);
         </div>
         <div class="row">
             <div class="col-xs-5 children-list">
-                <?= Html::label('Роли назначенные на права:') ?>
+                <?= Html::label('Роли назначенные на права') ?>
                 <div class="form-group">
                     <input type="text" class="form-control listFilter" placeholder="поиск по названию">
                 </div>
@@ -47,7 +47,7 @@ UsersAsset::register($this);
                 <button class="btn btn-success" type="submit" name="Permissions[action]" value="revoke"><span class="glyphicon glyphicon-arrow-right"></span></button>
             </div>
             <div class="col-xs-5 children-list">
-                <?=  Html::label('Какие роли назначить:') ?>
+                <?=  Html::label('Какие роли назначить') ?>
                 <div class="form-group">
                     <input type="text" class="form-control listFilter" placeholder="поиск по названию">
                 </div>
