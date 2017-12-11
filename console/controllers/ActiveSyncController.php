@@ -129,6 +129,15 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+
+        $connection = ssh2_connect('192.168.156.2', 22);
+        ssh2_auth_password($connection, 'itr', 'Gthtgenmt117!');
+        $shell = ssh2_shell($connection, 'xterm');
+        fwrite( $shell, 'cd ~;'.PHP_EOL);
+
+
+
+        exit;
         //todo присвоение прав пользователю
         $findPermissions = Permissions::findAll([
             'department' => 0
