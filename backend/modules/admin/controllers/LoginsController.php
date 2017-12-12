@@ -77,15 +77,15 @@ class LoginsController extends Controller
     }
 
     /**
-     * Lists all Logins models.
-     * @return mixed
+     * @param string $department
+     * @return string
      */
-    public function actionRoles()
+    public function actionRoles($department = '')
     {
         $action = '';
-        $department = '';
         $arrRows = [];
         $rowInsert = [];
+        if ($department == 7) $department = '';
 
         if (!empty(Yii::$app->request->post()['Permissions'])) {
             $request = Yii::$app->request->post()['Permissions'];

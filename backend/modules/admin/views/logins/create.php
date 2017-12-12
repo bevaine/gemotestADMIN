@@ -59,21 +59,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                             'attribute' => 'department',
                                             'addon' => [
                                                 'prepend' => [
-                                                    'content' => Html::a(
-                                                        '',
-                                                        Url::to('roles'), [
-                                                            'class' => 'glyphicon glyphicon-pencil',
-                                                            'target' => '_blank'
-                                                        ]
-                                                    )
+                                                    'content' => Html::a('','#', ['class' => 'glyphicon glyphicon-pencil'])
                                                 ],
                                             ]
                                         ]);
                                         ?>
                                     </div>
-
                                 </div>
-                                    <?php //Html::a('', Url::to('roles'), ['class' => 'glyphicon glyphicon-pencil']) ?>
                                 <div class="col-lg-4">
                                     <div class="form-group">
                                         <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
@@ -233,6 +225,12 @@ if ($action == 'user' || $action == 'franch' || $action == 'doc'  ) {
                 $('#adduserform-firstname').val(),
                 $('#adduserform-middlename').val());
             });
+
+        $(".glyphicon-pencil").click(function() {
+            var department = $('#adduserform-department').val(); 
+            window.open("./roles/" + department, '_blank');
+        });
+
 JS;
 
     $this->registerJs($js);
