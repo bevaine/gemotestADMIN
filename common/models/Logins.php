@@ -199,6 +199,14 @@ class Logins extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getDirectorInfo()
+    {
+        return $this->hasOne(DirectorFlo::className(), ['login' => 'Login']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getDirectorFloSender()
     {
         return $this->hasOne(DirectorFloSender::className(), [])
@@ -217,15 +225,6 @@ class Logins extends \yii\db\ActiveRecord
             'Key' => $userKey
         ]);
     }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDirectorInfo()
-    {
-        return $this->hasOne(DirectorFlo::className(), ['login' => 'Login']);
-    }
-
 
     /**
      * @return \yii\db\ActiveQuery

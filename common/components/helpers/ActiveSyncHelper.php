@@ -290,6 +290,44 @@ class ActiveSyncHelper
     }
 
     /**
+     * @param null $login
+     * @param null $password
+     * @return bool
+     */
+    public static function resetPasswordGD($login = null, $password = null)
+    {
+        if (is_null($login)
+            || is_null($password))
+            return false;
+
+        $port = 22;
+        $server = '192.168.156.2';
+        $userLogin = 'itr';
+        $userPassword = 'Gthtgenmt117!';
+
+        $script = "sudo ./changePasswordSkynet.sh '".$login."' '".$password."'";
+
+        try {
+            $connection = ssh2_connect($server, $port);
+            if (!$connect = ssh2_auth_password(
+                $connection,
+                $userLogin,
+                $userPassword)
+            ) return false;
+
+            ssh2_shell($connection, 'xterm');
+            if (!ssh2_exec($connection, $script)) return false;
+
+        } catch (Exception $e) {
+            Yii::getLogger()->log([
+                'resetPasswordGD'=>$e->getMessage()
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @return mixed
      */
     public function addCheckLogins()

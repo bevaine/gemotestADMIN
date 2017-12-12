@@ -94,14 +94,35 @@ if ($model->adUsers) {
                     [
                         'label' => 'Почта (директор)',
                         'attribute' => 'directorInfo.email',
-                        'visible' => $model->UserType == 9 ? true : false
+                        'visible' => $model->UserType == 9 ? true : false,
+                        'value' => function($model) {
+                            /** @var \common\models\LoginsSearch $model */
+                            return Html::mailto($model->directorInfo->email);
+                        },
+                        'format' => 'raw',
                     ],
                     [
                         'label' => 'Моб. номер (директор)',
                         'attribute' => 'directorInfo.phoneNumber',
                         'visible' => $model->UserType == 9 ? true : false
                     ],
-                    'Email:email',
+                    [
+                        'headerOptions' => array('style' => 'width: 75px;'),
+                        'attribute' => 'email',
+                        'value' => function($model) {
+                            /** @var \common\models\LoginsSearch $model */
+                            $row = Html::mailto($model->Email);
+                            if ($model->directorInfo) {
+                                $row .= " " . Html::SubmitButton('Сбросить пароль', [
+                                        'name' => 'reset-pass-gd',
+                                        'class' => 'btn btn-primary btn-sm',
+                                        'value' => '1'
+                                    ]);
+                            }
+                            return $row;
+                        },
+                        'format' => 'raw',
+                    ],
                     'Logo',
                     'LogoText',
                     'LogoText2',

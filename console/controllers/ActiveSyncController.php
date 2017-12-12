@@ -129,14 +129,22 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        $port = 22;
+        $server = '192.168.156.2';
+        $userLogin = 'itr';
+        $userPassword = 'Gthtgenmt117!';
 
-        $connection = ssh2_connect('192.168.156.2', 22);
-        ssh2_auth_password($connection, 'itr', 'Gthtgenmt117!');
-        $shell = ssh2_shell($connection, 'xterm');
-        fwrite( $shell, 'cd ~;'.PHP_EOL);
+        $login = '5171-gd-515';
+        $password = 'As1234567';
+        $script = "sudo ./changePasswordSkynet.sh '".$login."' '".$password."'";
 
-
-
+        $connection = ssh2_connect($server, $port);
+        if ($connect = ssh2_auth_password($connection, $userLogin, $userPassword)) {
+            ssh2_shell($connection, 'xterm');
+            if (!ssh2_exec($connection, $script)) {
+                return false;
+            }
+        }
         exit;
         //todo присвоение прав пользователю
         $findPermissions = Permissions::findAll([

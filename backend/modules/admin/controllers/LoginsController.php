@@ -204,6 +204,22 @@ class LoginsController extends Controller
                     ], Logger::LEVEL_WARNING, 'binary');
                 }
             }
+        } elseif (isset($post['reset-pass-gd'])) {
+
+            $style = 'error';
+            $message = 'Не удалось сбросить пароль для почты <b>'.$model->Email.'</b>';
+            if (isset($model->Login)
+                && isset($model->Pass)
+                && isset($model->Email)
+            ) {
+                if (ActiveSyncHelper::resetPasswordGD(
+                    $model->Login,
+                    $model->Pass)) {
+                    $style = 'success';
+                    $message = 'Успешно был сброшен пароль на "'.$model->Pass.'" для почты <b>'.$model->Email.'</b>';
+                }
+            }
+            Yii::$app->session->setFlash($style, $message);
         }
 
         return $this->render('view', [
