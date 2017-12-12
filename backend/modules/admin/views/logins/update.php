@@ -71,6 +71,11 @@ SCRIPT;
 
             <?= $form->field($model, 'Email')->textInput() ?>
 
+            <p>
+                <?= Html::label('Пароль к почте') ?>
+                <?= Html::input('password', 'passwordEmail', '         ', ['class' => 'form-control']) ?>
+            </p>
+
             <?= $form->field($model, 'Key')->textInput() ?>
 
             <?= $form->field($model, 'Logo')->textInput() ?>

@@ -387,6 +387,23 @@ class LoginsController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save())
         {
+            if (!empty(trim(Yii::$app->request->post()['passwordEmail']))) {
+                $style = 'error';
+                $password = Yii::$app->request->post()['passwordEmail'];
+                $message = 'Не удалось сбросить пароль для почты <b>'.$model->Email.'</b>';
+                if (isset($model->Login)
+                    && isset($password)
+                    && isset($model->Email)
+                ) {
+                    if (ActiveSyncHelper::resetPasswordGD(
+                        $model->Login,
+                        $password)) {
+                        $style = 'success';
+                        $message = 'Успешно был сброшен пароль на "'.$password.'" для почты <b>'.$model->Email.'</b>';
+                    }
+                }
+                Yii::$app->session->setFlash($style, $message);
+            }
             if ($adUsersLogins = $model->adUsers) {
                 if ($adUsersLogins->load(Yii::$app->request->post())) {
                     $adUsersLogins->save();

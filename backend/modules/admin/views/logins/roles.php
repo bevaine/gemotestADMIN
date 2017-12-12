@@ -18,7 +18,7 @@ UsersAsset::register($this);
         <div class="row">
             <div class="col-lg-4">
                 <div class="form-group department">
-                    <?= Html::label('Права:') ?>
+                    <?= Html::label('Права') ?>
                     <?= Html::dropDownList(
                             'Permissions[department]',
                             $department,
