@@ -206,20 +206,10 @@ class LoginsController extends Controller
             }
         } elseif (isset($post['reset-pass-gd'])) {
 
-            $style = 'error';
-            $message = 'Не удалось сбросить пароль для почты <b>'.$model->Email.'</b>';
-            if (isset($model->Login)
-                && isset($model->Pass)
-                && isset($model->Email)
-            ) {
-                if (ActiveSyncHelper::resetPasswordGD(
-                    $model->Login,
-                    $model->Pass)) {
-                    $style = 'success';
-                    $message = 'Успешно был сброшен пароль на "'.$model->Pass.'" для почты <b>'.$model->Email.'</b>';
-                }
+            if ($model->UserType == 9) {
+                $model->EmailPassword = $model->Pass;
+                self::resetPassword($model);
             }
-            Yii::$app->session->setFlash($style, $message);
         }
 
         return $this->render('view', [
@@ -387,22 +377,8 @@ class LoginsController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->save())
         {
-            if (!empty(trim(Yii::$app->request->post()['passwordEmail']))) {
-                $style = 'error';
-                $password = Yii::$app->request->post()['passwordEmail'];
-                $message = 'Не удалось сбросить пароль для почты <b>'.$model->Email.'</b>';
-                if (isset($model->Login)
-                    && isset($password)
-                    && isset($model->Email)
-                ) {
-                    if (ActiveSyncHelper::resetPasswordGD(
-                        $model->Login,
-                        $password)) {
-                        $style = 'success';
-                        $message = 'Успешно был сброшен пароль на "'.$password.'" для почты <b>'.$model->Email.'</b>';
-                    }
-                }
-                Yii::$app->session->setFlash($style, $message);
+            if (!empty(trim($model->EmailPassword))) {
+                self::resetPassword($model);
             }
             if ($adUsersLogins = $model->adUsers) {
                 if ($adUsersLogins->load(Yii::$app->request->post())) {
@@ -419,6 +395,28 @@ class LoginsController extends Controller
             'model' => $model,
             'ad' => $ad
         ]);
+    }
+
+    /**
+     * @param $model Logins
+     */
+    private static function resetPassword($model)
+    {
+        $style = 'error';
+        $message = 'Не удалось сбросить пароль для почты <b>'.$model->Email.'</b>';
+        if (isset($model->Login)
+            && isset($model->EmailPassword)
+            && isset($model->Email)
+        ) {
+            if (ActiveSyncHelper::resetPasswordGD(
+                $model->Login,
+                $model->EmailPassword)
+            ) {
+                $style = 'success';
+                $message = 'Успешно был сброшен пароль на "'.$model->EmailPassword.'" для почты <b>'.$model->Email.'</b>';
+            }
+        }
+        Yii::$app->session->setFlash($style, $message);
     }
 
     /**

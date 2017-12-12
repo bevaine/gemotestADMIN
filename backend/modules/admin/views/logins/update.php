@@ -71,10 +71,12 @@ SCRIPT;
 
             <?= $form->field($model, 'Email')->textInput() ?>
 
-            <p>
-                <?= Html::label('Пароль к почте') ?>
-                <?= Html::input('password', 'passwordEmail', '         ', ['class' => 'form-control']) ?>
-            </p>
+            <?php if ($model->UserType == 9) : ?>
+                <p>
+                    <?= Html::label('Пароль к почте') ?>
+                    <?= Html::input('password', 'Logins[EmailPassword]', '         ', ['class' => 'form-control']) ?>
+                </p>
+            <?php endif; ?>
 
             <?= $form->field($model, 'Key')->textInput() ?>
 

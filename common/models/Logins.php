@@ -60,6 +60,7 @@ use yii\log\Logger;
  * @property integer $aid_donor
  * @property Franchazy $franchazy
  * @property LpASs $lpASs
+ * @property string EmailPassword
  */
 class Logins extends \yii\db\ActiveRecord
 {
@@ -72,6 +73,7 @@ class Logins extends \yii\db\ActiveRecord
     public $AD_position;
     public $idAD;
     public $aid_donor;
+    public $EmailPassword;
 
     /**
      * @return null|object
@@ -96,7 +98,7 @@ class Logins extends \yii\db\ActiveRecord
         return [
             [['aid', 'Key', 'UserType'], 'required'],
             [['aid_donor', 'aid', 'IsOperator', 'IsAdmin', 'OpenExcel', 'EngVersion', 'IsDoctor', 'UserType', 'InputOrder', 'PriceID', 'CanRegister', 'InputOrderRM', 'OrderEdit', 'MedReg', 'goscontract', 'FizType', 'clientmen', 'mto', 'mto_editor', 'show_preanalytic', 'parentAid', 'GarantLetter'], 'integer'],
-            [['Login', 'Pass', 'Name', 'Email', 'Key', 'Logo', 'LogoText', 'LogoText2', 'LogoType', 'LogoWidth', 'TextPaddingLeft', 'tbl', 'CACHE_Login', 'role'], 'string'],
+            [['Login', 'Pass', 'Name', 'Email', 'EmailPassword', 'Key', 'Logo', 'LogoText', 'LogoText2', 'LogoType', 'LogoWidth', 'TextPaddingLeft', 'tbl', 'CACHE_Login', 'role'], 'string'],
             [['LastLogin', 'DateBeg', 'DateEnd', 'last_update_password'], 'safe'],
         ];
     }
