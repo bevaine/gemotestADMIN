@@ -50,7 +50,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'KeyUserIns',
                 'value' => function ($model) {
                     /** @var \common\models\OrdersToExport $model  */
-                    return Logins::getUserByKey($model->TypeUserIns, $model->KeyUserIns)->Name;
+                    if ($modelLogins = Logins::getUserByKey($model->TypeUserIns, $model->KeyUserIns)) {
+                        return $modelLogins->Name;
+                    } else return false;
                 }
             ],
             [
@@ -66,7 +68,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'KeyUserReg',
                 'value' => function ($model) {
                     /** @var \common\models\OrdersToExport $model  */
-                    return Logins::getUserByKey($model->TypeUserReg, $model->KeyUserReg)->Name;
+                    if ($modelLogins = Logins::getUserByKey($model->TypeUserReg, $model->KeyUserReg)) {
+                        return $modelLogins->Name;
+                    } else return false;
                 }
             ],
             [
@@ -82,7 +86,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'KeyUserDel',
                 'value' => function ($model) {
                     /** @var \common\models\OrdersToExport $model  */
-                    return Logins::getUserByKey($model->TypeUserDel, $model->KeyUserDel)->Name;
+                    if ($modelLogins = Logins::getUserByKey($model->TypeUserDel, $model->KeyUserDel)) {
+                        return $modelLogins->Name;
+                    } else return false;
                 }
             ],
             'DateDel',
