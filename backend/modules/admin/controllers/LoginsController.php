@@ -290,7 +290,7 @@ class LoginsController extends Controller
                 . " " . trim($activeSyncHelper->firstName);
 
             if (!empty($activeSyncHelper->middleName))
-                $activeSyncHelper->fullName = " " . trim($activeSyncHelper->middleName);
+                $activeSyncHelper->fullName .= " " . trim($activeSyncHelper->middleName);
 
             if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
                 !is_null(Yii::$app->request->post('hiddenEmailList')))
