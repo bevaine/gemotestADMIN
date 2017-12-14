@@ -130,6 +130,7 @@ return [
                 'GET /admin/logins/create/<param>' => '/admin/logins/create',
                 'POST /admin/logins/create/<param>' => '/admin/logins/create',
                 'GET /admin/logins/roles/<department>' => '/admin/logins/roles',
+                'POST /admin/logins/roles/<department>' => '/admin/logins/roles',
             ],
         ],
         'authManager' => [

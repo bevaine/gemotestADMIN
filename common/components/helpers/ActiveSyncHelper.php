@@ -8,6 +8,8 @@
 
 namespace common\components\helpers;
 
+use common\models\DirectorFlo;
+use common\models\DirectorFloSender;
 use common\models\medUserCounterparty;
 use common\models\NSprDoctorConsultant;
 use common\models\Permissions;
@@ -60,7 +62,12 @@ use yii\db\Transaction;
  * @property string  $idAD
  * @property string  $orgName
  * @property boolean $resetPassword
- *
+ * @property string  $emailGD
+ * @property string  $phone
+ * @property string  $directorID
+ * @property mixed $directorFloSender
+ * @property integer $changeGD
+ * @property  string $tableName
  */
 
 class ActiveSyncHelper
@@ -71,6 +78,11 @@ class ActiveSyncHelper
     CONST LDAP_LOGIN    = 'dymchenko.adm@lab.gemotest.ru';
     CONST LDAP_PASSW    = '2Hszfaussw';
     CONST LDAP_DN       = "DC=lab,DC=gemotest,DC=ru";
+
+    CONST POSTFIX_PORT      = 22;
+    CONST POSTFIX_SERVER    = '192.168.156.2';
+    CONST POSTFIX_LOGIN     = 'itr';
+    CONST POSTFIX_PASSW     = 'Gthtgenmt117!';
 
     CONST ORG_NAME      = 'ООО "Лаборатория Гемотест"';
     CONST LOGO_TEXT     = '107031 Москва, Рождественский бульвар д.21, ст.2^*^тел. (495) 532-13-13, 8(800) 550-13-13^*^www.gemotest.ru';
@@ -105,6 +117,10 @@ class ActiveSyncHelper
     public $idAD;
     public $orgName;
     public $resetPassword;
+    public $emailGD;
+    public $phone;
+    public $directorID;
+    public $changeGD;
 
     /**
      * ActiveSyncHelper constructor.
@@ -196,6 +212,35 @@ class ActiveSyncHelper
 
             //todo проверяем/добавляем запись в таблицы AD
             if (!$this->addUserAdTables()) return false;
+
+            //todo добавление ролей для пользователя
+            if (!$this->addPermissions()) return false;
+
+        } elseif ($this->type == 9) {
+
+            //todo добавляем/сбрасываем пароль для УЗ AD
+            if (!$this->createAdUserAcc()) return false;
+
+            //todo генерируем Login
+            if (!$this->generateLogin()) return false;
+
+            //todo проверяем/создаем есть ли УЗ в DirectorFlo
+            if (!$this->addCheckDirectorFlo()) return false;
+
+            //todo если на отделении есть назначенный директор, и выбрали переназначить директора
+            if (!$this->addCheckDirectorFloSender()) return false;
+
+            //todo проверяем/добавляем запись в Logins
+            if (!$this->addCheckLogins()) return false;
+
+            //todo проверяем/добавляем запись в таблицы AD
+            if (!$this->addUserAdTables()) return false;
+
+            //todo добавление ролей для пользователя
+            if (!$this->addPermissions()) return false;
+
+            //todo добавление пользователя для выбора ЛО
+            if (!$this->addCheckCounterparty()) return false;
         }
 
         return $this->setLoginPassword();
@@ -234,7 +279,6 @@ class ActiveSyncHelper
          */
         if (empty($this->lastName)
             || empty($this->firstName)
-            || empty($this->middleName)
         ) {
             Yii::getLogger()->log([
                 'addCheckOperators'=>[
@@ -249,11 +293,14 @@ class ActiveSyncHelper
         if (!$objectOperators = $this->checkOperatorAccount()) {
 
             $this->setLastOperatorCacheId();
+            $name = $this->firstName;
+            if (!empty($this->middleName))
+                $name .= " ".$this->middleName;
 
             //todo если нет, то добавление в Operators
             $objectOperators = new Operators();
             $objectOperators->CACHE_Login = $this->accountName;
-            $objectOperators->Name = $this->firstName." ".$this->middleName;
+            $objectOperators->Name = $name;
             $objectOperators->LastName = $this->lastName;
             $objectOperators->DateIns = date("Y-m-d G:i:s:000");
             $objectOperators->CACHE_OperatorID = strval($this->cacheId);
@@ -280,12 +327,46 @@ class ActiveSyncHelper
                 return false;
             }
         }
+        return $this->generateLogin($objectOperators);
+    }
 
-        $loginId = $objectOperators->AID;
-        $this->aid = 3000000 + $loginId;
-        $this->cacheId = $objectOperators->CACHE_OperatorID;
-        if ($this->department == 5) $this->loginGS = 'medr'.$loginId;
-        else $this->loginGS = 'reg'.$loginId;
+    /**
+     * @param $model Operators/
+     * @return bool
+     */
+    private function generateLogin($model = null)
+    {
+        if ($this->type == 7) {
+
+            if (!$model
+                || !isset($model->AID)
+                || !isset($model->CACHE_OperatorID)
+                || !isset($this->department)
+            ) return false;
+
+            $loginId = $model->AID;
+            $this->aid = 3000000 + $loginId;
+            $this->cacheId = $model->CACHE_OperatorID;
+
+            if ($this->department == 5) {
+                $this->loginGS = 'medr' . $loginId;
+            } else {
+                $this->loginGS = 'reg' . $loginId;
+            }
+
+        } elseif ($this->type == 9) {
+
+            if (empty($this->key)) return false;
+
+            $cacheId = Logins::find()->where([
+                'tbl' => 'DirectorFlo'
+            ])->max('[key]');
+
+            if (!$cacheId) return false;
+
+            $this->cacheId =  strval($cacheId) + 1;
+            $this->loginGS = $this->key."-gd-".strval(rand(100,999));
+        }
         return true;
     }
 
@@ -294,25 +375,20 @@ class ActiveSyncHelper
      * @param null $password
      * @return bool
      */
-    public static function resetPasswordGD($login = null, $password = null)
+    public static function createResetPasswordGD($login = null, $password = null)
     {
         if (is_null($login)
             || is_null($password))
             return false;
 
-        $port = 22;
-        $server = '192.168.156.2';
-        $userLogin = 'itr';
-        $userPassword = 'Gthtgenmt117!';
-
         $script = "sudo ./changePasswordSkynet.sh '".$login."' '".$password."'";
 
         try {
-            $connection = ssh2_connect($server, $port);
+            $connection = ssh2_connect(self::POSTFIX_SERVER, self::POSTFIX_PORT);
             if (!$connect = ssh2_auth_password(
                 $connection,
-                $userLogin,
-                $userPassword)
+                self::POSTFIX_LOGIN,
+                self::POSTFIX_PASSW)
             ) return false;
 
             ssh2_shell($connection, 'xterm');
@@ -332,7 +408,9 @@ class ActiveSyncHelper
      */
     public function addCheckLogins()
     {
-        if (empty($this->fullName) || empty($this->cacheId)) {
+        if (empty($this->fullName)
+            || empty($this->cacheId)
+        ) {
             Yii::getLogger()->log([
                 'addCheckLogins1'=>[
                     'Одно из обязательных полей пустое!',
@@ -341,6 +419,8 @@ class ActiveSyncHelper
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
+
+
 
         //todo проверяем существует ли запись в Logins
         /** @var  $objectUsersLogins Logins*/
@@ -365,26 +445,47 @@ class ActiveSyncHelper
                 return false;
             }
 
+            $objectUsersLogins = new Logins();
+
             $this->state = 'new';
+            $email = $this->emailAD;
+
             $loginName = $this->cacheId;
             if (!empty($this->operatorofficestatus)) {
                 $loginName .= '.' . $this->operatorofficestatus;
             }
             $loginName .= ": " . $this->fullName;
 
-            $objectUsersLogins = new Logins();
+            if ($this->type == 9) {
+
+                $objectUsersLogins->block_register = date("Y-m-d G:i:s.000", time());
+                $loginName = $this->fullName;
+                $email = $this->loginGS."@gemosystem.ru";
+
+                if (ActiveSyncHelper::createResetPasswordGD(
+                    $this->loginGS,
+                    $this->cachePass)
+                ) {
+                    Yii::getLogger()->log(
+                        'Успешно была добавлена почта '.$email,
+                        Logger::LEVEL_WARNING,
+                        'binary'
+                    );
+                }
+            }
+
             $objectUsersLogins->aid = $this->aid;
             $objectUsersLogins->Login = $this->loginGS;
             $objectUsersLogins->Pass = $this->cachePass;
             $objectUsersLogins->Name = $loginName;
-            $objectUsersLogins->Email = $this->emailAD;
+            $objectUsersLogins->Email = $email;
             $objectUsersLogins->Key = strval($this->cacheId);
             $objectUsersLogins->UserType = $this->type;
             $objectUsersLogins->CACHE_Login = $this->accountName;
             $objectUsersLogins->last_update_password = date("Y-m-d G:i:s:000");
             $objectUsersLogins->Logo = self::LOGO_IMG ;
             $objectUsersLogins->LogoText = self::LOGO_TEXT;
-            $objectUsersLogins->tbl = 'Operators';
+            $objectUsersLogins->tbl = $this->tableName;
             $objectUsersLogins->IsAdmin = 0;
             $objectUsersLogins->IsOperator = 1;
             $objectUsersLogins->LogoText2 = '';
@@ -469,7 +570,6 @@ class ActiveSyncHelper
 
         if (empty($this->lastName)
             || empty($this->firstName)
-            || empty($this->middleName)
             || empty($this->cacheId)
         ) {
             Yii::getLogger()->log([
@@ -536,7 +636,6 @@ class ActiveSyncHelper
 
         if (empty($this->lastName)
             || empty($this->firstName)
-            || empty($this->middleName)
             || empty($this->fullName)
             || empty($this->aid)
             || empty($this->cacheId)
@@ -603,7 +702,6 @@ class ActiveSyncHelper
         if (empty($this->cacheId)
             || empty($this->firstName)
             || empty($this->lastName)
-            || empty($this->middleName)
             || empty($this->loginGS)
         ) {
             Yii::getLogger()->log([
@@ -642,6 +740,120 @@ class ActiveSyncHelper
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
+        return true;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function addCheckDirectorFloSender()
+    {
+        if ($this->changeGD == 1) {
+            $objectDirectorFloSender = DirectorFloSender::findOne([
+                'sender_key' => $this->key
+            ]);
+
+            if ($objectDirectorFloSender) {
+                if ($objectDirectorFloSender->director_id != $this->directorID) {
+                    $objectDirectorFloSender->director_id = $this->directorID;
+                } else return true;
+            }
+        } else {
+            $objectDirectorFloSender = new DirectorFloSender();
+            $objectDirectorFloSender->sender_key = $this->key;
+            $objectDirectorFloSender->director_id = $this->directorID;
+        }
+
+        if ($objectDirectorFloSender->save()) {
+            Yii::getLogger()->log([
+                'objectDirectorFloSender->save()' => $objectDirectorFloSender
+            ], Logger::LEVEL_WARNING, 'binary');
+        } else {
+            Yii::getLogger()->log([
+                'objectDirectorFloSender->save()'=>$objectDirectorFloSender->errors
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     * @throws Exception
+     * @throws \Throwable
+     */
+    public function addCheckDirectorFlo()
+    {
+        if (empty($this->firstName)
+            || empty($this->lastName)
+            || empty($this->phone)
+            || empty($this->emailGD)
+            || empty($this->loginGS)
+            || empty($this->cachePass)
+        ) {
+            Yii::getLogger()->log([
+                'addCheckDirectorFlo' => [
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+
+        $objectDirectorFlo = DirectorFlo::findOne([
+            'first_name' => $this->firstName,
+            'middle_name' => $this->middleName,
+            'last_name' => $this->lastName,
+        ]);
+
+        if (!$objectDirectorFlo) {
+
+            /** @var $transaction Transaction */
+            $transaction = DirectorFlo::getDb()->beginTransaction();
+            try {
+                $objectDirectorFlo = new DirectorFlo();
+                $objectDirectorFlo->first_name = $this->firstName;
+                $objectDirectorFlo->middle_name = $this->middleName;
+                $objectDirectorFlo->last_name = $this->lastName;
+                $objectDirectorFlo->phoneNumber = $this->phone;
+                $objectDirectorFlo->email = $this->emailGD;
+                $objectDirectorFlo->passReplaced = 0;
+                $objectDirectorFlo->login = $this->loginGS;
+                $objectDirectorFlo->password = $this->cachePass;
+
+                if ($objectDirectorFlo->save()) {
+                    $transaction->commit();
+                    $this->state = 'new';
+                    $this->directorID = $transaction->db->getLastInsertID();
+                    Yii::getLogger()->log([
+                        'objectDirectorFlo->save()' => $objectDirectorFlo
+                    ], Logger::LEVEL_WARNING, 'binary');
+                } else {
+                    $transaction->rollBack();
+                    Yii::getLogger()->log([
+                        'objectDirectorFlo->save()' => $objectDirectorFlo->errors
+                    ], Logger::LEVEL_ERROR, 'binary');
+                    return false;
+                }
+
+            } catch(\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            } catch(\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
+
+        } else {
+            $this->state = 'old';
+        }
+
+        Yii::getLogger()->log([
+            'addCheckDirectorFlo->state' => $this->state
+        ], Logger::LEVEL_WARNING, 'binary');
+
+        $this->directorID = $objectDirectorFlo->id;
+        $this->aid = 8000000 + strval($this->directorID);
         return true;
     }
 
@@ -705,7 +917,6 @@ class ActiveSyncHelper
     {
         if (empty($this->firstName)
             || empty($this->lastName)
-            || empty($this->middleName)
         ) {
             Yii::getLogger()->log([
                 'addCheckNNurse'=>[
@@ -817,9 +1028,10 @@ class ActiveSyncHelper
             return true;
         }
 
+        $this->type == 9 ? $counterparty_id = $this->key : $counterparty_id = 1;
         $objectUserCounterparty = new medUserCounterparty();
         $objectUserCounterparty->user_id = $this->aid;
-        $objectUserCounterparty->counterparty_id = 1;
+        $objectUserCounterparty->counterparty_id = $counterparty_id;
 
         if ($objectUserCounterparty->save()) {
             Yii::getLogger()->log([
@@ -906,8 +1118,10 @@ class ActiveSyncHelper
         $this->loginGS = 'v'.$doctorModel->CACHE_DocID;
         $this->lastName = $doctorModel->LastName;
         $this->firstName = $expName[0];
-        if (!empty($expName[1])) $this->middleName = $expName[1];
-        $this->fullName = $this->lastName . " " . $this->firstName . " " . $this->middleName;
+        if (count($expName) == 2) $this->middleName = $expName[1];
+        $this->fullName = $this->lastName . " " . $this->firstName;
+        if (!empty($this->middleName))
+            $this->fullName .= " " . $this->middleName;
 
         if (array_key_exists($this->specId, SprDoctorSpec::getKeysList())) {
             $this->operatorofficestatus = SprDoctorSpec::getKeysList()[$this->specId];
@@ -1064,7 +1278,6 @@ class ActiveSyncHelper
         //todo проверяем существует и подобный логин в AD
         if (empty($this->lastName
             || empty($this->firstName))
-            || empty($this->middleName)
             || empty($this->fullName)
         ){
             Yii::getLogger()->log([
@@ -1079,7 +1292,8 @@ class ActiveSyncHelper
         $this->cnName = $this->fullName;
         $this->displayName = $this->fullName;
 
-        if ($this->type == 8)  {
+        if ($this->type == 8 && !empty($this->key)) {
+            $this->cnName = $this->fullName.' '.$this->key;
             $this->accountName = $this->key;
             $this->accountName .= ".".substr($this->translit($this->firstName),0,1);
             $this->accountName .= ".".$this->translit($this->lastName);
@@ -1091,16 +1305,15 @@ class ActiveSyncHelper
             $this->displayName = $this->fullName . " (" . $this->operatorofficestatus . ")";
         }
 
-        if ($this->typeLO == 'FLO' && !empty($this->key)) {
-            $this->cnName = $this->fullName.' '.$this->key;
-        }
-
         if ($this->checkUserAccountAd())
         {
             //todo если есть, то добавляю отчество в присвоеный логин в AD
             $this->accountName = $this->translit($this->firstName);
-            $this->accountName .= ".".substr($this->translit($this->middleName),0,1);
+            if (!empty($this->middleName)) {
+                $this->accountName .= "." . substr($this->translit($this->middleName), 0, 1);
+            } else $this->accountName .= "1";
             $this->accountName .= ".".$this->translit($this->lastName);
+
             if ($this->typeLO != 'FLO' && !empty($this->operatorofficestatus)) {
                 $this->cnName = $this->fullName." (".$this->operatorofficestatus.")";
             }
@@ -1221,7 +1434,6 @@ class ActiveSyncHelper
     public function checkOperatorAccount()
     {
         if (empty($this->firstName) ||
-            empty($this->middleName) ||
             empty($this->lastName)
         ) {
             Yii::getLogger()->log([
@@ -1233,9 +1445,13 @@ class ActiveSyncHelper
             return false;
         }
 
+        $name = $this->firstName;
+        if (!empty($this->middleName))
+            $name .= " ".$this->middleName;
+
         /** @var  $objectOperators Operators */
         $objectOperators = Operators::find()->where([
-            'Name' => $this->firstName." ".$this->middleName,
+            'Name' => $name,
             'LastName' => $this->lastName
         ])->one();
 
@@ -1352,12 +1568,15 @@ class ActiveSyncHelper
     {
         $password = self::generatePasswordAD();
         $email = $this->accountName."@gemotest.ru";
+        $name = $this->firstName;
+        if (!empty($this->middleName))
+            $name .= " ".$this->middleName;
 
         $ldaprecord = [
             "CN" => $this->cnName,
             "name" => $this->cnName,
             "sn" => $this->lastName, //фамилия
-            "givenname" => $this->firstName.' '.$this->middleName, //имя отчество
+            "givenname" => $name, //имя отчество
             "sAMAccountName" => $this->accountName, //логин
             "userPrincipalName" => $email, //емаил
             "mail" => $email, //емаил
@@ -1460,7 +1679,6 @@ class ActiveSyncHelper
                     'email' => $info[$i]['userprincipalname'][0],
                     'active' => $active
                 ];
-
             }
 
             Yii::getLogger()->log([

@@ -129,6 +129,8 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        print_r(Logins::find()->where(['tbl' => 'DirectorFlo'])->max('[key]'));
+        exit;
         $port = 22;
         $server = '192.168.156.2';
         $userLogin = 'itr';

@@ -10,6 +10,7 @@ use Yii;
  * @property integer $id
  * @property integer $director_id
  * @property string $sender_key
+ * @property DirectorFlo $directorFlo
  */
 class DirectorFloSender extends \yii\db\ActiveRecord
 {
@@ -57,6 +58,6 @@ class DirectorFloSender extends \yii\db\ActiveRecord
      */
     public function getDirectorFlo()
     {
-        return $this->hasOne(DirectorFlo::className(), ['id' => 'sender_key']);
+        return $this->hasOne(DirectorFlo::className(), ['id' => 'director_id']);
     }
 }

@@ -20,9 +20,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="nav-tabs-custom">
 
             <ul class="nav nav-tabs">
-                <li class="<?= ($action == 'user') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/user"]) ?>">Пользователи</a></li>
-                <li class="<?= ($action == 'doc') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/doc"]) ?>">Врач конс.</a></li>
+                <li class="<?= ($action == 'user') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/user"]) ?>">Пользователь</a></li>
                 <li class="<?= ($action == 'franch') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/franch"]) ?>">Франчайзи</a></li>
+                <li class="<?= ($action == 'doc') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/doc"]) ?>">Врач конс.</a></li>
+                <li class="<?= ($action == 'gd') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/gd"]) ?>">Ген. директор</a></li>
             </ul>
 
             <div class="tab-content">
@@ -38,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                     <div class="modal-body" id="modal-body"></div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-                                        <?= Html::submitButton('Выбрать', ['class' => 'btn btn-success']) ?>
+                                        <?= Html::submitButton('Продолжить', ['class' => 'btn btn-success']) ?>
                                     </div>
                                 </div>
                             </div>
@@ -143,9 +144,46 @@ $this->params['breadcrumbs'][] = $this->title;
                             </div>
                         <?php endif; ?>
 
+                        <?php if ($action == 'gd') : ?>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'key')->dropDownlist(\common\models\AddUserForm::getKeysList(), ['prompt' => '---', 'disabled' => false]); ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'email')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'phone')->textInput() ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'lastName')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'firstName')->textInput() ?>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'middleName')->textInput() ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="form-group">
                             <?php
-                            if ($action == 'user' || $action == 'franch' || $action == 'doc') {
+                            if ($action == 'user' || $action == 'franch' || $action == 'doc' || $action == 'gd') {
                                 echo Html::Button('Создать', ['class' => 'btn btn-success']);
                             } else {
                                 //echo Html::submitButton('Создать', ['class' => 'btn btn-success']);
@@ -161,7 +199,14 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
     <script>
-        function checkAD (department = null, key_doc, last_name, first_name, middle_name)
+        function checkAD (
+            department = null,
+            key_fr = null,
+            key_doc,
+            last_name,
+            first_name,
+            middle_name
+        )
         {
             if (department === '4' || department === '5') {
                 $("#form-input").submit();
@@ -169,6 +214,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 $.ajax({
                     url: '/admin/logins/ajax-for-active',
                     data: {
+                        gd_id: key_fr,
                         doc_id: key_doc,
                         last_name: last_name,
                         first_name: first_name,
@@ -179,21 +225,21 @@ $this->params['breadcrumbs'][] = $this->title;
                             $("#form-input").submit();
                         } else {
                             res = JSON.parse(res);
-                            //console.log(res.length);
-                            if (res.length > 0) {
-                                var html = "";
-                                var htm_header = "";
-                                for (var i = 0; i < res.length; i++) {
+                            var html = "";
+                            var htm_header = "";
+                            var ad = res.ad;
+                            var gd = res.gd;
+                            if (ad !== undefined && ad.length > 0) {
+                                for (var i = 0; i < ad.length; i++) {
                                     var style = "";
                                     var txtComment = "";
-                                    if (res[i].active === 1) {
-                                        console.log(res[i].active);
+                                    if (ad[i].active === 1) {
                                         style = ' style="color:#ec1c24;font-weight:bold;" ';
                                         txtComment = ' - уже используется';
                                     }
-                                    var dataUser = res[i].name + '<br>(' + res[i].account + ', email: ' + res[i].email + ')' + txtComment;
-                                    html += '<label' + style + '><input type="radio" name="radioAccountsList" value="' + res[i].account + '">' + dataUser +'</label>';
-                                    html += '<input type="hidden" name="hiddenEmailList[' + res[i].account + ']" value="' + res[i].email + '">';
+                                    var dataUser = ad[i].name + '<br>(' + ad[i].account + ', email: ' + ad[i].email + ')' + txtComment;
+                                    html += '<label' + style + '><input type="radio" name="radioAccountsList" value="' + ad[i].account + '">' + dataUser +'</label>';
+                                    html += '<input type="hidden" name="hiddenEmailList[' + ad[i].account + ']" value="' + ad[i].email + '">';
                                 }
                                 html += '<p><label><input type="radio" name="radioAccountsList" value="new">Создать новую учетную запись</label></p>';
                                 html += '<p><label><input type="checkbox" name="checkResetPassword">Сменить пароль</label></p>';
@@ -201,6 +247,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 htm_header += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b>';
                                 htm_header += ' несколько УЗ в Active Directory</p>';
                                 htm_header += 'Выбирите аккаунт AD на основании которого нужно создать УЗ Gomotest';
+                            }
+                            if (gd !== undefined ) {
+                                if (html !== '') html += '<hr />';
+                                html += '<b>Примечание:</b> <p>На отделении <b>' + key_fr + '</b> уже есть назначенный директор <b>' + gd + '</b></p>';
+                                html += '<input type="hidden" name="AddUserForm[changeGD]" value="1">';
+                            }
+                            if (ad !== undefined || gd !== undefined) {
                                 $('#modal-header').html(htm_header);
                                 $('#modal-body').html(html);
                                 $('#deactivate-user').modal('show');
@@ -215,11 +268,16 @@ $this->params['breadcrumbs'][] = $this->title;
     </script>
 <?php
 
-if ($action == 'user' || $action == 'franch' || $action == 'doc'  ) {
-    $js = <<< JS
+if ($action == 'user' ||
+    $action == 'franch' ||
+    $action == 'doc' ||
+    $action == 'gd'
+) {
+    $js1 = <<< JS
         $(".btn-success").click(function() { 
             checkAD(
                 $('#adduserform-department').val(),
+                $('#adduserform-key').val(),
                 $('#adduserform-docid').val(),
                 $('#adduserform-lastname').val(),
                 $('#adduserform-firstname').val(),
@@ -230,8 +288,7 @@ if ($action == 'user' || $action == 'franch' || $action == 'doc'  ) {
             var department = $('#adduserform-department').val(); 
             window.open("./roles/" + department, '_blank');
         });
-
 JS;
-
-    $this->registerJs($js);
+    $this->registerJs($js1);
 }
+?>

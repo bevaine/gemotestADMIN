@@ -21,6 +21,7 @@ use common\models\LoginsSearch;
 use common\models\AddUserForm;
 use common\components\helpers\ActiveSyncHelper;
 use common\models\PermissionsSearch;
+use common\models\DirectorFloSender;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -231,8 +232,8 @@ class LoginsController extends Controller
             case 'user':
                 $model->scenario = 'addUser';
                 break;
-            case 'org':
-                $model->scenario = 'addUserOrg';
+            case 'gd':
+                $model->scenario = 'addUserGD';
                 break;
             case 'doc':
                 $model->scenario = 'addUserDoc';
@@ -247,6 +248,7 @@ class LoginsController extends Controller
             if ($param == 'user') {
                 $activeSyncHelper->type = 7;
                 $activeSyncHelper->typeLO = 'SLO';
+                $activeSyncHelper->tableName = 'Operators';
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->lastName = trim($model->lastName);
                 $activeSyncHelper->firstName = trim($model->firstName);
@@ -262,9 +264,16 @@ class LoginsController extends Controller
                 $activeSyncHelper->firstName = trim($model->firstName);
                 $activeSyncHelper->middleName = trim($model->middleName);
                 $activeSyncHelper->operatorofficestatus = trim($model->operatorofficestatus);
-            } elseif ($param == 'org') {
-                $activeSyncHelper->type = 3;
+            } elseif ($param == 'gd') {
+                $activeSyncHelper->type = 9;
+                $activeSyncHelper->department = 9;
+                $activeSyncHelper->typeLO = 'FLO';
+                $activeSyncHelper->tableName = 'DirectorFlo';
+                $activeSyncHelper->operatorofficestatus = 'Генеральный директор';
+                $activeSyncHelper->changeGD = $model->changeGD;
                 $activeSyncHelper->key = $model->key;
+                $activeSyncHelper->emailGD = $model->email;
+                $activeSyncHelper->phone = $model->phone;
                 $activeSyncHelper->lastName = trim($model->lastName);
                 $activeSyncHelper->firstName = trim($model->firstName);
                 $activeSyncHelper->middleName = trim($model->middleName);
@@ -278,8 +287,10 @@ class LoginsController extends Controller
             }
 
             $activeSyncHelper->fullName = trim($activeSyncHelper->lastName)
-                . " " . trim($activeSyncHelper->firstName)
-                . " " . trim($activeSyncHelper->middleName);
+                . " " . trim($activeSyncHelper->firstName);
+
+            if (!empty($activeSyncHelper->middleName))
+                $activeSyncHelper->fullName = " " . trim($activeSyncHelper->middleName);
 
             if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
                 !is_null(Yii::$app->request->post('hiddenEmailList')))
@@ -408,7 +419,7 @@ class LoginsController extends Controller
             && isset($model->EmailPassword)
             && isset($model->Email)
         ) {
-            if (ActiveSyncHelper::resetPasswordGD(
+            if (ActiveSyncHelper::createResetPasswordGD(
                 $model->Login,
                 $model->EmailPassword)
             ) {
@@ -438,14 +449,21 @@ class LoginsController extends Controller
     }
 
     /**
-     * @param $last_name
-     * @param $first_name
-     * @param $middle_name
-     * @param $doc_id
+     * @param null $gd_id
+     * @param null $doc_id
+     * @param null $last_name
+     * @param null $first_name
+     * @param null $middle_name
      */
-    public function actionAjaxForActive($doc_id = null, $last_name = null, $first_name = null, $middle_name = null)
-    {
+    public function actionAjaxForActive(
+        $gd_id= null,
+        $doc_id = null,
+        $last_name = null,
+        $first_name = null,
+        $middle_name = null
+    ) {
         //todo проверяем существует ли УЗ
+        $arrAccountAD = [];
         $activeSyncHelper = new ActiveSyncHelper();
 
         if (!empty($doc_id)) {
@@ -471,13 +489,44 @@ class LoginsController extends Controller
             . " " . $activeSyncHelper->middleName;
 
         //todo проверяем существует ли пользователь с ФИО в AD
-        $arrAccountAD = $activeSyncHelper->checkUserNameAd();
+        if ($arr = $activeSyncHelper->checkUserNameAd()) {
+            $arrAccountAD['ad'] = $arr;
+        }
+
+        if (!empty($gd_id)) {
+            if ($checkGD = self::checkGD($gd_id)) {
+                $arrAccountAD = array_merge($arrAccountAD, $checkGD);
+            }
+        }
 
         if (!$arrAccountAD || !is_array($arrAccountAD)){
             exit('null') ;
         } else {
             echo Json::encode($arrAccountAD);
         }
+    }
+
+    /**
+     * @param null $key
+     * @return null
+     */
+    public static function checkGD($key = null)
+    {
+        $out = null;
+
+        if (!is_null($key)) {
+            $findModel = DirectorFloSender::findOne([
+                'sender_key' => $key
+            ]);
+
+            if ($findModel->directorFlo) {
+                $fullName = $findModel->directorFlo->last_name
+                    ." ".$findModel->directorFlo->first_name
+                    ." ".$findModel->directorFlo->middle_name;
+                $out['gd'] = $fullName;
+            }
+        }
+        return $out;
     }
 
     /**
@@ -505,7 +554,6 @@ class LoginsController extends Controller
 
         echo Json::encode($out);
     }
-
 
     /**
      * @param bool $department

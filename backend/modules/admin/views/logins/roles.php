@@ -3,6 +3,7 @@
 use yii\bootstrap\ActiveForm;
 use yii\helpers\Html;
 use budyaga\users\UsersAsset;
+use common\models\AddUserForm;
 
 /* @var $department */
 $this->title = 'Редактирование ролей пользователей';
@@ -22,7 +23,7 @@ UsersAsset::register($this);
                     <?= Html::dropDownList(
                             'Permissions[department]',
                             $department,
-                            \common\models\AddUserForm::getDepartments(),
+                                AddUserForm::getDepartments() + AddUserForm::getMainDepartments(),
                             [
                                 'options' => [7 => ['disabled' => true]],
                                 'class' =>'form-control',
