@@ -245,25 +245,32 @@ class LoginsController extends Controller
 
         if ($model->load(Yii::$app->request->post()))
         {
+            $model->lastName = trim($model->lastName);
+            $model->firstName = trim($model->firstName);
+            $model->middleName = trim($model->middleName);
+            $model->operatorofficestatus = trim($model->operatorofficestatus);
+            $model->email = trim($model->email);
+            $model->phone = trim($model->phone);
+
             if ($param == 'user') {
                 $activeSyncHelper->type = 7;
                 $activeSyncHelper->typeLO = 'SLO';
                 $activeSyncHelper->tableName = 'Operators';
                 $activeSyncHelper->key = $model->key;
-                $activeSyncHelper->lastName = trim($model->lastName);
-                $activeSyncHelper->firstName = trim($model->firstName);
-                $activeSyncHelper->middleName = trim($model->middleName);
+                $activeSyncHelper->lastName = $model->lastName;
+                $activeSyncHelper->firstName = $model->firstName;
+                $activeSyncHelper->middleName = $model->middleName;
                 $activeSyncHelper->department = $model->department;
-                $activeSyncHelper->operatorofficestatus = trim($model->operatorofficestatus);
+                $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
             } elseif ($param == 'franch') {
                 $activeSyncHelper->type = 8;
                 $activeSyncHelper->typeLO = 'FLO';
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->cacheId = $model->key;
-                $activeSyncHelper->lastName = trim($model->lastName);
-                $activeSyncHelper->firstName = trim($model->firstName);
-                $activeSyncHelper->middleName = trim($model->middleName);
-                $activeSyncHelper->operatorofficestatus = trim($model->operatorofficestatus);
+                $activeSyncHelper->lastName = $model->lastName;
+                $activeSyncHelper->firstName = $model->firstName;
+                $activeSyncHelper->middleName = $model->middleName;
+                $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
             } elseif ($param == 'gd') {
                 $activeSyncHelper->type = 9;
                 $activeSyncHelper->department = 9;
@@ -274,9 +281,9 @@ class LoginsController extends Controller
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->emailGD = $model->email;
                 $activeSyncHelper->phone = $model->phone;
-                $activeSyncHelper->lastName = trim($model->lastName);
-                $activeSyncHelper->firstName = trim($model->firstName);
-                $activeSyncHelper->middleName = trim($model->middleName);
+                $activeSyncHelper->lastName = $model->lastName;
+                $activeSyncHelper->firstName = $model->firstName;
+                $activeSyncHelper->middleName = $model->middleName;
             } elseif ($param == 'doc') {
                 $activeSyncHelper->type = 5;
                 $activeSyncHelper->typeLO = 'SLO';
@@ -286,11 +293,11 @@ class LoginsController extends Controller
                 $activeSyncHelper->specId = $model->specId;
             }
 
-            $activeSyncHelper->fullName = trim($activeSyncHelper->lastName)
-                . " " . trim($activeSyncHelper->firstName);
+            $activeSyncHelper->fullName = $activeSyncHelper->lastName
+                . " " . $activeSyncHelper->firstName;
 
             if (!empty($activeSyncHelper->middleName))
-                $activeSyncHelper->fullName .= " " . trim($activeSyncHelper->middleName);
+                $activeSyncHelper->fullName .= " " . $activeSyncHelper->middleName;
 
             if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
                 !is_null(Yii::$app->request->post('hiddenEmailList')))
