@@ -32,7 +32,6 @@ if ($model->adUsers) {
 }
 ?>
 
-
 <div class="logins-view">
 
     <?php $form = ActiveForm::begin(['id'=>'form-input','method' => 'post']); ?>
@@ -100,6 +99,22 @@ if ($model->adUsers) {
                             return Html::mailto($model->directorInfo->email);
                         },
                         'format' => 'raw',
+                    ],
+                    [
+                        'label' => 'Подключенные отделения',
+                        'format' => 'raw',
+                        'visible' => $model->UserType == 9 ? true : false,
+                        'value' => function($model){
+                            /** @var $model \common\models\Logins */
+                            $html = '';
+                            if (isset($model->directorInfoSender)) {
+                                /** @var \common\models\DirectorFloSender $object */
+                                foreach ($model->directorInfoSender as $object) {
+                                    $html .= " ".Html::tag('span', $object->floName->Name, ['class' => 'label label-success']);
+                                }
+                            }
+                            return $html;
+                        },
                     ],
                     [
                         'label' => 'Моб. номер (директор)',

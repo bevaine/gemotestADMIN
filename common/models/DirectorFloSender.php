@@ -11,6 +11,7 @@ use Yii;
  * @property integer $director_id
  * @property string $sender_key
  * @property DirectorFlo $directorFlo
+ * @property Franchazy $floName
  */
 class DirectorFloSender extends \yii\db\ActiveRecord
 {
@@ -59,5 +60,13 @@ class DirectorFloSender extends \yii\db\ActiveRecord
     public function getDirectorFlo()
     {
         return $this->hasOne(DirectorFlo::className(), ['id' => 'director_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFloName()
+    {
+        return $this->hasOne(Franchazy::className(), ['Key' => 'sender_key']);
     }
 }
