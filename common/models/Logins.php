@@ -56,6 +56,7 @@ use yii\log\Logger;
  * @property NAdUserAccounts $adUserAccounts
  * @property DirectorFlo $directorFlo
  * @property DirectorFlo $directorInfo
+ * @property DirectorFloSender $directorInfoSender
  * @property integer $idAD
  * @property integer $aid_donor
  * @property Franchazy $franchazy
@@ -204,6 +205,31 @@ class Logins extends \yii\db\ActiveRecord
     public function getDirectorInfo()
     {
         return $this->hasOne(DirectorFlo::className(), ['login' => 'Login']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDirectorInfoSender()
+    {
+        return $this->hasMany(DirectorFloSender::className(), [
+            'director_id' => 'id'
+        ])->via('directorInfo');
+    }
+
+        /**
+         * @return array
+         */
+    public function getSendersList()
+    {
+        $modules = [];
+        if ($this->directorInfoSender) {
+            /** @var DirectorFloSender $model */
+            foreach ($this->directorInfoSender as $model) {
+                $modules[$model->sender_key] = $model->sender_key;
+            }
+        }
+        return $modules;
     }
 
     /**

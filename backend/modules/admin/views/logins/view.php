@@ -40,7 +40,7 @@ if ($model->adUsers) {
     <div class="box box-solid box-success">
 
         <div class="box-header with-border">
-            <h3 class="box-title">Контрагент: <?= $model->Name ?></h3>
+            <h3 class="box-title">Пользователь GS:<?= $model->Name ?></h3>
         </div>
 
         <div class="box-body">

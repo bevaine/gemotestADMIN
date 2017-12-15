@@ -5,6 +5,8 @@ use yii\widgets\ActiveForm;
 use kartik\datetime\DateTimePicker;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+use common\models\AddUserForm;
+use common\models\Logins;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Logins */
@@ -63,6 +65,8 @@ SCRIPT;
 
             <?= $form->field($model, 'aid')->textInput(['readonly' => true]) ?>
 
+            <?= $form->field($model, 'Key')->textInput() ?>
+
             <?= $form->field($model, 'Login')->textInput() ?>
 
             <?= $form->field($model, 'Pass')->textInput() ?>
@@ -76,9 +80,26 @@ SCRIPT;
                     <?= Html::label('Пароль к почте') ?>
                     <?= Html::input('password', 'Logins[EmailPassword]', '         ', ['class' => 'form-control']) ?>
                 </p>
+
+                <p>
+                <?= Html::label('Подключенные отделения'); ?>
+                <?= Select2::widget([
+                        'data' => AddUserForm::getKeysList(),
+                        'name' => 'sendersKeys',
+                        'value' => $model->getSendersList(), // initial value
+                        'maintainOrder' => true,
+                        'showToggleAll' => false,
+                        'options' => ['placeholder' => 'отделение', 'multiple' => true],
+                        'pluginOptions' => [
+                            'tags' => true,
+                            'maximumInputLength' => 10
+                        ],
+                    ]);
+                ?>
+                </p>
             <?php endif; ?>
 
-            <?= $form->field($model, 'Key')->textInput() ?>
+            <?= $form->field($model, 'Logo')->textInput() ?>
 
             <?= $form->field($model, 'Logo')->textInput() ?>
 

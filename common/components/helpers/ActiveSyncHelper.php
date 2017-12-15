@@ -1226,46 +1226,45 @@ class ActiveSyncHelper
             return false;
         }
 
-        //todo удаляем все роли у пользователя
-        $searchAssignment = NAuthASsignment::deleteAll([
-            'userid' => $this->aid
-        ]);
+        $connection = 'GemoTestDB';
+        $db = Yii::$app->$connection;
+        /** @var $transaction Transaction */
+        $transaction = $db->beginTransaction();
 
-        if (!$searchAssignment) {
-            Yii::getLogger()->log([
-                'searchAssignment'=>'Не удалось удалить права!',
-                'userid' => $this->aid
-            ], Logger::LEVEL_ERROR, 'binary');
-        }
+        try {
+            //todo удаляем все роли у пользователя
+            $db->createCommand()->delete(
+                NAuthASsignment::tableName(),
+                ['userid' => $this->aid]
+            )->execute();
 
-        //todo присвоение прав пользователю
-        $findPermissions = Permissions::findAll([
-            'department' => $this->department
-        ]);
+            //todo присвоение прав пользователю
+            $findPermissions = Permissions::findAll([
+                'department' => $this->department
+            ]);
 
-        if ($findPermissions) {
-            $rowInsert = [];
-            foreach ($findPermissions as $permission) {
-                $rowInsert[] = [
-                    $permission->permission,
-                    $this->aid,
-                    'N;'
-                ];
-            }
-            try {
-                $connection = 'GemoTestDB';
-                $db = Yii::$app->$connection;
+            if ($findPermissions) {
+                $rowInsert = [];
+                foreach ($findPermissions as $permission) {
+                    $rowInsert[] = [
+                        $permission->permission,
+                        $this->aid,
+                        'N;'
+                    ];
+                }
                 $db->createCommand()->batchInsert(
                     NAuthASsignment::tableName(),
                     ['itemname', 'userid', 'data'],
                     $rowInsert
                 )->execute();
-            } catch (Exception $e) {
-                Yii::getLogger()->log([
-                    'addPermissions->batchInsert'=>$e->getMessage()
-                ], Logger::LEVEL_ERROR, 'binary');
-                return false;
             }
+            $transaction->commit();
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            Yii::getLogger()->log([
+                'DirectorFloSender->batchInsert' => $e->getMessage()
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
         }
         return true;
     }
@@ -1366,28 +1365,36 @@ class ActiveSyncHelper
                 $rowInsertOut[] = $row;
             }
 
-            NAuthASsignment::deleteAll([
-                'userid' => $toAid
-            ]);
+            /** @var $transaction Transaction */
+            $connection = 'GemoTestDB';
+            $db = Yii::$app->$connection;
+            $transaction = $db->beginTransaction();
 
             try {
-                $connection = 'GemoTestDB';
-                $db = Yii::$app->$connection;
+                //todo удаляем все роли у пользователя
+                $db->createCommand()->delete(
+                    NAuthASsignment::tableName(),
+                    ['userid' => $toAid]
+                )->execute();
+
                 $db->createCommand()->batchInsert(
                     NAuthASsignment::tableName(),
                     ['itemname', 'userid', 'bizrule', 'data'],
                     $rowInsertOut
                 )->execute();
 
+                $transaction->commit();
                 $rowRules = ArrayHelper::getColumn($rowInsert, 'itemname');
                 return $rowRules;
 
             } catch (Exception $e) {
+                $transaction->rollBack();
                 Yii::getLogger()->log([
                     'addFromDonor->batchInsert' => $e->getMessage()
                 ], Logger::LEVEL_ERROR, 'binary');
                 return false;
             }
+
         }
         return true;
     }

@@ -22,6 +22,7 @@ use common\models\AddUserForm;
 use common\components\helpers\ActiveSyncHelper;
 use common\models\PermissionsSearch;
 use common\models\DirectorFloSender;
+use yii\db\Transaction;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -245,32 +246,25 @@ class LoginsController extends Controller
 
         if ($model->load(Yii::$app->request->post()))
         {
-            $model->lastName = trim($model->lastName);
-            $model->firstName = trim($model->firstName);
-            $model->middleName = trim($model->middleName);
-            $model->operatorofficestatus = trim($model->operatorofficestatus);
-            $model->email = trim($model->email);
-            $model->phone = trim($model->phone);
-
             if ($param == 'user') {
                 $activeSyncHelper->type = 7;
                 $activeSyncHelper->typeLO = 'SLO';
                 $activeSyncHelper->tableName = 'Operators';
                 $activeSyncHelper->key = $model->key;
-                $activeSyncHelper->lastName = $model->lastName;
-                $activeSyncHelper->firstName = $model->firstName;
-                $activeSyncHelper->middleName = $model->middleName;
+                $activeSyncHelper->lastName = trim($model->lastName);
+                $activeSyncHelper->firstName = trim($model->firstName);
+                $activeSyncHelper->middleName = trim($model->middleName);
                 $activeSyncHelper->department = $model->department;
-                $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
+                $activeSyncHelper->operatorofficestatus = trim($model->operatorofficestatus);
             } elseif ($param == 'franch') {
                 $activeSyncHelper->type = 8;
                 $activeSyncHelper->typeLO = 'FLO';
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->cacheId = $model->key;
-                $activeSyncHelper->lastName = $model->lastName;
-                $activeSyncHelper->firstName = $model->firstName;
-                $activeSyncHelper->middleName = $model->middleName;
-                $activeSyncHelper->operatorofficestatus = $model->operatorofficestatus;
+                $activeSyncHelper->lastName = trim($model->lastName);
+                $activeSyncHelper->firstName = trim($model->firstName);
+                $activeSyncHelper->middleName = trim($model->middleName);
+                $activeSyncHelper->operatorofficestatus = trim($model->operatorofficestatus);
             } elseif ($param == 'gd') {
                 $activeSyncHelper->type = 9;
                 $activeSyncHelper->department = 9;
@@ -281,9 +275,9 @@ class LoginsController extends Controller
                 $activeSyncHelper->key = $model->key;
                 $activeSyncHelper->emailGD = $model->email;
                 $activeSyncHelper->phone = $model->phone;
-                $activeSyncHelper->lastName = $model->lastName;
-                $activeSyncHelper->firstName = $model->firstName;
-                $activeSyncHelper->middleName = $model->middleName;
+                $activeSyncHelper->lastName = trim($model->lastName);
+                $activeSyncHelper->firstName = trim($model->firstName);
+                $activeSyncHelper->middleName = trim($model->middleName);
             } elseif ($param == 'doc') {
                 $activeSyncHelper->type = 5;
                 $activeSyncHelper->typeLO = 'SLO';
@@ -293,11 +287,11 @@ class LoginsController extends Controller
                 $activeSyncHelper->specId = $model->specId;
             }
 
-            $activeSyncHelper->fullName = $activeSyncHelper->lastName
-                . " " . $activeSyncHelper->firstName;
+            $activeSyncHelper->fullName = trim($activeSyncHelper->lastName)
+                . " " . trim($activeSyncHelper->firstName);
 
             if (!empty($activeSyncHelper->middleName))
-                $activeSyncHelper->fullName .= " " . $activeSyncHelper->middleName;
+                $activeSyncHelper->fullName .= " " . trim($activeSyncHelper->middleName);
 
             if (!is_null(Yii::$app->request->post('radioAccountsList')) &&
                 !is_null(Yii::$app->request->post('hiddenEmailList')))
@@ -393,8 +387,44 @@ class LoginsController extends Controller
     {
         $model = $this->findModel($id, $ad);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save())
-        {
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            /** @var $transaction Transaction */
+            $connection = 'GemoTestDB';
+            $db = Yii::$app->$connection;
+            $transaction = $db->beginTransaction();
+            try {
+                if (!empty($model->directorInfo->id)) {
+                    $directorID = $model->directorInfo->id;
+                    $db->createCommand()->delete(
+                        DirectorFloSender::tableName(),
+                        ['director_id' => $directorID]
+                    )->execute();
+                }
+                if (isset(Yii::$app->request->post()['sendersKeys'])
+                    && is_array(Yii::$app->request->post()['sendersKeys'])
+                    && !empty($model->directorInfo->id)
+                ) {
+                    $rowInsert = [];
+                    $directorID = $model->directorInfo->id;
+                    $sendersKeys = Yii::$app->request->post()['sendersKeys'];
+                    foreach ($sendersKeys as $key) {
+                        $rowInsert[] = [$directorID, $key];
+                    }
+                    $db->createCommand()->batchInsert(
+                        DirectorFloSender::tableName(),
+                        ['director_id', 'sender_key'],
+                        $rowInsert
+                    )->execute();
+                }
+                $transaction->commit();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                Yii::getLogger()->log([
+                    'DirectorFloSender->batchInsert' => $e->getMessage()
+                ], Logger::LEVEL_ERROR, 'binary');
+            }
+
             if (!empty(trim($model->EmailPassword))) {
                 self::resetPassword($model);
             }
