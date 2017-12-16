@@ -59,17 +59,17 @@ class NReturnOrder extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'parent_id' => 'Parent ID',
-            'parent_type' => 'Parent Type',
-            'date' => 'Date',
-            'order_num' => 'Order Num',
-            'status' => 'Status',
-            'total' => 'Total',
-            'user_id' => 'User ID',
-            'kkm' => 'Kkm',
-            'sync_with_lc_status' => 'Sync With Lc Status',
-            'last_update' => 'Last Update',
-            'sync_with_lc_date' => 'Sync With Lc Date',
+            'parent_id' => 'Родитель ID',
+            'parent_type' => 'Тип родителя',
+            'date' => 'Дата возврата',
+            'order_num' => '№ заказа',
+            'status' => 'Статус',
+            'total' => 'Сумма',
+            'user_id' => 'Пользователь',
+            'kkm' => '№ ККМ',
+            'sync_with_lc_status' => 'Синхр. с 1С',
+            'last_update' => 'Дата обнов.',
+            'sync_with_lc_date' => 'Дата синхр. с 1С',
         ];
     }
 

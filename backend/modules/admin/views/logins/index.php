@@ -9,8 +9,10 @@ use common\models\Logins;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Пользователи';
-$this->params['breadcrumbs'][] = $this->title;
-
+$this->params['breadcrumbs'][] = [
+    'label' => $this->title,
+    'url' => 'logins'
+]
 ?>
 <div class="logins-index">
 
@@ -26,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 //                return ['style' => 'color:white;background-color:'.Logins::getColorTypes()[$model['UserType']]];
 //            } else return NULL;
 //        },
-        'striped'=>true,
+        'striped' => true,
         'columns' => [
             ['class' => 'kartik\grid\SerialColumn'],
             [
@@ -47,6 +49,8 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'headerOptions' => array('style' => 'width: 75px;'),
+                'attribute' => 'Key',
+                'format' => 'text',
                 'value' => function ($model) {
                     /** @var \common\models\LoginsSearch $model */
                     if (array_key_exists($model['UserType'], \common\models\Logins::getTypesArray())) {
@@ -57,7 +61,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         }
                     } else return NULL;
                 },
-                'attribute' => 'Key',
             ],
             [
                 'headerOptions' => array('style' => 'width: 75px;'),
@@ -116,7 +119,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => 'Логин AD',
-                'attribute' => 'AD_login',
+                'attribute' => 'ad_login',
                 'value' => function ($model) {
                     /** @var \common\models\LoginsSearch $model */
                     return !empty($model["AD_login"]) ? 'lab\\'.$model["AD_login"] : null;

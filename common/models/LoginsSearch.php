@@ -10,14 +10,23 @@ use Yii;
 
 /**
  * LoginsSearch represents the model behind the search form about `common\models\Logins`.
+ * @property string $last_name
+ * @property string $first_name
+ * @property string $middle_name
+ * @property string $ad_login
+ * @property string $AD_position
 */
 
 class LoginsSearch extends Logins
 {
     public $ad_login;
     public $DateBlocked;
+    public $AD_position;
+    public $last_name;
+    public $first_name;
+    public $middle_name;
 
-    /**
+        /**
      * @return null|object
      */
     public static function getDb() {
@@ -133,12 +142,16 @@ class LoginsSearch extends Logins
             'db' => 'GemoTestDB',
             'sort' => [
                 'attributes' => [
-                    'UserType' => [
-                        'default' => SORT_ASC,
-                    ],
-                    'Name' => [
-                        'default' => SORT_ASC,
-                    ],
+                    'aid' => ['default' => SORT_ASC],
+                    'Key' => ['default' => SORT_ASC],
+                    'UserType' => ['default' => SORT_ASC],
+                    'Name' => ['default' => SORT_ASC],
+                    'Login' => ['default' => SORT_ASC],
+                    'last_name' => ['default' => SORT_ASC],
+                    'first_name' => ['default' => SORT_ASC],
+                    'middle_name' => ['default' => SORT_ASC],
+                    'AD_position' => ['default' => SORT_ASC],
+                    'ad_login' => ['default' => SORT_ASC],
                 ],
             ],
         ]);

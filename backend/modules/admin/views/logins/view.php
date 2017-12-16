@@ -17,10 +17,12 @@ $blockDateEnd = 'active';
 $blockRegister = 'active';
 $activeGS = 'active';
 
-if (empty($model->DateEnd) || strtotime($model->DateEnd) > time()) {
+if (empty($model->DateEnd)
+    || strtotime($model->DateEnd) > time()) {
     $blockDateEnd = 'block';
 }
-if (empty($model->block_register) || strtotime($model->block_register) > time()) {
+if (empty($model->block_register)
+    || strtotime($model->block_register) > time()) {
     $blockRegister = 'block';
 }
 if ($model->adUsers) {
@@ -105,12 +107,15 @@ if ($model->adUsers) {
                         'format' => 'raw',
                         'visible' => $model->UserType == 9 ? true : false,
                         'value' => function($model){
-                            /** @var $model \common\models\Logins */
                             $html = '';
+                            /** @var $model \common\models\Logins */
                             if (isset($model->directorInfoSender)) {
                                 /** @var \common\models\DirectorFloSender $object */
                                 foreach ($model->directorInfoSender as $object) {
-                                    $html .= " ".Html::tag('span', $object->floName->Name, ['class' => 'label label-success']);
+                                    $html .= " ".Html::tag(
+                                            'span',
+                                            $object->floName->Name,
+                                            ['class' => 'label label-success']);
                                 }
                             }
                             return $html;

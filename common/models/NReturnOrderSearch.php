@@ -11,11 +11,15 @@ use common\models\NReturnOrder;
  * NReturnOrderSearch represents the model behind the search form about `common\models\NReturnOrder`.
  * @property $date_from
  * @property $date_to
+ * @property $date_from_1c
+ * @property $date_to_1c
  */
 class NReturnOrderSearch extends NReturnOrder
 {
     public $date_from;
     public $date_to;
+    public $date_from_1c;
+    public $date_to_1c;
 
     /**
      * @inheritdoc
@@ -24,7 +28,7 @@ class NReturnOrderSearch extends NReturnOrder
     {
         return [
             [['id', 'parent_id', 'parent_type', 'status', 'user_id', 'sync_with_lc_status'], 'integer'],
-            [['date', 'date_from', 'date_to', 'order_num', 'kkm', 'last_update', 'sync_with_lc_date'], 'safe'],
+            [['date', 'date_from', 'date_to', 'date_from_1c', 'date_to_1c', 'order_num', 'kkm', 'last_update', 'sync_with_lc_date'], 'safe'],
             [['total'], 'number'],
         ];
     }
@@ -74,16 +78,25 @@ class NReturnOrderSearch extends NReturnOrder
             'user_id' => $this->user_id,
             'sync_with_lc_status' => $this->sync_with_lc_status,
             'last_update' => $this->last_update,
-            'sync_with_lc_date' => $this->sync_with_lc_date,
         ]);
 
-        if (isset($params["NReturnOrderSearch"]['date_from']) && isset($params["NReturnOrderSearch"]['date_to'])) {
-            $query->andWhere(['>=', 'date', $params["NReturnOrderSearch"]['date_from']])
-                ->andWhere(['<=', 'date', $params["NReturnOrderSearch"]['date_to']]);
+        if (!empty($params["NReturnOrderSearch"]['date_from']) && !empty($params["NReturnOrderSearch"]['date_to'])) {
+            $query->andWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($params["NReturnOrderSearch"]['date_from']))]);
+            $query->andWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($params["NReturnOrderSearch"]['date_to']))]);
         } else {
             if ($this->date_from && $this->date_to) {
-                $query->andWhere(['>=', 'date', $this->date_from])
-                    ->andWhere(['<=', 'date', $this->date_to]);
+                $query->andFilterWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($this->date_from))]);
+                $query->andFilterWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($this->date_to))]);
+            }
+        }
+
+        if (!empty($params["NReturnOrderSearch"]['date_from_1c']) && !empty($params["NReturnOrderSearch"]['date_to_1c'])) {
+            $query->andWhere(['>=', 'sync_with_lc_date', date('Y-m-d 00:00:00', strtotime($params["NReturnOrderSearch"]['date_from_1c']))]);
+            $query->andWhere(['<=', 'sync_with_lc_date', date('Y-m-d 23:59:59', strtotime($params["NReturnOrderSearch"]['date_to_1c']))]);
+        } else {
+            if ($this->date_from_1c && $this->date_to_1c) {
+                $query->andFilterWhere(['>=', 'sync_with_lc_date', date('Y-m-d 00:00:00', strtotime($this->date_from_1c))]);
+                $query->andFilterWhere(['<=', 'sync_with_lc_date', date('Y-m-d 23:59:59', strtotime($this->date_to_1c))]);
             }
         }
 
