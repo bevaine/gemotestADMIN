@@ -3,15 +3,15 @@
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use common\models\Logins;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\LoginsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
-
 $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = [
     'label' => $this->title,
-    'url' => 'logins'
+    'url' => Url::to(["./logins"])
 ]
 ?>
 <div class="logins-index">

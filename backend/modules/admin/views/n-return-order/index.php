@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\NReturnOrderSearch */
@@ -10,7 +11,7 @@ use kartik\grid\GridView;
 $this->title = 'Возвраты ЛИС';
 $this->params['breadcrumbs'][] = [
     'label' => $this->title,
-    'url' => 'n-return-order'
+    'url' => Url::to(["./n-return-order"])
 ]
 ?>
 <div class="nreturn-order-index">
