@@ -54,14 +54,14 @@ class BranchStaff extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'first_name' => 'First Name',
-            'middle_name' => 'Middle Name',
-            'last_name' => 'Last Name',
+            'first_name' => 'Имя',
+            'middle_name' => 'Отчество',
+            'last_name' => 'Фамилия',
             'guid' => 'Guid',
-            'sender_key' => 'Sender Key',
+            'sender_key' => 'Отделение',
             'prototype' => 'Prototype',
-            'date' => 'Date',
-            'personnel_number' => 'Personnel Number',
+            'date' => 'Дата',
+            'personnel_number' => 'Персон. номер',
         ];
     }
 }

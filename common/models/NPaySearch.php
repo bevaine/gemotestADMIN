@@ -9,9 +9,19 @@ use common\models\NPay;
 
 /**
  * NPaySearch represents the model behind the search form about `\common\models\NPay`.
+ * @property $date_from
+ * @property $date_to
+ * @property $order_data_from
+ * @property $order_data_to
  */
+
 class NPaySearch extends NPay
 {
+    public $date_from;
+    public $date_to;
+    public $order_data_from;
+    public $order_data_to;
+
     /**
      * @return null|object
      */
@@ -26,7 +36,7 @@ class NPaySearch extends NPay
     {
         return [
             [['id', 'base_doc_id', 'base_doc_type', 'patient_id', 'login_id', 'login_type', 'pay_type', 'discount_id', 'cito_factor', 'printlist', 'free_pay', 'pay_type_original'], 'integer'],
-            [['date', 'order_num', 'order_data', 'base_doc_date', 'patient_fio', 'patient_phone', 'patient_birthday', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'discount_card', 'discount_name', 'app_version', 'kkm', 'z_num'], 'safe'],
+            [['date', 'order_data', 'date_from', 'date_to', 'order_num', 'order_data', 'base_doc_date', 'patient_fio', 'patient_phone', 'patient_birthday', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'discount_card', 'discount_name', 'app_version', 'kkm', 'z_num'], 'safe'],
             [['cost', 'discount_percent', 'bonus', 'discount_total', 'total', 'bonus_balance'], 'number'],
         ];
     }
@@ -68,8 +78,6 @@ class NPaySearch extends NPay
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'date' => $this->date,
-            'order_data' => $this->order_data,
             'base_doc_id' => $this->base_doc_id,
             'base_doc_type' => $this->base_doc_type,
             'base_doc_date' => $this->base_doc_date,
@@ -103,6 +111,20 @@ class NPaySearch extends NPay
             ->andFilterWhere(['like', 'app_version', $this->app_version])
             ->andFilterWhere(['like', 'kkm', $this->kkm])
             ->andFilterWhere(['like', 'z_num', $this->z_num]);
+
+        if ($this->date_from) {
+            $query->andFilterWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($this->date_from))]);
+        }
+        if ($this->date_to) {
+            $query->andFilterWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($this->date_to))]);
+        }
+
+        if ($this->order_data_from) {
+            $query->andFilterWhere(['>=', 'order_data', date('Y-m-d 00:00:00', strtotime($this->order_data_from))]);
+        }
+        if ($this->order_data_to) {
+            $query->andFilterWhere(['<=', 'order_data', date('Y-m-d 23:59:59', strtotime($this->order_data_to))]);
+        }
 
         return $dataProvider;
     }

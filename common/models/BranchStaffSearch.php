@@ -9,9 +9,15 @@ use common\models\BranchStaff;
 
 /**
  * BranchStaffSearch represents the model behind the search form about `common\models\BranchStaff`.
+ * @property $date_from
+ * @property $date_to
  */
+
 class BranchStaffSearch extends BranchStaff
 {
+    public $date_from;
+    public $date_to;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +25,7 @@ class BranchStaffSearch extends BranchStaff
     {
         return [
             [['id', 'prototype'], 'integer'],
-            [['first_name', 'middle_name', 'last_name', 'guid', 'sender_key', 'date', 'personnel_number'], 'safe'],
+            [['first_name', 'middle_name', 'last_name', 'date_from', 'date_to', 'guid', 'sender_key', 'date', 'personnel_number'], 'safe'],
         ];
     }
 
@@ -70,6 +76,13 @@ class BranchStaffSearch extends BranchStaff
             ->andFilterWhere(['like', 'guid', $this->guid])
             ->andFilterWhere(['like', 'sender_key', $this->sender_key])
             ->andFilterWhere(['like', 'personnel_number', $this->personnel_number]);
+
+        if ($this->date_from) {
+            $query->andFilterWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($this->date_from))]);
+        }
+        if ($this->date_to) {
+            $query->andFilterWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($this->date_to))]);
+        }
 
         return $dataProvider;
     }

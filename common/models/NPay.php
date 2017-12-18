@@ -65,7 +65,7 @@ class NPay extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['date', 'order_data', 'base_doc_date', 'patient_birthday'], 'safe'],
+            [['date', 'order_data_from', 'order_data_to', 'base_doc_date', 'patient_birthday'], 'safe'],
             [['order_num', 'patient_fio', 'patient_phone', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'discount_card', 'discount_name', 'app_version', 'kkm', 'z_num'], 'string'],
             [['order_data', 'base_doc_id', 'base_doc_type', 'base_doc_date', 'patient_id', 'patient_fio', 'patient_phone', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'pay_type', 'cost', 'total'], 'required'],
             [['base_doc_id', 'base_doc_type', 'patient_id', 'login_id', 'login_type', 'pay_type', 'discount_id', 'cito_factor', 'printlist', 'free_pay', 'pay_type_original'], 'integer'],
@@ -80,40 +80,48 @@ class NPay extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'date' => 'Date',
-            'order_num' => 'Order Num',
-            'order_data' => 'Order Data',
+            'date' => 'Дата',
+            'order_num' => '№ заказа',
+            'order_data' => 'Дата заказа',
             'base_doc_id' => 'Base Doc ID',
             'base_doc_type' => 'Base Doc Type',
             'base_doc_date' => 'Base Doc Date',
-            'patient_id' => 'Patient ID',
-            'patient_fio' => 'Patient Fio',
+            'patient_id' => 'Пациент ID',
+            'patient_fio' => 'Пациент ФИО',
             'patient_phone' => 'Patient Phone',
             'patient_birthday' => 'Patient Birthday',
-            'login_id' => 'Login ID',
-            'login_key' => 'Login Key',
-            'login_type' => 'Login Type',
-            'login_fio' => 'Login Fio',
-            'sender_id' => 'Sender ID',
-            'sender_name' => 'Sender Name',
-            'pay_type' => 'Pay Type',
-            'cost' => 'Cost',
+            'login_id' => 'ID сотрудника',
+            'login_key' => 'Код сотрудника',
+            'login_type' => 'Тип сотрудника',
+            'login_fio' => 'Сотрудник ФИО',
+            'sender_id' => '№ отделения',
+            'sender_name' => 'Название отд.',
+            'pay_type' => 'Тип оплаты',
+            'cost' => 'Стоимость',
             'discount_card' => 'Discount Card',
             'discount_id' => 'Discount ID',
             'discount_name' => 'Discount Name',
             'discount_percent' => 'Discount Percent',
             'bonus' => 'Bonus',
             'discount_total' => 'Discount Total',
-            'total' => 'Total',
+            'total' => 'Сумма',
             'cito_factor' => 'Cito Factor',
             'bonus_balance' => 'Bonus Balance',
             'printlist' => 'Printlist',
             'free_pay' => 'Free Pay',
             'app_version' => 'App Version',
-            'kkm' => 'Kkm',
-            'z_num' => 'Z Num',
+            'kkm' => '№ ККМ',
+            'z_num' => 'Z-отчет',
             'pay_type_original' => 'Pay Type Original',
         ];
     }
 
+    /**
+     * @param null $id
+     * @return array|mixed
+     */
+    public static function getPayTypeArray($id = null) {
+        $arr =  ['0' => 'Наличные', '1' => 'Кред. карта'];
+        return is_null($id) ? $arr : $arr[$id];
+    }
 }

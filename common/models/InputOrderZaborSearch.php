@@ -9,9 +9,15 @@ use common\models\InputOrderZabor;
 
 /**
  * InputOrderZaborSearch represents the model behind the search form about `common\models\InputOrderZabor`.
+ * @property $date_from
+ * @property $date_to
  */
+
 class InputOrderZaborSearch extends InputOrderZabor
 {
+    public $date_from;
+    public $date_to;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +25,7 @@ class InputOrderZaborSearch extends InputOrderZabor
     {
         return [
             [['aid'], 'integer'],
-            [['OrderID', 'IsslCode', 'MSZabor', 'DateIns'], 'safe'],
+            [['OrderID', 'IsslCode', 'MSZabor', 'DateIns', 'date_from', 'date_to'], 'safe'],
         ];
     }
 
@@ -60,12 +66,18 @@ class InputOrderZaborSearch extends InputOrderZabor
         // grid filtering conditions
         $query->andFilterWhere([
             'aid' => $this->aid,
-            'DateIns' => $this->DateIns,
         ]);
 
         $query->andFilterWhere(['like', 'OrderID', $this->OrderID])
             ->andFilterWhere(['like', 'IsslCode', $this->IsslCode])
             ->andFilterWhere(['like', 'MSZabor', $this->MSZabor]);
+
+        if ($this->date_from) {
+            $query->andFilterWhere(['>=', 'DateIns', date('Y-m-d 00:00:00', strtotime($this->date_from))]);
+        }
+        if ($this->date_to) {
+            $query->andFilterWhere(['<=', 'DateIns', date('Y-m-d 23:59:59', strtotime($this->date_to))]);
+        }
 
         return $dataProvider;
     }

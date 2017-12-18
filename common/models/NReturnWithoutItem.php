@@ -59,18 +59,27 @@ class NReturnWithoutItem extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'parent_id' => 'Parent ID',
-            'order_num' => 'Order Num',
-            'total' => 'Total',
-            'date' => 'Date',
-            'pay_type' => 'Pay Type',
-            'kkm' => 'Kkm',
-            'z_num' => 'Z Num',
-            'comment' => 'Comment',
-            'path_file' => 'Path File',
-            'base' => 'Base',
-            'user_aid' => 'User Aid',
-            'code_1c' => 'Code 1c',
+            'parent_id' => 'Родитель ID',
+            'order_num' => '№ заказа',
+            'total' => 'Сумма',
+            'date' => 'Дата',
+            'pay_type' => 'Тип оплаты',
+            'kkm' => 'ККМ',
+            'z_num' => 'Z-отчет',
+            'comment' => 'Комментарий',
+            'path_file' => 'Путь к файлу',
+            'base' => 'Тип возврата',
+            'user_aid' => 'Сотрудник',
+            'code_1c' => 'Код 1С',
         ];
+    }
+
+    /**
+     * @param null $id
+     * @return array|mixed
+     */
+    public static function getBaseArray($id = null) {
+        $arr =  ['claim' => 'Претензия', 'complex' => 'Комплекс'];
+        return is_null($id) ? $arr : $arr[$id];
     }
 }

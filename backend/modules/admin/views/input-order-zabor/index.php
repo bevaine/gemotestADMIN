@@ -1,35 +1,75 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\InputOrderZaborSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Input Order Iskl Issl Mszabors';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Взятие биоматериала';
+$this->params['breadcrumbs'][] = [
+    'label' => $this->title,
+    'url' => Url::to(["./input-order-zabor"])
+];
 ?>
 <div class="input-order-iskl-issl-mszabor-index">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <p>
-        <?= Html::a('Create Input Order Iskl Issl Mszabor', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'aid',
-            'OrderID',
-            'IsslCode',
+            [
+                'attribute' => 'aid',
+                'width'=>'150px',
+            ],
+            [
+                'attribute' => 'OrderID',
+                'width'=>'150px',
+                'value' => function($data){
+                    return Html::a(
+                        $data->OrderID,
+                        'https://office.gemotest.ru/inputOrder/inputMain_test.php?oid='.$data->OrderID,
+                        [
+                            'title' => $data->OrderID,
+                            'target' => '_blank'
+                        ]
+                    );
+                },
+                'format' => 'raw',
+            ],
+            [
+                'width'=>'196px',
+                'attribute' => 'DateIns',
+                'value' => 'DateIns',
+                'filter' => \kartik\date\DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'date_from',
+                    'attribute2' => 'date_to',
+                    'options' => [
+                        'placeholder' => 'Дата начала',
+                        'style'=>['width' => '98px']
+                    ],
+                    'options2' => [
+                        'placeholder' => 'Дата конца',
+                        'style'=>['width' => '98px']
+                    ],
+                    'separator' => 'По',
+                    'readonly' => false,
+                    'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                    'pluginOptions' => [
+                        'format' => 'yyyy-mm-dd',
+                        'autoclose' => true,
+                    ]
+                ]),
+                'format' => 'html', // datetime
+            ],
             'MSZabor',
-            'DateIns',
-
+            'IsslCode',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

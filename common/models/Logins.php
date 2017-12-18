@@ -343,10 +343,11 @@ class Logins extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return array
+     * @param null $id
+     * @return array|mixed
      */
-    public static function getTypesArray() {
-        return [
+    public static function getTypesArray($id = null) {
+        $arr = [
             '1' => 'Администр.',        //вход через AD
             '3' => 'Юр. лица',          //вход через Logins
             '4' => 'Врач иное.',        //вход через Logins
@@ -356,6 +357,7 @@ class Logins extends \yii\db\ActiveRecord
             '9' => 'Ген. директор',     //вход через AD
             '13' => 'Фин. менеджер',    //вход через Logins
         ];
+        return is_null($id) ? $arr : $arr[$id];
     }
 
     /**

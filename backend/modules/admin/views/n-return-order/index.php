@@ -12,7 +12,7 @@ $this->title = 'Возвраты ЛИС';
 $this->params['breadcrumbs'][] = [
     'label' => $this->title,
     'url' => Url::to(["./n-return-order"])
-]
+];
 ?>
 <div class="nreturn-order-index">
     <p>
@@ -30,6 +30,17 @@ $this->params['breadcrumbs'][] = [
             [
                 'attribute' => 'order_num',
                 'width'=>'120px',
+                'value' => function($data){
+                    return Html::a(
+                        $data->order_num,
+                        'https://office.gemotest.ru/inputOrder/inputMain_test.php?oid='.$data->order_num,
+                        [
+                            'title' => $data->order_num,
+                            'target' => '_blank'
+                        ]
+                    );
+                },
+                'format' => 'raw',
             ],
             [
                 'width'=>'196px',

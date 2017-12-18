@@ -55,11 +55,11 @@ class InputOrderZabor extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'aid' => 'Aid',
-            'OrderID' => 'Order ID',
-            'IsslCode' => 'Issl Code',
-            'MSZabor' => 'Mszabor',
-            'DateIns' => 'Date Ins',
+            'aid' => 'AID',
+            'OrderID' => '№ заказа',
+            'IsslCode' => 'Код исследования',
+            'MSZabor' => 'Сотрудник',
+            'DateIns' => 'Дата добавления',
         ];
     }
 }

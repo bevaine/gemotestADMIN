@@ -9,9 +9,15 @@ use common\models\NReturnWithoutItem;
 
 /**
  * NReturnWithoutItemSearch represents the model behind the search form about `common\models\NReturnWithoutItem`.
+ * @property $date_from
+ * @property $date_to
  */
+
 class NReturnWithoutItemSearch extends NReturnWithoutItem
 {
+    public $date_from;
+    public $date_to;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +25,7 @@ class NReturnWithoutItemSearch extends NReturnWithoutItem
     {
         return [
             [['id', 'parent_id', 'pay_type', 'user_aid'], 'integer'],
-            [['order_num', 'date', 'kkm', 'z_num', 'comment', 'path_file', 'base', 'code_1c'], 'safe'],
+            [['order_num', 'date', 'date_from', 'date_to' , 'kkm', 'z_num', 'comment', 'path_file', 'base', 'code_1c'], 'safe'],
             [['total'], 'number'],
         ];
     }
@@ -63,7 +69,6 @@ class NReturnWithoutItemSearch extends NReturnWithoutItem
             'id' => $this->id,
             'parent_id' => $this->parent_id,
             'total' => $this->total,
-            'date' => $this->date,
             'pay_type' => $this->pay_type,
             'user_aid' => $this->user_aid,
         ]);
@@ -75,6 +80,13 @@ class NReturnWithoutItemSearch extends NReturnWithoutItem
             ->andFilterWhere(['like', 'path_file', $this->path_file])
             ->andFilterWhere(['like', 'base', $this->base])
             ->andFilterWhere(['like', 'code_1c', $this->code_1c]);
+
+        if ($this->date_from) {
+            $query->andFilterWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($this->date_from))]);
+        }
+        if ($this->date_to) {
+            $query->andFilterWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($this->date_to))]);
+        }
 
         return $dataProvider;
     }
