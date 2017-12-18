@@ -80,7 +80,7 @@ class NPay extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'date' => 'Дата',
+            'date' => 'Дата платежа',
             'order_num' => '№ заказа',
             'order_data' => 'Дата заказа',
             'base_doc_id' => 'Base Doc ID',
