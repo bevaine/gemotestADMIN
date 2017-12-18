@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
+use kartik\export\ExportMenu;
 use common\models\Logins;
 use yii\helpers\Url;
 
@@ -12,14 +13,65 @@ $this->title = 'Пользователи';
 $this->params['breadcrumbs'][] = [
     'label' => $this->title,
     'url' => Url::to(["./logins"])
-]
+];
+
+$gridColumns = [
+    ['class' => 'yii\grid\SerialColumn'],
+    [
+        'label' => 'Отделение',
+        'value' => 'Name'
+    ],
+    [
+        'label' => 'Фамилия',
+        'value' => 'last_name'
+    ],
+    [
+        'label' => 'Имя',
+        'value' => 'first_name'
+    ],
+    [
+        'label' => 'Отчество',
+        'value' => 'middle_name'
+    ],
+    [
+        'label' => 'Должность',
+        'value' => 'AD_position'
+    ],
+    [
+        'label' => 'Логин',
+        'value' => 'AD_login'
+    ],
+    [
+        'label' => 'Пароль',
+        'value' => 'passAD'
+    ],
+];
 ?>
 <div class="logins-index">
 
     <p>
         <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
+    <p>
+        <?php
+        echo ExportMenu::widget([
+            'dataProvider' => $dataProvider,
+            'columns' => $gridColumns,
+            //'encoding' => 'windows-1251',
+            'target' => ExportMenu::TARGET_POPUP,
+            'showConfirmAlert'=>true,
+            'timeout' => 1000,
+            'exportConfig' => [
+//                ExportMenu::FORMAT_CSV => true,
+//                ExportMenu::FORMAT_HTML=> true,
+//                ExportMenu::FORMAT_TEXT => true,
+//                ExportMenu::FORMAT_PDF => false,
+                ExportMenu::FORMAT_EXCEL => false,
+                ExportMenu::FORMAT_EXCEL_X => false,
+            ],
+        ]);
+        ?>
+    </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
