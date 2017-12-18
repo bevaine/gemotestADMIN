@@ -65,8 +65,8 @@ class NPay extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['date', 'order_data_from', 'order_data_to', 'base_doc_date', 'patient_birthday'], 'safe'],
-            [['order_num', 'patient_fio', 'patient_phone', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'discount_card', 'discount_name', 'app_version', 'kkm', 'z_num'], 'string'],
+            [['date', 'patient_birthday'], 'safe'],
+            [['order_num', 'base_doc_date', 'patient_fio', 'patient_phone', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'discount_card', 'discount_name', 'app_version', 'kkm', 'z_num'], 'string'],
             [['order_data', 'base_doc_id', 'base_doc_type', 'base_doc_date', 'patient_id', 'patient_fio', 'patient_phone', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'pay_type', 'cost', 'total'], 'required'],
             [['base_doc_id', 'base_doc_type', 'patient_id', 'login_id', 'login_type', 'pay_type', 'discount_id', 'cito_factor', 'printlist', 'free_pay', 'pay_type_original'], 'integer'],
             [['cost', 'discount_percent', 'bonus', 'discount_total', 'total', 'bonus_balance'], 'number'],

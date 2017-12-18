@@ -36,7 +36,7 @@ class NPaySearch extends NPay
     {
         return [
             [['id', 'base_doc_id', 'base_doc_type', 'patient_id', 'login_id', 'login_type', 'pay_type', 'discount_id', 'cito_factor', 'printlist', 'free_pay', 'pay_type_original'], 'integer'],
-            [['date', 'order_data', 'date_from', 'date_to', 'order_num', 'order_data', 'base_doc_date', 'patient_fio', 'patient_phone', 'patient_birthday', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'discount_card', 'discount_name', 'app_version', 'kkm', 'z_num'], 'safe'],
+            [['date', 'order_data', 'order_data_from', 'order_data_to', 'order_num', 'order_data', 'base_doc_date', 'patient_fio', 'patient_phone', 'patient_birthday', 'login_key', 'login_fio', 'sender_id', 'sender_name', 'discount_card', 'discount_name', 'app_version', 'kkm', 'z_num'], 'safe'],
             [['cost', 'discount_percent', 'bonus', 'discount_total', 'total', 'bonus_balance'], 'number'],
         ];
     }
