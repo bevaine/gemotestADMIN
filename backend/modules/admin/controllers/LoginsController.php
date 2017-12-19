@@ -556,7 +556,7 @@ class LoginsController extends Controller
                 'sender_key' => $key
             ]);
 
-            if ($findModel->directorFlo) {
+            if (isset($findModel->directorFlo)) {
                 $fullName = $findModel->directorFlo->last_name
                     ." ".$findModel->directorFlo->first_name
                     ." ".$findModel->directorFlo->middle_name;
