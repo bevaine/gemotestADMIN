@@ -46,6 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         </div>
 
                         <div name="account-hide" id="account-hide"></div>
+                        <input type="hidden" name="action-hide" class="action-hide" id="action-hide" value="<?= $action ?>">
 
                         <?php if ($action == 'user') : ?>
 
@@ -200,6 +201,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <script>
         function checkAD (
+            type,
             department = null,
             key_fr = null,
             key_doc,
@@ -248,12 +250,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                 htm_header += ' несколько УЗ в Active Directory</p>';
                                 htm_header += 'Выбирите аккаунт AD на основании которого нужно создать УЗ Gomotest';
                             }
-                            if (gd !== undefined ) {
+                            if (gd !== undefined) {
                                 if (html !== '') html += '<hr />';
                                 html += '<b>Примечание:</b> <p>На отделении <b>' + key_fr + '</b> уже есть назначенный директор <b>' + gd + '</b></p>';
                                 html += '<input type="hidden" name="AddUserForm[changeGD]" value="1">';
                             }
-                            if (ad !== undefined || gd !== undefined) {
+                            if (ad !== undefined || (gd !== undefined && type === 'gd')) {
                                 $('#modal-header').html(htm_header);
                                 $('#modal-body').html(html);
                                 $('#deactivate-user').modal('show');
@@ -275,14 +277,19 @@ if ($action == 'user' ||
 ) {
     $js1 = <<< JS
         $(".btn-success").click(function() { 
-            checkAD(
-                $('#adduserform-department').val(),
-                $('#adduserform-key').val(),
-                $('#adduserform-docid').val(),
-                $('#adduserform-lastname').val(),
-                $('#adduserform-firstname').val(),
-                $('#adduserform-middlename').val());
-            });
+            if ($('#adduserform-lastname').val() !== ''  
+            && $('#adduserform-firstname').val() !== '') {
+                checkAD(
+                    $('#action-hide').val(),
+                    $('#adduserform-department').val(),
+                    $('#adduserform-key').val(),
+                    $('#adduserform-docid').val(),
+                    $('#adduserform-lastname').val(),
+                    $('#adduserform-firstname').val(),
+                    $('#adduserform-middlename').val()
+                );
+            }
+        });
 
         $(".glyphicon-pencil").click(function() {
             var department = $('#adduserform-department').val(); 

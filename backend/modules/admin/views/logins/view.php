@@ -198,7 +198,7 @@ if ($model->adUsers) {
             <div class="box-body">
 
                 <p>
-                    <?= Html::SubmitButton($activeGS == 'active' ? 'Откл. авториз. GS' : 'Вкл. авториз. GS', [
+                    <?= Html::SubmitButton($activeGS == 'active' ? 'Вкл. только AD авторизацию' : 'Вкл. авторизацию GS и AD', [
                         'name' => 'active-gs',
                         'class' => $activeGS == 'active' ? 'btn btn-success' : 'btn btn-info',
                         'value' => $activeGS,

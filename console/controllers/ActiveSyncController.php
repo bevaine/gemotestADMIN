@@ -129,6 +129,9 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+
+        echo str_replace('&quot;', '"', ' ООО &quot;Гемотест-Севастополь&quot; (Севастополь 2)');
+
         print_r(Logins::find()->where(['tbl' => 'DirectorFlo'])->max('[key]'));
         exit;
         $port = 22;

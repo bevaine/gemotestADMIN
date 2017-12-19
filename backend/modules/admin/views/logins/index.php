@@ -3,7 +3,6 @@
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use kartik\export\ExportMenu;
-use common\models\Logins;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
@@ -16,10 +15,11 @@ $this->params['breadcrumbs'][] = [
 ];
 
 $gridColumns = [
-    ['class' => 'yii\grid\SerialColumn'],
     [
         'label' => 'Отделение',
-        'value' => 'Name'
+        'value' => function ($model) {
+            return str_replace('&quot;', '"', $model['Name']);
+        }
     ],
     [
         'label' => 'Фамилия',

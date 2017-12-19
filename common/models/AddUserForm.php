@@ -86,9 +86,9 @@ class AddUserForm extends Model
         return [
             [['type', 'lastName', 'firstName', 'operatorofficestatus', 'department', 'nurse'], 'required', 'on' => 'addUser'],
             [['docId', 'specId'], 'required', 'on' => 'addUserDoc'],
-            [['name', 'key', 'phone', 'email', 'lastName', 'firstName'], 'required', 'on' => 'addUserGD'],
+            [['name', 'key', 'phone', 'lastName', 'firstName'], 'required', 'on' => 'addUserGD'],
             [['lastName', 'firstName', 'key'], 'required', 'on' => 'addUserFranch'],
-            [['lastName', 'firstName'], 'string'],
+            [['lastName', 'firstName', 'email'], 'string'],
             [['department', 'nurse', 'key','changeGD'], 'integer'],
             ['nurse', 'in', 'range' => array_keys(self::getNurses())],
         ];

@@ -17,6 +17,13 @@ use Yii;
 class SystemLog extends \yii\db\ActiveRecord
 {
     /**
+     * @return null|object
+     */
+    public static function getDb() {
+        return Yii::$app->get('userDB');
+    }
+
+    /**
      * @inheritdoc
      */
     public static function tableName()

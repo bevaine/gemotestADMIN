@@ -787,7 +787,6 @@ class ActiveSyncHelper
         if (empty($this->firstName)
             || empty($this->lastName)
             || empty($this->phone)
-            || empty($this->emailGD)
             || empty($this->loginGS)
             || empty($this->cachePass)
         ) {
@@ -1344,7 +1343,11 @@ class ActiveSyncHelper
     public function checkLoginAccount()
     {
         return $loginSearch = Logins::find()
-            ->andFilterWhere(['like', 'Name', $this->fullName])
+            ->andFilterWhere([
+                'OR',
+                ['like', 'Name', $this->fullName],
+                ['aid' => $this->aid]
+            ])
             ->andFilterWhere(['UserType' => $this->type])
             ->one();
     }
