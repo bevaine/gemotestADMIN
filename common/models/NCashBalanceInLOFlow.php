@@ -55,14 +55,14 @@ class NCashBalanceInLOFlow extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'cashbalance_id' => 'Cashbalance ID',
-            'sender_key' => 'Sender Key',
-            'total' => 'Total',
-            'date' => 'Date',
-            'operation' => 'Operation',
-            'balance' => 'Balance',
-            'workshift_id' => 'Workshift ID',
-            'operation_id' => 'Operation ID',
+            'cashbalance_id' => 'Код движения ДС',
+            'sender_key' => 'Код отделения',
+            'total' => 'Сумма',
+            'date' => 'Дата',
+            'operation' => 'Операция',
+            'balance' => 'Баланс',
+            'workshift_id' => 'Код смены',
+            'operation_id' => 'Код операции',
         ];
     }
 }

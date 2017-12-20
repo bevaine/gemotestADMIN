@@ -77,7 +77,8 @@
                                     ],
                                 ]
                             ],
-                            ['label' => 'Заказы', 'icon' => 'file-code-o', 'url' => ['/admin/orders'],],
+                            ['label' => 'Инкасации', 'icon' => 'dashboard', 'url' => ['/admin/encashment'],],
+                            ['label' => 'Заказы', 'icon' => 'dashboard', 'url' => ['/admin/orders'],],
                             ['label' => 'Платежи', 'icon' => 'dashboard', 'url' => ['/admin/pay'],],
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
                             ['label' => 'Контрагенты', 'icon' => 'dashboard', 'url' => ['/admin/kontragents'],],

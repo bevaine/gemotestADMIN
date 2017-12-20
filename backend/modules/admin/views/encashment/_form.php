@@ -2,22 +2,27 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use kartik\date\DatePicker;
 use kartik\datetime\DateTimePicker;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\NCashBalanceInLOFlow */
+/* @var $model common\models\NEncashment */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="ncash-balance-in-loflow-form">
+<div class="nencashment-form">
 
     <?php $form = ActiveForm::begin(); ?>
-
-    <?= $form->field($model, 'cashbalance_id')->textInput() ?>
 
     <?= $form->field($model, 'sender_key')->textInput() ?>
 
     <?= $form->field($model, 'total')->textInput() ?>
+
+    <?= $form->field($model, 'user_aid')->textInput() ?>
+
+    <?= $form->field($model, 'receipt_number')->textInput() ?>
+
+    <?= $form->field($model, 'receipt_file')->textInput() ?>
 
     <?= Html::label("Дата") ?>
 
@@ -32,13 +37,9 @@ use kartik\datetime\DateTimePicker;
     ]);
     ?><br>
 
-    <?= $form->field($model, 'operation')->textInput() ?>
+    <?= $form->field($model, 'code_1c')->textInput() ?>
 
-    <?= $form->field($model, 'balance')->textInput() ?>
-
-    <?= $form->field($model, 'workshift_id')->textInput() ?>
-
-    <?= $form->field($model, 'operation_id')->textInput() ?>
+    <?= $form->field($model, 'status')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
