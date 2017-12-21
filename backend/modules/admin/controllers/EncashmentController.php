@@ -93,8 +93,6 @@ class EncashmentController extends Controller
                 $modelDetail->save();
             }
             if ($modelBalance = $model->cashBalanceInLOFlow) {
-                //print_r($modelBalance);
-                //exit;
                 $modelBalance->date = $model->date;
                 $modelBalance->total = "-".$model->total;
                 $modelBalance->operation = 'Инкассация EncashmentID:'.$model->id.' общая сумма инкассации = '.$model->total;

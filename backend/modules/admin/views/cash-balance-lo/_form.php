@@ -22,7 +22,7 @@ use kartik\datetime\DateTimePicker;
     <?= Html::label("Дата") ?>
 
     <?= DateTimePicker::widget([
-        'name' => 'NEncashment[date]',
+        'name' => 'NCashBalanceInLOFlow[date]',
         'type' => DateTimePicker::TYPE_INPUT,
         'value' => date("Y-m-d H:i:s", strtotime($model->date)),
         'pluginOptions' => [
