@@ -83,6 +83,8 @@ class NEncashment extends \yii\db\ActiveRecord
      */
     public function getCashBalanceInLOFlow()
     {
-        return NCashBalanceInLOFlow::find()->where(['like', 'operation', 'EncashmentID:'.$this->id.' ']);
+        return NCashBalanceInLOFlow::find()
+            ->where(['like', 'operation', 'EncashmentID:'.$this->id.' '])
+            ->orWhere(['like', 'operation', 'EncashmentID: '.$this->id.' ']);
     }
 }

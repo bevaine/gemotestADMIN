@@ -3,6 +3,7 @@
 namespace app\modules\admin\controllers;
 
 use common\models\NEncashmentDetail;
+use common\models\NWorkshift;
 use Yii;
 use common\models\NEncashment;
 use common\models\NEncashmentSearch;
@@ -92,6 +93,8 @@ class EncashmentController extends Controller
                 $modelDetail->save();
             }
             if ($modelBalance = $model->cashBalanceInLOFlow) {
+                //print_r($modelBalance);
+                //exit;
                 $modelBalance->date = $model->date;
                 $modelBalance->total = "-".$model->total;
                 $modelBalance->operation = 'Инкассация EncashmentID:'.$model->id.' общая сумма инкассации = '.$model->total;
@@ -102,6 +105,33 @@ class EncashmentController extends Controller
             return $this->render('update', [
                 'model' => $model,
             ]);
+        }
+    }
+
+
+    /**
+     * Updates an existing NEncashment model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionCreateEncashment($id)
+    {
+        $modelWorkshift = NWorkshift::findOne($id);
+
+        //if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+        if ($model) {
+            $modelEncashment = new NEncashment();
+            $modelEncashment->date = date(
+                'Y-m-d H:i:s.000',
+                strtotime($model->open_date) + 1 * 60 * 60
+            );
+            $modelEncashment->sender_key = $model->sender_key;
+            $modelEncashment->user_aid = $model->user_aid;
+
+            ;
+
         }
     }
 

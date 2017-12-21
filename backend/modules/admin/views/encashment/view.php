@@ -8,7 +8,7 @@ use yii\helpers\Url;
 /* @var $model common\models\NEncashment */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Nencashments', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Инкассации', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="nencashment-view">
