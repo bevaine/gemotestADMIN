@@ -16,7 +16,6 @@ use kartik\datetime\DateTimePicker;
 
     <?= $form->field($model, 'sender_key')->textInput() ?>
 
-
     <?= $form->field($model, 'user_aid')->textInput() ?>
 
     <?= $form->field($model, 'receipt_number')->textInput() ?>
@@ -47,7 +46,7 @@ use kartik\datetime\DateTimePicker;
             <?= Html::label($row->target == 'office_summ' ? 'Приход в отделение' : 'Приход по ККМ:'.$row->target) ?>
             <?= Html::textInput('arrDetail['.$row->id.']', $row->total, ['class' => 'form-control']) ?>
             </p>
-            <?
+            <?php
         }
     }
     ?>
