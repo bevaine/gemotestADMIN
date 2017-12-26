@@ -8,6 +8,9 @@ use common\models\NEncashmentDetail;
 /* @var $this yii\web\View */
 /* @var $model common\models\NEncashment */
 
+//print_r($model->cashBalanceInLOFlow);
+//exit;
+
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Инкассации', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;

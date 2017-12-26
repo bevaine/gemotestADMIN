@@ -24,6 +24,7 @@ use yii\db\Exception;
  * @property NEncashmentDetail $detail
  * @property NEncashmentDetail $detailOfficeSumm
  * @property NCashBalanceInLOFlow $cashBalanceInLOFlow
+ * @property NWorkshift $getWorkShift
  */
 
 class NEncashment extends \yii\db\ActiveRecord
@@ -98,11 +99,21 @@ class NEncashment extends \yii\db\ActiveRecord
      */
     public function getCashBalanceInLOFlow()
     {
-        $model = $this->hasOne(NCashBalanceInLOFlow::className(), ['sender_key' => 'sender_key'])
-            ->andWhere("n_CashBalanceInLOFlow.operation_id=:operation_id", [':operation_id' => 'encashment']);
-        $model->andWhere("CONVERT(DATETIME, FLOOR(CONVERT(float, n_CashBalanceInLOFlow.[date]))) = :date", [
+        return $this->hasOne(NCashBalanceInLOFlow::className(), ['workshift_id' => 'id'])
+            ->andWhere("n_CashBalanceInLOFlow.operation_id=:operation_id", [':operation_id' => 'encashment'])
+            ->via('workShift');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWorkShift() {
+        return $this->hasOne(NWorkshift::className(), [
+            'sender_key' => 'sender_key',
+            'user_aid' => 'user_aid'
+        ])->where("CONVERT(DATETIME, FLOOR(CONVERT(float, n_workshift.[open_date]))) = :date", [
             ':date' => date('Y-m-d 00:00:00', strtotime($this->date))
         ]);
-        return $model;
     }
+
 }
