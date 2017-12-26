@@ -100,8 +100,9 @@ class NEncashment extends \yii\db\ActiveRecord
     public function getCashBalanceInLOFlow()
     {
         return $this->hasOne(NCashBalanceInLOFlow::className(), ['workshift_id' => 'id'])
-            ->andWhere("n_CashBalanceInLOFlow.operation_id=:operation_id", [':operation_id' => 'encashment'])
-            ->via('workShift');
+            ->andWhere("n_CashBalanceInLOFlow.operation_id=:operation_id", [
+                ':operation_id' => 'encashment'
+            ])->via('workShift');
     }
 
     /**
@@ -109,11 +110,11 @@ class NEncashment extends \yii\db\ActiveRecord
      */
     public function getWorkShift() {
         return $this->hasOne(NWorkshift::className(), [
-            'sender_key' => 'sender_key',
-            'user_aid' => 'user_aid'
-        ])->where("CONVERT(DATETIME, FLOOR(CONVERT(float, n_workshift.[open_date]))) = :date", [
-            ':date' => date('Y-m-d 00:00:00', strtotime($this->date))
-        ]);
+                'sender_key' => 'sender_key',
+                'user_aid' => 'user_aid'
+            ])->where("CONVERT(DATETIME, FLOOR(CONVERT(float, n_workshift.[open_date]))) = :date", [
+                ':date' => date('Y-m-d 00:00:00', strtotime($this->date))
+            ]);
     }
 
 }
