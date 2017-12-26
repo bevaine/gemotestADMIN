@@ -4,6 +4,10 @@ namespace common\models;
 
 use Yii;
 use common\models\NCashBalanceInLOFlow;
+use yii\db\ActiveRecord;
+use yii\db\Expression;
+use yii\db\Query;
+use yii\db\Exception;
 
 /**
  * This is the model class for table "n_Encashment".
@@ -18,6 +22,7 @@ use common\models\NCashBalanceInLOFlow;
  * @property string $code_1c
  * @property integer $status
  * @property NEncashmentDetail $detail
+ * @property NEncashmentDetail $detailOfficeSumm
  * @property NCashBalanceInLOFlow $cashBalanceInLOFlow
  */
 class NEncashment extends \yii\db\ActiveRecord
@@ -75,7 +80,16 @@ class NEncashment extends \yii\db\ActiveRecord
      */
     public function getDetail()
     {
-        return $this->hasOne(NEncashmentDetail::className(), ['encashment_id' => 'id']);
+        return $this->hasMany(NEncashmentDetail::className(), ['encashment_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDetailOfficeSumm()
+    {
+        return $this->hasOne(NEncashmentDetail::className(), ['encashment_id' => 'id'])
+            ->where(['target' => 'office_summ']);
     }
 
     /**
@@ -83,8 +97,14 @@ class NEncashment extends \yii\db\ActiveRecord
      */
     public function getCashBalanceInLOFlow()
     {
-        return NCashBalanceInLOFlow::find()
-            ->where(['like', 'operation', 'EncashmentID:'.$this->id.' '])
-            ->orWhere(['like', 'operation', 'EncashmentID: '.$this->id.' ']);
+        $model = $this->hasOne(NCashBalanceInLOFlow::className(), ['sender_key' => 'sender_key'])
+            ->andWhere("n_CashBalanceInLOFlow.operation_id=:operation_id", [':operation_id' => 'encashment']);
+        if (!empty($this->detailOfficeSumm->total)) {
+            $model->andWhere("n_CashBalanceInLOFlow.total=:total", [':total' => $this->detailOfficeSumm->total * (-1)]);
+        }
+        $model->andWhere("CONVERT(DATETIME, FLOOR(CONVERT(float, n_CashBalanceInLOFlow.[date]))) = :date", [
+            ':date' => date('Y-m-d 00:00:00', strtotime($this->date))
+        ]);
+        return $model;
     }
 }

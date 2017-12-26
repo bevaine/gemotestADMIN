@@ -115,9 +115,8 @@ class EncashmentController extends Controller
      */
     public function actionCreateEncashment($id)
     {
-        $modelWorkshift = NWorkshift::findOne($id);
-
-        //if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        $model = NWorkshift::findOne($id);
+       // if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
         if ($model) {
             $modelEncashment = new NEncashment();
@@ -127,8 +126,6 @@ class EncashmentController extends Controller
             );
             $modelEncashment->sender_key = $model->sender_key;
             $modelEncashment->user_aid = $model->user_aid;
-
-            ;
 
         }
     }
