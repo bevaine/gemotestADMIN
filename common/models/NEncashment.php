@@ -25,6 +25,7 @@ use yii\db\Exception;
  * @property NEncashmentDetail $detailOfficeSumm
  * @property NCashBalanceInLOFlow $cashBalanceInLOFlow
  */
+
 class NEncashment extends \yii\db\ActiveRecord
 {
     /**
@@ -99,9 +100,6 @@ class NEncashment extends \yii\db\ActiveRecord
     {
         $model = $this->hasOne(NCashBalanceInLOFlow::className(), ['sender_key' => 'sender_key'])
             ->andWhere("n_CashBalanceInLOFlow.operation_id=:operation_id", [':operation_id' => 'encashment']);
-        if (!empty($this->detailOfficeSumm->total)) {
-            $model->andWhere("n_CashBalanceInLOFlow.total=:total", [':total' => $this->detailOfficeSumm->total * (-1)]);
-        }
         $model->andWhere("CONVERT(DATETIME, FLOOR(CONVERT(float, n_CashBalanceInLOFlow.[date]))) = :date", [
             ':date' => date('Y-m-d 00:00:00', strtotime($this->date))
         ]);

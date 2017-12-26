@@ -28,7 +28,6 @@ $this->params['breadcrumbs'][] = $this->title;
     $columns = [
         'id',
         'sender_key',
-        'total',
         'user_aid',
         'receipt_number',
         'receipt_file',
@@ -58,6 +57,9 @@ $this->params['breadcrumbs'][] = $this->title;
             ];
         }
     }
+
+    $columns[] = 'total';
+
     ?>
 
     <?= DetailView::widget([

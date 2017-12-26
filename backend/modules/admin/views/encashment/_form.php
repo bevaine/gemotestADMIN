@@ -16,7 +16,6 @@ use kartik\datetime\DateTimePicker;
 
     <?= $form->field($model, 'sender_key')->textInput() ?>
 
-    <?= $form->field($model, 'total')->textInput() ?>
 
     <?= $form->field($model, 'user_aid')->textInput() ?>
 
@@ -40,6 +39,20 @@ use kartik\datetime\DateTimePicker;
     <?= $form->field($model, 'code_1c')->textInput() ?>
 
     <?= $form->field($model, 'status')->textInput() ?>
+
+    <?php
+    if ($model->detail) {
+        foreach ($model->detail as $row) { ?>
+            <p>
+            <?= Html::label($row->target == 'office_summ' ? 'Приход в отделение' : 'Приход по ККМ:'.$row->target) ?>
+            <?= Html::textInput('arrDetail['.$row->id.']', $row->total, ['class' => 'form-control']) ?>
+            </p>
+            <?
+        }
+    }
+    ?>
+
+    <?= $form->field($model, 'total')->textInput(['readonly' => true]) ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

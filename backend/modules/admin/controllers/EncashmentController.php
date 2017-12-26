@@ -87,25 +87,43 @@ class EncashmentController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            if ($modelDetail = $model->detail) {
-                $modelDetail->total = $model->total;
-                $modelDetail->save();
+        if ($model->load(Yii::$app->request->post())) {
+            $summ = $model->total;
+            if (isset(Yii::$app->request->post()['arrDetail'])
+                && is_array(Yii::$app->request->post()['arrDetail'])
+            ) {
+                $summ = 0;
+                $totalBalance = 0;
+                foreach (Yii::$app->request->post()['arrDetail'] as $keyId => $valTotal) {
+                    $summ = $summ + strval($valTotal);
+                    if ($findModel = NEncashmentDetail::findOne($keyId)) {
+                        $findModel->total = $valTotal;
+                        if ($findModel->save() && $findModel->target == 'office_summ') {
+                            $totalBalance = $findModel->total;
+                        }
+                    }
+                }
             }
-            if ($modelBalance = $model->cashBalanceInLOFlow) {
-                $modelBalance->date = $model->date;
-                $modelBalance->total = "-".$model->total;
-                $modelBalance->operation = 'Инкассация EncashmentID:'.$model->id.' общая сумма инкассации = '.$model->total;
-                $modelBalance->save();
-            }
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
-        }
-    }
 
+            $model->total = $summ;
+
+            if ($model->save()) {
+                if ($modelBalance = $model->cashBalanceInLOFlow) {
+                    $modelBalance->date = $model->date;
+                    if (!empty($totalBalance)) {
+                        $modelBalance->total = "-" . $totalBalance;
+                    }
+                    $modelBalance->operation = 'Инкассация EncashmentID:' . $model->id . ' общая сумма инкассации = ' . $model->total;
+                    $modelBalance->save();
+                }
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
 
     /**
      * Updates an existing NEncashment model.
