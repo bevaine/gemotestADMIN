@@ -5,6 +5,7 @@ namespace app\modules\admin\controllers;
 use Yii;
 use common\models\NWorkshift;
 use common\models\NWorkshiftSearch;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -55,6 +56,36 @@ class WorkshiftController extends Controller
             'model' => $this->findModel($id),
         ]);
     }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function actionClose($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($model->pays) {
+            $arrPays = ArrayHelper::toArray($model->pays);
+            $arrPays = ArrayHelper::getColumn($arrPays, 'total');
+            $summPays = array_sum($arrPays);
+            $countPays = count($arrPays);
+
+            $arrReturnPays = ArrayHelper::toArray($model->returnPays);
+            $arrReturnPays = ArrayHelper::getColumn($arrReturnPays, 'total');
+            $summReturnPays = array_sum($arrReturnPays);
+
+            $countPays = count($arrPays);
+
+            //$summPays = ArrayHelper::getColumn($summPays, 'total');
+            print_r($summPays);
+        }
+
+        return $this->render('view', [
+            'model' => $model,
+        ]);
+    }
+
 
     /**
      * Creates a new NWorkshift model.

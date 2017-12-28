@@ -35,8 +35,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
+
                                     <div class="modal-header" id="modal-header"></div>
-                                    <div class="modal-body" id="modal-body"></div>
+                                    <div class="modal-body" id="modal-body">
+
+                                    </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
                                         <?= Html::submitButton('Продолжить', ['class' => 'btn btn-success']) ?>
@@ -201,7 +204,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <script>
         function checkAD (
-            type,
+            type = null,
             department = null,
             key_fr = null,
             key_doc,
@@ -216,6 +219,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 $.ajax({
                     url: '/admin/logins/ajax-for-active',
                     data: {
+                        type: type,
                         gd_id: key_fr,
                         doc_id: key_doc,
                         last_name: last_name,
@@ -228,10 +232,28 @@ $this->params['breadcrumbs'][] = $this->title;
                         } else {
                             res = JSON.parse(res);
                             var html = "";
-                            var htm_header = "";
+                            var AD_text = "";
+                            var GS_text = "";
+                            var GD_text = "";
+                            var AD_html_text = "";
+                            var GS_html_text = "";
                             var ad = res.ad;
                             var gd = res.gd;
+                            var gs = res.gs;
+                            var htm_header = 'Информация по учетным записям';
+                            if (gs !== undefined && gs.length > 0) {
+                                GS_text += '<p>Пользователь ';
+                                GS_text += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b> уже имеет учетную запись в GemoSytems:';
+                                for (var e = 0; e < ad.length; e++) {
+                                    GS_text += '<p><label><input type="radio" name="radioAIDList" value="' + gs[e].aid + '" checked>' + gs[e].Name + '</label></p>';
+                                }
+                                GS_text += '<p><label><input type="radio" name="radioAIDList" value="new">Создать новую учетную запись GS</label></p>';
+                            }
                             if (ad !== undefined && ad.length > 0) {
+                                AD_text += '<p>У пользователя ';
+                                AD_text += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b>';
+                                AD_text += ' несколько УЗ в Active Directory</p>';
+                                AD_text += 'Выбирите аккаунт AD на основании которого нужно создать УЗ Gemotest:';
                                 for (var i = 0; i < ad.length; i++) {
                                     var style = "";
                                     var txtComment = "";
@@ -240,22 +262,38 @@ $this->params['breadcrumbs'][] = $this->title;
                                         txtComment = ' - уже используется';
                                     }
                                     var dataUser = ad[i].name + '<br>(' + ad[i].account + ', email: ' + ad[i].email + ')' + txtComment;
-                                    html += '<label' + style + '><input type="radio" name="radioAccountsList" value="' + ad[i].account + '">' + dataUser +'</label>';
-                                    html += '<input type="hidden" name="hiddenEmailList[' + ad[i].account + ']" value="' + ad[i].email + '">';
+                                    AD_text += '<label' + style + '><input type="radio" name="radioAccountsList" value="' + ad[i].account + '">' + dataUser +'</label>';
+                                    AD_text += '<input type="hidden" name="hiddenEmailList[' + ad[i].account + ']" value="' + ad[i].email + '">';
                                 }
-                                html += '<p><label><input type="radio" name="radioAccountsList" value="new">Создать новую учетную запись</label></p>';
-                                html += '<p><label><input type="checkbox" name="checkResetPassword">Сменить пароль</label></p>';
-                                htm_header += '<p>У пользователя ';
-                                htm_header += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b>';
-                                htm_header += ' несколько УЗ в Active Directory</p>';
-                                htm_header += 'Выбирите аккаунт AD на основании которого нужно создать УЗ Gomotest';
+                                AD_text += '<p><label><input type="radio" name="radioAccountsList" value="new">Создать новую учетную запись AD</label></p>';
+                                AD_text += '<p><label><input type="checkbox" name="checkResetPassword">Сменить пароль</label></p>';
                             }
-                            if (gd !== undefined) {
-                                if (html !== '') html += '<hr />';
-                                html += '<b>Примечание:</b> <p>На отделении <b>' + key_fr + '</b> уже есть назначенный директор <b>' + gd + '</b></p>';
-                                html += '<input type="hidden" name="AddUserForm[changeGD]" value="1">';
+                            if (gd !== undefined && type === 'gd') {
+                                GD_text += '<b>Примечание:</b> <p>На отделении <b>' + key_fr + '</b> уже есть назначенный директор <b>' + gd + '</b></p>';
+                                GD_text += '<input type="hidden" name="AddUserForm[changeGD]" value="1">';
                             }
-                            if (ad !== undefined || (gd !== undefined && type === 'gd')) {
+                            if (GS_text !== '' ||  AD_text !== '' || GD_text !== '') {
+                                if (GS_text !== '') {
+                                    GS_html_text = '<div class="box box-solid box-success">';
+                                    GS_html_text += '<div class="box-header with-border">';
+                                    GS_html_text += '<h3 class="box-title">Учетная запись SkyNet</h3>';
+                                    GS_html_text += '</div>';
+                                    GS_html_text += '<div class="box-body">' + GS_text + '</div>';
+                                    GS_html_text += '</div>';
+                                }
+                                if (AD_text !== '') {
+                                    AD_html_text = '<div class="box box-solid box-info">';
+                                    AD_html_text += '<div class="box-header with-border">';
+                                    AD_html_text += '<h3 class="box-title">Учетная запись Active Directory</h3>';
+                                    AD_html_text += '</div>';
+                                    AD_html_text += '<div class="box-body">' + AD_text + '</div>';
+                                    AD_html_text += '</div>';
+                                }
+                                html = GS_html_text + AD_html_text;
+                                if (GD_text !== '') {
+                                    if (html !== '') html += '<hr />';
+                                    html += GD_text;
+                                }
                                 $('#modal-header').html(htm_header);
                                 $('#modal-body').html(html);
                                 $('#deactivate-user').modal('show');

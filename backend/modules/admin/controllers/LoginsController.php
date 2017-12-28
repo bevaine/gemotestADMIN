@@ -311,6 +311,14 @@ class LoginsController extends Controller
                 }
             }
 
+            if (!is_null(Yii::$app->request->post('radioAIDList'))) {
+                if (Yii::$app->request->post('radioAIDList') == 'new') {
+                    $activeSyncHelper->createNewGS = true;
+                } else {
+                    $activeSyncHelper->aid = Yii::$app->request->post('radioAIDList');
+                }
+            }
+
             if (in_array($activeSyncHelper->department, [10])) {
                 $activeSyncHelper->department = 0;
                 $activeSyncHelper->nurse = 1;
@@ -486,6 +494,7 @@ class LoginsController extends Controller
     }
 
     /**
+     * @param null $type
      * @param null $gd_id
      * @param null $doc_id
      * @param null $last_name
@@ -493,7 +502,8 @@ class LoginsController extends Controller
      * @param null $middle_name
      */
     public function actionAjaxForActive(
-        $gd_id= null,
+        $type = null,
+        $gd_id = null,
         $doc_id = null,
         $last_name = null,
         $first_name = null,
@@ -502,6 +512,10 @@ class LoginsController extends Controller
         //todo проверяем существует ли УЗ
         $arrAccountAD = [];
         $activeSyncHelper = new ActiveSyncHelper();
+
+        if ($type == 'user') {
+            $activeSyncHelper->type = 7;
+        }
 
         if (!empty($doc_id)) {
             $doctorModel = Doctors::findOne([
@@ -530,6 +544,12 @@ class LoginsController extends Controller
             $arrAccountAD['ad'] = $arr;
         }
 
+        //todo проверяем существует ли пользователь с ФИО в GS
+        if ($objectUsersLogins = $activeSyncHelper->checkLoginAccount()) {
+            $arrAccountAD['gs'] = ArrayHelper::toArray($objectUsersLogins);
+        }
+
+        //todo проверяем существует ли пользователь с ФИО в GS
         if (!empty($gd_id)) {
             if ($checkGD = self::checkGD($gd_id)) {
                 $arrAccountAD = array_merge($arrAccountAD, $checkGD);

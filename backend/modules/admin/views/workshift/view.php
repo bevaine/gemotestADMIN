@@ -25,6 +25,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Создать инкассацию', Url::to(["./encashment/create-encashment", 'workshift_id' => $model->id]), ['class' => 'btn btn-success']) ?>
+
+        <?php
+            if (empty($model->close_date)) {
+                echo  Html::a('Закрыть смену', ['close', 'id' => $model->id], ['class' => 'btn btn-success']);
+            }
+        ?>
     </p>
 
     <?= DetailView::widget([

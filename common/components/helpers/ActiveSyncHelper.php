@@ -65,9 +65,10 @@ use yii\db\Transaction;
  * @property string  $emailGD
  * @property string  $phone
  * @property string  $directorID
- * @property mixed $directorFloSender
+ * @property mixed   $directorFloSender
  * @property integer $changeGD
- * @property  string $tableName
+ * @property string  $tableName
+ * @property boolean $createNewGS
  */
 
 class ActiveSyncHelper
@@ -80,7 +81,7 @@ class ActiveSyncHelper
     CONST LDAP_DN       = "DC=lab,DC=gemotest,DC=ru";
 
     CONST POSTFIX_PORT      = 22;
-    CONST POSTFIX_SERVER    = '192.168.156.2';
+    CONST POSTFIX_SERVER    = '192.168.151.152';
     CONST POSTFIX_LOGIN     = 'itr';
     CONST POSTFIX_PASSW     = 'Gthtgenmt117!';
 
@@ -121,6 +122,7 @@ class ActiveSyncHelper
     public $phone;
     public $directorID;
     public $changeGD;
+    public $createNewGS;
 
     /**
      * ActiveSyncHelper constructor.
@@ -129,6 +131,7 @@ class ActiveSyncHelper
     {
        $this->orgName = self::ORG_NAME;
        $this->resetPassword = false;
+       $this->createNewGS = false;
     }
 
     /**
@@ -290,8 +293,9 @@ class ActiveSyncHelper
         }
 
         //todo проверяем существует ли запись в Operators
-        if (!$objectOperators = $this->checkOperatorAccount()) {
-
+        $objectOperators = $this->checkOperatorAccount();
+        if (!$objectOperators || $this->createNewGS)
+        {
             $this->setLastOperatorCacheId();
             $name = $this->firstName;
             if (!empty($this->middleName))
@@ -420,17 +424,11 @@ class ActiveSyncHelper
             return false;
         }
 
-
-
         //todo проверяем существует ли запись в Logins
         /** @var  $objectUsersLogins Logins*/
-        if ($objectUsersLogins = $this->checkLoginAccount()) {
-            $this->state = 'old';
-
-            //todo разблокируем учетную запись
-            $this->unblockAccount($objectUsersLogins->aid);
-
-        } else {
+        $objectUsersLogins = $this->checkLoginAccount();
+        if (!$objectUsersLogins || $this->createNewGS)
+        {
             //todo добавляем новую запись в Logins
             if (empty($this->aid)
                 || empty($this->loginGS)
@@ -520,6 +518,12 @@ class ActiveSyncHelper
                 ], Logger::LEVEL_ERROR, 'binary');
                 return false;
             }
+
+        } else {
+            $this->state = 'old';
+
+            //todo разблокируем учетную запись
+            $this->unblockAccount($objectUsersLogins->aid);
         }
 
         $this->aid = $objectUsersLogins->aid;
@@ -1349,7 +1353,7 @@ class ActiveSyncHelper
                 ['aid' => $this->aid]
             ])
             ->andFilterWhere(['UserType' => $this->type])
-            ->one();
+            ->all();
     }
 
     static function addFromDonor($fromAid, $toAid)

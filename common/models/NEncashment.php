@@ -24,7 +24,7 @@ use yii\db\Exception;
  * @property NEncashmentDetail $detail
  * @property NEncashmentDetail $detailOfficeSumm
  * @property NCashBalanceInLOFlow $cashBalanceInLOFlow
- * @property NWorkshift $getWorkShift
+ * @property NWorkshift $workShift
  */
 
 class NEncashment extends \yii\db\ActiveRecord

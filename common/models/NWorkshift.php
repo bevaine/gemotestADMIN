@@ -26,6 +26,8 @@ use Yii;
  * @property string $error_check_return_total_card
  * @property string $file_name
  * @property string $code_1c
+ * @property NPay $pays
+ * @property NPay $returnPays
  */
 class NWorkshift extends \yii\db\ActiveRecord
 {
@@ -84,5 +86,23 @@ class NWorkshift extends \yii\db\ActiveRecord
             'file_name' => 'Имя файла',
             'code_1c' => 'Код в 1С',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPays()
+    {
+        return $this->hasMany(NPay::className(), ['z_num' => 'z_num', 'kkm' => 'kkm'])
+            ->where(['base_doc_type' => 1]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getReturnPays()
+    {
+        return $this->hasMany(NPay::className(), ['z_num' => 'z_num', 'kkm' => 'kkm'])
+            ->where(['base_doc_type' => 2]);
     }
 }
