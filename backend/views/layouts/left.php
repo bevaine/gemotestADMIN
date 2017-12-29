@@ -10,6 +10,11 @@
                         //,'options' => ['class' => 'sidebar-menu']
                     ],
                     [
+                        'label' => 'Wiki',
+                        'icon' => 'dashboard',
+                        'url' => ['/wiki/content/admin'],
+                    ],
+                    [
                         'label' => 'Гемотест',
                         'icon' => 'share',
                         'url' => '#',

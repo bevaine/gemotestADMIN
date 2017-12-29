@@ -23,6 +23,14 @@ return [
         'gridview' =>  [
             'class' => '\kartik\grid\Module'
         ],
+        'wiki'=>[
+            'class'=>'backend\modules\wiki\Module',
+            //C:\Users\evgeny.dymchenko\www\admin\vendor\asinfotrack\yii2\wiki\Module.php
+            'processContentCallback'=>function($content) {
+                //example if you want to use markdown in your wiki
+                return Parsedown::instance()->parse($content);
+            }
+        ],
     ],
     'components' => [
         'view' => [
