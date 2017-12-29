@@ -245,7 +245,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 GS_text += '<p>Пользователь ';
                                 GS_text += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b> уже имеет учетную запись в GemoSytems:';
                                 for (var e = 0; e < ad.length; e++) {
-                                    GS_text += '<p><label><input type="radio" name="radioAIDList" value="' + gs[e].aid + '" checked>' + gs[e].Name + '</label></p>';
+                                    var checked = '';
+                                    if (e === 0) checked = 'checked';
+                                    GS_text += '<p><label><input type="radio" name="radioAIDList" value="' + gs[e].aid + '" ' + checked + '>' + gs[e].Name + '</label></p>';
                                 }
                                 GS_text += '<p><label><input type="radio" name="radioAIDList" value="new">Создать новую учетную запись GS</label></p>';
                             }
