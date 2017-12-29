@@ -426,7 +426,7 @@ class ActiveSyncHelper
 
         //todo проверяем существует ли запись в Logins
         /** @var  $objectUsersLogins Logins*/
-        $objectUsersLogins = $this->checkLoginAccount();
+        $objectUsersLogins = $this->checkLoginAccountOne();
         if (!$objectUsersLogins || $this->createNewGS)
         {
             //todo добавляем новую запись в Logins
@@ -1344,9 +1344,24 @@ class ActiveSyncHelper
     /**
      * @return array|null|\yii\db\ActiveRecord
      */
-    public function checkLoginAccount()
+    public function checkLoginAccountOne()
     {
-        return $loginSearch = Logins::find()
+        return Logins::find()
+            ->andFilterWhere([
+                'OR',
+                ['like', 'Name', $this->fullName],
+                ['aid' => $this->aid]
+            ])
+            ->andFilterWhere(['UserType' => $this->type])
+            ->one();
+    }
+
+    /**
+     * @return array|\yii\db\ActiveRecord[]
+     */
+    public function checkLoginAccountAll()
+    {
+        return Logins::find()
             ->andFilterWhere([
                 'OR',
                 ['like', 'Name', $this->fullName],
@@ -1356,6 +1371,11 @@ class ActiveSyncHelper
             ->all();
     }
 
+    /**
+     * @param $fromAid
+     * @param $toAid
+     * @return array|bool
+     */
     static function addFromDonor($fromAid, $toAid)
     {
         $rowInsertOut = [];

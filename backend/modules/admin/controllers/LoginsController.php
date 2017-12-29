@@ -545,7 +545,7 @@ class LoginsController extends Controller
         }
 
         //todo проверяем существует ли пользователь с ФИО в GS
-        if ($objectUsersLogins = $activeSyncHelper->checkLoginAccount()) {
+        if ($objectUsersLogins = $activeSyncHelper->checkLoginAccountAll()) {
             $arrAccountAD['gs'] = ArrayHelper::toArray($objectUsersLogins);
         }
 
