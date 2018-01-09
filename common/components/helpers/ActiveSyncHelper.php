@@ -216,9 +216,6 @@ class ActiveSyncHelper
             //todo проверяем/добавляем запись в таблицы AD
             if (!$this->addUserAdTables()) return false;
 
-            //todo добавление ролей для пользователя
-            if (!$this->addPermissions()) return false;
-
         } elseif ($this->type == 9) {
 
             //todo добавляем/сбрасываем пароль для УЗ AD
