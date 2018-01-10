@@ -8,16 +8,13 @@ use common\models\Logins;
 /* @var $model common\models\OrdersToExport */
 
 $this->title = $model->AID;
-$this->params['breadcrumbs'][] = ['label' => 'Orders To Exports', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Заказы', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="orders-to-export-view">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->AID], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->AID], [
+        <?= Html::a('Редактировать', ['update', 'id' => $model->AID], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->AID], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',

@@ -7,13 +7,10 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\OrdersToExportSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Orders To Exports';
+$this->title = 'Заказы';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="orders-to-export-index">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
