@@ -354,7 +354,19 @@ class LoginsController extends Controller
                 ]);
                 if ($activeSyncHelper->state == 'new') {
                     !empty($activeSyncHelper->idAD) ? $style = 'info' : $style = 'success';
-                    $message = '<p>Успешно добавлена УЗ для <b>'.$url.'</b> авторизации через '.$auth.'</p>';
+                    $message = '<p>Успешно добавлена УЗ для <b>'.$url.'</b>';
+                    if ($activeSyncHelper->type == 8) {
+                        $urlKey = \yii\helpers\Url::toRoute([
+                            './logins/index',
+                            'LoginsSearch[Key]' => $activeSyncHelper->key
+                        ]);
+                        $urlKey .= Html::a($activeSyncHelper->key, $urlKey, [
+                            'title' => $activeSyncHelper->key,
+                            'target' => '_blank'
+                        ]);
+                        $message .= ' (отделение '.$urlKey.')';
+                    }
+                    $message .= ' авторизации через '.$auth.'</p>';
                 } elseif ($activeSyncHelper->state == 'old') {
                     $style = 'warning';
                     $message = '<p>У пользователя <b>'.$url.'</b> уже есть УЗ для авторизации через '.$auth.'</p>';

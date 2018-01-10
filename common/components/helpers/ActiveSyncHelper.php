@@ -1232,18 +1232,18 @@ class ActiveSyncHelper
         $transaction = $db->beginTransaction();
 
         try {
-            //todo удаляем все роли у пользователя
-            $db->createCommand()->delete(
-                NAuthASsignment::tableName(),
-                ['userid' => $this->aid]
-            )->execute();
-
             //todo присвоение прав пользователю
             $findPermissions = Permissions::findAll([
                 'department' => $this->department
             ]);
 
             if ($findPermissions) {
+                //todo удаляем все роли у пользователя
+                $db->createCommand()->delete(
+                    NAuthASsignment::tableName(),
+                    ['userid' => $this->aid]
+                )->execute();
+
                 $rowInsert = [];
                 foreach ($findPermissions as $permission) {
                     $rowInsert[] = [
@@ -1262,7 +1262,7 @@ class ActiveSyncHelper
         } catch (\Exception $e) {
             $transaction->rollBack();
             Yii::getLogger()->log([
-                'DirectorFloSender->batchInsert' => $e->getMessage()
+                'NAuthASsignment->batchInsert' => $e->getMessage()
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
