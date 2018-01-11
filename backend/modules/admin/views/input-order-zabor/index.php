@@ -31,14 +31,16 @@ $this->params['breadcrumbs'][] = [
                 'attribute' => 'OrderID',
                 'width'=>'150px',
                 'value' => function($data){
-                    return Html::a(
-                        $data->OrderID,
-                        'https://office.gemotest.ru/inputOrder/inputMain_test.php?oid='.$data->OrderID,
-                        [
-                            'title' => $data->OrderID,
-                            'target' => '_blank'
-                        ]
-                    );
+                    /** @var $data \common\models\InputOrderZaborSearch */
+                    return isset($data->OrderID) ?
+                         Html::a(
+                            $data->OrderID,
+                            'https://office.gemotest.ru/inputOrder/inputMain_test.php?oid='.$data->OrderID,
+                            [
+                                'title' => $data->OrderID,
+                                'target' => '_blank'
+                            ]
+                        ) : null;
                 },
                 'format' => 'raw',
             ],
