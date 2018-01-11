@@ -12,9 +12,15 @@ use Yii;
  * @property string $IsslCode
  * @property string $MSZabor
  * @property string $DateIns
+ * @property BranchStaff $branchStaff
  */
+
 class InputOrderZabor extends \yii\db\ActiveRecord
 {
+    public $last_name;
+    public $first_name;
+    public $middle_name;
+
     /**
      * @return null|object
      */
@@ -58,8 +64,19 @@ class InputOrderZabor extends \yii\db\ActiveRecord
             'aid' => 'AID',
             'OrderID' => '№ заказа',
             'IsslCode' => 'Код исследования',
-            'MSZabor' => 'Сотрудник',
+            'MSZabor' => 'GUID Сотрудника',
             'DateIns' => 'Дата добавления',
+            'last_name' => 'Фамилия',
+            'first_name' => 'Имя',
+            'middle_name' => 'Отчество'
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBranchStaff()
+    {
+        return $this->hasOne(BranchStaff::className(), ['CAST([guid] AS varchar(100))' => 'MSZabor']);
     }
 }

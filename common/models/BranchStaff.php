@@ -64,4 +64,6 @@ class BranchStaff extends \yii\db\ActiveRecord
             'personnel_number' => 'Персон. номер',
         ];
     }
+
+
 }

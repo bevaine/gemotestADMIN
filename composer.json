@@ -38,7 +38,8 @@
         "kartik-v/yii2-detail-view": "*",
         "erusev/parsedown": "^1.6",
         "2amigos/yii2-ckeditor-widget": "*",
-        "mihaildev/yii2-ckeditor": "*"
+        "mihaildev/yii2-ckeditor": "*",
+        "wolfguard/yii2-video-gallery": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

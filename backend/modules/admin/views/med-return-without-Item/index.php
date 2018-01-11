@@ -11,9 +11,6 @@ $this->title = 'Возврат МИС (без номенклатуры)';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="med-return-without-item-index">
-
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <p>
         <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>

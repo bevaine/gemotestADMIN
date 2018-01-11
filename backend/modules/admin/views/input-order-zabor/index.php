@@ -68,6 +68,9 @@ $this->params['breadcrumbs'][] = [
                 ]),
                 'format' => 'html', // datetime
             ],
+            'last_name',
+            'first_name',
+            'middle_name',
             'MSZabor',
             'IsslCode',
             ['class' => 'yii\grid\ActionColumn'],

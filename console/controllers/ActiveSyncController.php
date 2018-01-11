@@ -15,6 +15,7 @@ use Yii;
 use yii\log\Logger;
 use common\models\NAuthASsignment;
 use yii\base\Exception;
+use common\models\BranchStaff;
 
 /**
  * Created by PhpStorm.
@@ -129,6 +130,16 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        $d = BranchStaff::find()
+            ->filterWhere(['like', 'last_name', null])
+            ->andFilterWhere(['like', 'first_name', 'Иван'])
+            ->andFilterWhere(['like', 'middle_name', 'qwe'])
+            ->one();
+
+        print_r($d);
+        exit;
+
+
 
         echo str_replace('&quot;', '"', ' ООО &quot;Гемотест-Севастополь&quot; (Севастополь 2)');
 
