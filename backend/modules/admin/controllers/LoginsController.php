@@ -280,6 +280,7 @@ class LoginsController extends Controller
                 $activeSyncHelper->middleName = trim($model->middleName);
             } elseif ($param == 'doc') {
                 $activeSyncHelper->type = 5;
+                $activeSyncHelper->tableName = 'Doctors';
                 $activeSyncHelper->typeLO = 'SLO';
                 $activeSyncHelper->department = 8;
                 $activeSyncHelper->key = $model->docId;
@@ -360,7 +361,7 @@ class LoginsController extends Controller
                             './logins/index',
                             'LoginsSearch[Key]' => $activeSyncHelper->key
                         ]);
-                        $urlKey .= Html::a($activeSyncHelper->key, $urlKey, [
+                        $urlKey = Html::a($activeSyncHelper->key, $urlKey, [
                             'title' => $activeSyncHelper->key,
                             'target' => '_blank'
                         ]);

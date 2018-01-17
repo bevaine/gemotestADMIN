@@ -75,7 +75,39 @@ $this->params['breadcrumbs'][] = [
             'middle_name',
             'MSZabor',
             'IsslCode',
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'admin/input-order-zabor/view',
+                            'id' => $model['aid']
+                        ]);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                    },
+                    'update' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'admin/input-order-zabor/update',
+                            'id' => $model['aid']
+                        ]);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'Update'), 'data-pjax' => '0']);
+                    },
+                    'delete' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'admin/input-order-zabor/delete',
+                            'id' => $model['aid']
+                        ]);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-trash"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'Update'), 'data-pjax' => '0']);
+                    },
+                ],
+                'template' => '{view} {update} {delete}'
+            ]
         ],
     ]); ?>
 </div>

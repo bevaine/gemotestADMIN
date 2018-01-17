@@ -12,6 +12,7 @@ use Yii;
  * @property string $IsslCode
  * @property string $MSZabor
  * @property string $DateIns
+ * @property string $FIO
  * @property BranchStaff $branchStaff
  */
 
@@ -20,6 +21,7 @@ class InputOrderZabor extends \yii\db\ActiveRecord
     public $last_name;
     public $first_name;
     public $middle_name;
+    public $FIO;
 
     /**
      * @return null|object
