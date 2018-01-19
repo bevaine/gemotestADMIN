@@ -14,6 +14,8 @@ use Yii;
  * @property string $DateIns
  * @property string $FIO
  * @property BranchStaff $branchStaff
+ * @property HrPublicEmployee $hrPublicEmployee
+ * @property HrPublicEmployee $hrPublicEmployeeOne
  */
 
 class InputOrderZabor extends \yii\db\ActiveRecord
@@ -77,8 +79,19 @@ class InputOrderZabor extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getBranchStaff()
+    public function getHrPublicEmployeeOne()
     {
-        return $this->hasOne(BranchStaff::className(), ['CAST([guid] AS varchar(100))' => 'MSZabor']);
+        return $this->hasOne(HrPublicEmployee::className(), ['CAST([guid] AS varchar(100))' => 'MSZabor']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHrPublicEmployee()
+    {
+        return $this->hasOne(HrPublicEmployee::className(), [])
+            ->onCondition('CAST([guid] AS varchar(100)) = CAST([MSZabor] AS varchar(100))')
+            ->where('MSZabor is not null')
+            ->andWhere("MSZabor <> ''");
     }
 }

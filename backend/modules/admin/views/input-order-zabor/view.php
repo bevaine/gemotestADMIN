@@ -29,18 +29,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'aid',
             'OrderID',
             'DateIns',
-            [
-                'attribute' => 'last_name',
-                'value' => isset($model->branchStaff) ? $model->branchStaff->last_name : null
-            ],
-            [
-                'attribute' => 'first_name',
-                'value' => isset($model->branchStaff) ? $model->branchStaff->first_name : null
-            ],
-            [
-                'attribute' => 'middle_name',
-                'value' => isset($model->branchStaff) ? $model->branchStaff->middle_name : null
-            ],
+            'hrPublicEmployeeOne.last_name',
+            'hrPublicEmployeeOne.first_name',
+            'hrPublicEmployeeOne.middle_name',
             'MSZabor',
             'IsslCode',
         ],

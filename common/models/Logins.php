@@ -97,7 +97,7 @@ class Logins extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['aid', 'Key', 'UserType'], 'required'],
+            [['aid', 'Key', 'UserType', 'Login', 'Pass', 'Name', 'UserType'], 'required'],
             [['aid_donor', 'aid', 'IsOperator', 'IsAdmin', 'OpenExcel', 'EngVersion', 'IsDoctor', 'UserType', 'InputOrder', 'PriceID', 'CanRegister', 'InputOrderRM', 'OrderEdit', 'MedReg', 'goscontract', 'FizType', 'clientmen', 'mto', 'mto_editor', 'show_preanalytic', 'parentAid', 'GarantLetter'], 'integer'],
             [['Login', 'Pass', 'Name', 'Email', 'EmailPassword', 'Key', 'Logo', 'LogoText', 'LogoText2', 'LogoType', 'LogoWidth', 'TextPaddingLeft', 'tbl', 'CACHE_Login', 'role'], 'string'],
             [['LastLogin', 'DateBeg', 'DateEnd', 'last_update_password'], 'safe'],

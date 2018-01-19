@@ -18,7 +18,7 @@ $this->params['breadcrumbs'][] = [
     <p>
         <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-    <?= GridView::widget([
+        <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -29,15 +29,15 @@ $this->params['breadcrumbs'][] = [
             ],
             [
                 'attribute' => 'OrderID',
-                'width'=>'150px',
-                'value' => function($data){
+                'width' => '150px',
+                'content' => function($data){
                     /** @var $data \common\models\InputOrderZaborSearch */
-                    return isset($data->OrderID) ?
+                    return isset($data["OrderID"]) ?
                          Html::a(
-                            $data->OrderID,
-                            'https://office.gemotest.ru/inputOrder/inputMain_test.php?oid='.$data->OrderID,
+                             $data["OrderID"],
+                            'https://office.gemotest.ru/inputOrder/inputMain_test.php?oid='.$data["OrderID"],
                             [
-                                'title' => $data->OrderID,
+                                'title' => $data["OrderID"],
                                 'target' => '_blank'
                             ]
                         ) : null;

@@ -415,28 +415,37 @@ class LoginsController extends Controller
             $db = Yii::$app->$connection;
             $transaction = $db->beginTransaction();
             try {
-                if (!empty($model->directorInfo->id)) {
-                    $directorID = $model->directorInfo->id;
+                if (isset($model->directorInfo)) {
+                    $modelDirector = $model->directorInfo;
+                    $modelDirector->password = $model->Pass;
+
+                    if (!$modelDirector->save()) {
+                        Yii::getLogger()->log([
+                            '$model->directorInfo->save' => $modelDirector->errors
+                        ], Logger::LEVEL_ERROR, 'binary');
+                    }
+
+                    $directorID = $modelDirector->id;
                     $db->createCommand()->delete(
                         DirectorFloSender::tableName(),
                         ['director_id' => $directorID]
                     )->execute();
-                }
-                if (isset(Yii::$app->request->post()['sendersKeys'])
-                    && is_array(Yii::$app->request->post()['sendersKeys'])
-                    && !empty($model->directorInfo->id)
-                ) {
-                    $rowInsert = [];
-                    $directorID = $model->directorInfo->id;
-                    $sendersKeys = Yii::$app->request->post()['sendersKeys'];
-                    foreach ($sendersKeys as $key) {
-                        $rowInsert[] = [$directorID, $key];
+
+                    if (isset(Yii::$app->request->post()['sendersKeys'])
+                        && is_array(Yii::$app->request->post()['sendersKeys'])
+                    ) {
+                        $rowInsert = [];
+                        $sendersKeys = Yii::$app->request->post()['sendersKeys'];
+
+                        foreach ($sendersKeys as $key) {
+                            $rowInsert[] = [$directorID, $key];
+                        }
+                        $db->createCommand()->batchInsert(
+                            DirectorFloSender::tableName(),
+                            ['director_id', 'sender_key'],
+                            $rowInsert
+                        )->execute();
                     }
-                    $db->createCommand()->batchInsert(
-                        DirectorFloSender::tableName(),
-                        ['director_id', 'sender_key'],
-                        $rowInsert
-                    )->execute();
                 }
                 $transaction->commit();
             } catch (\Exception $e) {

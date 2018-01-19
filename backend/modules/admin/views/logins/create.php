@@ -242,8 +242,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             var gs = res.gs;
                             var htm_header = 'Информация по учетным записям';
                             if (gs !== undefined && gs.length > 0) {
-                                GS_text += '<p>Пользователь ';
-                                GS_text += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b> уже имеет учетную запись в GemoSytems:';
+                                GS_text += '<p>Пользователь уже имеет учетные записи в GemoSytems</p>';
+                                GS_text += 'Выбирите аккаунт на основании которого нужно создать УЗ GemoSystem:';
                                 for (var e = 0; e < gs.length; e++) {
                                     var checked = '';
                                     if (e === 0) checked = 'checked';
@@ -252,10 +252,8 @@ $this->params['breadcrumbs'][] = $this->title;
                                 GS_text += '<p><label><input type="radio" name="radioAIDList" value="new">Создать новую учетную запись GS</label></p>';
                             }
                             if (ad !== undefined && ad.length > 0) {
-                                AD_text += '<p>У пользователя ';
-                                AD_text += '<b>' + last_name + ' ' + first_name + ' ' + middle_name + '</b>';
-                                AD_text += ' несколько УЗ в Active Directory</p>';
-                                AD_text += 'Выбирите аккаунт AD на основании которого нужно создать УЗ Gemotest:';
+                                AD_text += '<p>Пользователь уже имеет учетные записи в Active Directory</p>';
+                                AD_text += 'Выбирите аккаунт AD на основании которого нужно создать УЗ GemoSystem:';
                                 for (var i = 0; i < ad.length; i++) {
                                     var style = "";
                                     var txtComment = "";

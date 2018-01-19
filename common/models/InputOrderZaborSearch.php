@@ -55,22 +55,26 @@ class InputOrderZaborSearch extends InputOrderZabor
     {
         $this->load($params);
 
-        $subQuery = BranchStaff::find()
-            ->distinct()
-            ->select(['guid', 'first_name', 'last_name', 'middle_name'])
-            ->where(['is not', 'guid', null]);
+//        $subQuery = BranchStaff::find()
+//            ->distinct()
+//            ->select(['guid', 'first_name', 'last_name', 'middle_name'])
+//            ->where(['is not', 'guid', null]);
+//
+//        $query = InputOrderZabor::find()
+//            ->select('InputOrderIsklIsslMSZabor.*, vf.*')
+//            ->leftJoin(
+//                ['vf' =>
+//                    '('.$subQuery
+//                        ->prepare(Yii::$app->db->queryBuilder)
+//                        ->createCommand()
+//                        ->rawSql.')'
+//                    ],
+//                "MSZabor=CAST(vf.[guid] AS varchar(100))"
+//            );
 
         $query = InputOrderZabor::find()
-            ->select('InputOrderIsklIsslMSZabor.*, vf.*')
-            ->leftJoin(
-                ['vf' =>
-                    '('.$subQuery
-                        ->prepare(Yii::$app->db->queryBuilder)
-                        ->createCommand()
-                        ->rawSql.')'
-                    ],
-                "MSZabor=CAST(vf.[guid] AS varchar(100))"
-            );
+            ->joinWith('hrPublicEmployee')
+            ->select('InputOrderIsklIsslMSZabor.*, hr_public_employee.*');
 
         $query->andFilterWhere([
             'aid' => $this->aid,
