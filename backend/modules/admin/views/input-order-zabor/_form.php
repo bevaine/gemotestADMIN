@@ -11,11 +11,12 @@ use yii\web\JsExpression;
 ?>
 
 <?php
-$url = \yii\helpers\Url::to(['/admin/logins/ajax-user-data-list']);
+$url = \yii\helpers\Url::to(['/admin/logins/ajax-zabor-list']);
 
 $initScript = <<< SCRIPT
     function (element, callback) {
         var id=\$(element).val();
+        console.log(id);
         if (id !== "") {
             \$.ajax("{$url}?id=" + id, {
                 dataType: "json"
@@ -33,12 +34,10 @@ SCRIPT;
 
     <?= $form->field($model, 'IsslCode')->textInput() ?>
 
-    <?= $form->field($model, 'MSZabor')->textInput() ?>
-
     <?= $form->field($model, 'DateIns')->textInput() ?>
 
     <?php
-    echo $form->field($model, 'FIO')->widget(Select2::classname(), [
+    echo $form->field($model, 'MSZabor')->widget(Select2::classname(), [
         'options' => ['placeholder' => 'ФИО сотрудника'],
         'pluginOptions' => [
             'allowClear' => true,

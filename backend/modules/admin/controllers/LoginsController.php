@@ -23,6 +23,7 @@ use common\components\helpers\ActiveSyncHelper;
 use common\models\PermissionsSearch;
 use common\models\DirectorFloSender;
 use yii\db\Transaction;
+use common\models\HrPublicEmployee;
 
 /**
  * LoginsController implements the CRUD actions for Logins model.
@@ -629,6 +630,43 @@ class LoginsController extends Controller
             }
         } elseif ($id > 0) {
             $out['results'] = ['id' => $id, 'text' => Logins::findOne($id)->Name];
+        }
+
+        echo Json::encode($out);
+    }
+
+    /**
+     * @param null $search
+     * @param null $id
+     */
+    public function actionAjaxZaborList($search = null, $id = null)
+    {
+        $out = ['more' => false];
+
+        if (!is_null($search)) {
+            $search = mb_strtolower($search, 'UTF-8');
+            $data = HrPublicEmployee::find()
+                ->where('lower(last_name) LIKE \'%' . $search . '%\'')
+                ->orWhere('lower(first_name) LIKE \'%' . $search . '%\'')
+                ->orWhere('lower(middle_name) LIKE \'%' . $search . '%\'')
+                ->limit(20)
+                ->all();
+            /** @var HrPublicEmployee $userData */
+
+            foreach ($data as $userData) {
+                $name = "";
+                $name .= isset($userData->last_name) ? ' '.$userData->last_name : '';
+                $name .= isset($userData->first_name) ? ' '.$userData->first_name : '';
+                $name .= isset($userData->middle_name) ? ' '.$userData->middle_name : '';
+                $out['results'][] = ['id' => $userData->guid, 'text' => $name];
+            }
+        } elseif (isset($id)) {
+            $name = "";
+            $findModel = HrPublicEmployee::findOne(['guid' => $id]);
+            $name .= isset($findModel->last_name) ? ' '.$findModel->last_name : '';
+            $name .= isset($findModel->first_name) ? ' '.$findModel->first_name : '';
+            $name .= isset($findModel->middle_name) ? ' '.$findModel->middle_name : '';
+            $out['results'] = ['id' => $id, 'text' => $name];
         }
 
         echo Json::encode($out);
