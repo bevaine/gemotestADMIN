@@ -11,6 +11,22 @@ $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Nworkshifts', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
+<?php
+$url = \yii\helpers\Url::to(['/admin/logins/ajax-user-data-list']);
+
+$initScript = <<< SCRIPT
+    function (element, callback) {
+        var id=\$(element).val();
+        if (id !== "") {
+            \$.ajax("{$url}?id=" + id, {
+                dataType: "json"
+            }).done(function(data) { callback(data.results);});
+        }
+    }
+SCRIPT;
+?>
+
 <div class="nworkshift-view">
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -37,8 +53,27 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'user_aid',
-            'sender_key',
+            [
+                'attribute' => 'user_aid',
+                'value' => function ($model) {
+                    /** @var \common\models\NWorkshift $model  */
+                    return \common\models\Logins::findOne(['AID' => $model->user_aid])->Name;
+                }
+            ],
+            [
+                'attribute' => 'sender_key',
+                'value' => function ($model) {
+                    /** @var \common\models\NWorkshift $model  */
+                    return \common\models\Kontragents::findOne(['Key' => $model->sender_key])->Name;
+                }
+            ],
+            [
+                'attribute' => 'sender_key_close',
+                'value' => function ($model) {
+                    /** @var \common\models\NWorkshift $model  */
+                    return \common\models\Kontragents::findOne(['Key' => $model->sender_key_close])->Name;
+                }
+            ],
             'kkm',
             'z_num',
             'open_date',
@@ -46,7 +81,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'not_zero_sum_start',
             'not_zero_sum_end',
             'amount_cash_register',
-            'sender_key_close',
             'error_check_count',
             'error_check_total_cash',
             'error_check_total_card',

@@ -11,11 +11,9 @@ $this->params['breadcrumbs'][] = ['label' => 'Возврат ЛИС', 'url' => [
 ?>
 <div class="nreturn-order-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -34,7 +32,13 @@ $this->params['breadcrumbs'][] = ['label' => 'Возврат ЛИС', 'url' => [
             'order_num',
             'status',
             'total',
-            'user_id',
+            [
+                'attribute' => 'user_id',
+                'value' => function ($model) {
+                    /** @var \common\models\NReturnOrder $model  */
+                    return \common\models\Logins::findOne($model->user_id)->Name;
+                }
+            ],
             'kkm',
             'sync_with_lc_status',
             'last_update',

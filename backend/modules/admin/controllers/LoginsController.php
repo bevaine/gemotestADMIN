@@ -646,30 +646,37 @@ class LoginsController extends Controller
         if (!is_null($search)) {
             $search = mb_strtolower($search, 'UTF-8');
             $data = HrPublicEmployee::find()
-                ->where('lower(last_name) LIKE \'%' . $search . '%\'')
-                ->orWhere('lower(first_name) LIKE \'%' . $search . '%\'')
-                ->orWhere('lower(middle_name) LIKE \'%' . $search . '%\'')
+                ->select(['last_name', 'first_name', 'middle_name', 'guid', 'personnel_number'])
+                ->distinct(true)
+                ->where('lower(last_name + \' \' + first_name + \' \' + middle_name) LIKE \'%' . $search . '%\'')
+                ->orderBy(['last_name' =>'acs'])
                 ->limit(20)
                 ->all();
             /** @var HrPublicEmployee $userData */
-
             foreach ($data as $userData) {
-                $name = "";
-                $name .= isset($userData->last_name) ? ' '.$userData->last_name : '';
-                $name .= isset($userData->first_name) ? ' '.$userData->first_name : '';
-                $name .= isset($userData->middle_name) ? ' '.$userData->middle_name : '';
-                $out['results'][] = ['id' => $userData->guid, 'text' => $name];
+                $out['results'][] = ['id' => $userData->guid, 'text' => self::addName($userData)];
             }
         } elseif (isset($id)) {
-            $name = "";
-            $findModel = HrPublicEmployee::findOne(['guid' => $id]);
-            $name .= isset($findModel->last_name) ? ' '.$findModel->last_name : '';
-            $name .= isset($findModel->first_name) ? ' '.$findModel->first_name : '';
-            $name .= isset($findModel->middle_name) ? ' '.$findModel->middle_name : '';
-            $out['results'] = ['id' => $id, 'text' => $name];
+            if ($findModel = HrPublicEmployee::findOne(['guid' => $id])) {
+                $out['results'] = ['id' => $id, 'text' => self::addName($findModel)];
+            }
         }
 
         echo Json::encode($out);
+    }
+
+    /**
+     * @param $model HrPublicEmployee
+     * @return string
+     */
+    public static function addName($model) {
+        if (!$model) return '';
+        $name = "";
+        $name .= isset($model->last_name) ? ' '.$model->last_name : '';
+        $name .= isset($model->first_name) ? ' '.$model->first_name : '';
+        $name .= isset($model->middle_name) ? ' '.$model->middle_name : '';
+        $name .= isset($model->personnel_number) ? ' (табел. № '.$model->personnel_number.')' : '';
+        return $name;
     }
 
     /**

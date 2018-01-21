@@ -8,6 +8,7 @@ use common\models\KontragentsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * KontragentsController implements the CRUD actions for Kontragents model.
@@ -120,5 +121,30 @@ class KontragentsController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param null $search
+     * @param null $id
+     */
+    public function actionAjaxKontragentsList($search = null, $id = null)
+    {
+        $out = ['more' => false];
+
+        if (!is_null($search)) {
+            $search = mb_strtolower($search, 'UTF-8');
+            $data = Kontragents::find()->select(['[Key], [Name]'])
+                ->where('lower(Name) LIKE \'%' . $search . '%\'')
+                ->limit(20)
+                ->all();
+            /** @var Kontragents $userData */
+            foreach ($data as $userData) {
+                $out['results'][] = ['id' => $userData->Key, 'text' => $userData->Name];
+            }
+        } elseif (isset($id)) {
+            $out['results'] = ['id' => $id, 'text' => Kontragents::findOne(['key' =>$id])->Name];
+        }
+
+        echo Json::encode($out);
     }
 }

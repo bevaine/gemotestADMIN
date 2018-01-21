@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\controllers;
 
+use common\models\HrPublicEmployee;
 use Yii;
 use common\models\BranchStaff;
 use common\models\BranchStaffSearch;
@@ -84,7 +85,15 @@ class BranchStaffController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            if (isset($model->guid)) {
+                if ($findModel = HrPublicEmployee::findOne(['guid' => $model->guid])) {
+                    $model->last_name = $findModel->last_name;
+                    $model->first_name = $findModel->first_name;
+                    $model->middle_name = $findModel->middle_name;
+                }
+            }
+            $model->save();
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [

@@ -67,13 +67,13 @@ class NWorkshift extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'user_aid' => 'Aid',
+            'user_aid' => 'Пользователь',
             'sender_key' => 'Отд. открытия',
             'sender_key_close' => 'Отд. закрытия',
             'kkm' => 'ККМ',
             'z_num' => 'Z-отчет',
-            'open_date' => 'Дата откр.',
-            'close_date' => 'Дата закрыт.',
+            'open_date' => 'Дата открытия',
+            'close_date' => 'Дата закрытия',
             'not_zero_sum_start' => 'Необнул. сумма на нач.',
             'not_zero_sum_end' => 'Необнул. сумма на кон.',
             'amount_cash_register' => 'Сумма нал.',

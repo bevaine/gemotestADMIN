@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 use yii\web\JsExpression;
+use kartik\datetime\DateTimePicker;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\InputOrderZabor */
@@ -34,7 +35,18 @@ SCRIPT;
 
     <?= $form->field($model, 'IsslCode')->textInput() ?>
 
-    <?= $form->field($model, 'DateIns')->textInput() ?>
+    <?= Html::label("Дата добавления") ?>
+
+    <?= DateTimePicker::widget([
+        'name' => 'InputOrderZabor[DateIns]',
+        'type' => DateTimePicker::TYPE_INPUT,
+        'value' => date("Y-m-d H:i:s", strtotime($model->DateIns)),
+        'pluginOptions' => [
+            'autoclose'=>true,
+            'format' => 'yyyy-mm-dd hh:ii:ss'
+        ]
+    ]);
+    ?><br>
 
     <?php
     echo $form->field($model, 'MSZabor')->widget(Select2::classname(), [
