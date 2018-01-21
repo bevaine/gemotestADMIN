@@ -159,7 +159,10 @@ class EncashmentController extends Controller
         $model = $this->findModel($id);
 
         if ($modelDetail = $model->detail) {
-            $modelDetail->delete();
+            foreach ($modelDetail as $rowDetail) {
+                /** @var $rowDetail NEncashmentDetail */
+                $rowDetail->delete();
+            }
         }
         if ($modelBalance = $model->cashBalanceInLOFlow) {
             $modelBalance->delete();
