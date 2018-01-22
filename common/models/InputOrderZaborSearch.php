@@ -73,8 +73,9 @@ class InputOrderZaborSearch extends InputOrderZabor
 //            );
 
         $query = InputOrderZabor::find()
+            ->distinct(true)
             ->joinWith('hrPublicEmployee')
-            ->select('InputOrderIsklIsslMSZabor.*, hr_public_employee.*');
+            ->select('InputOrderIsklIsslMSZabor.*, last_name, first_name, middle_name');
 
         $query->andFilterWhere([
             'aid' => $this->aid,
