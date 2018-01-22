@@ -91,6 +91,7 @@ class BranchStaffController extends Controller
                     $model->last_name = $findModel->last_name;
                     $model->first_name = $findModel->first_name;
                     $model->middle_name = $findModel->middle_name;
+                    $model->personnel_number = $findModel->personnel_number;
                 }
             }
             $model->save();

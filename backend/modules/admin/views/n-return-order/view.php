@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use common\models\Logins;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\NReturnOrder */
@@ -36,7 +37,9 @@ $this->params['breadcrumbs'][] = ['label' => 'Возврат ЛИС', 'url' => [
                 'attribute' => 'user_id',
                 'value' => function ($model) {
                     /** @var \common\models\NReturnOrder $model  */
-                    return \common\models\Logins::findOne($model->user_id)->Name;
+                    if ($findLogins = Logins::findOne($model->user_id)) {
+                        return $findLogins->Name;
+                    } else return null;
                 }
             ],
             'kkm',

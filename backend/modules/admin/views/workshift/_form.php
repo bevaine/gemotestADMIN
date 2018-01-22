@@ -12,14 +12,26 @@ use yii\web\JsExpression;
 ?>
 
 <?php
-$url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
+$url1 = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
+$url2 = \yii\helpers\Url::to(['/admin/logins/ajax-user-data-list']);
 
-$initScript = <<< SCRIPT
+$initScript1 = <<< SCRIPT
+    function (element, callback) {
+        var id=\$(element).val();
+        if (id !== "") {
+            \$.ajax("{$url1}?id=" + id, {
+                dataType: "json"
+            }).done(function(data) { callback(data.results);});
+        }
+    }
+SCRIPT;
+
+$initScript2 = <<< SCRIPT
     function (element, callback) {
         var id=\$(element).val();
         console.log(id);
         if (id !== "") {
-            \$.ajax("{$url}?id=" + id, {
+            \$.ajax("{$url2}?id=" + id, {
                 dataType: "json"
             }).done(function(data) { callback(data.results);});
         }
@@ -31,42 +43,55 @@ SCRIPT;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'user_aid')->textInput() ?>
-
-    <?php
-    echo $form->field($model, 'sender_key')->widget(Select2::classname(), [
+    <?= $form->field($model, 'sender_key')->widget(Select2::classname(), [
         'options' => ['placeholder' => 'Наименование отделения'],
         'pluginOptions' => [
             'allowClear' => true,
             'minimumInputLength' => 2,
             'multiple' => false,
             'ajax' => [
-                'url' => $url,
+                'url' => $url1,
                 'dataType' => 'json',
                 'data' => new JsExpression('function(params) { return {search:params.term}; }'),
                 'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
             ],
-            'initSelection' => new JsExpression($initScript)
+            'initSelection' => new JsExpression($initScript1)
         ],
     ])->label('Отделение');
     ?>
 
-    <?php
-    echo $form->field($model, 'sender_key_close')->widget(Select2::classname(), [
+    <?= $form->field($model, 'sender_key_close')->widget(Select2::classname(), [
         'options' => ['placeholder' => 'Наименование отделения'],
         'pluginOptions' => [
             'allowClear' => true,
             'minimumInputLength' => 2,
             'multiple' => false,
             'ajax' => [
-                'url' => $url,
+                'url' => $url1,
                 'dataType' => 'json',
                 'data' => new JsExpression('function(params) { return {search:params.term}; }'),
                 'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
             ],
-            'initSelection' => new JsExpression($initScript)
+            'initSelection' => new JsExpression($initScript1)
         ],
     ])->label('Отделение закрытия');
+    ?>
+
+    <?= $form->field($model, 'user_aid')->widget(Select2::classname(), [
+        'options' => ['placeholder' => 'ФИО сотрудника'],
+        'pluginOptions' => [
+            'allowClear' => true,
+            'minimumInputLength' => 2,
+            'multiple' => false,
+            'ajax' => [
+                'url' => $url2,
+                'dataType' => 'json',
+                'data' => new JsExpression('function(params) { return {search:params.term}; }'),
+                'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
+            ],
+            'initSelection' => new JsExpression($initScript2)
+        ],
+    ])->label('Пользователь:');
     ?>
 
     <?= $form->field($model, 'kkm')->textInput() ?>

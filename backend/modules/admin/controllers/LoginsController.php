@@ -675,7 +675,7 @@ class LoginsController extends Controller
         $name .= isset($model->last_name) ? ' '.$model->last_name : '';
         $name .= isset($model->first_name) ? ' '.$model->first_name : '';
         $name .= isset($model->middle_name) ? ' '.$model->middle_name : '';
-        $name .= isset($model->personnel_number) ? ' (табел. № '.$model->personnel_number.')' : '';
+        $name .= isset($model->personnel_number) ? ' (персон. № '.$model->personnel_number.')' : '';
         return $name;
     }
 

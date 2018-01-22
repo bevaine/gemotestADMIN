@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\helpers\Url;
+use common\models\Logins;
+use common\models\Kontragents;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\NWorkshift */
@@ -57,21 +59,27 @@ SCRIPT;
                 'attribute' => 'user_aid',
                 'value' => function ($model) {
                     /** @var \common\models\NWorkshift $model  */
-                    return \common\models\Logins::findOne(['AID' => $model->user_aid])->Name;
+                    if ($findLogins = Logins::findOne($model->user_aid)) {
+                        return $findLogins->Name;
+                    } else return null;
                 }
             ],
             [
                 'attribute' => 'sender_key',
                 'value' => function ($model) {
                     /** @var \common\models\NWorkshift $model  */
-                    return \common\models\Kontragents::findOne(['Key' => $model->sender_key])->Name;
+                    if ($findKontragents = Kontragents::findOne(['Key' => $model->sender_key])) {
+                        return $findKontragents->Name;
+                    } else return null;
                 }
             ],
             [
                 'attribute' => 'sender_key_close',
                 'value' => function ($model) {
                     /** @var \common\models\NWorkshift $model  */
-                    return \common\models\Kontragents::findOne(['Key' => $model->sender_key_close])->Name;
+                    if ($findKontragents = Kontragents::findOne(['Key' => $model->sender_key_close])) {
+                        return $findKontragents->Name;
+                    } else return null;
                 }
             ],
             'kkm',
