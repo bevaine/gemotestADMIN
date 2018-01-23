@@ -59,18 +59,18 @@ class MedReturnWithoutItem extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'parent_id' => 'Parent ID',
-            'order_num' => 'Order Num',
-            'total' => 'Total',
-            'date' => 'Date',
-            'pay_type' => 'Pay Type',
-            'kkm' => 'Kkm',
-            'z_num' => 'Z Num',
-            'comment' => 'Comment',
-            'path_file' => 'Path File',
-            'base' => 'Base',
-            'user_aid' => 'User Aid',
-            'code_1c' => 'Code 1c',
+            'parent_id' => 'Родитель',
+            'order_num' => '№ заказа',
+            'total' => 'Сумма',
+            'date' => 'Дата',
+            'pay_type' => 'Тип оплаты',
+            'kkm' => 'ККМ',
+            'z_num' => 'Z-отчет',
+            'comment' => 'Комментарий',
+            'path_file' => 'Путь к файлу',
+            'base' => 'Основание',
+            'user_aid' => 'Пользователь',
+            'code_1c' => 'Код 1С',
         ];
     }
 }

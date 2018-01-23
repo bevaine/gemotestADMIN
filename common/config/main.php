@@ -1,7 +1,7 @@
 <?php
 return [
     'language' => 'ru',
-    'name' => 'Гемотест.Админка',
+    'name' => 'GemoTest::fix',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
     'components' => [
         'formatter'  => [

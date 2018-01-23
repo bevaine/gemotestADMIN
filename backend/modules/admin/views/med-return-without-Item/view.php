@@ -7,16 +7,13 @@ use yii\widgets\DetailView;
 /* @var $model common\models\MedReturnWithoutItem */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Med Return Without Items', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Возврат без номенклатуры (МИС)', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="med-return-without-item-view">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -24,6 +21,11 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
         ]) ?>
     </p>
+    <?php
+    if (!isset($model->parent_id)) {
+        echo '<p>'.Html::a('{Создать родителя}', ['create-parent', 'id' => $model->id], ['class' => 'btn btn-info']).'</p>';
+    }
+    ?>
 
     <?= DetailView::widget([
         'model' => $model,

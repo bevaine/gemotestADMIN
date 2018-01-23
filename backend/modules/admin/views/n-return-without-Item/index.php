@@ -73,7 +73,7 @@ $this->params['breadcrumbs'][] = [
                     /** @var \common\models\LoginsSearch $model */
                     return Html::a(
                         $model['user_aid'],
-                        './logins/view?id='.$model['user_aid'],
+                        '/admin/logins/view?id='.$model['user_aid'],
                         [
                             'title' => $model['user_aid'],
                             'target' => '_blank'

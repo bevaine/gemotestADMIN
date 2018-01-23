@@ -2,12 +2,17 @@
 
 namespace app\modules\admin\controllers;
 
+use common\models\MedReturnOrder;
+use common\models\MedReturnOrderDetail;
 use Yii;
 use common\models\MedReturnWithoutItem;
 use common\models\MedReturnWithoutItemSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\db\Transaction;
+use yii\log\Logger;
+use yii\helpers\Html;
 
 /**
  * MedReturnWithoutItemController implements the CRUD actions for MedReturnWithoutItem model.
@@ -72,6 +77,74 @@ class MedReturnWithoutItemController extends Controller
                 'model' => $model,
             ]);
         }
+    }
+
+    /**
+     * @param $id
+     * @return \yii\web\Response
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function actionCreateParent($id)
+    {
+        $searchModel = MedReturnWithoutItem::findOne($id);
+
+        if ($searchModel && !isset($searchModel->parent_id)) {
+            /** @var $transaction Transaction */
+            $transaction = MedReturnOrder::getDb()->beginTransaction();
+            try {
+                $model = new MedReturnOrder();
+                $model->date = $searchModel->date;
+                $model->order_id = $searchModel->order_num;
+                $model->status = 4;
+                $model->total = $searchModel->total;
+                $model->user_id = $searchModel->user_aid;
+                $model->is_virtual = 0;
+                $model->kkm = $searchModel->kkm;
+                $model->z_num = $searchModel->z_num;
+                $model->pay_type = $searchModel->pay_type;
+                $model->pay_type_original = $searchModel->pay_type;
+
+                if ($model->save()) {
+                    $transaction->commit();
+                    $parent_id = $transaction->db->getLastInsertID();
+                    $searchModel->parent_id = $parent_id;
+
+                    $modelDetail = new MedReturnOrderDetail();
+                    $modelDetail->order_id = $searchModel->order_num;
+                    $modelDetail->return_id = $parent_id;
+                    $modelDetail->total = $searchModel->total;
+                    $modelDetail->price = $searchModel->total;
+
+                    if ($searchModel->save() && $modelDetail->save()) {
+                        $urlKey = \yii\helpers\Url::toRoute([
+                            '/admin/med-return-order/view',
+                            'id' => $searchModel->parent_id
+                        ]);
+                        $urlKey = Html::a($searchModel->parent_id, $urlKey, [
+                            'title' => $searchModel->parent_id,
+                            'target' => '_blank'
+                        ]);
+                        $message = '<p>Для возврата без номенклатуры <b>#'.$searchModel->id.'</b>';
+                        $message .= ' был успешно добавлен родитель <b>#'.$urlKey.'</b></p>';
+                        Yii::$app->session->setFlash('warning', $message);
+                    }
+                } else {
+                    $transaction->rollBack();
+                    Yii::getLogger()->log([
+                        'MedReturnOrder->save()'=>$model->errors
+                    ], Logger::LEVEL_ERROR, 'binary');
+                }
+            } catch(\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            } catch(\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
+        }
+
+        return $this->redirect(['view', 'id' => $searchModel->id]);
     }
 
     /**
