@@ -110,13 +110,13 @@ class MedReturnWithoutItemController extends Controller
                     $parent_id = $transaction->db->getLastInsertID();
                     $searchModel->parent_id = $parent_id;
 
-                    $modelDetail = new MedReturnOrderDetail();
-                    $modelDetail->order_id = $searchModel->order_num;
-                    $modelDetail->return_id = $parent_id;
-                    $modelDetail->total = $searchModel->total;
-                    $modelDetail->price = $searchModel->total;
-
-                    if ($searchModel->save() && $modelDetail->save()) {
+//                    $modelDetail = new MedReturnOrderDetail();
+//                    $modelDetail->order_id = $searchModel->order_num;
+//                    $modelDetail->return_id = $parent_id;
+//                    $modelDetail->total = $searchModel->total;
+//                    $modelDetail->price = $searchModel->total;
+//                    && $modelDetail->save()
+                    if ($searchModel->save()) {
                         $urlKey = \yii\helpers\Url::toRoute([
                             '/admin/med-return-order/view',
                             'id' => $searchModel->parent_id
