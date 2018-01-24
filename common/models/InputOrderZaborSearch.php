@@ -54,28 +54,21 @@ class InputOrderZaborSearch extends InputOrderZabor
     public function search($params)
     {
         $this->load($params);
-
-//        $subQuery = BranchStaff::find()
-//            ->distinct()
-//            ->select(['guid', 'first_name', 'last_name', 'middle_name'])
-//            ->where(['is not', 'guid', null]);
-//
-//        $query = InputOrderZabor::find()
-//            ->select('InputOrderIsklIsslMSZabor.*, vf.*')
-//            ->leftJoin(
-//                ['vf' =>
-//                    '('.$subQuery
-//                        ->prepare(Yii::$app->db->queryBuilder)
-//                        ->createCommand()
-//                        ->rawSql.')'
-//                    ],
-//                "MSZabor=CAST(vf.[guid] AS varchar(100))"
-//            );
+        $field = [
+            'aid',
+            'OrderID',
+            'IsslCode',
+            'MSZabor',
+            'DateIns',
+            'last_name',
+            'first_name',
+            'middle_name'
+        ];
 
         $query = InputOrderZabor::find()
-            ->distinct(true)
             ->joinWith('hrPublicEmployee')
-            ->select('InputOrderIsklIsslMSZabor.*, last_name, first_name, middle_name');
+            ->select('InputOrderIsklIsslMSZabor.*, last_name, first_name, middle_name')
+            ->groupBy($field);
 
         $query->andFilterWhere([
             'aid' => $this->aid,
@@ -95,20 +88,16 @@ class InputOrderZaborSearch extends InputOrderZabor
             $query->andFilterWhere(['<=', 'DateIns', date('Y-m-d 23:59:59', strtotime($this->date_to))]);
         }
 
+        if (!isset($params['sort'])) {
+            $params['sort'] = '-DateIns';
+        }
+
+
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),
             'db' => 'GemoTestDB',
             'sort' => [
-                'attributes' => [
-                    'aid' => ['default' => SORT_ASC],
-                    'OrderID' => ['default' => SORT_ASC],
-                    'IsslCode' => ['default' => SORT_ASC],
-                    'MSZabor' => ['default' => SORT_ASC],
-                    'DateIns' => ['default' => SORT_ASC],
-                    'last_name' => ['default' => SORT_ASC],
-                    'first_name' => ['default' => SORT_ASC],
-                    'middle_name' => ['default' => SORT_ASC],
-                ],
+                'attributes' => $field
             ],
         ]);
 

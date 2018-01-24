@@ -51,6 +51,33 @@ class ActiveSyncController extends Controller
 
     public function actionUpdate ()
     {
+        $senders = ['2007', '2040', '2097', '2029', '1385', '1298','2020','2196','2023','2154','2271','2222','2223','2224','2225','2226','2227','2228','2229','2230',
+            '2231','2232','2233','2224','2235','2236','2237','2238','2239','2240','2241','2242','2243','2244','2245','2246','2247','2248','2249','2250','2251',
+            '2252','2253','2254','2255','2256','2257','2262','2271','2272','2286','2095','2295','2296','2298','2299','2301','2302','2305','2306','2281','1283','20003',
+            '20013','2300','4006'];
+
+        $rowInsert = [];
+        foreach ($senders as $key) {
+            if ($aid = Logins::findOne(['Key' => $key, 'UserType' => '3'])->aid) {
+                $rowInsert[] = [
+                    'contingent_donor',
+                    $aid,
+                    'N;'
+                ];
+            }
+        }
+
+        $connection = 'GemoTestDB';
+        $db = Yii::$app->$connection;
+
+        $db->createCommand()->batchInsert(
+            NAuthASsignment::tableName(),
+            ['itemname', 'userid', 'data'],
+            $rowInsert
+        )->execute();
+
+        exit;
+
         $i = 0;
 
         $models = NAdUsers::find()

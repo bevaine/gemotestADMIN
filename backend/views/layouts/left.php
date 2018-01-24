@@ -39,10 +39,21 @@
                                     ]
                                 ]
                             ],
-                            [
-                                'label' => 'Возвраты',
-                                'icon' => 'circle-o',
-                                'url' => '#',
+                            ['label' => 'Платежи', 'icon' => 'circle-o', 'url' => '#', 'active' => true,
+                                'items' =>[
+                                    [
+                                        'label' => 'Лабораторные',
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/pay'],
+                                    ],
+                                    [
+                                        'label' => 'Медицинские',
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/med-pay'],
+                                    ],
+                                ]
+                            ],
+                            ['label' => 'Возвраты', 'icon' => 'circle-o', 'url' => '#',
                                 'items' => [
                                     [
                                         'label' => 'Лабораторные',
@@ -84,15 +95,14 @@
                             ],
                             ['label' => 'Инкасации', 'icon' => 'dashboard', 'url' => ['/admin/encashment'],],
                             ['label' => 'Заказы', 'icon' => 'dashboard', 'url' => ['/admin/orders'],],
-                            ['label' => 'Платежи', 'icon' => 'dashboard', 'url' => ['/admin/pay'],],
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
                             ['label' => 'Контрагенты', 'icon' => 'dashboard', 'url' => ['/admin/kontragents'],],
+                            ['label' => 'Франчайзи', 'icon' => 'dashboard', 'url' => ['/admin/franchazy'],],
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
                             ['label' => 'Таблицы', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
                                     [
                                         'label' => 'NAdUsers',
-
                                         'icon' => 'dashboard',
                                         'url' => ['/admin/n-ad-users'],
                                     ],
