@@ -649,6 +649,11 @@ class LoginsController extends Controller
                 ->select(['last_name', 'first_name', 'middle_name', 'guid', 'personnel_number'])
                 ->distinct(true)
                 ->where('lower(last_name + \' \' + first_name + \' \' + middle_name) LIKE \'%' . $search . '%\'')
+                ->andWhere(['is not', 'guid', null])
+                ->andWhere(['!=', 'guid', ''])
+                ->andWhere(['fired_date' => ''])
+                ->andWhere(['!=', 'hiring_date', ''])
+                ->andWhere(['not in', 'type_contract', ['3','4']])
                 ->orderBy(['last_name' =>'acs'])
                 ->limit(20)
                 ->all();

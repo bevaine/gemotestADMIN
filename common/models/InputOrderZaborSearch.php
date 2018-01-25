@@ -54,21 +54,27 @@ class InputOrderZaborSearch extends InputOrderZabor
     public function search($params)
     {
         $this->load($params);
-        $field = [
-            'aid',
-            'OrderID',
-            'IsslCode',
-            'MSZabor',
-            'DateIns',
-            'last_name',
-            'first_name',
-            'middle_name'
-        ];
+
+        $subQuery = HrPublicEmployee::find()
+            ->distinct()
+            ->select(['guid', 'first_name', 'last_name', 'middle_name'])
+            ->where(['is not', 'guid', null])
+            ->andWhere(['!=', 'guid', ''])
+            ->andWhere(['fired_date' => ''])
+            ->andWhere(['!=', 'hiring_date', ''])
+            ->andWhere(['not in', 'type_contract', ['3','4']]);
 
         $query = InputOrderZabor::find()
-            ->joinWith('hrPublicEmployee')
-            ->select('InputOrderIsklIsslMSZabor.*, last_name, first_name, middle_name')
-            ->groupBy($field);
+            ->select('InputOrderIsklIsslMSZabor.*, vf.*')
+            ->leftJoin(
+                ['vf' =>
+                    '('.$subQuery
+                        ->prepare(Yii::$app->db->queryBuilder)
+                        ->createCommand()
+                        ->rawSql.')'
+                ],
+                "MSZabor=CAST(vf.[guid] AS varchar(100))"
+            );
 
         $query->andFilterWhere([
             'aid' => $this->aid,
@@ -92,12 +98,20 @@ class InputOrderZaborSearch extends InputOrderZabor
             $params['sort'] = '-DateIns';
         }
 
-
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),
             'db' => 'GemoTestDB',
             'sort' => [
-                'attributes' => $field
+                'attributes' => [
+                    'aid',
+                    'OrderID',
+                    'IsslCode',
+                    'MSZabor',
+                    'DateIns',
+                    'last_name',
+                    'first_name',
+                    'middle_name'
+                ]
             ],
         ]);
 

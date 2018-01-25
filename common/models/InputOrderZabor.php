@@ -81,7 +81,14 @@ class InputOrderZabor extends \yii\db\ActiveRecord
      */
     public function getHrPublicEmployeeOne()
     {
-        return $this->hasOne(HrPublicEmployee::className(), ['CAST([guid] AS varchar(100))' => 'MSZabor']);
+        return $this->hasOne(HrPublicEmployee::className(), [
+            'CAST([guid] AS varchar(100))' => 'MSZabor'
+        ])
+            ->where(['is not', 'guid', null])
+            ->andWhere(['!=', 'guid', ''])
+            ->andWhere(['fired_date' => ''])
+            ->andWhere(['!=', 'hiring_date', ''])
+            ->andWhere(['not in', 'type_contract', ['3','4']]);
     }
 
     /**
