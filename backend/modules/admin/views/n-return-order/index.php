@@ -125,6 +125,16 @@ $this->params['breadcrumbs'][] = [
             ],
             'parent_id',
             'parent_type',
+            [
+                'attribute' => 'agreement_status',
+                'width'=>'150px',
+                'filter' => \common\models\NReturnOrder::getAgreementArray(),
+                'value' => function ($model) {
+                    if (!is_null($model['agreement_status'])) {
+                        return \common\models\NReturnOrder::getAgreementArray($model['agreement_status']);
+                    } else return null;
+                }
+            ],
             //'last_update',
             ['class' => 'yii\grid\ActionColumn'],
         ],

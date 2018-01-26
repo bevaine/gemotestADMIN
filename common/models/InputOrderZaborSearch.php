@@ -59,10 +59,10 @@ class InputOrderZaborSearch extends InputOrderZabor
             ->distinct()
             ->select(['guid', 'first_name', 'last_name', 'middle_name'])
             ->where(['is not', 'guid', null])
-            ->andWhere(['!=', 'guid', ''])
+            ->andWhere(['not in', 'type_contract', ['3','4']])
             ->andWhere(['fired_date' => ''])
-            ->andWhere(['!=', 'hiring_date', ''])
-            ->andWhere(['not in', 'type_contract', ['3','4']]);
+            ->andWhere(['!=', 'guid', ''])
+            ->andWhere(['!=', 'hiring_date', '']);
 
         $query = InputOrderZabor::find()
             ->select('InputOrderIsklIsslMSZabor.*, vf.*')
@@ -94,10 +94,6 @@ class InputOrderZaborSearch extends InputOrderZabor
             $query->andFilterWhere(['<=', 'DateIns', date('Y-m-d 23:59:59', strtotime($this->date_to))]);
         }
 
-        if (!isset($params['sort'])) {
-            $params['sort'] = '-DateIns';
-        }
-
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),
             'db' => 'GemoTestDB',
@@ -111,7 +107,10 @@ class InputOrderZaborSearch extends InputOrderZabor
                     'last_name',
                     'first_name',
                     'middle_name'
-                ]
+                ],
+                'defaultOrder' => [
+                    'DateIns' => SORT_DESC
+                ],
             ],
         ]);
 

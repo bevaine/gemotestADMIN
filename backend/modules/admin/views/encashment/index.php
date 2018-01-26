@@ -53,6 +53,22 @@ $this->params['breadcrumbs'][] = [
             'sender_key',
             'total',
             'user_aid',
+            [
+                'attribute' => 'user_aid',
+                'width'=>'120px',
+                'value' => function($model) {
+                    /** @var \common\models\LoginsSearch $model */
+                    return Html::a(
+                        $model['user_aid'],
+                        Url::to(["/admin/logins/view?id=".$model['user_aid']]),
+                        [
+                            'title' => $model['user_aid'],
+                            'target' => '_blank'
+                        ]
+                    );
+                },
+                'format' => 'raw',
+            ],
             'receipt_number',
             // 'receipt_file',
             // 'code_1c',

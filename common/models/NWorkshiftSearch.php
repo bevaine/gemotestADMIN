@@ -65,6 +65,11 @@ class NWorkshiftSearch extends NWorkshift
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'open_date' => SORT_DESC
+                ]
+            ],
         ]);
 
         $this->load($params);

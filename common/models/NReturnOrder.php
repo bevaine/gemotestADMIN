@@ -19,6 +19,7 @@ use Yii;
  * @property integer $sync_with_lc_status
  * @property string $last_update
  * @property string $sync_with_lc_date
+ * @property integer $agreement_status
  *
  * @property NReturnOrderDetail[] $nReturnOrderDetails
  */
@@ -45,7 +46,7 @@ class NReturnOrder extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['parent_id', 'parent_type', 'status', 'user_id', 'sync_with_lc_status'], 'integer'],
+            [['parent_id', 'parent_type', 'status', 'user_id', 'sync_with_lc_status', 'agreement_status'], 'integer'],
             [['date', 'last_update', 'sync_with_lc_date'], 'safe'],
             [['order_num', 'kkm'], 'string'],
             [['total'], 'number'],
@@ -70,6 +71,7 @@ class NReturnOrder extends \yii\db\ActiveRecord
             'sync_with_lc_status' => 'Синхр. с 1С',
             'last_update' => 'Дата обнов.',
             'sync_with_lc_date' => 'Дата синхр. с 1С',
+            'agreement_status' => 'Согласование'
         ];
     }
 
@@ -79,5 +81,20 @@ class NReturnOrder extends \yii\db\ActiveRecord
     public function getNReturnOrderDetails()
     {
         return $this->hasMany(NReturnOrderDetail::className(), ['return_id' => 'id']);
+    }
+
+    /**
+     * @param null $id
+     * @return array|mixed
+     */
+    public static function getAgreementArray($id = null) {
+        $arr =  [
+            '0' => 'Не согласован',
+            '1' => 'На согласовании',
+            '2' => 'Согласован',
+            '3' => 'Не требуется',
+            '4' => 'Неизвестный статус'
+        ];
+        return is_null($id) ? $arr : $arr[$id];
     }
 }

@@ -115,7 +115,9 @@ $this->params['breadcrumbs'][] = [
                 'width'=>'150px',
                 'filter' => \common\models\Logins::getTypesArray(),
                 'value' => function ($model) {
-                    return  \common\models\Logins::getTypesArray($model['login_type']);
+                    if (!is_null($model['login_type'])) {
+                        return \common\models\Logins::getTypesArray($model['login_type']);
+                    } else return null;
                 }
             ],
             [
@@ -123,7 +125,9 @@ $this->params['breadcrumbs'][] = [
                 'width'=>'150px',
                 'filter' => \common\models\NPay::getPayTypeArray(),
                 'value' => function ($model) {
-                    return  \common\models\NPay::getPayTypeArray($model['pay_type']);
+                    if (!is_null($model['pay_type'])) {
+                        return \common\models\NPay::getPayTypeArray($model['pay_type']);
+                    } else return null;
                 }
             ],
             'cost',
