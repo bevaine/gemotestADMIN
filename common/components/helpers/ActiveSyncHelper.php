@@ -1029,6 +1029,7 @@ class ActiveSyncHelper
         }
 
         $this->type == 9 ? $counterparty_id = $this->key : $counterparty_id = 1;
+
         $objectUserCounterparty = new medUserCounterparty();
         $objectUserCounterparty->user_id = $this->aid;
         $objectUserCounterparty->counterparty_id = $counterparty_id;

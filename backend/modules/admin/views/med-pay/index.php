@@ -5,16 +5,13 @@ use kartik\grid\GridView;
 use yii\helpers\Url;
 
 /* @var $this yii\web\View */
-/* @var $searchModel common\models\NPaySearch */
+/* @var $searchModel common\models\MedPaySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Платежи: лабораторные';
-$this->params['breadcrumbs'][] = [
-    'label' => $this->title,
-    'url' => Url::to(["./pay"])
-];
+$this->title = 'Платежи: медицинские';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="npay-index">
+<div class="med-pay-index">
     <p>
         <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
@@ -51,75 +48,38 @@ $this->params['breadcrumbs'][] = [
                 'format' => 'html', // datetime
             ],
             [
-                'attribute' => 'order_num',
+                'attribute' => 'order_id',
                 'width'=>'150px',
                 'value' => function($data){
                     return Html::a(
-                        $data->order_num,
-                        'https://office.gemotest.ru/inputOrder/inputMain_test.php?oid='.$data->order_num,
+                        $data['order_id'],
+                        'https://office.gemotest.ru/mis/registry/order?order_id='.$data['order_id'],
                         [
-                            'title' => $data->order_num,
+                            'title' => $data['order_id'],
                             'target' => '_blank'
                         ]
                     );
                 },
                 'format' => 'raw',
             ],
+            'patient_id',
             [
-                'width'=>'196px',
-                'attribute' => 'order_data',
-                'value' => 'order_data',
-                'filter' => \kartik\date\DatePicker::widget([
-                    'model' => $searchModel,
-                    'attribute' => 'order_data_from',
-                    'attribute2' => 'order_data_to',
-                    'options' => [
-                        'placeholder' => 'Дата начала',
-                        'style'=>['width' => '98px']
-                    ],
-                    'options2' => [
-                        'placeholder' => 'Дата конца',
-                        'style'=>['width' => '98px']
-                    ],
-                    'separator' => 'По',
-                    'readonly' => false,
-                    'type' => \kartik\date\DatePicker::TYPE_RANGE,
-                    'pluginOptions' => [
-                        'format' => 'yyyy-mm-dd',
-                        'autoclose' => true,
-                    ]
-                ]),
-                'format' => 'html', // datetime
-            ],
-            'kkm',
-            'z_num',
-            [
-                'attribute' => 'login_id',
+                'attribute' => 'user_id',
                 'width'=>'120px',
                 'value' => function($model) {
                     /** @var \common\models\LoginsSearch $model */
                     return Html::a(
-                        $model['login_id'],
-                        Url::to(["/admin/logins/view?id=".$model['login_id']]),
+                        $model['user_id'],
+                        Url::to(["/admin/logins/view?id=".$model['user_id']]),
                         [
-                            'title' => $model['login_id'],
+                            'title' => $model['user_id'],
                             'target' => '_blank'
                         ]
                     );
                 },
                 'format' => 'raw',
             ],
-            'login_key',
-            [
-                'attribute' => 'login_type',
-                'width'=>'150px',
-                'filter' => \common\models\Logins::getTypesArray(),
-                'value' => function ($model) {
-                    if (!is_null($model['login_type'])) {
-                        return \common\models\Logins::getTypesArray($model['login_type']);
-                    } else return null;
-                }
-            ],
+            'office_id',
             [
                 'attribute' => 'pay_type',
                 'width'=>'150px',
@@ -132,28 +92,22 @@ $this->params['breadcrumbs'][] = [
             ],
             'cost',
             'total',
-            'sender_id',
-            //'sender_name',
-            // 'login_fio',
-            // 'patient_id',
+            'kkm',
+            'z_num',
+            'base_doc_type',
+            'base_doc_id',
+            // 'is_virtual',
+            // 'printlist',
+            // 'user_fio',
+            // 'free_pay',
+            // 'discount_total',
+            // 'office_name',
+            // 'user_username',
             // 'patient_fio',
-            // 'base_doc_id',
-            // 'base_doc_type',
-            // 'base_doc_date',
             // 'patient_phone',
             // 'patient_birthday',
-            // 'discount_card',
-            // 'discount_id',
-            // 'discount_name',
-            // 'discount_percent',
-            // 'bonus',
-            // 'discount_total',
-            // 'cito_factor',
-            // 'bonus_balance',
-            // 'printlist',
-            // 'free_pay',
-            // 'app_version',
             // 'pay_type_original',
+
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

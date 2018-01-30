@@ -20,6 +20,20 @@
                         'url' => '#',
                         //'active' => true,
                         'items' => [
+                            ['label' => 'Заказы', 'icon' => 'circle-o', 'url' => '#', 'active' => true,
+                                'items' =>[
+                                    [
+                                        'label' => 'Лабораторные',
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/orders'],
+                                    ],
+                                    [
+                                        'label' => 'Медицинские',
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/med-order'],
+                                    ],
+                                ]
+                            ],
                             ['label' => 'Смены', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
                                     [
@@ -93,9 +107,8 @@
                                     ],
                                 ]
                             ],
-                            ['label' => 'Инкасации', 'icon' => 'dashboard', 'url' => ['/admin/encashment'],],
-                            ['label' => 'Заказы', 'icon' => 'dashboard', 'url' => ['/admin/orders'],],
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
+                            ['label' => 'Инкасации', 'icon' => 'dashboard', 'url' => ['/admin/encashment'],],
                             ['label' => 'Контрагенты', 'icon' => 'dashboard', 'url' => ['/admin/kontragents'],],
                             ['label' => 'Франчайзи', 'icon' => 'dashboard', 'url' => ['/admin/franchazy'],],
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
