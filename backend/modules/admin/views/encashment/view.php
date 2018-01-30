@@ -33,7 +33,9 @@ $this->params['breadcrumbs'][] = $this->title;
         'sender_key',
         'user_aid',
         [
-            'value' => \common\models\Logins::findOne($model->user_aid)->Name
+            'label' => 'Пользователь',
+            'value' => \common\models\Logins::findOne($model->user_aid)->Name,
+            'format' => 'html'
         ],
         'receipt_number',
         'receipt_file',

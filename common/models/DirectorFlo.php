@@ -16,6 +16,7 @@ use Yii;
  * @property integer $passReplaced
  * @property string $login
  * @property string $password
+ * @property string $fullName
  */
 class DirectorFlo extends \yii\db\ActiveRecord
 {
@@ -62,5 +63,12 @@ class DirectorFlo extends \yii\db\ActiveRecord
             'login' => 'Login',
             'password' => 'Password',
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function fullName() {
+        return $this->last_name.' '.$this->first_name.' '.$this->middle_name;
     }
 }

@@ -20,7 +20,6 @@ use Yii;
  * @property string $last_update
  * @property string $sync_with_lc_date
  * @property integer $agreement_status
- *
  * @property NReturnOrderDetail[] $nReturnOrderDetails
  */
 class NReturnOrder extends \yii\db\ActiveRecord

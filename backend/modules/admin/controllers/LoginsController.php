@@ -343,7 +343,8 @@ class LoginsController extends Controller
 
                 $style = '';
                 $message = '';
-                !empty($activeSyncHelper->idAD) ? $auth = 'AD' : $auth = 'GemoSystem';
+                !empty($activeSyncHelper->idAD) ? $auth = 'Active Directory' : $auth = 'GemoSystem';
+                $message .= '<p>Aвторизации через '.$auth.'</p>';
 
                 $url = \yii\helpers\Url::toRoute([
                     './logins/view',
@@ -355,8 +356,7 @@ class LoginsController extends Controller
                     'target' => '_blank'
                 ]);
                 if ($activeSyncHelper->state == 'new') {
-                    !empty($activeSyncHelper->idAD) ? $style = 'info' : $style = 'success';
-                    $message = '<p>Успешно добавлена УЗ для <b>'.$url.'</b>';
+
                     if ($activeSyncHelper->type == 8) {
                         $urlKey = \yii\helpers\Url::toRoute([
                             './logins/index',
@@ -366,19 +366,41 @@ class LoginsController extends Controller
                             'title' => $activeSyncHelper->key,
                             'target' => '_blank'
                         ]);
-                        $message .= ' (отделение '.$urlKey.')';
+
+                        $message .= '<p>Отделение №<b>'.$urlKey.'</b>';
+                        if ($modelLogin = Logins::findOne($activeSyncHelper->aid)) {
+                            $emailArr = [];
+                            if (isset($modelLogin->directorInfo->fullName)) {
+                                $message .= ', директор '.$modelLogin->directorInfo->fullName;
+                            }
+                            if (isset($modelLogin->Email)) {
+                                $emailArr[] =  $modelLogin->Email;
+                            }
+                            if (isset($modelLogin->directorInfo->email)) {
+                                $emailArr[] =  $modelLogin->directorInfo->email;
+                            }
+
+                            if (isset($emailArr) && is_array($emailArr)) {
+                                $email = implode(';', $emailArr);
+                                $message .= ' (почта <b>'.Html::mailto($email).'</b>)';
+                            }
+                        }
+                        $message .= '</p><br>';
                     }
-                    $message .= ' авторизации через '.$auth.'</p>';
+
+                    !empty($activeSyncHelper->idAD) ? $style = 'info' : $style = 'success';
+                    $message .= '<p>Успешно добавлена УЗ для <b>'.$url.'</b></p>';
+
                 } elseif ($activeSyncHelper->state == 'old') {
                     $style = 'warning';
-                    $message = '<p>У пользователя <b>'.$url.'</b> уже есть УЗ для авторизации через '.$auth.'</p>';
+                    $message = '<p>У пользователя <b>'.$url.'</b> уже есть учетная запись!</p>';
                 }
                 $message .= '<p>Данные для входа в ';
-                $message .= Html::a('GemoSystem (https://office.gemotest.ru)', 'https://office.gemotest.ru', [
+                $message .= Html::a('GemoSystem (https://office.gemotest.ru):', 'https://office.gemotest.ru', [
                     'title' => 'https://office.gemotest.ru',
                     'target' => '_blank'
                 ]);
-                $message .= '<p>';
+                $message .= '</p>';
                 $message .= '<br>Логин: <b>' . $activeSyncHelper->login.'</b>';
                 $message .= '<br>Пароль: <b>' . $activeSyncHelper->password.'</b>';
                 Yii::$app->session->setFlash($style, $message);

@@ -48,4 +48,12 @@ class medUserCounterparty extends \yii\db\ActiveRecord
             'counterparty_id' => 'Counterparty ID',
         ];
     }
+
+    public function getSenderKey ()
+    {
+        return $this->hasOne(MedCounterpartyPos::className(), [
+            'counterparty_id' => 'counterparty_id'
+        ]);
+    }
+
 }

@@ -27,7 +27,7 @@ class NReturnOrderSearch extends NReturnOrder
     public function rules()
     {
         return [
-            [['id', 'parent_id', 'parent_type', 'status', 'user_id', 'sync_with_lc_status'], 'integer'],
+            [['id', 'parent_id', 'parent_type', 'status', 'user_id', 'sync_with_lc_status', 'agreement_status'], 'integer'],
             [['date', 'date_from', 'date_to', 'date_from_1c', 'date_to_1c', 'order_num', 'kkm', 'last_update', 'sync_with_lc_date'], 'safe'],
             [['total'], 'number'],
         ];
@@ -78,6 +78,7 @@ class NReturnOrderSearch extends NReturnOrder
             'user_id' => $this->user_id,
             'sync_with_lc_status' => $this->sync_with_lc_status,
             'last_update' => $this->last_update,
+            'agreement_status' => $this->agreement_status,
         ]);
 
         if (!empty($params["NReturnOrderSearch"]['date_from']) && !empty($params["NReturnOrderSearch"]['date_to'])) {

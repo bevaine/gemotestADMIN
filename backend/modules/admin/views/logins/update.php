@@ -7,6 +7,7 @@ use kartik\select2\Select2;
 use yii\web\JsExpression;
 use common\models\AddUserForm;
 use common\models\Logins;
+use common\components\helpers\FunctionsHelper;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Logins */
@@ -21,20 +22,6 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?php
-    $url = \yii\helpers\Url::to(['/admin/logins/ajax-user-data-list']);
-
-    $initScript = <<< SCRIPT
-    function (element, callback) {
-        var id=\$(element).val();
-        if (id !== "") {
-            \$.ajax("{$url}?id=" + id, {
-                dataType: "json"
-            }).done(function(data) { callback(data.results);});
-        }
-    }
-SCRIPT;
-    ?>
     <div class="box box-solid box-success">
 
         <div class="box-header with-border">
@@ -45,6 +32,7 @@ SCRIPT;
 
             <?php
             if ($model->UserType != 8) :
+                $url = \yii\helpers\Url::to(['/admin/logins/ajax-user-data-list']);
                 echo $form->field($model, 'aid_donor')->widget(Select2::classname(), [
                     'options' => ['placeholder' => 'ФИО сотрудника'],
                     'pluginOptions' => [
@@ -57,9 +45,9 @@ SCRIPT;
                             'data' => new JsExpression('function(params) { return {search:params.term}; }'),
                             'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
                         ],
-                        'initSelection' => new JsExpression($initScript)
+                        'initSelection' => new JsExpression(FunctionsHelper::AjaxInitScript($url))
                     ],
-                ])->label('Установить права как у:');
+                ])->label('Установить права как у');
             endif;
             ?>
 
