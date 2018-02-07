@@ -2,6 +2,8 @@
 
 namespace app\modules\admin\controllers;
 
+use common\models\ErpGroupsRelations;
+use common\models\ErpUsergroups;
 use common\models\NAdUseraccounts;
 use common\models\NAdUsers;
 use common\models\NAuthItem;
@@ -96,6 +98,16 @@ class LoginsController extends Controller
             if (!empty($request['action']) && isset($request['department'])) {
                 $action = $request['action'];
                 $department = $request['department'];
+            }
+
+            ErpGroupsRelations::deleteAll(
+                ['department' => $department]
+            );
+            if (isset($request['erp-user-groups'])) {
+                $newErpUser = new ErpGroupsRelations();
+                $newErpUser->group = $request['erp-user-groups'];
+                $newErpUser->department = $department;
+                $newErpUser->save();
             }
 
             if ($action == 'assign'
@@ -431,17 +443,20 @@ class LoginsController extends Controller
     {
         $model = $this->findModel($id, $ad);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($modelDirector = $model->directorInfo) {
+            if ($modelDirector->load(Yii::$app->request->post())) {
 
-            /** @var $transaction Transaction */
-            $connection = 'GemoTestDB';
-            $db = Yii::$app->$connection;
-            $transaction = $db->beginTransaction();
-            try {
-                if (isset($model->directorInfo)) {
-                    $modelDirector = $model->directorInfo;
-                    $modelDirector->password = $model->Pass;
+                if ($modelDirector->getOldAttribute('password')
+                    != $modelDirector['password']){
+                    self::resetPassword($model);
+                }
 
+                /** @var $transaction Transaction */
+                $connection = 'GemoTestDB';
+                $db = Yii::$app->$connection;
+                $transaction = $db->beginTransaction();
+
+                try {
                     if (!$modelDirector->save()) {
                         Yii::getLogger()->log([
                             '$model->directorInfo->save' => $modelDirector->errors
@@ -469,23 +484,36 @@ class LoginsController extends Controller
                             $rowInsert
                         )->execute();
                     }
+                    $transaction->commit();
+                } catch (\Exception $e) {
+                    $transaction->rollBack();
+                    Yii::getLogger()->log([
+                        'DirectorFloSender->batchInsert' => $e->getMessage()
+                    ], Logger::LEVEL_ERROR, 'binary');
                 }
-                $transaction->commit();
-            } catch (\Exception $e) {
-                $transaction->rollBack();
-                Yii::getLogger()->log([
-                    'DirectorFloSender->batchInsert' => $e->getMessage()
-                ], Logger::LEVEL_ERROR, 'binary');
+            }
+        }
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            if (($adUsers = $model->adUsers) &&
+                ($adUserAccountsOne = $model->adUsers->adUserAccounts)) {
+                if ($adUserAccountsOne->load(Yii::$app->request->post())) {
+                    if ($adUserAccountsOne->getOldAttribute('ad_pass')
+                        != $adUserAccountsOne['ad_pass']){
+                        if ($adPass = ActiveSyncHelper::resetPasswordAD(
+                            $adUsers->AD_login, $adUserAccountsOne['ad_pass'])
+                        ) {
+                            $adUserAccountsOne->ad_pass = $adPass;
+                            if ($adUserAccountsOne->save()) {
+                                $message = 'Успешно был сброшен пароль для УЗ <b>'.$adUsers->AD_login.'</b>';
+                                Yii::$app->session->setFlash('success', $message);
+                            }
+                        }
+                    }
+                }
             }
 
-            if (!empty(trim($model->EmailPassword))) {
-                self::resetPassword($model);
-            }
-            if ($adUsersLogins = $model->adUsers) {
-                if ($adUsersLogins->load(Yii::$app->request->post())) {
-                    $adUsersLogins->save();
-                }
-            }
             return $this->redirect([
                 'view',
                 'id' => $model->aid,
@@ -580,9 +608,17 @@ class LoginsController extends Controller
             $activeSyncHelper->middleName = $middle_name;
         }
 
-        $activeSyncHelper->fullName = $activeSyncHelper->lastName
-            . " " . $activeSyncHelper->firstName
-            . " " . $activeSyncHelper->middleName;
+        if (!empty(trim($activeSyncHelper->lastName))) {
+            $activeSyncHelper->fullName = trim($activeSyncHelper->lastName);
+        } else exit('null') ;
+
+        if (!empty(trim($activeSyncHelper->firstName))) {
+            $activeSyncHelper->fullName .= " " . trim($activeSyncHelper->firstName);
+        }
+
+        if (!empty(trim($activeSyncHelper->middleName))) {
+            $activeSyncHelper->fullName .= " " . trim($activeSyncHelper->middleName);
+        }
 
         //todo проверяем существует ли пользователь с ФИО в AD
         if ($arr = $activeSyncHelper->checkUserNameAd()) {
@@ -643,12 +679,12 @@ class LoginsController extends Controller
             $search = mb_strtolower($search, 'UTF-8');
             $data = Logins::find()->select(['aid, [Name]'])
                 ->where('lower(Name) LIKE \'%' . $search . '%\'')
-                ->andWhere('UserType in (7,5)')
+                ->andWhere('UserType in (7,5,8)')
                 ->limit(20)
                 ->all();
             /** @var Logins $userData */
             foreach ($data as $userData) {
-                $out['results'][] = ['id' => $userData->aid, 'text' => $userData->Name];
+                $out['results'][] = ['id' => $userData->aid, 'text' => $userData->Name.' '];
             }
         } elseif ($id > 0) {
             $out['results'] = ['id' => $id, 'text' => Logins::findOne($id)->Name];
@@ -674,8 +710,8 @@ class LoginsController extends Controller
                 ->andWhere(['is not', 'guid', null])
                 ->andWhere(['!=', 'guid', ''])
                 ->andWhere(['fired_date' => ''])
-                ->andWhere(['!=', 'hiring_date', ''])
-                ->andWhere(['not in', 'type_contract', ['3','4']])
+                //->andWhere(['!=', 'hiring_date', ''])
+                ->andWhere(['not in', 'type_contract', ['3']])
                 ->orderBy(['last_name' =>'acs'])
                 ->limit(20)
                 ->all();
@@ -714,14 +750,20 @@ class LoginsController extends Controller
         $out = null;
 
         if (!is_null($department)) {
-            $data = Permissions::find()
-                ->where(['department' => $department])
-                ->all();
-            if ($data) {
+
+            if ($data = Permissions::find()->where(['department' => $department])->all()) {
                 /** @var Permissions $userData */
                 foreach ($data as $userData) {
-                    $out['results'][] = ['id' => $userData->permission, 'text' => $userData->name->description];
+                    $out['permission'][] = [
+                        'id' => $userData->permission,
+                        'text' => $userData->name->description
+                    ];
                 }
+            }
+
+            /** @var ErpGroupsRelations $data */
+            if ($data = ErpGroupsRelations::findOne(['department' => $department])) {
+                $out['erp_groups'] = $data->group;
             }
         }
 

@@ -37,7 +37,7 @@ $this->params['breadcrumbs'][] = 'Редактирование';
                     'options' => ['placeholder' => 'ФИО сотрудника'],
                     'pluginOptions' => [
                         'allowClear' => true,
-                        'minimumInputLength' => 2,
+                        'minimumInputLength' => 1,
                         'multiple' => false,
                         'ajax' => [
                             'url' => $url,
@@ -64,10 +64,10 @@ $this->params['breadcrumbs'][] = 'Редактирование';
             <?= $form->field($model, 'Email')->textInput() ?>
 
             <?php if ($model->UserType == 9) : ?>
-                <p>
-                    <?= Html::label('Пароль к почте') ?>
-                    <?= Html::input('password', 'Logins[EmailPassword]', '         ', ['class' => 'form-control']) ?>
-                </p>
+
+                <?= $form->field($model->directorInfo, 'email')->textInput() ?>
+
+                <?= $form->field($model->directorInfo, 'password')->passwordInput() ?>
 
                 <p>
                 <?= Html::label('Подключенные отделения'); ?>
@@ -148,7 +148,7 @@ $this->params['breadcrumbs'][] = 'Редактирование';
                 <?php
                 if ($model->adUserAccounts) {
                     echo $form->field($model->adUserAccounts, 'ad_login')->textInput(['readonly' => true]);
-                    echo $form->field($model->adUserAccounts, 'ad_pass')->textInput(['readonly' => true]);
+                    echo $form->field($model->adUserAccounts, 'ad_pass')->textInput();
                 } ?>
             </div>
         </div>

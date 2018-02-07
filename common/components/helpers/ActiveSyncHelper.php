@@ -10,6 +10,7 @@ namespace common\components\helpers;
 
 use common\models\DirectorFlo;
 use common\models\DirectorFloSender;
+use common\models\ErpGroupsRelations;
 use common\models\medUserCounterparty;
 use common\models\NSprDoctorConsultant;
 use common\models\Permissions;
@@ -976,7 +977,16 @@ class ActiveSyncHelper
             return false;
         }
 
-        if (ErpUsers::findOne(['login' => $this->loginAD,])){
+        if (!$groupId = ErpGroupsRelations::findOne([
+            'department' => $this->department
+        ])) {
+            Yii::getLogger()->log([
+                'addCheckErpUsers'=>'Нет привязки департамента к роли в ERP!'
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+
+        if (ErpUsers::findOne(['login' => $this->accountName,])){
             Yii::getLogger()->log([
                 'addCheckErpUsers'=>'В ErpUsers уже есть запись!'
             ], Logger::LEVEL_WARNING, 'binary');
@@ -984,11 +994,11 @@ class ActiveSyncHelper
         }
 
         $objectErpUsers = new ErpUsers();
-        $objectErpUsers->group_id = 11;
+        $objectErpUsers->group_id = $groupId;
         $objectErpUsers->name = $this->fullName;
-        $objectErpUsers->login = $this->loginAD;
+        $objectErpUsers->login = $this->accountName;
         $objectErpUsers->skynet_login = $this->loginGS;
-        $objectErpUsers->password = 'd9b1d7db4cd6e70935368a1efb10e377';
+        $objectErpUsers->password = 'd9b1d7db4cd6e70935368a1efb10e377'; //123
         $objectErpUsers->status = 1;
         $objectErpUsers->save();
 
@@ -1136,14 +1146,13 @@ class ActiveSyncHelper
     private function addDepartmentRules()
     {
         //todo если call-центр, клиент-меджер, выездная медсестра
-        if (in_array($this->department, [0, 1, 6])) {
+        if (in_array($this->department, [1, 6, 10])) {
             //todo добавляем в модуль выездного обслуживания
             if (!$this->addCheckErpUsers()) return false;
         }
 
         //todo выездная медсетра
-        if (!in_array($this->department, [0])
-            && $this->nurse == 1) {
+        if ($this->department == 10) {
             if (!$this->addCheckErpNurses()) return false;
         }
         return true;
@@ -1187,7 +1196,7 @@ class ActiveSyncHelper
             $this->passwordAD = '******';
 
             if ($this->resetPassword) {
-                $newPasswordAd = $this->resetPasswordAD($this->accountName);
+                $newPasswordAd = self::resetPasswordAD($this->accountName);
                 if ($newPasswordAd) {
                     Yii::getLogger()->log([
                         'resetPasswordAD' => 'Пароль успешно изменен для ' . $this->accountName
@@ -1552,11 +1561,13 @@ class ActiveSyncHelper
 
     /**
      * @param $accountName
-     * @return bool|string
+     * @param null $password
+     * @return bool|null|string
      */
-    public function resetPasswordAD($accountName)
+    public static function resetPasswordAD($accountName, $password = null)
     {
-        $newPassword = self::generatePasswordAD();
+       is_null($password) ? $newPassword = self::generatePasswordAD() : $newPassword = $password;
+
         $newPasswordUTF6LE = iconv("UTF-8", "UTF-16LE", '"' . $newPassword . '"');
         $ADgroup = "DC=lab,DC=gemotest,DC=ru";
 
@@ -1691,6 +1702,7 @@ class ActiveSyncHelper
             if (!$ldapbind) return false;
 
             $sr = ldap_search($ldapconn, self::LDAP_DN, $ADcheckUser, $justthese);
+
             $info = ldap_get_entries($ldapconn, $sr);
             ldap_close($ldapconn);
 

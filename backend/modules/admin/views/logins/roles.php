@@ -14,7 +14,7 @@ UsersAsset::register($this);
 ?>
 
 <div class="permission-children-editor">
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id'=>'form-input']); ?>
     <div class="roles-form">
         <div class="row">
             <div class="col-lg-4">
@@ -33,6 +33,25 @@ UsersAsset::register($this);
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group erp_users">
+                    <?= Html::label('Права в модуле выездного обслуживания') ?>
+                    <?= Html::dropDownList(
+                        'Permissions[erp-user-groups]',
+                        'null',
+                        \common\models\ErpUsergroups::getErpGroupsList(),
+                        [
+                            'class' =>'form-control',
+                            'id' => 'erp_user_groups',
+                            'prompt' => 'нет',
+                        ]
+                    ) ?>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-xs-5 children-list">
                 <?= Html::label('Роли назначенные на права') ?>
@@ -67,19 +86,25 @@ UsersAsset::register($this);
             department: department
         },
         success: function(res) {
-            var optionsAsString = 0;
             res = JSON.parse(res);
-            if (res !== null) {
-                if (res.results.length > 0) {
-                    for (var i = 0; i < res.results.length; i++) {
-                        optionsAsString += "<option value='" + res.results[i]['id'] + "'>" + res.results[i]['text'] + "</option>";
-                    }
+            var optionsAsString1 = 0;
+            var permission = res.permission;
+            var erp_groups = res.erp_groups;
+
+            if (permission !== undefined && permission.length > 0) {
+                for (var i1 = 0; i1 < permission.length; i1++) {
+                    optionsAsString1 += "<option value='" + permission[i1]['id'] + "'>" + permission[i1]['text'] + "</option>";
                 }
             }
             $(".permission select option").each(function () {
                 $(this).remove();
             });
-            $(".permission select").append(optionsAsString);
+            $(".permission select").append(optionsAsString1);
+
+            $('#erp_user_groups').val(null);
+            if (erp_groups !== undefined) {
+                $('#erp_user_groups').val(erp_groups);
+            }
         }
     });
 }
@@ -89,6 +114,10 @@ UsersAsset::register($this);
     $js = <<< JS
         $(".department select").change(function() { 
             checkAD($('#permissions-department').val());
+        });
+
+        $(".erp_users select").change(function() { 
+            $("#form-input").submit();
         });
 
         $(document).ready(function() { 

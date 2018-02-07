@@ -57,7 +57,7 @@ class MedPay extends \yii\db\ActiveRecord
     {
         return [
             [['date', 'patient_birthday'], 'safe'],
-            [['order_id', 'patient_id', 'patient_fio', 'patient_phone', 'user_id', 'user_username', 'office_id', 'office_name', 'pay_type', 'cost', 'total'], 'required'],
+            [['order_id', 'patient_id', 'patient_fio', 'user_id', 'user_username', 'office_id', 'office_name', 'pay_type', 'cost', 'total'], 'required'],
             [['order_id', 'patient_id', 'user_id', 'pay_type', 'printlist', 'free_pay', 'base_doc_type', 'base_doc_id', 'is_virtual', 'pay_type_original'], 'integer'],
             [['patient_fio', 'patient_phone', 'user_username', 'office_id', 'office_name', 'user_fio', 'kkm', 'z_num'], 'string'],
             [['cost', 'discount_total', 'total'], 'number'],
