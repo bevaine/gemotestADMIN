@@ -293,9 +293,9 @@ class LoginsController extends Controller
                 $activeSyncHelper->middleName = trim($model->middleName);
             } elseif ($param == 'doc') {
                 $activeSyncHelper->type = 5;
+                $activeSyncHelper->department = 8;
                 $activeSyncHelper->tableName = 'Doctors';
                 $activeSyncHelper->typeLO = 'SLO';
-                $activeSyncHelper->department = 8;
                 $activeSyncHelper->key = $model->docId;
                 $activeSyncHelper->cacheId = $model->docId;
                 $activeSyncHelper->specId = $model->specId;

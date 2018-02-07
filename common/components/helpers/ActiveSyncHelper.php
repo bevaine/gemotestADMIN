@@ -960,6 +960,21 @@ class ActiveSyncHelper
     }
 
     /**
+     * @param $department
+     * @return bool|string
+     */
+    public static function getRelationGroup($department) {
+        if (!$groupId = ErpGroupsRelations::findOne([
+            'department' => $department
+        ])) {
+            Yii::getLogger()->log([
+                'addCheckErpUsers'=>'Нет привязки департамента к роли в ERP!'
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }  else return $groupId->group;
+    }
+
+    /**
      * @return bool
      */
     public function addCheckErpUsers()
@@ -977,14 +992,11 @@ class ActiveSyncHelper
             return false;
         }
 
-        if (!$groupId = ErpGroupsRelations::findOne([
-            'department' => $this->department
-        ])) {
-            Yii::getLogger()->log([
-                'addCheckErpUsers'=>'Нет привязки департамента к роли в ERP!'
-            ], Logger::LEVEL_ERROR, 'binary');
-            return false;
-        }
+        if ($this->nurse == 1 && $this->department == 0) {
+            $department = 10;
+        } else $department = $this->department;
+
+        if (!$group = self::getRelationGroup($department)) return false;
 
         if (ErpUsers::findOne(['login' => $this->accountName,])){
             Yii::getLogger()->log([
@@ -994,13 +1006,12 @@ class ActiveSyncHelper
         }
 
         $objectErpUsers = new ErpUsers();
-        $objectErpUsers->group_id = $groupId;
+        $objectErpUsers->group_id = $group;
         $objectErpUsers->name = $this->fullName;
         $objectErpUsers->login = $this->accountName;
         $objectErpUsers->skynet_login = $this->loginGS;
         $objectErpUsers->password = 'd9b1d7db4cd6e70935368a1efb10e377'; //123
         $objectErpUsers->status = 1;
-        $objectErpUsers->save();
 
         if ($objectErpUsers->save()) {
             Yii::getLogger()->log([
@@ -1062,9 +1073,8 @@ class ActiveSyncHelper
      */
     public function addCheckErpNurses()
     {
-        if (empty($this->loginGS)
-            || empty($this->loginAD)
-            || empty($this->fullName)
+        if (!isset($this->department)
+            || !isset($this->cacheId)
         ) {
             Yii::getLogger()->log([
                 'addCheckErpNurses'=>[
@@ -1075,17 +1085,25 @@ class ActiveSyncHelper
             return false;
         }
 
+        if ($this->nurse == 1 && $this->department == 0) {
+            $department = 10;
+        } else $department = $this->department;
+
+        if (!$group = self::getRelationGroup($department)){
+            return false;
+        }
+
         $nurseId = ErpUsers::find()
-            ->select('id')
-            ->where(['group_id' => 11])
-            ->orderBy('id DESC')
-            ->one();
+            ->where(['group_id' => $group])
+            ->max('id');
+
+        if (!$nurseId) return false;
 
         $objectErpNurses = new ErpNurses();
         $objectErpNurses->user_id = $nurseId;
         $objectErpNurses->nurse_email = $this->emailAD;
         $objectErpNurses->nurse_phone = '';
-        $objectErpNurses->nurse_key = $this->key;
+        $objectErpNurses->nurse_key = strval($this->cacheId);
 
         if ($objectErpNurses->save()) {
             Yii::getLogger()->log([
@@ -1146,13 +1164,13 @@ class ActiveSyncHelper
     private function addDepartmentRules()
     {
         //todo если call-центр, клиент-меджер, выездная медсестра
-        if (in_array($this->department, [1, 6, 10])) {
+        if (in_array($this->department, [1, 6, 0])) {
             //todo добавляем в модуль выездного обслуживания
             if (!$this->addCheckErpUsers()) return false;
         }
 
         //todo выездная медсетра
-        if ($this->department == 10) {
+        if ($this->nurse == 1) {
             if (!$this->addCheckErpNurses()) return false;
         }
         return true;
