@@ -755,7 +755,8 @@ class LoginsController extends Controller
      */
     public function actionAjaxListName($department = false)
     {
-        $out = null;
+        $out['erp_groups'] = null;
+        $out['erp_nurse'] = false;
 
         if (!is_null($department)) {
 
@@ -772,6 +773,8 @@ class LoginsController extends Controller
             /** @var ErpGroupsRelations $data */
             if ($data = ErpGroupsRelations::findOne(['department' => $department])) {
                 $out['erp_groups'] = $data->group;
+                $out['erp_nurse'] = !empty($data->nurse) ? true : false;
+
             }
         }
 

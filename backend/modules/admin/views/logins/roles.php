@@ -61,7 +61,7 @@ UsersAsset::register($this);
                         \common\models\ErpGroupsRelations::getNurse($department),
                         [
                             'label' => 'Добавить в справочник выездных медсестер',
-                            'id' => 'erp_user_nurses',
+                            'id' => 'erp_user_nurse',
                         ]
                     ) ?>
                 </div>
@@ -118,10 +118,9 @@ UsersAsset::register($this);
             });
             $(".permission select").append(optionsAsString1);
 
-            $('#erp_user_groups').val(null);
-            if (erp_groups !== undefined) {
-                $('#erp_user_groups').val(erp_groups);
-            }
+            $('#erp_user_groups').val(erp_groups);
+
+            $('#erp_user_nurse').attr('checked', erp_nurse);
         }
     });
 }
