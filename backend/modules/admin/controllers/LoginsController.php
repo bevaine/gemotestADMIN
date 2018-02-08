@@ -501,15 +501,18 @@ class LoginsController extends Controller
                 if ($adUserAccountsOne->load(Yii::$app->request->post())) {
                     if ($adUserAccountsOne->getOldAttribute('ad_pass')
                         != $adUserAccountsOne['ad_pass']){
+                        $status = 'error';
+                        $message = 'Не удалось сбросить пароль для УЗ <b>'.$adUsers->AD_login.'</b>, возможно AD запись удалена!';
                         if ($adPass = ActiveSyncHelper::resetPasswordAD(
                             $adUsers->AD_login, $adUserAccountsOne['ad_pass'])
                         ) {
                             $adUserAccountsOne->ad_pass = $adPass;
                             if ($adUserAccountsOne->save()) {
+                                $status = 'success';
                                 $message = 'Успешно был сброшен пароль для УЗ <b>'.$adUsers->AD_login.'</b>';
-                                Yii::$app->session->setFlash('success', $message);
                             }
                         }
+                        Yii::$app->session->setFlash($status, $message);
                     }
                 }
             }

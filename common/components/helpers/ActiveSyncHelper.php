@@ -992,11 +992,11 @@ class ActiveSyncHelper
             return false;
         }
 
-        if ($this->nurse == 1 && $this->department == 0) {
-            $department = 10;
-        } else $department = $this->department;
+        $this->nurse == 1 ? $department = 10 : $department = $this->department;
 
-        if (!$group = self::getRelationGroup($department)) return false;
+        if (!$group = self::getRelationGroup($department)){
+            return true;
+        }
 
         if (ErpUsers::findOne(['login' => $this->accountName,])){
             Yii::getLogger()->log([
@@ -1164,8 +1164,7 @@ class ActiveSyncHelper
     private function addDepartmentRules()
     {
         //todo если call-центр, клиент-меджер, выездная медсестра
-        if (in_array($this->department, [1, 6])
-            || ($this->department == 0 && $this->nurse == 1)) {
+        if (in_array($this->department, [1, 6]) || ($this->nurse == 1)) {
             //todo добавляем в модуль выездного обслуживания
             if (!$this->addCheckErpUsers()) return false;
         }
