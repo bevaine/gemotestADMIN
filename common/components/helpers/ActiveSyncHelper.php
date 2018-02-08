@@ -1029,48 +1029,6 @@ class ActiveSyncHelper
     /**
      * @return bool
      */
-    public function addCheckCounterparty()
-    {
-        if (empty($this->aid)
-        ) {
-            Yii::getLogger()->log([
-                'addCheckCounterparty'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
-            return false;
-        }
-
-        if (medUserCounterparty::findOne(['user_id' => $this->aid])){
-            Yii::getLogger()->log([
-                'addCheckCounterparty'=>'В medUserCounterparty уже есть запись!'
-            ], Logger::LEVEL_WARNING, 'binary');
-            return true;
-        }
-
-        $this->type == 9 ? $counterparty_id = $this->key : $counterparty_id = 1;
-
-        $objectUserCounterparty = new medUserCounterparty();
-        $objectUserCounterparty->user_id = $this->aid;
-        $objectUserCounterparty->counterparty_id = $counterparty_id;
-
-        if ($objectUserCounterparty->save()) {
-            Yii::getLogger()->log([
-                'objectUserCounterparty->save()' => $objectUserCounterparty
-            ], Logger::LEVEL_WARNING, 'binary');
-        } else {
-            Yii::getLogger()->log([
-                'objectUserCounterparty->save()'=>$objectUserCounterparty->errors
-            ], Logger::LEVEL_ERROR, 'binary');
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @return bool
-     */
     public function addCheckErpNurses()
     {
         if (!isset($this->department)
@@ -1112,6 +1070,48 @@ class ActiveSyncHelper
         } else {
             Yii::getLogger()->log([
                 'objectErpNurses->save()'=>$objectErpNurses->errors
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function addCheckCounterparty()
+    {
+        if (empty($this->aid)
+        ) {
+            Yii::getLogger()->log([
+                'addCheckCounterparty'=>[
+                    'Одно из обязательных полей пустое!',
+                    ArrayHelper::toArray($this)
+                ]
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+
+        if (medUserCounterparty::findOne(['user_id' => $this->aid])){
+            Yii::getLogger()->log([
+                'addCheckCounterparty'=>'В medUserCounterparty уже есть запись!'
+            ], Logger::LEVEL_WARNING, 'binary');
+            return true;
+        }
+
+        $this->type == 9 ? $counterparty_id = $this->key : $counterparty_id = 1;
+
+        $objectUserCounterparty = new medUserCounterparty();
+        $objectUserCounterparty->user_id = $this->aid;
+        $objectUserCounterparty->counterparty_id = $counterparty_id;
+
+        if ($objectUserCounterparty->save()) {
+            Yii::getLogger()->log([
+                'objectUserCounterparty->save()' => $objectUserCounterparty
+            ], Logger::LEVEL_WARNING, 'binary');
+        } else {
+            Yii::getLogger()->log([
+                'objectUserCounterparty->save()'=>$objectUserCounterparty->errors
             ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
@@ -1164,7 +1164,8 @@ class ActiveSyncHelper
     private function addDepartmentRules()
     {
         //todo если call-центр, клиент-меджер, выездная медсестра
-        if (in_array($this->department, [1, 6, 0])) {
+        if (in_array($this->department, [1, 6])
+            || ($this->department == 0 && $this->nurse == 1)) {
             //todo добавляем в модуль выездного обслуживания
             if (!$this->addCheckErpUsers()) return false;
         }
