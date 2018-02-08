@@ -55,4 +55,16 @@ class ErpGroupsRelations extends \yii\db\ActiveRecord
     {
         return $this->hasOne(ErpUsergroups::className(), ['id' => 'group']);
     }
+
+    /**
+     * @param $department
+     * @return bool
+     */
+    public static function getNurse($department)
+    {
+        if ($data = self::findOne(['department' => $department])) {
+            if ($data->nurse == 1) return true;
+        }
+        return false;
+    }
 }

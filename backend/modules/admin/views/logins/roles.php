@@ -58,7 +58,7 @@ UsersAsset::register($this);
                     <? //Html::label('Добавить в справочник выездных медсестер') ?>
                     <?= Html::checkbox(
                         'Permissions[erp-user-nurse]',
-                        \common\models\ErpGroupsRelations::findOne(['department' => $department])->nurse,
+                        \common\models\ErpGroupsRelations::getNurse($department),
                         [
                             'label' => 'Добавить в справочник выездных медсестер',
                             'id' => 'erp_user_nurses',
