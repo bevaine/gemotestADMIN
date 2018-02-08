@@ -103,12 +103,15 @@ class LoginsController extends Controller
             ErpGroupsRelations::deleteAll(
                 ['department' => $department]
             );
-            if (isset($request['erp-user-groups'])) {
-                $newErpUser = new ErpGroupsRelations();
-                $newErpUser->group = $request['erp-user-groups'];
-                $newErpUser->department = $department;
-                $newErpUser->save();
-            }
+
+            !empty($request['erp-user-nurse']) ? $nurse = 1 : $nurse = null;
+            isset($request['erp-user-groups']) ? $groups = $request['erp-user-groups'] : $groups = null;
+
+            $newErpUser = new ErpGroupsRelations();
+            $newErpUser->group = $groups;
+            $newErpUser->department = $department;
+            $newErpUser->nurse = $nurse;
+            $newErpUser->save();
 
             if ($action == 'assign'
                 && !empty($request['list-permission'])
@@ -333,14 +336,16 @@ class LoginsController extends Controller
                 }
             }
 
-            if (in_array($activeSyncHelper->department, [10])) {
-                $activeSyncHelper->department = 0;
-                $activeSyncHelper->nurse = 1;
-            }
+            $activeSyncHelper->erpGroup = $activeSyncHelper->department;
 
+            //todo признак добавления в справочник медсестр
+            $activeSyncHelper->nurse = ErpGroupsRelations::findOne([
+                'department' => $activeSyncHelper->department
+            ]);
+
+            //todo установка алиаса для ролей
             if (in_array($activeSyncHelper->department, [21, 22]))
                 $activeSyncHelper->department = 2;
-
             if (in_array($activeSyncHelper->department, [31, 32, 33]))
                 $activeSyncHelper->department = 3;
 

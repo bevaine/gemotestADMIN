@@ -53,6 +53,22 @@ UsersAsset::register($this);
         </div>
 
         <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group erp_nurse">
+                    <? //Html::label('Добавить в справочник выездных медсестер') ?>
+                    <?= Html::checkbox(
+                        'Permissions[erp-user-nurse]',
+                        \common\models\ErpGroupsRelations::findOne(['department' => $department])->nurse,
+                        [
+                            'label' => 'Добавить в справочник выездных медсестер',
+                            'id' => 'erp_user_nurses',
+                        ]
+                    ) ?>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col-xs-5 children-list">
                 <?= Html::label('Роли назначенные на права') ?>
                 <div class="form-group">
@@ -90,6 +106,7 @@ UsersAsset::register($this);
             var optionsAsString1 = 0;
             var permission = res.permission;
             var erp_groups = res.erp_groups;
+            var erp_nurse = res.erp_nurse;
 
             if (permission !== undefined && permission.length > 0) {
                 for (var i1 = 0; i1 < permission.length; i1++) {
@@ -117,6 +134,10 @@ UsersAsset::register($this);
         });
 
         $(".erp_users select").change(function() { 
+            $("#form-input").submit();
+        });
+        
+        $(".erp_nurse input").change(function() { 
             $("#form-input").submit();
         });
 

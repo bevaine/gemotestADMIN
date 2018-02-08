@@ -70,6 +70,7 @@ use yii\db\Transaction;
  * @property integer $changeGD
  * @property string  $tableName
  * @property boolean $createNewGS
+ * @property integer $erpGroup
  */
 
 class ActiveSyncHelper
@@ -124,6 +125,7 @@ class ActiveSyncHelper
     public $directorID;
     public $changeGD;
     public $createNewGS;
+    public $erpGroup;
 
     /**
      * ActiveSyncHelper constructor.
@@ -975,9 +977,10 @@ class ActiveSyncHelper
     }
 
     /**
+     * @param $erpGroup
      * @return bool
      */
-    public function addCheckErpUsers()
+    public function addCheckErpUsers($erpGroup)
     {
         if (empty($this->loginGS)
             || empty($this->loginAD)
@@ -992,13 +995,7 @@ class ActiveSyncHelper
             return false;
         }
 
-        $this->nurse == 1 ? $department = 10 : $department = $this->department;
-
-        if (!$group = self::getRelationGroup($department)){
-            return true;
-        }
-
-        if (ErpUsers::findOne(['login' => $this->accountName,])){
+        if (ErpUsers::findOne(['login' => $this->accountName])){
             Yii::getLogger()->log([
                 'addCheckErpUsers'=>'В ErpUsers уже есть запись!'
             ], Logger::LEVEL_WARNING, 'binary');
@@ -1006,7 +1003,7 @@ class ActiveSyncHelper
         }
 
         $objectErpUsers = new ErpUsers();
-        $objectErpUsers->group_id = $group;
+        $objectErpUsers->group_id = $erpGroup;
         $objectErpUsers->name = $this->fullName;
         $objectErpUsers->login = $this->accountName;
         $objectErpUsers->skynet_login = $this->loginGS;
@@ -1027,12 +1024,12 @@ class ActiveSyncHelper
     }
 
     /**
+     * @param $erpGroup
      * @return bool
      */
-    public function addCheckErpNurses()
+    public function addCheckErpNurses($erpGroup)
     {
-        if (!isset($this->department)
-            || !isset($this->cacheId)
+        if (!isset($this->cacheId)
         ) {
             Yii::getLogger()->log([
                 'addCheckErpNurses'=>[
@@ -1043,16 +1040,8 @@ class ActiveSyncHelper
             return false;
         }
 
-        if ($this->nurse == 1 && $this->department == 0) {
-            $department = 10;
-        } else $department = $this->department;
-
-        if (!$group = self::getRelationGroup($department)){
-            return false;
-        }
-
         $nurseId = ErpUsers::find()
-            ->where(['group_id' => $group])
+            ->where(['group_id' => $erpGroup])
             ->max('id');
 
         if (!$nurseId) return false;
@@ -1164,14 +1153,15 @@ class ActiveSyncHelper
     private function addDepartmentRules()
     {
         //todo если call-центр, клиент-меджер, выездная медсестра
-        if (in_array($this->department, [1, 6]) || ($this->nurse == 1)) {
-            //todo добавляем в модуль выездного обслуживания
-            if (!$this->addCheckErpUsers()) return false;
-        }
+        if ($erpGroup = self::getRelationGroup($this->erpGroup)) {
 
-        //todo выездная медсетра
-        if ($this->nurse == 1) {
-            if (!$this->addCheckErpNurses()) return false;
+            //todo добавляем в модуль выездного обслуживания
+            if (!$this->addCheckErpUsers($erpGroup)) return false;
+
+            //todo выездная медсетра
+            if ($this->nurse == 1) {
+                if (!$this->addCheckErpNurses($erpGroup)) return false;
+            }
         }
         return true;
     }

@@ -10,6 +10,7 @@ use Yii;
  * @property integer $id
  * @property string $department
  * @property string $group
+ * @property integer $nurse
  * @property ErpUsergroups $name
  */
 class ErpGroupsRelations extends \yii\db\ActiveRecord
@@ -30,6 +31,7 @@ class ErpGroupsRelations extends \yii\db\ActiveRecord
         return [
             [['department'], 'required'],
             [['department', 'group'], 'string', 'max' => 255],
+            [['nurse'], 'integer']
         ];
     }
 
@@ -42,6 +44,7 @@ class ErpGroupsRelations extends \yii\db\ActiveRecord
             'id' => 'ID',
             'department' => 'Department',
             'group' => 'Group',
+            'nurse' => 'Nurse',
         ];
     }
 
