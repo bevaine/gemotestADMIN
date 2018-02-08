@@ -339,9 +339,10 @@ class LoginsController extends Controller
             $activeSyncHelper->erpGroup = $activeSyncHelper->department;
 
             //todo признак добавления в справочник медсестр
-            $activeSyncHelper->nurse = ErpGroupsRelations::findOne([
+
+            if ($dataNurse = ErpGroupsRelations::findOne([
                 'department' => $activeSyncHelper->department
-            ]);
+            ])) $activeSyncHelper->nurse = $dataNurse->nurse;
 
             //todo установка алиаса для ролей
             if (in_array($activeSyncHelper->department, [21, 22]))
