@@ -345,8 +345,12 @@ class LoginsController extends Controller
             ])) $activeSyncHelper->nurse = $dataNurse->nurse;
 
             //todo установка алиаса для ролей
+            if ($activeSyncHelper->department == 10)
+                $activeSyncHelper->department = 0;
+
             if (in_array($activeSyncHelper->department, [21, 22]))
                 $activeSyncHelper->department = 2;
+
             if (in_array($activeSyncHelper->department, [31, 32, 33]))
                 $activeSyncHelper->department = 3;
 
