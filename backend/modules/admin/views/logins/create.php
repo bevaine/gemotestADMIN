@@ -184,17 +184,14 @@ $this->params['breadcrumbs'][] = $this->title;
                                 </div>
                             </div>
                         <?php endif; ?>
-
-                        <div class="form-group">
-                            <?php
+                        <p>
+                        <?php
                             if ($action == 'user' || $action == 'franch' || $action == 'doc' || $action == 'gd') {
                                 echo Html::Button('Создать', ['class' => 'btn btn-success']);
-                            } else {
-                                //echo Html::submitButton('Создать', ['class' => 'btn btn-success']);
                             }
-                            ?>
-                        </div>
-
+                            echo " ";
+                            echo Html::a('Роли', ['roles'], ['class' => 'btn btn-primary']) ?>
+                        </p>
                         <?php ActiveForm::end(); ?>
 
                     </div>

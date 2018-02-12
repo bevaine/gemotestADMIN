@@ -86,7 +86,10 @@ SCRIPT;
     ])->label('Отделение');
     ?>
 
-    <?= $form->field($model, 'prototype')->textInput() ?>
+    <?php
+    $model->isNewRecord ? $params = ['options' => ['1'=>['selected'=>'selected']]] : $params = ['options' => null];
+    echo $form->field($model, 'prototype')->dropDownList(\common\models\BranchStaffPrototype::getPrototypeList(), $params)
+    ?>
 
     <?= Html::label("Дата открытия") ?>
 
@@ -101,7 +104,7 @@ SCRIPT;
     ]);
     ?><br>
 
-    <?= $form->field($model, 'personnel_number')->textInput() ?>
+    <? //$form->field($model, 'personnel_number')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Редактировать', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>

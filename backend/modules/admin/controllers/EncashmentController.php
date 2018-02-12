@@ -113,7 +113,8 @@ class EncashmentController extends Controller
                     if (!empty($totalBalance)) {
                         $modelBalance->total = "-" . $totalBalance;
                     }
-                    $modelBalance->operation = 'Инкассация EncashmentID:' . $model->id . ' общая сумма инкассации = ' . $model->total;
+                    $modelBalance->operation = 'Инкассация EncashmentID:' . $model->id . ' общая сумма инкассации = ';
+                    $modelBalance->operation .=  number_format($model->total, 2, '.', '');
                     $modelBalance->save();
                 }
                 return $this->redirect(['view', 'id' => $model->id]);

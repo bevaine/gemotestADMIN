@@ -25,12 +25,38 @@
                                     [
                                         'label' => 'Лабораторные',
                                         'icon' => 'dashboard',
-                                        'url' => ['/admin/orders'],
+                                        'active' => true,
+                                        'url' => '#',
+                                        'items' => [
+                                            [
+                                                'label' => 'Заказы',
+                                                'icon' => 'dashboard',
+                                                'url' => ['/admin/orders'],
+                                            ],
+                                            [
+                                                'label' => 'Взятие БМ',
+                                                'icon' => 'dashboard',
+                                                'url' => ['/admin/input-order-zabor'],
+                                            ],
+                                        ]
                                     ],
                                     [
                                         'label' => 'Медицинские',
                                         'icon' => 'dashboard',
-                                        'url' => ['/admin/med-order'],
+                                        'active' => true,
+                                        'url' => '#',
+                                        'items' => [
+                                            [
+                                                'label' => 'Заказы',
+                                                'icon' => 'dashboard',
+                                                'url' => ['/admin/med-order'],
+                                            ],
+                                            [
+                                                'label' => 'Врачи вып. исслед.',
+                                                'icon' => 'dashboard',
+                                                'url' => ['/admin/med-appointment'],
+                                            ],
+                                        ]
                                     ],
                                 ]
                             ],
@@ -42,15 +68,11 @@
                                         'url' => ['/admin/workshift'],
                                     ],
                                     [
-                                        'label' => 'Доб. в смене',
+                                        'label' => 'Регистрация в смене',
                                         'icon' => 'dashboard',
                                         'url' => ['/admin/branch-staff'],
                                     ],
-                                    [
-                                        'label' => 'Взятие БМ',
-                                        'icon' => 'dashboard',
-                                        'url' => ['/admin/input-order-zabor'],
-                                    ]
+
                                 ]
                             ],
                             ['label' => 'Платежи', 'icon' => 'circle-o', 'url' => '#', 'active' => true,
@@ -111,6 +133,7 @@
                             ['label' => 'Инкасации', 'icon' => 'dashboard', 'url' => ['/admin/encashment'],],
                             ['label' => 'Контрагенты', 'icon' => 'dashboard', 'url' => ['/admin/kontragents'],],
                             ['label' => 'Франчайзи', 'icon' => 'dashboard', 'url' => ['/admin/franchazy'],],
+                            ['label' => 'Запись на прием', 'icon' => 'dashboard', 'url' => ['/admin/doctor-spec'],],
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
                             ['label' => 'Таблицы', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [

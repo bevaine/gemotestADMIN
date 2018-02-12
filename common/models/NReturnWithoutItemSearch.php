@@ -24,7 +24,7 @@ class NReturnWithoutItemSearch extends NReturnWithoutItem
     public function rules()
     {
         return [
-            [['id', 'parent_id', 'pay_type', 'user_aid'], 'integer'],
+            [['id', 'parent_id', 'pay_type', 'user_aid', 'agreement_status'], 'integer'],
             [['order_num', 'date', 'date_from', 'date_to' , 'kkm', 'z_num', 'comment', 'path_file', 'base', 'code_1c'], 'safe'],
             [['total'], 'number'],
         ];
@@ -71,6 +71,8 @@ class NReturnWithoutItemSearch extends NReturnWithoutItem
             'total' => $this->total,
             'pay_type' => $this->pay_type,
             'user_aid' => $this->user_aid,
+            'agreement_status' => $this->agreement_status
+
         ]);
 
         $query->andFilterWhere(['like', 'order_num', $this->order_num])

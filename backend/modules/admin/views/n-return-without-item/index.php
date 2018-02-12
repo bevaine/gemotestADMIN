@@ -102,6 +102,7 @@ $this->params['breadcrumbs'][] = [
                     return  \common\models\NReturnWithoutItem::getBaseArray($model['base']);
                 }
             ],
+            'agreement_status',
             //'comment:ntext',
             // 'path_file',
             // 'code_1c',

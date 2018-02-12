@@ -159,6 +159,9 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        print_r(\common\models\BranchStaffPrototype::getPrototypeList());
+        exit;
+        print_r(number_format(1554, 2, '.', ''));
         print_r(base64_decode('d9b1d7db4cd6e70935368a1efb10e377'));
         $d = BranchStaff::find()
             ->filterWhere(['like', 'last_name', null])

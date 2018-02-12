@@ -20,6 +20,7 @@ use Yii;
  * @property string $base
  * @property integer $user_aid
  * @property string $code_1c
+ * @property integer $agreement_status
  */
 class NReturnWithoutItem extends \yii\db\ActiveRecord
 {
@@ -44,7 +45,7 @@ class NReturnWithoutItem extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['parent_id', 'pay_type', 'user_aid'], 'integer'],
+            [['parent_id', 'pay_type', 'user_aid', 'agreement_status'], 'integer'],
             [['order_num', 'total', 'pay_type', 'kkm', 'z_num'], 'required'],
             [['order_num', 'kkm', 'z_num', 'comment', 'path_file', 'base', 'code_1c'], 'string'],
             [['total'], 'number'],
@@ -71,6 +72,7 @@ class NReturnWithoutItem extends \yii\db\ActiveRecord
             'base' => 'Тип возврата',
             'user_aid' => 'Сотрудник',
             'code_1c' => 'Код 1С',
+            'agreement_status' => 'Согласование'
         ];
     }
 
@@ -80,6 +82,8 @@ class NReturnWithoutItem extends \yii\db\ActiveRecord
      */
     public static function getBaseArray($id = null) {
         $arr =  ['claim' => 'Претензия', 'complex' => 'Комплекс'];
-        return is_null($id) ? $arr : $arr[$id];
+        if (is_null($id)) {
+            return !empty($arr[$id]) ? $arr[$id] : null;
+        } else return $arr;
     }
 }

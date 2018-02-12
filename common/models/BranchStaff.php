@@ -65,5 +65,17 @@ class BranchStaff extends \yii\db\ActiveRecord
         ];
     }
 
-
+    /**
+     * @param bool $insert
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if ($findModel = HrPublicEmployee::findOne([
+            'guid' => $this->guid
+        ])->toArray()) {
+            $this->load(['BranchStaff' => $findModel]);
+            return true;
+        } else return false;
+    }
 }
