@@ -39,7 +39,13 @@
         "erusev/parsedown": "^1.6",
         "2amigos/yii2-ckeditor-widget": "*",
         "mihaildev/yii2-ckeditor": "*",
-        "wolfguard/yii2-video-gallery": "*"
+        "wolfguard/yii2-video-gallery": "*",
+        "yii2mod/yii2-tree": "*",
+        "wbraganca/yii2-fancytree-widget": "*",
+        "wbraganca/yii2-videojs-widget": "~1.0",
+        "php-ffmpeg/php-ffmpeg": "^0.11.0",
+        "xutl/yii2-videojs-widget": "~1.0",
+        "2amigos/yii2-file-upload-widget": "~1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

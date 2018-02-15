@@ -82,7 +82,7 @@ class NReturnWithoutItem extends \yii\db\ActiveRecord
      */
     public static function getBaseArray($id = null) {
         $arr =  ['claim' => 'Претензия', 'complex' => 'Комплекс'];
-        if (is_null($id)) {
+        if (!empty($id)) {
             return !empty($arr[$id]) ? $arr[$id] : null;
         } else return $arr;
     }

@@ -8,6 +8,8 @@
 
 namespace common\components\helpers;
 
+use FFMpeg\FFProbe;
+use Yii;
 
 class FunctionsHelper
 {
@@ -27,5 +29,23 @@ class FunctionsHelper
             }
         }
 SCRIPT;
+    }
+
+    static function getDurationVideo($file)
+    {
+        try {
+            $ffprobe = FFProbe::create([
+                'ffmpeg.binaries'  => Yii::getAlias('@common').'/bin/ffmpeg.exe',
+                'ffprobe.binaries' => Yii::getAlias('@common').'/bin/ffprobe.exe',
+            ]);
+
+            $duration = $ffprobe
+                ->format($file)
+                ->get('duration');
+
+            return !empty($duration) ? $duration : false;
+        } catch (\Exception $exception) {
+            return false;
+        }
     }
 }

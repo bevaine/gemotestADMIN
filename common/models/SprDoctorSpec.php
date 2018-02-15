@@ -54,7 +54,7 @@ class SprDoctorSpec extends \yii\db\ActiveRecord
     public static function getKeysList()
     {
         $modules = [];
-        foreach (self::find()->all() as $model) {
+        foreach (self::find()->orderBy(['specName' => 'asc'])->all() as $model) {
             $modules[$model->aid] = $model->specName;
         }
         return $modules;

@@ -15,6 +15,9 @@ return [
         'admin' => [
             'class' => 'backend\modules\admin\Module',
         ],
+        'GMS' => [
+            'class' => 'backend\modules\GMS\Module',
+        ],
         'user' => [
             'class' => 'budyaga\users\Module',
             'userPhotoUrl' => 'http://example.com/uploads/user/photo',
