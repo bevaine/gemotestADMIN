@@ -9,17 +9,20 @@ use common\models\GmsPlaylist;
 
 /**
  * GmsPlaylistSearch represents the model behind the search form about `common\models\GmsPlaylist`.
+ * @property string $sender_name
  */
 class GmsPlaylistSearch extends GmsPlaylist
 {
+    public $sender_name;
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'type', 'region', 'created_at', 'updated_at'], 'integer'],
-            [['name', 'file'], 'safe'],
+            [['id', 'type', 'region', 'created_at', 'updated_at', 'sender_id'], 'integer'],
+            [['name', 'file', 'sender_name'], 'safe'],
         ];
     }
 
@@ -42,6 +45,9 @@ class GmsPlaylistSearch extends GmsPlaylist
     public function search($params)
     {
         $query = GmsPlaylist::find();
+        $query->joinWith('senderModel');
+
+
 
         // add conditions that should always apply here
 
@@ -67,8 +73,10 @@ class GmsPlaylistSearch extends GmsPlaylist
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'file', $this->file]);
+            ->andFilterWhere(['like', 'file', $this->file])
+            ->andFilterWhere(['like', 'sender_name', $this->sender_name]);
 
+        //print_r($query);
         return $dataProvider;
     }
 }

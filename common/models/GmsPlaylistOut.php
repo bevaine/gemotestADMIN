@@ -30,9 +30,9 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['file'], 'required'],
-            [['device_id', 'date_play', 'start_time_play', 'end_time_play'], 'integer'],
-            [['file'], 'string', 'max' => 255],
+            [['region_id', 'sender_id', 'device_id', 'jsonPlaylist', 'dateStart', 'dateEnd', 'timeStart', 'timeEnd'], 'required'],
+            [['region_id', 'sender_id', 'device_id', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday', 'timeStart', 'timeEnd', 'dateStart', 'dateEnd'], 'integer'],
+            [['jsonPlaylist'], 'string'],
         ];
     }
 
@@ -43,11 +43,15 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'file' => 'File',
-            'device_id' => 'Device ID',
-            'date_play' => 'Date Play',
-            'start_time_play' => 'Start Time Play',
-            'end_time_play' => 'End Time Play',
+            'region_id' => 'Регион',
+            'sender_id' => 'Отделение',
+            'device_id' => 'Устройство',
+            'dateStart' => 'Дата старта',
+            'dateEnd' => 'Дата окончания',
+            'timeStart' => 'Время старта',
+            'timeEnd' => 'Время окончания',
+            'jsonPlaylist' => 'Плейлист',
+            'active' => 'Активный'
         ];
     }
 }

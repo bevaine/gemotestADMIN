@@ -8,6 +8,7 @@ use common\models\GmsPlaylistSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * PlaylistController implements the CRUD actions for GmsPlaylist model.
@@ -64,18 +65,16 @@ class PlaylistController extends Controller
     public function actionCreate()
     {
         $model = new GmsPlaylist();
-        if (!empty(Yii::$app->request->post())) {
-            print_r(Yii::$app->request->post());
-            exit;
-        }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+            //$model->created_at = time();
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -88,13 +87,15 @@ class PlaylistController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+        if ($model->load(Yii::$app->request->post())) {
+            //$model->updated_at = time();
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
 
     /**
@@ -110,6 +111,9 @@ class PlaylistController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * @return string
+     */
     public function actionEdit()
     {
         return $this->render('edit');
@@ -129,5 +133,66 @@ class PlaylistController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param null $region
+     * @param null $sender_id
+     * @param null $type_list
+     */
+    public function actionAjaxPlaylistActive(
+        $region = null,
+        $sender_id = null,
+        $type_list = null
+    ) {
+
+        if (empty($sender_id)) $sender_id = null;
+        if (empty($region)) exit('null');
+
+        $findModel = GmsPlaylist::findOne([
+            'region' => $region,
+            'sender_id' => $sender_id,
+            'type' => $type_list
+        ]);
+
+        if ($findModel) {
+            $out = $findModel->toArray();
+            if (isset($findModel->regionModel)) {
+                $out['region'] = $findModel->regionModel->region_name;
+            }
+            if (isset($findModel->senderModel)) {
+                $out['sender'] = $findModel->senderModel->sender_name;
+            }
+            if (isset($findModel->type)) {
+                $out['type'] =  \common\models\GmsPlaylist::getPlayListType($findModel->type);
+            }
+        }
+
+        echo !empty($out) ? Json::encode($out) : 'null';
+    }
+
+    /**
+     * @param null $region
+     * @param null $sender_id
+     */
+    public function actionAjaxPlaylistTemplate(
+        $region = null,
+        $sender_id = null
+    ) {
+        if (empty($sender_id)) $sender_id = null;
+        if (empty($region)) exit('null');
+
+        $findModel = GmsPlaylist::findAll([
+            'region' => $region,
+            'sender_id' => $sender_id,
+        ]);
+
+        foreach ($findModel as $model) {
+            /** @var $model GmsPlaylist */
+            if (!isset($model->type)) continue;
+            $out["result"][$model->type][] = Json::decode($model->jsonPlaylist);
+        }
+
+        echo !empty($out) ? Json::encode($out) : 'null';
     }
 }
