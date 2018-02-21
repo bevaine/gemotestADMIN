@@ -62,7 +62,7 @@ class GmsVideos extends \yii\db\ActiveRecord
         $modules = [];
         foreach (self::find()->orderBy(['name' => 'asc'])->all() as $model) {
             /** @var $model GmsVideos */
-            $modules[] = ['key' => $model->id, 'title' => $model->name];
+            $modules[] = ['key' => $model->id, 'title' => $model->name, 'duration' => $model->time];
         }
         return $modules;
     }

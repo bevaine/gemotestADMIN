@@ -9,6 +9,7 @@ use kartik\time\TimePicker;
 use kartik\form\ActiveForm;
 use yii\web\JsExpression;
 use wbraganca\fancytree\FancytreeWidget;
+use mihaildev\ckeditor\Assets;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylistOut */
@@ -31,6 +32,10 @@ $layout = <<< HTML
     </span>
 HTML;
 
+$tableTree = <<< HTML
+
+HTML;
+
 $week = [
     "isMonday" => "Понедельник",
     "isTuesday" => "Вторник",
@@ -40,7 +45,10 @@ $week = [
     "isSaturday" => "Суббота",
     "isSunday" => "Воскресенье"
 ];
+
+$this->registerCss("td.alignRight { text-align: right; }");
 ?>
+
 <div class="gms-playlist-out-form">
 
     <?php $form = ActiveForm::begin(); ?>
@@ -49,7 +57,7 @@ $week = [
         <div class="col-xs-6">
             <div class="box box-solid box-success">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Выбирите регион (отделение) для отображения доступных шаблонов</h3>
+                    <h3 class="box-title">Выберите регион (отделение) для отображения доступных шаблонов</h3>
                 </div>
                 <div class="box-body">
                     <div class="row">
@@ -162,64 +170,41 @@ $week = [
                                         <h3 class="box-title">Окончательный плейлист</h3>
                                     </div>
                                     <div class="box-body">
-                                        <?php
-                                        $playListKey = 1;
-                                        $playListKeyStr = 'playList['.$playListKey.']';
-
-                                        echo FancytreeWidget::widget([
-                                            'id' => 'sender_playlist',
-                                            'options' =>[
-                                                'source' => [
-                                                    [
-                                                        'title' => 'Новый плейлист',
-                                                        'key' => $playListKeyStr,
-                                                        'folder' => true,
-                                                        'expanded' => true
-                                                    ]
-                                                ],
-                                                'extensions' => ['dnd', 'edit'],
-                                                'edit' => [
-                                                    'triggerStart' => ["clickActive", "dblclick"],
-                                                    'beforeEdit' =>  new JsExpression('function(event, data){
-                                                }'),
-                                                    'inputCss' => [
-                                                        'color' => 'black'
-                                                    ],
-                                                    'edit' => new JsExpression('function(event, data){
-                                                    }'),
-                                                    'beforeClose' => new JsExpression('function(event, data){
-                                                    }'),
-                                                    'save' => new JsExpression('function(event, data){
-                                                        setTimeout(function(){
-                                                            $(data.node.span).removeClass("pending");
-                                                            data.node.setTitle(data.node.title);
-                                                        }, 2000);
-                                                        return true;
-                                                    }'),
-                                                    'close' => new JsExpression('function(event, data){
-                                                        if(data.save) {
-                                                            $(data.node.span).addClass("pending");
-                                                        }
-                                                    }'),
-                                                ],
-                                                'dnd' => [
-                                                    'preventVoidMoves' => true,
-                                                    'preventRecursiveMoves' => true,
-                                                    'autoExpandMS' => 400,
-                                                    'dragStart' => new JsExpression('function(node, data) {
-                                                        if (node.isFolder()) return false;
-                                                        else return true;
-                                                    }'),
-                                                    'dragEnter' => new JsExpression('function(node, data) {
-                                                        return true;
-                                                    }'),
-                                                    'dragDrop' => new JsExpression('function(node, data) {
-                                                        data.otherNode.moveTo(node, data.hitMode);
-                                                    }'),
-                                                ],
-                                            ]
-                                        ]);
-                                        ?>
+                                        <table id="treetable">
+                                            <colgroup>
+                                                <col width="50px">
+                                                <col width="385px">
+                                                <col width="100px">
+                                                <col width="150px">
+                                                <col width="80px">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Плейлист</th>
+                                                <th>Прод.</th>
+                                                <th>Тип ролика</th>
+                                                <th>
+                                                    <span style="font-size: smaller">Маскс. Кол-во повт. в сутки</span>
+                                                </th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <!-- Define a row template for all invariant markup: -->
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <select name="sel1" id="">
+                                                        <option value="a">A</option>
+                                                        <option value="b">B</option>
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -331,10 +316,103 @@ $week = [
 </div>
 
 <?php
+
+
 $urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
 $urlAjaxPlaylistTemplate = \yii\helpers\Url::to(['/GMS/playlist/ajax-playlist-template']);
 
 $js1 = <<< JS
+    $(function(){
+        $("#treetable").fancytree({
+              extensions: ["table", "dnd", "edit"],
+              table: {
+                indentation: 20,      // indent 20px per node level
+                nodeColumnIdx: 1,     // render the node title into the 2nd column
+                checkboxColumnIdx: 0  // render the checkboxes into the 1st column
+              },
+              source: [
+                 {"title" : "Новый плейлист", "key" : "PlayList[0]", "folder" : true, "expanded" : true}  
+              ],
+              renderColumns: function(event, data) {
+                    var node = data.node, tdList = $(node.tr).find(">td");
+                    var typePlaylist = '';
+                    tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
+                    if (node.data.type !== undefined) {
+                        if (node.data.type === '1') {
+                            typePlaylist = 'Региональный'; 
+                        } else typePlaylist = 'Коммерческий';
+                        tdList.eq(3).text(typePlaylist);
+                    }
+                    if (node.data.duration !== undefined) {
+                        var time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
+                        tdList.eq(2).text(time);
+                    }
+                    //tdList.eq(4).html("<input type='checkbox' name='like' value='" + node.key + "'>");
+              },
+              edit: {
+                    triggerStart: ["clickActive", "dblclick"],
+                    beforeEdit : function(event, data){
+                        return data.node.isFolder()
+                    },
+                    edit : function(event, data){
+                    },
+                    beforeClose : function(event, data){
+                    },
+                    save : function(event, data){
+                        setTimeout(function(){
+                            $(data.node.span).removeClass("pending");
+                            data.node.setTitle(data.node.title);
+                        }, 2000);
+                        return true;
+                    },
+                    close : function(event, data){
+                        if(data.save) {
+                            $(data.node.span).addClass("pending");
+                        }
+                    }
+              },
+              dnd: {
+                    preventVoidMoves : true,
+                    preventRecursiveMoves : true,
+                    autoExpandMS :400,
+                    dragStart : function(node, data) {
+                        return !node.isFolder();
+                    },
+                    dragEnter : function(node, data) {
+                        return true;
+                    },
+                    dragDrop : function(node, data) {
+                        if (data.otherNode) {
+                            var playListKey = "PlayList[0]";
+                            var playlistNode = data.tree.getNodeByKey(playListKey);
+                            data.otherNode.moveTo(node, data.hitMode);
+                            if (data.otherNode.parent.key !== playListKey 
+                                || data.otherNode.parent.isRoot() === true) {
+                                    data.otherNode.moveTo(playlistNode, "over");
+                            }        
+                        } else if (data.otherNodeData) {
+                            node.addChild(data.otherNodeData, data.hitMode);
+                        } else {
+                            node.addNode({
+                                title: transfer.getData("text")
+                            }, data.hitMode);
+                        }
+                    }
+              }
+        });
+        /* Handle custom checkbox clicks */
+        $("#treetable").delegate("input[name=like]", "click", function(e){
+              var node = $.ui.fancytree.getNode(e),
+              input = $(e.target);
+              e.stopPropagation();  // prevent fancytree activate for this row
+              if(input.is(":checked")){
+                alert("like " + input.val());
+              }else{
+                alert("dislike " + input.val());
+              }
+        });
+    });
+
     /**
     * @param region
     */
@@ -417,6 +495,16 @@ $js1 = <<< JS
         );
     });
 JS;
+$this->registerCssFile('http://wwwendt.de/tech/fancytree/src/skin-win8/ui.fancytree.css');
+$this->registerJsFile(
+    'http://wwwendt.de/tech/fancytree/src/jquery.fancytree.js',
+    ['depends' => [Assets::className()]]);
+$this->registerJsFile(
+    'http://wwwendt.de/tech/fancytree/src/jquery.fancytree.table.js',
+    ['depends' => [Assets::className()]]);
+$this->registerJsFile(
+    'http://momentjs.com/downloads/moment.js',
+    ['depends' => [Assets::className()]]);
 
 $this->registerJs($js1);
 ?>

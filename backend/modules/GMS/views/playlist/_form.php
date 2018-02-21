@@ -10,7 +10,7 @@ use common\components\helpers\FunctionsHelper;
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylist */
 /* @var $form yii\widgets\ActiveForm */
-
+print_r(GmsVideos::getVideosTree());
 ?>
 <style type="text/css">
     span.fancytree-title {
@@ -103,6 +103,7 @@ use common\components\helpers\FunctionsHelper;
                                 'edit' => [
                                     'triggerStart' => ["clickActive", "dblclick"],
                                     'beforeEdit' =>  new JsExpression('function(event, data){
+                                        return data.node.isFolder()
                                     }'),
                                     'inputCss' => [
                                         'color' => 'black'
@@ -191,8 +192,7 @@ use common\components\helpers\FunctionsHelper;
                                     'preventRecursiveMoves' => true,
                                     'autoExpandMS' => 400,
                                     'dragStart' => new JsExpression('function(node, data) {
-                                        if (node.isFolder()) return false;
-                                        else return true;
+                                        return !node.isFolder()
                                     }'),
                                     'dragEnter' => new JsExpression('function(node, data) {
                                         return true;
@@ -295,11 +295,17 @@ use common\components\helpers\FunctionsHelper;
         
         if (parentFolder.children !== null) {
             parentFolder.children.forEach(function(children) {
+                console.log(children);
                 var arrChildren = {};
+                var arrData = {};
                 var key = children.key;
                 var name = children.title;
+                var typePlaylist = $('#gmsplaylist-type').val();
+                arrData["duration"] = children.data.duration;
+                arrData["type"] = typePlaylist;
                 arrChildren["key"] = key; 
                 arrChildren["title"] = name;
+                arrChildren["data"] = arrData;
                 arrChildrenOne.push(arrChildren); 
             });
 
@@ -409,7 +415,9 @@ use common\components\helpers\FunctionsHelper;
                 if (res.results !== undefined && res.results.length > 0) {
                     var results = res.results; 
                     for (var i = 0; i < results.length; i++) {
-                        optionsAsString += "<option value='" + results[i].id + "' " + (results[i].id == '{$model->sender_id}' ? 'selected' : '') + ">" + results[i].name + "</option>";
+                        optionsAsString += "<option value='" + results[i].id + "' ";
+                        optionsAsString += results[i].id == '{$model->sender_id}' ? 'selected' : '';
+                        optionsAsString += ">" + results[i].name + "</option>"
                     }
                 }
                 $(".sender_id select option").each(function() {
