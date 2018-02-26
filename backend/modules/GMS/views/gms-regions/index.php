@@ -9,7 +9,6 @@ use yii\grid\GridView;
 
 $this->title = 'Регионы';
 $this->params['breadcrumbs'][] = $this->title;
-print_r(Yii::$app->user->can('GMSaccess'));
 ?>
 <div class="gms-regions-index">
 
