@@ -33,6 +33,12 @@ class Module extends \yii\base\Module
                 'rules' => [
                     [
                         'allow' => true,
+                        'controllers' => ['admin/kontragents'],
+                        'roles' => ['GemotestAdmin', 'GMSaccess'],
+                        'actions' => ['ajax-kontragents-list']
+                    ],
+                    [
+                        'allow' => true,
                         'roles' => ['GemotestAdmin'],
                     ],
                 ],

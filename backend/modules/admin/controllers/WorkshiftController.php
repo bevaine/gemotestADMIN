@@ -78,7 +78,7 @@ class WorkshiftController extends Controller
             $countPays = count($arrPays);
 
             //$summPays = ArrayHelper::getColumn($summPays, 'total');
-            print_r($summPays);
+            //print_r($summPays);
         }
 
         return $this->render('view', [
