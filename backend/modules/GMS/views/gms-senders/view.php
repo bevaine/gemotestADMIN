@@ -26,12 +26,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'sender_id',
+            'sender_key',
             'sender_name',
             [
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsSenders */
-                    return \common\models\GmsRegions::findOne($model->region_id)->region_name;
+                    return $model->regions->region_name;
                 },
                 'attribute' => 'region_id'
             ],

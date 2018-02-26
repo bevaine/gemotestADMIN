@@ -68,16 +68,16 @@ class GmsSendersController extends Controller
         $model = new GmsSenders();
 
         if ($model->load(Yii::$app->request->post())) {
-            if (isset($model->sender_id)) {
-                $model->sender_name = Kontragents::findOne(['Key' => $model->sender_id])->Name;
+            if (isset($model->kontragents)) {
+                $model->sender_name = $model->kontragents->Name;
             }
-            $model->save();
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            if ($model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**

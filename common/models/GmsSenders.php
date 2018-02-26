@@ -11,6 +11,8 @@ use Yii;
  * @property string $sender_key
  * @property string $sender_name
  * @property string $region_id
+ * @property Kontragents $kontragents
+ * @property GmsRegions $regions
  */
 class GmsSenders extends \yii\db\ActiveRecord
 {
@@ -44,5 +46,21 @@ class GmsSenders extends \yii\db\ActiveRecord
             'sender_name' => 'Отделение',
             'region_id' => 'Регион',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKontragents()
+    {
+        return $this->hasOne(Kontragents::className(), ['Key' => 'sender_key']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRegions()
+    {
+        return $this->hasOne(GmsRegions::className(), ['id' => 'region_id']);
     }
 }
