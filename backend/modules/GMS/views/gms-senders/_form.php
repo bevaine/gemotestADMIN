@@ -15,25 +15,12 @@ use kartik\select2\Select2;
 
     <?php $form = ActiveForm::begin(); ?>
 
+    <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), [
+        'prompt' => '---'
+    ]);
+    ?>
+
     <?php
-    $url = \yii\helpers\Url::to(['/GMS/gms-regions/ajax-regions-list']);
-    echo $form->field($model, 'region_id')->widget(Select2::classname(), [
-        'options' => ['placeholder' => 'Наименование региона'],
-        'pluginOptions' => [
-            'allowClear' => true,
-            'minimumInputLength' => 3,
-            'multiple' => false,
-            'ajax' => [
-                'url' => $url,
-                'dataType' => 'json',
-                'data' => new JsExpression('function(params) { return {search:params.term}; }'),
-                'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
-            ],
-            'initSelection' => new JsExpression(FunctionsHelper::AjaxInitScript($url))
-        ],
-    ])->label('Регион');
-
-
     $url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
     echo $form->field($model, 'sender_key')->widget(Select2::classname(), [
         'options' => ['placeholder' => 'Наименование отделения'],

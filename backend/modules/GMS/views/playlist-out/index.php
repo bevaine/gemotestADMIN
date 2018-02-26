@@ -7,16 +7,13 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\GmsPlaylistOutSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Gms Playlist Outs';
+$this->title = 'Действующие плейлисты';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-playlist-out-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <p>
-        <?= Html::a('Create Gms Playlist Out', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -25,10 +22,16 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'file',
+            'region_id',
+            'sender_id',
             'device_id',
-            'date_play',
-            'start_time_play:datetime',
+            'dateStart:datetime',
+            'dateEnd:datetime',
+            'timeStart:time',
+            'timeEnd:time',
+            'active',
+            'created_at',
+            //'file',
             // 'end_time_play:datetime',
             // 'isMonday',
             // 'isTuesday',
@@ -37,15 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
             // 'isFriday',
             // 'isSaturday',
             // 'isSunday',
-            // 'timeStart:datetime',
-            // 'timeEnd:datetime',
-            // 'dateStart',
-            // 'dateEnd',
-            // 'sender_id',
-            // 'region_id',
             // 'jsonPlaylist:ntext',
-            // 'created_at',
-            // 'active',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
