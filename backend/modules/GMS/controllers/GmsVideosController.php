@@ -61,7 +61,7 @@ class GmsVideosController extends Controller
 
         $directory = Yii::getAlias('@backend/web/upload/video') . DIRECTORY_SEPARATOR . Yii::$app->session->id . DIRECTORY_SEPARATOR;
         if (!is_dir($directory)) {
-            FileHelper::createDirectory($directory);
+            FileHelper::createDirectory($directory, 0777);
         }
 
         if ($imageFile) {
