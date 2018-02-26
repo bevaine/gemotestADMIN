@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylistOut */
 
-$this->title = 'Создание плейлиста';
+$this->title = 'Конструктор плейлиста';
 $this->params['breadcrumbs'][] = ['label' => 'Плейлисты', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

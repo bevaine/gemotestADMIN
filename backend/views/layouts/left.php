@@ -26,7 +26,6 @@
                             ['label' => 'Устройства', 'icon' => 'file-code-o', 'url' => ['/GMS/gms-devices']],
                             ['label' => 'Плейлисты', 'icon' => 'file-code-o', 'url' => ['/GMS/playlist-out']],
                             ['label' => 'Шаблоны плейлистов', 'icon' => 'file-code-o', 'url' => ['/GMS/playlist']],
-                            ['label' => 'Конструктор плейлиста', 'icon' => 'file-code-o', 'url' => ['/GMS/playlist/edit']],
                             [
                                 'label' => 'Справочники',
                                 'icon' => 'circle-o',
