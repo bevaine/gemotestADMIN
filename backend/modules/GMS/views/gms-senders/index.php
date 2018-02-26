@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'sender_id',
+            'sender_key',
             'sender_name',
             [
                 'value' => function ($model) {

@@ -30,7 +30,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['region_id', 'sender_id', 'device_id', 'jsonPlaylist', 'dateStart', 'dateEnd', 'timeStart', 'timeEnd'], 'required'],
+            [['region_id', 'jsonPlaylist', 'dateStart', 'dateEnd', 'timeStart', 'timeEnd'], 'required'],
             [['region_id', 'sender_id', 'device_id', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday', 'timeStart', 'timeEnd', 'dateStart', 'dateEnd'], 'integer'],
             [['jsonPlaylist'], 'string'],
         ];

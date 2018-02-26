@@ -208,4 +208,37 @@ class GmsVideosController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+    /**
+     * @param null $video
+     */
+    public function actionAjaxVideoActive($video = null)
+    {
+        $out = [];
+        $table = '';
+        if (!is_null($video)) {
+            $data = GmsVideos::findOne($video);
+            /** @var GmsVideos $userData */
+            $tr = '';
+            foreach ($data->attributeLabels() as $key=>$label) {
+                if (in_array($key, ['type', 'file'])) continue;
+                if ($key == 'time')
+                    $data->$key = date("H:i:s", mktime(0, 0, $data->$key));
+                if ($key == 'created_at')
+                    $data->$key = date("d-m-Y H:i:s", $data->$key);
+                $tr .= '<tr>';
+                $tr .= '<th class="">'.$label.'</th>';
+                $tr .= '<td>'.$data->$key.'</td>';
+                $tr .= '</tr>';
+            }
+            if (!empty($tr)) {
+                $table .= '<table id="w0" class="table table-striped table-bordered detail-view">';
+                $table .=  '<tbody>'.$tr.'</tbody>';
+                $table .=  '</table>';
+                $out['results']['table'] = $table;
+            }
+            if (!empty($data->file)) $out['results']['file'] = $data->file;
+        }
+        echo !empty($out) ? Json::encode($out) : null;
+    }
 }

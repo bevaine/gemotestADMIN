@@ -1,6 +1,7 @@
 <aside class="main-sidebar">
 
     <section class="sidebar">
+        <? //print_r(Yii::$app->user); ?>
 
         <?= dmstr\widgets\Menu::widget(
             [
@@ -15,10 +16,34 @@
                         'url' => ['/wiki/content/admin'],
                     ],
                     [
+                        'label' => 'Модуль GMS',
+                        'icon' => 'share',
+                        'url' => '#',
+                        'active' => true,
+                        'visible' => Yii::$app->user->can('GMSaccess'),
+                        'items' => [
+                            ['label' => 'Видео', 'icon' => 'file-code-o', 'url' => ['/GMS/gms-videos']],
+                            ['label' => 'Устройства', 'icon' => 'file-code-o', 'url' => ['/GMS/gms-devices']],
+                            ['label' => 'Плейлисты', 'icon' => 'file-code-o', 'url' => ['/GMS/playlist-out']],
+                            ['label' => 'Шаблоны плейлистов', 'icon' => 'file-code-o', 'url' => ['/GMS/playlist']],
+                            ['label' => 'Конструктор плейлиста', 'icon' => 'file-code-o', 'url' => ['/GMS/playlist/edit']],
+                            [
+                                'label' => 'Справочники',
+                                'icon' => 'circle-o',
+                                'url' => '#',
+                                'active' => true,
+                                'items' => [
+                                    ['label' => 'Регионы', 'icon' => 'dashboard', 'url' => '/GMS/gms-regions'],
+                                    ['label' => 'Отделения', 'icon' => 'dashboard', 'url' => '/GMS/gms-senders'],
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
                         'label' => 'Гемотест',
                         'icon' => 'share',
                         'url' => '#',
-                        //'active' => true,
+                        'visible' => Yii::$app->user->can('GemotestAdmin'),
                         'items' => [
                             ['label' => 'Заказы', 'icon' => 'circle-o', 'url' => '#', 'active' => true,
                                 'items' =>[
@@ -156,6 +181,7 @@
                         'icon' => 'share',
                         'url' => '#',
                         'active' => true,
+                        'visible' => Yii::$app->user->can('userManage'),
                         'items' => [
                             ['label' => 'Gii', 'icon' => 'file-code-o', 'url' => ['/gii']],
                             ['label' => 'Debug', 'icon' => 'dashboard', 'url' => ['/debug']],

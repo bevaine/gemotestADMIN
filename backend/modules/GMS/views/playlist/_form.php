@@ -10,7 +10,6 @@ use common\components\helpers\FunctionsHelper;
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylist */
 /* @var $form yii\widgets\ActiveForm */
-print_r(GmsVideos::getVideosTree());
 ?>
 <style type="text/css">
     span.fancytree-title {

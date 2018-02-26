@@ -78,7 +78,7 @@ class GmsPlaylist extends \yii\db\ActiveRecord
      * @return array|mixed
      */
     public static function getPlayListType($id = null) {
-        $arr =  ['1' => 'Региональный', '2' => 'Коммерческий'];
+        $arr =  ['1' => 'Стандартный', '2' => 'Коммерческий'];
         return is_null($id) ? $arr : $arr[$id];
     }
 
