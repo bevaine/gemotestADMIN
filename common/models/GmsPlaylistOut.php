@@ -51,7 +51,8 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             'timeStart' => 'Время старта',
             'timeEnd' => 'Время окончания',
             'jsonPlaylist' => 'Плейлист',
-            'active' => 'Активный'
+            'active' => 'Активный',
+            'created_at' => 'Дата создания'
         ];
     }
 }

@@ -188,8 +188,16 @@ class GmsVideosController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
+        $findModel = $this->findModel($id);
+        if (!empty($findModel->file)) {
+            $pathInfo = pathinfo($findModel->file);
+            $directory = Yii::getAlias('@backend/web') . $pathInfo['dirname'];
+            $fileName = $directory . DIRECTORY_SEPARATOR . $pathInfo['basename'];
+            if (file_exists($fileName)) {
+                unlink($fileName);
+            }
+        }
+        $findModel->delete();
         return $this->redirect(['index']);
     }
 
