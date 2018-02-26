@@ -36,10 +36,10 @@ SCRIPT;
     {
         try {
             $ffprobe = FFProbe::create(
-                //[
-                //'ffmpeg.binaries'  => Yii::getAlias('@common').'/bin/ffmpeg.exe',
-                //'ffprobe.binaries' => Yii::getAlias('@common').'/bin/ffprobe.exe',
-                //]
+                [
+                    'ffmpeg.binaries'  => self::getWinOS() ? Yii::getAlias('@common').'/bin/ffmpeg.exe' : '/usr/bin/ffmpeg' ,
+                    'ffprobe.binaries' => self::getWinOS() ? Yii::getAlias('@common').'/bin/ffprobe.exe' : '/usr/bin/ffprobe',
+                ]
             );
 
             $duration = $ffprobe
@@ -55,6 +55,14 @@ SCRIPT;
             Yii::getLogger()->log([
                 'getDurationVideo' => $exception->getMessage()
             ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+    }
+
+    static function getWinOS () {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            return true;
+        } else {
             return false;
         }
     }
