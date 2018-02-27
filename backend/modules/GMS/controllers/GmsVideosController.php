@@ -141,14 +141,18 @@ class GmsVideosController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             if (!empty(Yii::$app->request->post()['GmsVideos']['fileName'])) {
                 $post = Yii::$app->request->post();
-                $file = Yii::getAlias('@backend/web') . DIRECTORY_SEPARATOR
-                    . $post['GmsVideos']['fileName'];
+                $directory = Yii::getAlias('@backend/web') . DIRECTORY_SEPARATOR;
+                $file = $directory . $post['GmsVideos']['fileName'];
                 if (file_exists($file)) {
                     $model->file = $post['GmsVideos']['fileName'];
                     //$model->type = FileHelper::getMimeType($file);
                     if ($duration = FunctionsHelper::getDurationVideo($file)) {
                         $model->time = round($duration);
                     }
+                    if ($thumbnail = FunctionsHelper::createMovieThumb($file, $directory.'thumbnail.jpg')) {
+
+                    }
+
                     $model->created_at = time() ;
                 }
             }
