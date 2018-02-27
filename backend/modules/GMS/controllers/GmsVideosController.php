@@ -59,24 +59,32 @@ class GmsVideosController extends Controller
 
         $imageFile = UploadedFile::getInstance($model, 'file');
 
-        $directory = Yii::getAlias('@backend/web/upload/video') . DIRECTORY_SEPARATOR . Yii::$app->session->id . DIRECTORY_SEPARATOR;
+        $directory = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
         if (!is_dir($directory)) {
             FileHelper::createDirectory($directory, 0777);
         }
 
         if ($imageFile) {
+
+            $thumbnailUrl = '/img/video.png';
             $uid = uniqid(time(), true);
             $fileName = $uid . '.' . $imageFile->extension;
+            $thumbnailName = $uid . '_thumbnail.jpg';
             $filePath = $directory . $fileName;
+            $thumbnailPath = $directory . $thumbnailName;
+
             if ($imageFile->saveAs($filePath)) {
-                $path = '/upload/video/' . Yii::$app->session->id . DIRECTORY_SEPARATOR . $fileName;
+                if ($thumbnail = FunctionsHelper::createMovieThumb($filePath, $thumbnailPath)) {
+                    $thumbnailUrl = '/upload/video/'.Yii::$app->session->id.'/'.$thumbnailName;
+                }
+                $path = implode(DIRECTORY_SEPARATOR, ['upload', 'video', Yii::$app->session->id, $fileName]);
                 return Json::encode([
                     'files' => [
                         [
                             'name' => $fileName,
                             'size' => $imageFile->size,
                             'url' => $path,
-                            'thumbnailUrl' =>  '/img/video.png',
+                            'thumbnailUrl' => $thumbnailUrl,
                             'deleteUrl' => 'video-delete?name=' . $fileName,
                             'deleteType' => 'POST',
                         ],
