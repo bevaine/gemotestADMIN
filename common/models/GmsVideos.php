@@ -14,6 +14,7 @@ use Yii;
  * @property integer $time
  * @property integer $created_at
  * @property string $comment
+ * @property string $thumbnail
  */
 class GmsVideos extends \yii\db\ActiveRecord
 {
@@ -32,9 +33,9 @@ class GmsVideos extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'file'], 'required'],
-            [['type', 'time', 'created_at'], 'integer'],
+            [['time', 'created_at'], 'integer'],
             [['name', 'file'], 'string', 'max' => 255],
-            [['comment'], 'string']
+            [['comment', 'thumbnail', 'type'], 'string']
         ];
     }
 
@@ -50,7 +51,8 @@ class GmsVideos extends \yii\db\ActiveRecord
             'type' => 'Тип',
             'time' => 'Продолжительность',
             'created_at' => 'Дата добавления',
-            'comment' => 'Коментарий'
+            'comment' => 'Коментарий',
+            'thumbnail' => 'thumbnail'
         ];
     }
 

@@ -14,6 +14,7 @@ use yii\helpers\Json;
 use yii\web\UploadedFile;
 use FFMpeg;
 use yii\helpers\Url;
+use yii\log\Logger;
 
 /**
  * GmsVideosController implements the CRUD actions for GmsVideos model.
@@ -58,7 +59,6 @@ class GmsVideosController extends Controller
         $model = new GmsVideos();
 
         $imageFile = UploadedFile::getInstance($model, 'file');
-
         $directory = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
         if (!is_dir($directory)) {
             FileHelper::createDirectory($directory, 0777);
@@ -68,28 +68,58 @@ class GmsVideosController extends Controller
 
             $thumbnailUrl = '/img/video.png';
             $uid = uniqid(time(), true);
+
             $fileName = $uid . '.' . $imageFile->extension;
             $thumbnailName = $uid . '_thumbnail.jpg';
+
             $filePath = $directory . $fileName;
             $thumbnailPath = $directory . $thumbnailName;
 
             if ($imageFile->saveAs($filePath)) {
                 if ($thumbnail = FunctionsHelper::createMovieThumb($filePath, $thumbnailPath)) {
-                    $thumbnailUrl = '/upload/video/'.Yii::$app->session->id.'/'.$thumbnailName;
+                    $thumbnailUrl = '/upload/video/' . Yii::$app->session->id . '/' . $thumbnailName;
                 }
                 $path = implode(DIRECTORY_SEPARATOR, ['upload', 'video', Yii::$app->session->id, $fileName]);
-                return Json::encode([
-                    'files' => [
-                        [
-                            'name' => $fileName,
-                            'size' => $imageFile->size,
-                            'url' => $path,
-                            'thumbnailUrl' => $thumbnailUrl,
-                            'deleteUrl' => 'video-delete?name=' . $fileName,
-                            'deleteType' => 'POST',
-                        ],
-                    ],
-                ]);
+
+                $model->file = $path;
+                $model->type = FileHelper::getMimeType($filePath);
+                $model->thumbnail = $thumbnailUrl;
+                if ($duration = FunctionsHelper::getDurationVideo($filePath)) {
+                    $model->time = round($duration);
+                }
+                $model->created_at = time();
+
+                if (!empty(Yii::$app->request->post())) {
+                    $post = Yii::$app->request->post();
+                    if (!empty($imageFile->name)) {
+                        $nameBase64 = base64_encode($imageFile->name);
+                        if (!empty($post["GmsVideos"][$nameBase64]['name'])) {
+                            $model->name = $post["GmsVideos"][$nameBase64]['name'];
+                        }
+                        if (!empty($post["GmsVideos"][$nameBase64]['comment'])) {
+                            $model->comment = $post["GmsVideos"][$nameBase64]['comment'];
+                        }
+                    }
+                }
+
+                if ($model->save()) {
+                    return Json::encode([
+                        'files' => [
+                            [
+                                'name' => $fileName,
+                                'size' => $imageFile->size,
+                                'url' => "../../" . $path,
+                                'thumbnailUrl' => $thumbnailUrl,
+                                'deleteUrl' => 'video-delete?name=' . $fileName,
+                                'deleteType' => 'POST'
+                            ]
+                        ]
+                    ]);
+                } else {
+                    Yii::getLogger()->log([
+                        '$model->save()' => $model->getErrors()
+                    ], Logger::LEVEL_ERROR, 'binary');
+                }
             }
         }
 
@@ -102,13 +132,15 @@ class GmsVideosController extends Controller
      */
     public function actionVideoDelete($name)
     {
-        $directory = Yii::getAlias('@backend/web/upload/video') . DIRECTORY_SEPARATOR . Yii::$app->session->id;
+        $output = [];
+        $directory = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]);
+
         if (is_file($directory . DIRECTORY_SEPARATOR . $name)) {
             unlink($directory . DIRECTORY_SEPARATOR . $name);
         }
 
         $files = FileHelper::findFiles($directory);
-        $output = [];
+
         foreach ($files as $file) {
             $fileName = basename($file);
             $path = '/upload/video/' . Yii::$app->session->id . DIRECTORY_SEPARATOR . $fileName;
@@ -119,7 +151,7 @@ class GmsVideosController extends Controller
                 'thumbnailUrl' => '/img/video.png',
                 'deleteUrl' => 'video-delete?name=' . $fileName,
                 'deleteType' => 'POST',
-                'value' => $fileName
+                'value' => $fileName,
             ];
         }
         return Json::encode($output);
@@ -147,23 +179,6 @@ class GmsVideosController extends Controller
         $model = new GmsVideos();
 
         if ($model->load(Yii::$app->request->post())) {
-            if (!empty(Yii::$app->request->post()['GmsVideos']['fileName'])) {
-                $post = Yii::$app->request->post();
-                $directory = Yii::getAlias('@backend/web') . DIRECTORY_SEPARATOR;
-                $file = $directory . $post['GmsVideos']['fileName'];
-                if (file_exists($file)) {
-                    $model->file = $post['GmsVideos']['fileName'];
-                    //$model->type = FileHelper::getMimeType($file);
-                    if ($duration = FunctionsHelper::getDurationVideo($file)) {
-                        $model->time = round($duration);
-                    }
-                    if ($thumbnail = FunctionsHelper::createMovieThumb($file, $directory.'thumbnail.jpg')) {
-
-                    }
-
-                    $model->created_at = time() ;
-                }
-            }
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
