@@ -35,8 +35,6 @@ HTML;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?// Html::hiddenInput('GmsVideos[fileName]', null , ['id' => 'gmsvideos-fileName'])?>
-
     <?= FileUploadUI::widget([
         'model' => $model,
         'attribute' => 'file',
