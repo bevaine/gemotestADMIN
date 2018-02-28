@@ -62,6 +62,9 @@ $this->params['breadcrumbs'][] = $this->title;
                         Html::img($model['thumbnail']),
                         null,
                         [
+                            'style' => [
+                                'cursor' => 'pointer'
+                            ],
                             'title' => $model['name'],
                             'target' => '_blank',
                             'onclick' => "
@@ -84,6 +87,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 });
                                 modalHtml.modal('show');
                                 modalPlayer.open();"
+
                         ]
                     );
                 },
