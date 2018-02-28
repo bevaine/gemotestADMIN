@@ -15,14 +15,6 @@ use mihaildev\ckeditor\Assets;
 /* @var $model common\models\GmsPlaylistOut */
 /* @var $form yii\widgets\ActiveForm */
 
-$data = [
-    ['title' => 'Node 1', 'key' => 1],
-    ['title' => 'Folder 2', 'key' => '2', 'folder' => true, 'children' => [
-        ['title' => 'Node 2.1', 'key' => '3'],
-        ['title' => 'Node 2.2', 'key' => '4']
-    ]]
-];
-
 $layout = <<< HTML
     {input1}
     {separator}
@@ -30,10 +22,6 @@ $layout = <<< HTML
     <span class="input-group-addon kv-date-remove">
         <i class="glyphicon glyphicon-remove"></i>
     </span>
-HTML;
-
-$tableTree = <<< HTML
-
 HTML;
 
 $week = [
@@ -648,8 +636,9 @@ $js1 = <<< JS
 JS;
 
 $this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
-$this->registerCssFile('http://wwwendt.de/tech/fancytree/src/skin-win8/ui.fancytree.css');
 $this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
+
+$this->registerCssFile('http://wwwendt.de/tech/fancytree/src/skin-win8/ui.fancytree.css');
 $this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.js', ['depends' => [Assets::className()]]);
 $this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.table.js', ['depends' => [Assets::className()]]);
 $this->registerJsFile('http://momentjs.com/downloads/moment.js', ['depends' => [Assets::className()]]);

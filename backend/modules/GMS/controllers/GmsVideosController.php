@@ -59,8 +59,6 @@ class GmsVideosController extends Controller
         $model = new GmsVideos();
 
         $imageFile = UploadedFile::getInstance($model, 'file');
-        //$videoDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
-        //$thumbnailDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'thumbnail', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
 
         if (!is_dir(self::getVideoDir())) {
             FileHelper::createDirectory(self::getVideoDir(), 0777);
@@ -117,7 +115,7 @@ class GmsVideosController extends Controller
                                 'url' => "../.." . $path,
                                 'thumbnailUrl' => "../.." . $thumbnailUrl,
                                 'deleteUrl' => 'video-delete?id=' . $model->id,
-                                'deleteType' => 'POST'
+                                'deleteType' => 'POST',
                             ]
                         ]
                     ]);
@@ -309,24 +307,30 @@ class GmsVideosController extends Controller
             $data = GmsVideos::findOne($video);
             /** @var GmsVideos $userData */
             $tr = '';
-            foreach ($data->attributeLabels() as $key=>$label) {
-                if (in_array($key, ['type', 'file'])) continue;
-                if ($key == 'time')
-                    $data->$key = date("H:i:s", mktime(0, 0, $data->$key));
-                if ($key == 'created_at')
-                    $data->$key = date("d-m-Y H:i:s", $data->$key);
-                $tr .= '<tr>';
-                $tr .= '<th class="">'.$label.'</th>';
-                $tr .= '<td>'.$data->$key.'</td>';
-                $tr .= '</tr>';
+            if ($data) {
+                foreach ($data->attributeLabels() as $key=>$label) {
+                    if (in_array($key, ['type', 'file', 'thumbnail'])) continue;
+                    if ($key == 'time')
+                        $data->$key = date("H:i:s", mktime(0, 0, $data->$key));
+                    if ($key == 'created_at')
+                        $data->$key = date("d-m-Y H:i:s", $data->$key);
+                    $tr .= '<tr>';
+                    $tr .= '<th class="">'.$label.'</th>';
+                    $tr .= '<td>'.$data->$key.'</td>';
+                    $tr .= '</tr>';
+                }
+                if (!empty($tr)) {
+                    $table .= '<div class="row">';
+                    $table .= '<div class="col-lg-12">';
+                    $table .= '<table id="w0" class="table table-striped table-bordered detail-view">';
+                    $table .= '<tbody>'.$tr.'</tbody>';
+                    $table .= '</table>';
+                    $table .= '</div>';
+                    $table .= '</div>';
+                    $out['results']['table'] = $table;
+                }
+                if (!empty($data->file)) $out['results']['file'] = $data->file;
             }
-            if (!empty($tr)) {
-                $table .= '<table id="w0" class="table table-striped table-bordered detail-view">';
-                $table .=  '<tbody>'.$tr.'</tbody>';
-                $table .=  '</table>';
-                $out['results']['table'] = $table;
-            }
-            if (!empty($data->file)) $out['results']['file'] = $data->file;
         }
         echo !empty($out) ? Json::encode($out) : null;
     }

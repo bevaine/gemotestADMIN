@@ -15,6 +15,7 @@ use Yii;
  * @property integer $created_at
  * @property string $comment
  * @property string $thumbnail
+ *
  */
 class GmsVideos extends \yii\db\ActiveRecord
 {

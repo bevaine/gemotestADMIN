@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use mihaildev\ckeditor\Assets;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylistOut */
@@ -54,3 +55,8 @@ $this->params['breadcrumbs'][] = $this->title;
     ]) ?>
 
 </div>
+
+<?php
+$this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
+$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
+?>

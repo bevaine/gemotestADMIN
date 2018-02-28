@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use mihaildev\ckeditor\Assets;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsVideos */
@@ -9,14 +10,32 @@ use yii\widgets\DetailView;
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Gms Videos', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+$htmlPlayer = <<<HTML
+    <video
+            id="my-player"
+            class="video-js"
+            controls
+            preload="auto"
+            poster="../../img/logo.jpg"
+            width="783"
+            data-setup='{}'>
+            <source src="$model->file" type="$model->type"></source>
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a
+            web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">
+                supports HTML5 video
+            </a>
+        </p>
+    </video>
+HTML;
+
 ?>
 <div class="gms-videos-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -29,12 +48,41 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
+            [
+                'headerOptions' => array('style' => 'width: 200px;'),
+                'label' => 'Видео',
+                'value' => $htmlPlayer,
+                'format' => 'raw',
+            ],
             'name',
-            'file',
+            'created_at:datetime',
             'type',
-            'time:datetime',
-            'created_at',
+            [
+                'attribute' => 'time',
+                'value' => function($model) {
+                    /** @var $model \common\models\GmsVideos */
+                    return date("H:i:s" , mktime(0, 0, $model->time));
+                },
+            ],
+
         ],
     ]) ?>
 
 </div>
+
+<?php
+$js1 = <<< JS
+  
+    $(function()
+    {
+        var videoPath = res.results.file; 
+        var myPlayer = videojs('my-player');
+        //myPlayer.src(videoPath);
+        //myPlayer.ready(function() {
+            //this.play();
+        //});   
+    });
+JS;
+$this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
+$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
+?>

@@ -52,7 +52,7 @@ HTML;
             'fileuploadprocessalways' => $htmlFileUpload,
             'fileuploadprogressall' => 'function (e, data) {
             }',
-            'fileuploaddone' => 'function (e, data) {
+            'fileuploaddone' => 'function(e, data) {
             }',
             'fileuploadfail' => "function(e, data) {
             }",
