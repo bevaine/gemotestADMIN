@@ -59,14 +59,14 @@ class GmsVideosController extends Controller
         $model = new GmsVideos();
 
         $imageFile = UploadedFile::getInstance($model, 'file');
-        $videoDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
-        $thumbnailDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'thumbnail', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
+        //$videoDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
+        //$thumbnailDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'thumbnail', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
 
-        if (!is_dir($videoDir)) {
-            FileHelper::createDirectory($videoDir, 0777);
+        if (!is_dir(self::getVideoDir())) {
+            FileHelper::createDirectory(self::getVideoDir(), 0777);
         }
-        if (!is_dir($thumbnailDir)) {
-            FileHelper::createDirectory($thumbnailDir, 0777);
+        if (!is_dir(self::getThumbnailDir())) {
+            FileHelper::createDirectory(self::getThumbnailDir(), 0777);
         }
 
         if ($imageFile) {
@@ -77,8 +77,8 @@ class GmsVideosController extends Controller
             $fileName = $uid . '.' . $imageFile->extension;
             $thumbnailName = $uid . '.jpg';
 
-            $filePath = $videoDir . $fileName;
-            $thumbnailPath = $thumbnailDir . $thumbnailName;
+            $filePath = self::getVideoDir() . $fileName;
+            $thumbnailPath = self::getThumbnailDir() . $thumbnailName;
 
             if ($imageFile->saveAs($filePath)) {
                 if ($thumbnail = FunctionsHelper::createMovieThumb($filePath, $thumbnailPath)) {
@@ -139,15 +139,11 @@ class GmsVideosController extends Controller
     public function actionVideoDelete($id)
     {
         $output = [];
-        $videoDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
-        $thumbnailDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'thumbnail', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
-
-        $modelVideo = GmsVideos::findOne($id);
-        if (!$modelVideo) return '';
+        $modelVideo = $this->findModel($id);
 
         if (!empty($modelVideo->file)) {
             $videoFile = $modelVideo->file;
-            $videoPath = $videoDir . basename($videoFile);
+            $videoPath = self::getVideoDir() . basename($videoFile);
             if (is_file($videoPath)) {
                 unlink($videoPath);
             } else {
@@ -158,7 +154,7 @@ class GmsVideosController extends Controller
 
         if (!empty($modelVideo->thumbnail)) {
             $thumbnailFile = $modelVideo->thumbnail;
-            $thumbnailPath = $thumbnailDir . basename($thumbnailFile);
+            $thumbnailPath = self::getThumbnailDir() . basename($thumbnailFile);
             if (is_file($thumbnailPath)) {
                 unlink($thumbnailPath);
             } else {
@@ -167,7 +163,7 @@ class GmsVideosController extends Controller
             }
         }
 
-        $files = FileHelper::findFiles($videoDir);
+        $files = FileHelper::findFiles(self::getVideoDir());
 
         foreach ($files as $file) {
 
@@ -177,10 +173,10 @@ class GmsVideosController extends Controller
             $videoURL = '/' . implode('/', ['upload', 'video', Yii::$app->session->id, $fileName]);
 
             $thumbnailURL = '/img/video.png';
-            if (is_file($thumbnailDir . $thumbnailName)) {
+            if (is_file(self::getThumbnailDir(). $thumbnailName)) {
                 $thumbnailURL = '/' . implode('/', ['upload', 'thumbnail', Yii::$app->session->id, $thumbnailName]);
             } else {
-                Yii::getLogger()->log('Файл ' . $thumbnailDir . $thumbnailName . ' - не найден!',
+                Yii::getLogger()->log('Файл ' . self::getThumbnailDir() . $thumbnailName . ' - не найден!',
                     Logger::LEVEL_ERROR, 'binary');
             }
 
@@ -198,6 +194,42 @@ class GmsVideosController extends Controller
         $modelVideo->delete();
 
         return Json::encode($output);
+    }
+
+    /**
+     * Deletes an existing GmsVideos model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     */
+    public function actionDelete($id)
+    {
+        $modelVideo = $this->findModel($id);
+
+        if (!empty($modelVideo->file)) {
+            $videoFile = $modelVideo->file;
+            $videoPath = self::getVideoDir() . basename($videoFile);
+            if (is_file($videoPath)) {
+                unlink($videoPath);
+            } else {
+                Yii::getLogger()->log('Файл ' . $videoPath . ' - не найден!',
+                    Logger::LEVEL_ERROR, 'binary');
+            }
+        }
+
+        if (!empty($modelVideo->thumbnail)) {
+            $thumbnailFile = $modelVideo->thumbnail;
+            $thumbnailPath = self::getThumbnailDir() . basename($thumbnailFile);
+            if (is_file($thumbnailPath)) {
+                unlink($thumbnailPath);
+            } else {
+                Yii::getLogger()->log('Файл ' . $thumbnailPath . ' - не найден!',
+                    Logger::LEVEL_ERROR, 'binary');
+            }
+        }
+
+        $modelVideo->delete();
+        return $this->redirect(['index']);
     }
 
     /**
@@ -251,27 +283,6 @@ class GmsVideosController extends Controller
     }
 
     /**
-     * Deletes an existing GmsVideos model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     */
-    public function actionDelete($id)
-    {
-        $findModel = $this->findModel($id);
-        if (!empty($findModel->file)) {
-            $pathInfo = pathinfo($findModel->file);
-            $directory = Yii::getAlias('@backend/web') . $pathInfo['dirname'];
-            $fileName = $directory . DIRECTORY_SEPARATOR . $pathInfo['basename'];
-            if (file_exists($fileName)) {
-                unlink($fileName);
-            }
-        }
-        $findModel->delete();
-        return $this->redirect(['index']);
-    }
-
-    /**
      * Finds the GmsVideos model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
@@ -318,5 +329,20 @@ class GmsVideosController extends Controller
             if (!empty($data->file)) $out['results']['file'] = $data->file;
         }
         echo !empty($out) ? Json::encode($out) : null;
+    }
+
+
+    /**
+     * @return string
+     */
+    static public function getVideoDir() {
+        return implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * @return string
+     */
+    static public function getThumbnailDir() {
+        return implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'thumbnail', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
     }
 }
