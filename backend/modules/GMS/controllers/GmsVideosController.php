@@ -59,9 +59,14 @@ class GmsVideosController extends Controller
         $model = new GmsVideos();
 
         $imageFile = UploadedFile::getInstance($model, 'file');
-        $directory = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
-        if (!is_dir($directory)) {
-            FileHelper::createDirectory($directory, 0777);
+        $videoDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
+        $thumbnailDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'thumbnail', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
+
+        if (!is_dir($videoDir)) {
+            FileHelper::createDirectory($videoDir, 0777);
+        }
+        if (!is_dir($thumbnailDir)) {
+            FileHelper::createDirectory($thumbnailDir, 0777);
         }
 
         if ($imageFile) {
@@ -70,17 +75,18 @@ class GmsVideosController extends Controller
             $uid = uniqid(time(), true);
 
             $fileName = $uid . '.' . $imageFile->extension;
-            $thumbnailName = $uid . '_thumbnail.jpg';
+            $thumbnailName = $uid . '.jpg';
 
-            $filePath = $directory . $fileName;
-            $thumbnailPath = $directory . $thumbnailName;
+            $filePath = $videoDir . $fileName;
+            $thumbnailPath = $thumbnailDir . $thumbnailName;
 
             if ($imageFile->saveAs($filePath)) {
                 if ($thumbnail = FunctionsHelper::createMovieThumb($filePath, $thumbnailPath)) {
-                    $thumbnailUrl = '/upload/video/' . Yii::$app->session->id . '/' . $thumbnailName;
+                    $thumbnailUrl = '/' . implode('/', ['upload', 'thumbnail', Yii::$app->session->id, $thumbnailName]);
                 }
-                $path = implode(DIRECTORY_SEPARATOR, ['upload', 'video', Yii::$app->session->id, $fileName]);
+                $path = '/' . implode('/', ['upload', 'video', Yii::$app->session->id, $fileName]);
 
+                $model->name = 'Без имени';
                 $model->file = $path;
                 $model->type = FileHelper::getMimeType($filePath);
                 $model->thumbnail = $thumbnailUrl;
@@ -108,9 +114,9 @@ class GmsVideosController extends Controller
                             [
                                 'name' => $fileName,
                                 'size' => $imageFile->size,
-                                'url' => "../../" . $path,
-                                'thumbnailUrl' => $thumbnailUrl,
-                                'deleteUrl' => 'video-delete?name=' . $fileName,
+                                'url' => "../.." . $path,
+                                'thumbnailUrl' => "../.." . $thumbnailUrl,
+                                'deleteUrl' => 'video-delete?id=' . $model->id,
                                 'deleteType' => 'POST'
                             ]
                         ]
@@ -127,33 +133,70 @@ class GmsVideosController extends Controller
     }
 
     /**
-     * @param $name
+     * @param $id
      * @return string
      */
-    public function actionVideoDelete($name)
+    public function actionVideoDelete($id)
     {
         $output = [];
-        $directory = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]);
+        $videoDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'video', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
+        $thumbnailDir = implode(DIRECTORY_SEPARATOR, [Yii::getAlias('@backend'), 'web', 'upload', 'thumbnail', Yii::$app->session->id]). DIRECTORY_SEPARATOR;
 
-        if (is_file($directory . DIRECTORY_SEPARATOR . $name)) {
-            unlink($directory . DIRECTORY_SEPARATOR . $name);
+        $modelVideo = GmsVideos::findOne($id);
+        if (!$modelVideo) return '';
+
+        if (!empty($modelVideo->file)) {
+            $videoFile = $modelVideo->file;
+            $videoPath = $videoDir . basename($videoFile);
+            if (is_file($videoPath)) {
+                unlink($videoPath);
+            } else {
+                Yii::getLogger()->log('Файл ' . $videoPath . ' - не найден!',
+                    Logger::LEVEL_ERROR, 'binary');
+            }
         }
 
-        $files = FileHelper::findFiles($directory);
+        if (!empty($modelVideo->thumbnail)) {
+            $thumbnailFile = $modelVideo->thumbnail;
+            $thumbnailPath = $thumbnailDir . basename($thumbnailFile);
+            if (is_file($thumbnailPath)) {
+                unlink($thumbnailPath);
+            } else {
+                Yii::getLogger()->log('Файл ' . $thumbnailPath . ' - не найден!',
+                    Logger::LEVEL_ERROR, 'binary');
+            }
+        }
+
+        $files = FileHelper::findFiles($videoDir);
 
         foreach ($files as $file) {
-            $fileName = basename($file);
-            $path = '/upload/video/' . Yii::$app->session->id . DIRECTORY_SEPARATOR . $fileName;
+
+            $path_parts = pathinfo($file);
+            $fileName = $path_parts['basename'];
+            $thumbnailName =  $path_parts['filename'].'.jpg';
+            $videoURL = '/' . implode('/', ['upload', 'video', Yii::$app->session->id, $fileName]);
+
+            $thumbnailURL = '/img/video.png';
+            if (is_file($thumbnailDir . $thumbnailName)) {
+                $thumbnailURL = '/' . implode('/', ['upload', 'thumbnail', Yii::$app->session->id, $thumbnailName]);
+            } else {
+                Yii::getLogger()->log('Файл ' . $thumbnailDir . $thumbnailName . ' - не найден!',
+                    Logger::LEVEL_ERROR, 'binary');
+            }
+
             $output['files'][] = [
                 'name' => $fileName,
                 'size' => filesize($file),
-                'url' => $path,
-                'thumbnailUrl' => '/img/video.png',
-                'deleteUrl' => 'video-delete?name=' . $fileName,
+                'url' => '../..' . $videoURL,
+                'thumbnailUrl' => '../..'. $thumbnailURL,
+                'deleteUrl' => 'video-delete?id=' . $modelVideo->id,
                 'deleteType' => 'POST',
                 'value' => $fileName,
             ];
         }
+
+        $modelVideo->delete();
+
         return Json::encode($output);
     }
 

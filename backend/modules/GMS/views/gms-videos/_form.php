@@ -1,10 +1,5 @@
 <?php
-
-use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use xutl\videojs\VideoJsWidget;
-use yii\helpers\FileHelper;
-use common\components\helpers\FunctionsHelper;
 use dosamigos\fileupload\FileUploadUI;
 
 /* @var $this yii\web\View */
@@ -40,42 +35,31 @@ HTML;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= Html::hiddenInput('GmsVideos[fileName]', null , ['id' => 'gmsvideos-fileName'])?>
+    <?// Html::hiddenInput('GmsVideos[fileName]', null , ['id' => 'gmsvideos-fileName'])?>
 
     <?= FileUploadUI::widget([
         'model' => $model,
         'attribute' => 'file',
-        'url' => ['gms-videos/video-upload'], // your url, this is just for demo purposes,
-        'options' => ['accept' => 'video/*'],
+        'url' => [
+            'gms-videos/video-upload'
+        ],
+        'options' => [
+            'accept' => 'video/*'
+        ],
         'gallery' => true,
         'clientOptions' => [
             'maxNumberOfFiles' => 8,
         ],
         'clientEvents' => [
-            'fileuploadprogressall' => 'function (e, data) {
-                //console.log(data); 
-            }',
             'fileuploadprocessalways' => $htmlFileUpload,
+            'fileuploadprogressall' => 'function (e, data) {
+            }',
             'fileuploaddone' => 'function (e, data) {
-                
-                var url = data.result.files[0].url; 
-                $("#gmsvideos-fileName").val(url);
             }',
             'fileuploadfail' => "function(e, data) {
-
             }",
         ],
     ]); ?>
     <?php ActiveForm::end(); ?>
 
 </div>
-<?php
-$js1 = <<< JS
-
-    function addFields() {
-        
-    }
-JS;
-
-$this->registerJs($js1);
-

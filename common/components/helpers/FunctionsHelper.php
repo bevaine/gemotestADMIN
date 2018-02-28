@@ -44,16 +44,9 @@ SCRIPT;
             $duration = $ffprobe
                 ->format($file)
                 ->get('duration');
-
-            Yii::getLogger()->log([
-                'getDurationVideo' => $duration
-            ], Logger::LEVEL_WARNING, 'binary');
             return !empty($duration) ? $duration : false;
 
         } catch (\Exception $exception) {
-            Yii::getLogger()->log([
-                'getDurationVideo' => $exception->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
     }
@@ -63,30 +56,17 @@ SCRIPT;
      * @param string $destFile
      * @return bool|string
      */
-    public static function createMovieThumb($srcFile, $destFile = "test.jpg")
+    public static function createMovieThumb($srcFile, $destFile = "unknown.jpg")
     {
         $output = array();
         try {
             $cmd = sprintf('%s -i %s -an -ss 00:00:05 -vf scale=150:-2 -r 1 -vframes 1 -y %s',
                 self::getBinFFmpeg()['ffmpeg.binaries'], $srcFile, $destFile);
+
             exec($cmd, $output, $retval);
-            Yii::getLogger()->log([
-                '$output' => $output
-            ], Logger::LEVEL_ERROR, 'binary');
-            Yii::getLogger()->log([
-                '$cmd' => $cmd
-            ], Logger::LEVEL_ERROR, 'binary');
-            if ($retval) {
-                Yii::getLogger()->log([
-                    '$retval' => $retval
-                ], Logger::LEVEL_ERROR, 'binary');
-                return false;
-            }
+            if ($retval) return false;
             return $destFile;
         } catch (\Exception $exception) {
-            Yii::getLogger()->log([
-                'createMovieThumb' => $exception->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
             return false;
         }
     }
