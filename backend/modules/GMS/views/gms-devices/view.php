@@ -12,11 +12,9 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-devices-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',
@@ -29,14 +27,25 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'sender_id',
-            'host_name',
             'device',
-            'created_at',
-            'last_active_at',
-            'region_id',
-            'auth_status',
-            'current_pls_id',
+            [
+                'value' => !empty($model->regionModel) ? $model->regionModel->region_name : null,
+                'attribute' => 'region_id'
+            ],
+            [
+                'value' => !empty($model->senderModel) ? $model->senderModel->sender_name : null,
+                'attribute' => 'sender_id'
+            ],
+            [
+                'value' => !empty($model->playListOutModel) ? $model->playListOutModel->name : null,
+                'attribute' => 'current_pls_id'
+            ],
+            [
+                'value' => \common\models\GmsDevices::getAuthStatus($model->auth_status),
+                'attribute' => 'auth_status'
+            ],
+            'created_at:datetime',
+            'last_active_at:datetime',
         ],
     ]) ?>
 

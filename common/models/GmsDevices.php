@@ -23,6 +23,20 @@ use Yii;
 
 class GmsDevices extends \yii\db\ActiveRecord
 {
+    CONST SCENARIO_ADD_DEVICE = 'addDevice';
+    CONST SCENARIO_EDIT_DEVICE = 'editDevice';
+
+    /**
+     * @return array
+     */
+    public function scenarios()
+    {
+        return [
+            self::SCENARIO_ADD_DEVICE => ['device', 'created_at', 'last_active_at', 'auth_status'],
+            self::SCENARIO_EDIT_DEVICE => ['device', 'created_at', 'last_active_at', 'auth_status', 'sender_id', 'region_id', 'current_pls_id'],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -37,7 +51,8 @@ class GmsDevices extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['region_id', 'device'], 'required'],
+            [['device'], 'required', 'on' => 'addDevice'],
+            [['region_id', 'device'], 'required', 'on' => 'editDevice'],
             [['created_at', 'sender_id', 'last_active_at', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
             [['host_name', 'device'], 'string', 'max' => 255],
             ['auth_status', 'default', 'value' => 0],
@@ -59,6 +74,8 @@ class GmsDevices extends \yii\db\ActiveRecord
             'region_id' => 'Регион',
             'auth_status' => 'Авторизация',
             'current_pls_id' => 'Плейлист',
+            'sender_name' => 'Отделение',
+            'current_pls_name' => 'Плейлист',
         ];
     }
 

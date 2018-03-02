@@ -32,7 +32,7 @@ class GmsDevicesSearch extends GmsDevices
     {
         return [
             [['id', 'created_at',  'created_at_from', 'created_at_to', 'last_active_at', 'last_active_at_from', 'last_active_at_to', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
-            [['sender_id', 'host_name', 'device'], 'safe'],
+            [['sender_name', 'current_pls_name', 'sender_id', 'host_name', 'device'], 'safe'],
         ];
     }
 
@@ -63,7 +63,7 @@ class GmsDevicesSearch extends GmsDevices
             'query' => $query,
             'sort' => [
                 'defaultOrder' => [
-                    'created_at' => SORT_DESC
+                    'created_at' => SORT_DESC,
                 ]
             ],
         ]);
@@ -79,7 +79,7 @@ class GmsDevicesSearch extends GmsDevices
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'region_id' => $this->region_id,
+            'gms_devices.region_id' => $this->region_id,
             'auth_status' => $this->auth_status,
             'current_pls_id' => $this->current_pls_id,
         ]);

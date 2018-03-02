@@ -15,7 +15,8 @@ use common\models\GmsPlaylistOut;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'device')->textInput(['maxlength' => true, 'disabled' => true]) ?>
+    <?= $form->field($model, 'device')->textInput(['maxlength' => true, 'disabled' => !$model->isNewRecord]) ?>
+    <?= Html::hiddenInput('GmsDevices[device]', $model['device']) ?>
 
     <div class="form-group region_id">
         <?= $form->field($model, 'region_id')->dropDownList(GmsRegions::getRegionList(), ['prompt' => '---']); ?>
@@ -34,7 +35,7 @@ use common\models\GmsPlaylistOut;
     </div>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

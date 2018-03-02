@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="gms-devices-index">
 
     <p>
-        <?= Html::a('Добавить в ручную', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <div class="nav-tabs-custom">
@@ -50,7 +50,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                         $img_name = 'icon-time2.jpg';
                                     }
                                 }
-                                return Html::img('/img/'.$img_name);
+                                return Html::img('/img/'.$img_name, [
+                                    "alt" => 'Последняя активность была '.date("d-m-Y H:i:s", $value),
+                                    "title" => 'Последняя активность была '.date("d-m-Y H:i:s", $value)
+                                ]);
                             }
                         ],
                         [
@@ -60,7 +63,10 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'width'=>'196px',
                             'attribute' => 'created_at',
-                            'value' => 'created_at',
+                            'value' => function ($model) {
+                                /** @var $model \common\models\GmsDevices */
+                                return !empty($model->created_at) ? date("d-m-Y H:i:s", $model->created_at) : null;
+                            },
                             'filter' => \kartik\date\DatePicker::widget([
                                 'model' => $searchModel,
                                 'attribute' => 'created_at_from',
@@ -99,32 +105,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
                             },
                             'attribute' => 'sender_name'
-                        ],
-                        [
-                            'width'=>'196px',
-                            'attribute' => 'last_active_at',
-                            'value' => 'last_active_at',
-                            'filter' => \kartik\date\DatePicker::widget([
-                                'model' => $searchModel,
-                                'attribute' => 'last_active_at_from',
-                                'attribute2' => 'last_active_at_to',
-                                'options' => [
-                                    'placeholder' => 'От',
-                                    'style'=>['width' => '98px']
-                                ],
-                                'options2' => [
-                                    'placeholder' => 'До',
-                                    'style'=>['width' => '98px']
-                                ],
-                                'separator' => 'По',
-                                'readonly' => false,
-                                'type' => \kartik\date\DatePicker::TYPE_RANGE,
-                                'pluginOptions' => [
-                                    'format' => 'yyyy-mm-dd',
-                                    'autoclose' => true,
-                                ]
-                            ]),
-                            'format' => 'html', // datetime
                         ],
                         [
                             'value' => function ($model) {

@@ -87,8 +87,17 @@ class GmsDevicesController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->scenario = 'editDevice';
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            //print_r(Yii::$app->request->post());
+            //print_r($model);
+            if (!$model->save()) {
+                Yii::getLogger()->log([
+                    '$model->getErrors()' => $model->getErrors()
+                ], 1, 'binary');
+
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
