@@ -2,6 +2,9 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use common\models\GmsDevices;
+use common\models\GmsRegions;
+use common\models\GmsPlaylistOut;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsDevices */
@@ -12,17 +15,23 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'sender_id')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'device')->textInput(['maxlength' => true, 'disabled' => true]) ?>
 
-    <?= $form->field($model, 'host_name')->textInput(['maxlength' => true]) ?>
+    <div class="form-group region_id">
+        <?= $form->field($model, 'region_id')->dropDownList(GmsRegions::getRegionList(), ['prompt' => '---']); ?>
+    </div>
 
-    <?= $form->field($model, 'device_id')->textInput(['maxlength' => true]) ?>
+    <div class="form-group sender_id">
+        <?= $form->field($model, 'sender_id')->dropDownList([], ['prompt' => '---']); ?>
+    </div>
 
-    <?= $form->field($model, 'created_at')->textInput() ?>
+    <div class="form-group auth_status">
+        <?= $form->field($model, 'auth_status')->dropDownList(GmsDevices::getAuthStatusArray(), ['prompt' => '---']); ?>
+    </div>
 
-    <?= $form->field($model, 'updated_at')->textInput() ?>
-
-    <?= $form->field($model, 'playlist')->textInput(['maxlength' => true]) ?>
+    <div class="form-group current_pls_id">
+        <?= $form->field($model, 'current_pls_id')->dropDownList(GmsPlaylistOut::getPlayListArray(), ['prompt' => '---']); ?>
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Create' : 'Update', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
@@ -31,3 +40,50 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 
 </div>
+<?php
+$urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
+
+$js1 = <<< JS
+    /**
+    * @param region
+    */
+    function setSender(region) {
+        var senderSelect = $('.sender_id select');
+        var senderDisable = senderSelect.prop('disabled');        
+        senderSelect.attr('disabled', true);
+        $.ajax({
+            url: '{$urlAjaxSender}',
+            data: {region: region},
+            success: function (res) {
+                res = JSON.parse(res);
+                var optionsAsString = "<option value=''>---</option>";
+                if (res.results !== undefined && res.results.length > 0) {
+                    var results = res.results; 
+                    for (var i = 0; i < results.length; i++) {
+                        optionsAsString += "<option value='" + results[i].id + "' ";
+                        optionsAsString += results[i].id == '{$model->sender_id}' ? 'selected' : '';
+                        optionsAsString += ">" + results[i].name + "</option>"
+                    }
+                }
+                $(".sender_id select option").each(function() {
+                    $(this).remove();
+                });
+                senderSelect.append( optionsAsString );
+                senderSelect.attr('disabled', senderDisable);
+            }
+        });
+    }
+
+    $(".region_id select").change(function() {
+        setSender (
+            $('#gmsdevices-region_id').val()
+        );
+    });
+    
+    $(document).ready(function(){
+        setSender (
+            $('#gmsdevices-region_id').val()
+        );
+    });
+JS;
+$this->registerJs($js1);

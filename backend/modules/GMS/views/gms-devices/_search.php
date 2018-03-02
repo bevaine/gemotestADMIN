@@ -21,13 +21,17 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'host_name') ?>
 
-    <?= $form->field($model, 'device_id') ?>
+    <?= $form->field($model, 'device') ?>
 
     <?= $form->field($model, 'created_at') ?>
 
-    <?php // echo $form->field($model, 'updated_at') ?>
+    <?php // echo $form->field($model, 'last_active_at') ?>
 
-    <?php // echo $form->field($model, 'playlist') ?>
+    <?php // echo $form->field($model, 'region_id') ?>
+
+    <?php // echo $form->field($model, 'auth_status') ?>
+
+    <?php // echo $form->field($model, 'current_pls_id') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

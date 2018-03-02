@@ -2,6 +2,7 @@
 
 namespace app\modules\GMS\controllers;
 
+use common\models\GmsRegions;
 use common\models\Kontragents;
 use Yii;
 use common\models\GmsSenders;
@@ -145,4 +146,30 @@ class GmsSendersController extends Controller
 
         echo Json::encode($out);
     }
+
+    /**
+     * @param null $sender
+     */
+    public function actionAjaxGetRegion($sender = null)
+    {
+        $out = ['more' => false];
+
+        $region_id = null;
+        if ($dataSender = GmsSenders::findOne(['sender_key' => $sender])) {
+            $region_id = $dataSender->region_id;
+        }
+
+        foreach (GmsRegions::find()->all() as $userData) {
+            /** @var $userData GmsRegions */
+            $out['selected'] = $region_id;
+            $out['results'][] = [
+                'id' => $userData->id,
+                'name' => $userData->region_name
+            ];
+        }
+
+        echo Json::encode($out);
+    }
+
+
 }

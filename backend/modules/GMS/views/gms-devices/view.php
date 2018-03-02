@@ -31,10 +31,12 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'sender_id',
             'host_name',
-            'device_id',
+            'device',
             'created_at',
-            'updated_at',
-            'playlist',
+            'last_active_at',
+            'region_id',
+            'auth_status',
+            'current_pls_id',
         ],
     ]) ?>
 

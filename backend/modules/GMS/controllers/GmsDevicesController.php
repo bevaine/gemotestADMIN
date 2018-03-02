@@ -30,17 +30,21 @@ class GmsDevicesController extends Controller
     }
 
     /**
-     * Lists all GmsDevices models.
-     * @return mixed
+     * @param null $param
+     * @return string
      */
-    public function actionIndex()
+    public function actionIndex($param = null)
     {
         $searchModel = new GmsDevicesSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(
+            Yii::$app->request->queryParams,
+            $param
+        );
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'action' => $param
         ]);
     }
 

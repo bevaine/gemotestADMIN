@@ -10,11 +10,17 @@ use Yii;
  * @property integer $id
  * @property string $sender_id
  * @property string $host_name
- * @property string $device_id
+ * @property string $device
  * @property integer $created_at
- * @property integer $updated_at
- * @property string $playlist
+ * @property integer $last_active_at
+ * @property integer $region_id
+ * @property integer $auth_status
+ * @property integer $current_pls_id
+ * @property GmsRegions $regionModel
+ * @property GmsSenders $senderModel
+ * @property GmsPlaylistOut $playListOutModel
  */
+
 class GmsDevices extends \yii\db\ActiveRecord
 {
     /**
@@ -31,9 +37,10 @@ class GmsDevices extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['sender_id', 'host_name', 'device_id', 'playlist'], 'required'],
-            [['created_at', 'updated_at'], 'integer'],
-            [['sender_id', 'host_name', 'device_id', 'playlist'], 'string', 'max' => 255],
+            [['region_id', 'device'], 'required'],
+            [['created_at', 'sender_id', 'last_active_at', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
+            [['host_name', 'device'], 'string', 'max' => 255],
+            ['auth_status', 'default', 'value' => 0],
         ];
     }
 
@@ -44,12 +51,54 @@ class GmsDevices extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'sender_id' => 'Sender ID',
-            'host_name' => 'Host Name',
-            'device_id' => 'Device ID',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
-            'playlist' => 'Playlist',
+            'sender_id' => 'Отделение',
+            'host_name' => 'Хост',
+            'device' => 'Устройство',
+            'created_at' => 'Создан',
+            'last_active_at' => 'Активность',
+            'region_id' => 'Регион',
+            'auth_status' => 'Авторизация',
+            'current_pls_id' => 'Плейлист',
         ];
+    }
+
+    /**
+     * @param null $auth
+     * @return array|mixed
+     */
+    public static function getAuthStatus($auth = null) {
+        if ($auth == null || $auth != 1) $auth = 0;
+        return self::getAuthStatusArray()[$auth];
+    }
+
+    /**
+     * @return array
+     */
+    static public function getAuthStatusArray() {
+        return ['0' => 'Не авторизирован', '1' => 'Авторизирован'];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRegionModel()
+    {
+        return $this->hasOne(GmsRegions::className(), ['id' => 'region_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSenderModel()
+    {
+        return $this->hasOne(GmsSenders::className(), ['id' => 'sender_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPlayListOutModel()
+    {
+        return $this->hasOne(GmsPlaylistOut::className(), ['id' => 'current_pls_id']);
     }
 }

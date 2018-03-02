@@ -15,10 +15,7 @@ use kartik\select2\Select2;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), [
-        'prompt' => '---'
-    ]);
-    ?>
+    <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), ['prompt' => '---']); ?>
 
     <?php
     $url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);

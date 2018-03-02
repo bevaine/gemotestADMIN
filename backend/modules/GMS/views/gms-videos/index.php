@@ -11,14 +11,15 @@ use mihaildev\ckeditor\Assets;
 $this->title = 'Видео библиотека';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<style>
-    .center {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-    }
-</style>
+    <style>
+        .center {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+
     <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
         <div class="center">
             <video

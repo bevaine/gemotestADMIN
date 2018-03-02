@@ -22,6 +22,22 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
+            [
+                'filter' =>  \common\models\GmsRegions::getRegionList(),
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsPlaylist */
+                    return !empty($model->regionModel) ? $model->regionModel->region_name : null;
+                },
+                'attribute' => 'region'
+            ],
+            [
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsPlaylist */
+                    return !empty($model->senderModel) ? $model->senderModel->sender_name : null;
+
+                },
+                'attribute' => 'sender_name'
+            ],
             'region_id',
             'sender_id',
             'device_id',

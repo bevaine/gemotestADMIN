@@ -142,6 +142,8 @@ return [
                 'POST /admin/logins/create/<param>' => '/admin/logins/create',
                 'GET /admin/logins/roles/<department>' => '/admin/logins/roles',
                 'POST /admin/logins/roles/<department>' => '/admin/logins/roles',
+                'GET /GMS/gms-devices/index/<param>' => '/GMS/gms-devices/index',
+                'POST /GMS/gms-devices/index/<param>' => '/GMS/gms-devices/index',
             ],
         ],
         'authManager' => [

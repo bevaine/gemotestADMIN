@@ -9,17 +9,30 @@ use common\models\GmsDevices;
 
 /**
  * GmsDevicesSearch represents the model behind the search form about `common\models\GmsDevices`.
+ * @property $created_at_from
+ * @property $created_at_to
+ * @property $last_active_at_from
+ * @property $last_active_at_to
+ * @property $sender_name
+ * @property $current_pls_name
  */
 class GmsDevicesSearch extends GmsDevices
 {
+    public $created_at_from;
+    public $created_at_to;
+    public $last_active_at_from;
+    public $last_active_at_to;
+    public $sender_name;
+    public $current_pls_name;
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'created_at', 'updated_at'], 'integer'],
-            [['sender_id', 'host_name', 'device_id', 'playlist'], 'safe'],
+            [['id', 'created_at',  'created_at_from', 'created_at_to', 'last_active_at', 'last_active_at_from', 'last_active_at_to', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
+            [['sender_id', 'host_name', 'device'], 'safe'],
         ];
     }
 
@@ -33,41 +46,75 @@ class GmsDevicesSearch extends GmsDevices
     }
 
     /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
+     * @param $params
+     * @param null $param
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $param = null)
     {
         $query = GmsDevices::find();
+
+        $query->joinWith('senderModel')
+            ->joinWith('playListOutModel');
 
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC
+                ]
+            ],
         ]);
 
         $this->load($params);
 
         if (!$this->validate()) {
             // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
+            $query->where('0=1');
             return $dataProvider;
         }
 
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'region_id' => $this->region_id,
+            'auth_status' => $this->auth_status,
+            'current_pls_id' => $this->current_pls_id,
         ]);
+
+        if ($param == 'auth') {
+            $query->andWhere([
+                'auth_status' => 1
+            ]);
+        } else {
+            $query->andWhere([
+                'OR',
+                ['!=', 'auth_status', 1],
+                ['auth_status' => null]
+            ]);
+        }
 
         $query->andFilterWhere(['like', 'sender_id', $this->sender_id])
             ->andFilterWhere(['like', 'host_name', $this->host_name])
-            ->andFilterWhere(['like', 'device_id', $this->device_id])
-            ->andFilterWhere(['like', 'playlist', $this->playlist]);
+            ->andFilterWhere(['like', 'device', $this->device])
+            ->andFilterWhere(['like', 'gms_senders.sender_name', $this->sender_name])
+            ->andFilterWhere(['like', 'gms_playlist_out.name', $this->current_pls_name]);
+
+        if ($this->created_at_from) {
+            $query->andFilterWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($this->created_at_from))]);
+        }
+        if ($this->created_at_to) {
+            $query->andFilterWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($this->created_at_to))]);
+        }
+
+        if ($this->last_active_at_from) {
+            $query->andFilterWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($this->last_active_at_from))]);
+        }
+        if ($this->last_active_at_to) {
+            $query->andFilterWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($this->last_active_at_to))]);
+        }
 
         return $dataProvider;
     }

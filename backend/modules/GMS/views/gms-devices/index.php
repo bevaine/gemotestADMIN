@@ -1,38 +1,156 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
+use yii\helpers\Url;
+use common\models\GmsDevices;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsDevicesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $action string */
 
-$this->title = 'Gms Devices';
+$this->title = 'Устройства';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-devices-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <p>
-        <?= Html::a('Create Gms Devices', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Добавить в ручную', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'sender_id',
-            'host_name',
-            'device_id',
-            'created_at',
-            'updated_at',
-            'playlist',
+    <div class="nav-tabs-custom">
 
-            ['class' => 'yii\grid\ActionColumn'],
-        ],
-    ]); ?>
+        <ul class="nav nav-tabs">
+            <li class="<?= ($action == 'auth') ? "active" : '' ?>"><a href="<?php echo Url::to(["gms-devices/index/auth"]) ?>">Авторизованные</a></li>
+            <li class="<?= ($action != 'auth') ? "active" : '' ?>"><a href="<?php echo Url::to(["gms-devices/index"]) ?>">Не авторизованные</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="tab_1">
+                <?= GridView::widget([
+                    'dataProvider' => $dataProvider,
+                    'filterModel' => $searchModel,
+                    'columns' => [
+                        ['class' => 'yii\grid\SerialColumn'],
+                        [
+                            'headerOptions' => array('style' => 'text-align: center;'),
+                            'contentOptions' => function ($model, $key, $index, $column){
+                                return ['style' => 'text-align: center;'];
+                            },
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                /** @var \common\models\LoginsSearch $model */
+                                $value = $model['last_active_at'];
+                                $img_name = 'icon-time3.jpg';
+                                if (!empty($value)) {
+                                    if ($value <= strtotime("+1 day")) {
+                                        $img_name = 'icon-time1.jpg';
+                                    } elseif ($value <= strtotime("+2 day")) {
+                                        $img_name = 'icon-time2.jpg';
+                                    }
+                                }
+                                return Html::img('/img/'.$img_name);
+                            }
+                        ],
+                        [
+                            'attribute' => 'id',
+                            'headerOptions' => array('style' => 'width: 30px; text-align: center;'),
+                        ],
+                        [
+                            'width'=>'196px',
+                            'attribute' => 'created_at',
+                            'value' => 'created_at',
+                            'filter' => \kartik\date\DatePicker::widget([
+                                'model' => $searchModel,
+                                'attribute' => 'created_at_from',
+                                'attribute2' => 'created_at_to',
+                                'options' => [
+                                    'placeholder' => 'От',
+                                    'style'=>['width' => '98px']
+                                ],
+                                'options2' => [
+                                    'placeholder' => 'До',
+                                    'style'=>['width' => '98px']
+                                ],
+                                'separator' => 'По',
+                                'readonly' => false,
+                                'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                                'pluginOptions' => [
+                                    'format' => 'yyyy-mm-dd',
+                                    'autoclose' => true,
+                                ]
+                            ]),
+                            'format' => 'html', // datetime
+                        ],
+                        'device',
+                        [
+                            'filter' =>  \common\models\GmsRegions::getRegionList(),
+                            'value' => function ($model) {
+                                /** @var $model \common\models\GmsDevices */
+                                return !empty($model->regionModel) ? $model->regionModel->region_name : null;
+                            },
+                            'attribute' => 'region_id'
+                        ],
+                        [
+                            'value' => function ($model) {
+                                /** @var $model \common\models\GmsDevices */
+                                return !empty($model->senderModel) ? $model->senderModel->sender_name : null;
+
+                            },
+                            'attribute' => 'sender_name'
+                        ],
+                        [
+                            'width'=>'196px',
+                            'attribute' => 'last_active_at',
+                            'value' => 'last_active_at',
+                            'filter' => \kartik\date\DatePicker::widget([
+                                'model' => $searchModel,
+                                'attribute' => 'last_active_at_from',
+                                'attribute2' => 'last_active_at_to',
+                                'options' => [
+                                    'placeholder' => 'От',
+                                    'style'=>['width' => '98px']
+                                ],
+                                'options2' => [
+                                    'placeholder' => 'До',
+                                    'style'=>['width' => '98px']
+                                ],
+                                'separator' => 'По',
+                                'readonly' => false,
+                                'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                                'pluginOptions' => [
+                                    'format' => 'yyyy-mm-dd',
+                                    'autoclose' => true,
+                                ]
+                            ]),
+                            'format' => 'html', // datetime
+                        ],
+                        [
+                            'value' => function ($model) {
+                                /** @var $model \common\models\GmsDevices */
+                                return !empty($model->playListOutModel) ? $model->playListOutModel->name : null;
+
+                            },
+                            'attribute' => 'current_pls_name'
+                        ],
+                        [
+                            'label' => 'Статус',
+                            'headerOptions' => array('style' => 'width: 100px; text-align: center;'),
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                /** @var \common\models\LoginsSearch $model */
+                                $value = $model['auth_status'];
+                                $name = GmsDevices::getAuthStatus($value);
+                                $value == 1 ? $class = 'success' : $class = 'danger';
+                                $html = Html::tag('span', Html::encode($name), ['class' => 'label label-' . $class]);
+                                return $html;
+                            }
+                        ],
+                        ['class' => 'yii\grid\ActionColumn'],
+                    ],
+                ]); ?>
+            </div>
+        </div>
+    </div>
 </div>
