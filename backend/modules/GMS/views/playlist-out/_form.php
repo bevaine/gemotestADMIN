@@ -75,18 +75,12 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group region">
-                                <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), [
-                                    'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                ]);
-                                ?>
+                                <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), ['prompt' => '---']); ?>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group sender_id">
-                                <?= $form->field($model, 'sender_id')->dropDownList([], [
-                                    'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                ]);
-                                ?>
+                                <?= $form->field($model, 'sender_id')->dropDownList([], ['prompt' => '---']); ?>
                             </div>
                         </div>
                     </div>
@@ -240,9 +234,7 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group device_id">
-                                <?= $form->field($model, 'device_id')->dropDownList([], [
-                                    'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                ]);
+                                <?= $form->field($model, 'device_id')->dropDownList([], ['prompt' => '---']);
                                 ?>
                             </div>
                         </div>
@@ -253,11 +245,8 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                             <div class="form-group date">
                                 <?= Html::label('Период воспроизведения') ?>
                                 <?= DatePicker::widget([
-                                    'model' => $model,
-                                    'attribute' => 'dateStart',
-                                    'attribute2' => 'dateEnd',
-                                    'name' => 'dateStart',
-                                    'name2' => 'dateEnd',
+                                    'name' => 'GmsPlaylistOut[dateStart]',
+                                    'name2' => 'GmsPlaylistOut[dateEnd]',
                                     'value' => date('d-m-Y', $model->isNewRecord ? time() : $model->dateStart),
                                     'value2' => date('d-m-Y', $model->isNewRecord ? time() : $model->dateEnd),
                                     'type' => DatePicker::TYPE_RANGE,
@@ -404,12 +393,12 @@ if ($model->isNewRecord) {
             'icon' => '../../img/video1.png'
         ]
     ];
+    $source = json_encode($source);
 } else {
     if (!empty($model->jsonPlaylist)) {
         $source = new JsExpression('['.$model->jsonPlaylist.']');
     }
 }
-$source = json_encode($source);
 
 $js1 = <<< JS
 
@@ -660,7 +649,8 @@ $js1 = <<< JS
     /**
     * @param parent
     */
-    function sumDuration (parent) {
+    function sumDuration (parent) 
+    {
         var total = 0;
         var totalStr = '';
         if (parent.getChildren() === undefined) return;
@@ -678,7 +668,8 @@ $js1 = <<< JS
     /**
     * @param region
     */
-    function setSender(region) {
+    function setSender(region) 
+    {
         var senderSelect = $('.sender_id select');
         var senderDisable = senderSelect.prop('disabled');        
         senderSelect.attr('disabled', true); 
@@ -713,7 +704,8 @@ $js1 = <<< JS
     * @param region
     * @param sender
     */
-    function setDevice(region = null, sender = null) {
+    function setDevice(region = null, sender = null) 
+    {
         var deviceSelect = $('.device_id select');
         var deviceDisable = deviceSelect.prop('disabled');
         deviceSelect.attr('disabled', true); 
@@ -746,7 +738,10 @@ $js1 = <<< JS
         deviceSelect.attr('disabled', deviceDisable);
     }
     
-    function setTreeData (region = null, sender = null) 
+    /**
+    * 
+    */
+    function disableTree() 
     {
         var emptyList = [{ 
             title : 'уточните параметры для отображения', 
@@ -754,18 +749,29 @@ $js1 = <<< JS
         }];
         
         var regionObject = $("#fancyree_template_region");
-        var regionTree = regionObject.fancytree("getTree");
-        regionTree.reload(emptyList);
-        regionObject.fancytree("disable");        
+        var regionTree = regionObject.fancytree("getTree");        
         
         var commercialObject = $("#fancyree_template_commercial");
         var commercialTree = commercialObject.fancytree("getTree");
+        
+        regionTree.reload(emptyList);
+        regionObject.fancytree("disable");        
+        
         commercialTree.reload(emptyList);
         commercialObject.fancytree("disable");
         
         var outObject = $("#treetable");
         var outTree = outObject.fancytree("getTree");
-        outTree.reload(newPlayList);
+        outTree.reload(newPlayList);      
+    }
+    
+    function setTreeData (region = null, sender = null) 
+    {
+        var regionObject = $("#fancyree_template_region");
+        var regionTree = regionObject.fancytree("getTree");
+        
+        var commercialObject = $("#fancyree_template_commercial");
+        var commercialTree = commercialObject.fancytree("getTree");
         
         $.ajax({
             url: '{$urlAjaxPlaylistTemplate}',
@@ -794,15 +800,29 @@ $js1 = <<< JS
     });
     
     $(".region select").change(function() {
+        disableTree();
         setSender ($(this).val());
         setDevice ($(this).val(), $('#gmsplaylistout-sender_id').val());
         setTreeData ($(this).val(), $('#gmsplaylistout-sender_id').val());
     });
     
     $(".sender_id select").change(function() {
+        disableTree();
         setDevice ($('#gmsplaylistout-region_id').val(), $(this).val());
         setTreeData ($('#gmsplaylistout-region_id').val(), $(this).val());
     });
+    
+    $(document).ready(function(){  
+        setSender ($('#gmsplaylistout-region_id').val());
+        setTimeout(function(){
+            setDevice ($('#gmsplaylistout-region_id').val()
+                , $('#gmsplaylistout-sender_id').val());
+        }, 2000);
+        setTimeout(function(){
+            setTreeData ($('#gmsplaylistout-region_id').val()
+                ,$('#gmsplaylistout-sender_id').val());
+        }, 2000);        
+    }); 
 JS;
 
 $this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");

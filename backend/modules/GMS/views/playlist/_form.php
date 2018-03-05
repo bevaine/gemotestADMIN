@@ -366,7 +366,7 @@ use common\components\helpers\FunctionsHelper;
                 type_list: type_list
             },
             success: function (res) {
-                if (res === null) {
+                if (res === 'null') {
                     if (checkJSON()) $("#form").submit();
                 } else {
                     res = JSON.parse(res);
@@ -411,7 +411,7 @@ use common\components\helpers\FunctionsHelper;
             success: function (res) {
                 res = JSON.parse(res);
                 var optionsAsString = "<option value=''>---</option>";
-                if (res !== null && res.results !== undefined && res.results.length > 0) {
+                if (res.results !== undefined && res.results.length > 0) {
                     var results = res.results; 
                     for (var i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
