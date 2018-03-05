@@ -137,10 +137,6 @@ $gridColumns = [
                 'headerOptions' => array('style' => 'width: 100px;'),
             ],
             [
-                'label' => 'Пароль GS',
-                'value' => 'Pass',
-            ],
-            [
                 'label' => 'Фамилия AD',
                 'attribute' => 'last_name',
                 'headerOptions' => array('style' => 'width: 120px;'),
@@ -177,15 +173,6 @@ $gridColumns = [
                     return !empty($model["AD_login"]) ? 'lab\\'.$model["AD_login"] : null;
                 },
                 'headerOptions' => array('style' => 'width: 100px;'),
-            ],
-            [
-                'label' => 'Пароль AD',
-                'value' => function ($model) {
-                    /** @var \common\models\LoginsSearch $model */
-                    $default = 'Стандартный';
-                    $value = $model['passAD'];
-                    return stripos($value, $default) !== false ? $default : $value;
-                }
             ],
             [
                 'label' => 'Доступ к УЗ',
