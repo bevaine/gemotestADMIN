@@ -8,6 +8,7 @@ use common\models\GmsDevicesSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * GmsDevicesController implements the CRUD actions for GmsDevices model.
@@ -133,5 +134,27 @@ class GmsDevicesController extends Controller
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
         }
+    }
+
+    /**
+     * @param null $region
+     * @param null $sender
+     */
+    public function actionAjaxDeviceList($region = null, $sender = null)
+    {
+        if (empty($sender)) $sender = null;
+        if (empty($region)) exit('null');
+
+        $data = GmsDevices::findAll([
+            'region_id' => $region,
+            'sender_id' => $sender,
+        ]);
+
+        /** @var GmsDevices $userData */
+        foreach ($data as $userData) {
+            $out['results'][] = ['id' => $userData->id, 'name' => $userData->device];
+        }
+
+        echo !empty($out) ? Json::encode($out) : 'null';
     }
 }

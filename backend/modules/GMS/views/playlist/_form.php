@@ -232,7 +232,7 @@ use common\components\helpers\FunctionsHelper;
 </div>
 
 <?php
-    $urlDurations = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
+    $urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
 
     if ($model->isNewRecord === false && !empty($model->jsonPlaylist)) {
         $varJSON = $model->jsonPlaylist;
@@ -366,7 +366,7 @@ use common\components\helpers\FunctionsHelper;
                 type_list: type_list
             },
             success: function (res) {
-                if (res === 'null') {
+                if (res === null) {
                     if (checkJSON()) $("#form").submit();
                 } else {
                     res = JSON.parse(res);
@@ -406,12 +406,12 @@ use common\components\helpers\FunctionsHelper;
         var senderDisable = senderSelect.prop('disabled');
         senderSelect.attr('disabled', true);
         $.ajax({
-            url: '{$urlDurations}',
+            url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
                 res = JSON.parse(res);
                 var optionsAsString = "<option value=''>---</option>";
-                if (res.results !== undefined && res.results.length > 0) {
+                if (res !== null && res.results !== undefined && res.results.length > 0) {
                     var results = res.results; 
                     for (var i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";

@@ -19,7 +19,7 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
     {
         return [
             [['id', 'device_id', 'date_play', 'start_time_play', 'end_time_play', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday', 'timeStart', 'timeEnd', 'dateStart', 'dateEnd', 'sender_id', 'region_id', 'created_at', 'active'], 'integer'],
-            [['file', 'jsonPlaylist'], 'safe'],
+            [['name', 'jsonPlaylist'], 'safe'],
         ];
     }
 

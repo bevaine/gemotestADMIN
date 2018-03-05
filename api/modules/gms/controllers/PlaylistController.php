@@ -46,9 +46,9 @@ class PlaylistController extends ActiveController
             $modelDevices->device = $dev;
             $modelDevices->auth_status = 0;
             $modelDevices->created_at = time();
-        } else {
+        } else
             $modelDevices->scenario = 'editDevice';
-        }
+
         $modelDevices->last_active_at = time();
 
         if (!$modelDevices->save()) {

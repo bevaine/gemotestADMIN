@@ -24,16 +24,6 @@ $layout = <<< HTML
     </span>
 HTML;
 
-$week = [
-    "isMonday" => "Понедельник",
-    "isTuesday" => "Вторник",
-    "isWednesday" => "Среда",
-    "isThursday" => "Четверг",
-    "isFriday" => "Пятница",
-    "isSaturday" => "Суббота",
-    "isSunday" => "Воскресенье"
-];
-
 $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { background : #20b426 }; td.com { color : #df8505 }; ");
 ?>
 <style type="text/css">
@@ -58,7 +48,22 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
 
 <div class="gms-playlist-out-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id' => 'form']); ?>
+
+    <div class="modal fade" id="check-playlist" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header" id="modal-header"></div>
+                <div class="modal-body" id="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-xs-6">
@@ -248,11 +253,14 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                             <div class="form-group date">
                                 <?= Html::label('Период воспроизведения') ?>
                                 <?= DatePicker::widget([
-                                    'type' => DatePicker::TYPE_RANGE,
+                                    'model' => $model,
+                                    'attribute' => 'dateStart',
+                                    'attribute2' => 'dateEnd',
                                     'name' => 'dateStart',
-                                    'value' => date('d-m-Y', time()),
                                     'name2' => 'dateEnd',
-                                    'value2' => date('d-m-Y', time()),
+                                    'value' => date('d-m-Y', $model->isNewRecord ? time() : $model->dateStart),
+                                    'value2' => date('d-m-Y', $model->isNewRecord ? time() : $model->dateEnd),
+                                    'type' => DatePicker::TYPE_RANGE,
                                     'separator' => '<i class="glyphicon glyphicon-resize-horizontal"></i>',
                                     'layout' => $layout,
                                     'pluginOptions' => [
@@ -269,8 +277,13 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                 <?= Html::label('Время воспроизведения') ?>
                                 <div class="row">
                                     <div class="col-lg-5">
-                                        <?= TimePicker::widget([
+                                        <?php
+                                        if (!empty($model->timeStart)) {
+                                            $model->timeStart = date('H:i', $model->timeStart);
+                                        }
+                                        echo TimePicker::widget([
                                             'model' => $model,
+                                            'value' => date('H:i', $model->timeStart),
                                             'attribute' => 'timeStart',
                                             'name' => 'timeStart',
                                             'pluginOptions' => [
@@ -288,8 +301,10 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                     </div>
 
                                     <div class="col-lg-5">
-                                        <?= TimePicker::widget([
+                                        <?php
+                                        echo TimePicker::widget([
                                             'model' => $model,
+                                            'value' => date('H:i', $model->isNewRecord ? time() : $model->timeEnd),
                                             'attribute' => 'timeEnd',
                                             'name' => 'timeEnd',
                                             'pluginOptions' => [
@@ -310,7 +325,15 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                         <div class="col-lg-10">
                             <div class="form-group week">
                                 <?= Html::label('Воспроизводить только в') ?>
-                                <?= Html::checkboxList('week', null, $week, ['inline'=>false]) ?>
+                                <?php
+                                foreach ($model::WEEK as $key => $value) {
+                                    echo "<span style='padding-left: 10px'>".Html::Activecheckbox($model, $key, [
+                                        'value' => "1",
+                                        'label' => $value,
+                                        'data-url' => 'isMonday'
+                                    ])."</span>";
+                                }
+                                ?>
                             </div>
                         </div>
                     </div>
@@ -354,7 +377,7 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
     </div>
 
     <div class="form-group">
-        <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= Html::Button($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
@@ -363,8 +386,30 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
 
 <?php
 $urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
+$urlAjaxDevice = \yii\helpers\Url::to(['/GMS/gms-devices/ajax-device-list']);
 $urlAjaxVideo = \yii\helpers\Url::to(['/GMS/gms-videos/ajax-video-active']);
 $urlAjaxPlaylistTemplate = \yii\helpers\Url::to(['/GMS/playlist/ajax-playlist-template']);
+
+$source = [];
+$playListKey = 1;
+$playListKeyStr = 'playList['.$playListKey.']';
+
+if ($model->isNewRecord) {
+    $source =  [
+        [
+            'title' => 'Новый плейлист',
+            'key' => $playListKeyStr,
+            'folder' => true,
+            'expanded' => true,
+            'icon' => '../../img/video1.png'
+        ]
+    ];
+} else {
+    if (!empty($model->jsonPlaylist)) {
+        $source = new JsExpression('['.$model->jsonPlaylist.']');
+    }
+}
+$source = json_encode($source);
 
 $js1 = <<< JS
 
@@ -389,8 +434,8 @@ $js1 = <<< JS
                 indentation: 20,
                 nodeColumnIdx: 1,
                 checkboxColumnIdx: 0
-            },
-            source: newPlayList,
+            },                
+            source: {$source},
             dblclick: function(event, data) {
                 var videoKey = data.node.key;
                 $.ajax({
@@ -399,7 +444,7 @@ $js1 = <<< JS
                     success: function (res) {
                         var htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
                         res = JSON.parse(res);
-                        if (res.results.file !== undefined) {
+                        if (res !== null && res.results.file !== undefined) {
                             var videoPath = res.results.file; 
                             var myPlayer = videojs('my-player');
                             myPlayer.src(videoPath);
@@ -530,6 +575,89 @@ $js1 = <<< JS
     });
     
     /**
+    * 
+    * @param parentFolder
+    */
+    function addJSON (parentFolder) 
+    {
+        var arrOut = {};
+        var arrChildrenOne = [];
+        var playListKey = parentFolder.key;
+        var rootTitle = parentFolder.title;        
+        
+        if ($("input").is("#gmsplaylistout-jsonplaylist")) {
+            $("#gmsplaylistout-jsonplaylist").remove();
+        }                    
+        
+        if ($("input").is("#gmsplaylistout-name")) {
+            $("#gmsplaylistout-name").remove();
+        }
+
+        arrOut["key"] = playListKey;
+        arrOut["title"] = rootTitle;
+        arrOut["folder"] = "true";
+        arrOut["expanded"] = "true";
+
+        $("<input>").attr({
+            type: "hidden",
+            id: "gmsplaylistout-name",
+            name: "GmsPlaylistOut[name]",
+            value: rootTitle
+        }).appendTo("form");
+        
+        if (parentFolder.children !== null) {
+            parentFolder.children.forEach(function(children) {
+                console.log(children);
+                var arrChildren = {};
+                var arrData = {};
+                var key = children.key;
+                var name = children.title;
+                arrData["duration"] = children.data.duration;
+                arrData["type"] = children.data.type;
+                arrChildren["key"] = key; 
+                arrChildren["title"] = name;
+                arrChildren["data"] = arrData;
+                arrChildrenOne.push(arrChildren); 
+            });
+
+            arrOut["children"] = arrChildrenOne;
+            var jsonStr = JSON.stringify(arrOut);
+
+            $("<input>").attr({
+                type: "hidden",
+                id: "gmsplaylistout-jsonplaylist",
+                name: "GmsPlaylistOut[jsonPlaylist]",
+                value: jsonStr
+            }).appendTo("form");
+        }
+    }
+    
+    /**
+    * 
+    * @returns {boolean}
+    */
+    function checkJSON () 
+    {
+        var html_body = '';
+        var htm_header = 'Ошибка сохранения плейлиста';
+        var parentFolder = 
+            $("#treetable")
+            .fancytree("getTree")
+            .rootNode.children[0];
+        
+        if (parentFolder !== null && parentFolder.children !== null) {
+            addJSON(parentFolder);
+            return true;
+        } else {
+            html_body = 'Необходимо добавить хотя бы одно видео в окончательный плейлист'; 
+            $('#modal-header').html(htm_header);
+            $('#modal-body').html(html_body);
+            $('#check-playlist').modal('show');
+            return false;
+        }
+    }
+    
+    /**
     * @param parent
     */
     function sumDuration (parent) {
@@ -553,14 +681,20 @@ $js1 = <<< JS
     function setSender(region) {
         var senderSelect = $('.sender_id select');
         var senderDisable = senderSelect.prop('disabled');        
-        senderSelect.attr('disabled', true);
+        senderSelect.attr('disabled', true); 
+        
+        $(".sender_id select option").each(function() {
+            $(this).remove();
+        }); 
+        senderSelect.append("<option value=''>---</option>");
+        
         $.ajax({
             url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
                 res = JSON.parse(res);
-                var optionsAsString = "<option value=''>---</option>";
-                if (res.results !== undefined && res.results.length > 0) {
+                var optionsAsString = "";
+                if (res !== null && res.results !== undefined && res.results.length > 0) {
                     var results = res.results; 
                     for (var i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
@@ -568,16 +702,52 @@ $js1 = <<< JS
                         optionsAsString += ">" + results[i].name + "</option>"
                     }
                 }
-                $(".sender_id select option").each(function() {
-                    $(this).remove();
-                });
                 senderSelect.append( optionsAsString );
-                senderSelect.attr('disabled', senderDisable);
             }
         });
+        senderSelect.attr('disabled', senderDisable);
     }
     
-    function setTreeData (region = null, sender = null) {
+    /**
+    * 
+    * @param region
+    * @param sender
+    */
+    function setDevice(region = null, sender = null) {
+        var deviceSelect = $('.device_id select');
+        var deviceDisable = deviceSelect.prop('disabled');
+        deviceSelect.attr('disabled', true); 
+        
+        $(".device_id select option").each(function() {
+            $(this).remove();
+        }); 
+        deviceSelect.append("<option value=''>---</option>");                
+
+        $.ajax({
+            url: '{$urlAjaxDevice}',
+            data: {
+                region: region,
+                sender: sender
+            },
+            success: function (res) {
+                var optionsAsString = "";
+                res = JSON.parse(res);
+                if (res !== null && res.results !== undefined && res.results.length > 0) {
+                    var results = res.results; 
+                    for (var i = 0; i < results.length; i++) {
+                        optionsAsString += "<option value='" + results[i].id + "' ";
+                        optionsAsString += results[i].id == '{$model->device_id}' ? 'selected' : '';
+                        optionsAsString += ">" + results[i].name + "</option>"
+                    }
+                }
+                deviceSelect.append(optionsAsString);
+            }
+        });
+        deviceSelect.attr('disabled', deviceDisable);
+    }
+    
+    function setTreeData (region = null, sender = null) 
+    {
         var emptyList = [{ 
             title : 'уточните параметры для отображения', 
             folder : false 
@@ -619,19 +789,19 @@ $js1 = <<< JS
         });
     }
     
+    $(".btn-primary, .btn-success").click(function() { 
+        if (checkJSON()) $("#form").submit();
+    });
+    
     $(".region select").change(function() {
-        setSender($(this).val());
-        setTreeData (
-            $('#gmsplaylistout-region_id').val(),
-            $('#gmsplaylistout-sender_id').val()
-        );
+        setSender ($(this).val());
+        setDevice ($(this).val(), $('#gmsplaylistout-sender_id').val());
+        setTreeData ($(this).val(), $('#gmsplaylistout-sender_id').val());
     });
     
     $(".sender_id select").change(function() {
-        setTreeData (
-            $('#gmsplaylistout-region_id').val(),
-            $('#gmsplaylistout-sender_id').val()
-        );
+        setDevice ($('#gmsplaylistout-region_id').val(), $(this).val());
+        setTreeData ($('#gmsplaylistout-region_id').val(), $(this).val());
     });
 JS;
 

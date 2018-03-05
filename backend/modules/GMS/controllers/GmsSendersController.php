@@ -134,17 +134,14 @@ class GmsSendersController extends Controller
      */
     public function actionAjaxSendersList($region = null)
     {
-        $out = ['more' => false];
+        if (empty($region)) exit('null');
+        $data = GmsSenders::findAll(['region_id' => $region]);
 
-        if (!is_null($region)) {
-            $data = GmsSenders::findAll(['region_id' => $region]);
-            /** @var GmsSenders $userData */
-            foreach ($data as $userData) {
-                $out['results'][] = ['id' => $userData->id, 'name' => $userData->sender_name];
-            }
+        /** @var GmsSenders $userData */
+        foreach ($data as $userData) {
+            $out['results'][] = ['id' => $userData->id, 'name' => $userData->sender_name];
         }
-
-        echo Json::encode($out);
+        echo !empty($out) ? Json::encode($out) : 'null';
     }
 
     /**
@@ -170,6 +167,4 @@ class GmsSendersController extends Controller
 
         echo Json::encode($out);
     }
-
-
 }

@@ -22,13 +22,15 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
+            'name',
+            'created_at',
             [
                 'filter' =>  \common\models\GmsRegions::getRegionList(),
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylist */
                     return !empty($model->regionModel) ? $model->regionModel->region_name : null;
                 },
-                'attribute' => 'region'
+                'attribute' => 'region_id'
             ],
             [
                 'value' => function ($model) {
@@ -36,27 +38,31 @@ $this->params['breadcrumbs'][] = $this->title;
                     return !empty($model->senderModel) ? $model->senderModel->sender_name : null;
 
                 },
-                'attribute' => 'sender_name'
+                'attribute' => 'sender_id'
             ],
-            'region_id',
-            'sender_id',
             'device_id',
             'dateStart:datetime',
             'dateEnd:datetime',
             'timeStart:time',
             'timeEnd:time',
-            'active',
-            'created_at',
-            //'file',
-            // 'end_time_play:datetime',
-            // 'isMonday',
-            // 'isTuesday',
-            // 'isWednesday',
-            // 'isThursday',
-            // 'isFriday',
-            // 'isSaturday',
-            // 'isSunday',
-            // 'jsonPlaylist:ntext',
+            [
+                'label' => 'Статус',
+                'headerOptions' => array('style' => 'width: 100px; text-align: center;'),
+                'format' => 'raw',
+                'value' => function ($model) {
+                    /** @var \common\models\GmsPlaylistOut $model */
+                    return $model->getAuthStatus();
+                }
+            ],
+            [
+                'label' => 'Дни воспр.',
+                'headerOptions' => array('style' => 'width: 100px; text-align: center;'),
+                'format' => 'raw',
+                'value' => function ($model) {
+                    /** @var \common\models\GmsPlaylistOut $model */
+                    return $model->getDaysPlaylist();
+                }
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
