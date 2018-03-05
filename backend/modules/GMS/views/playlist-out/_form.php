@@ -314,6 +314,7 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                         <div class="col-lg-10">
                             <div class="form-group week">
                                 <?= Html::label('Воспроизводить только в') ?>
+                                <p>
                                 <?php
                                 foreach ($model::WEEK as $key => $value) {
                                     echo "<span style='padding-left: 10px'>".Html::Activecheckbox($model, $key, [
@@ -323,6 +324,7 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                     ])."</span>";
                                 }
                                 ?>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -486,6 +488,7 @@ $js1 = <<< JS
                 if (!node.isFolder()) {
                     tdList.eq(4).html('<span id="trash-node" style="cursor:pointer;" class="glyphicon glyphicon-trash"></span>');
                 }
+                sumDuration(node.parent);
             },
             edit: {
                 triggerStart: ["clickActive", "dblclick"],
@@ -548,7 +551,6 @@ $js1 = <<< JS
                         }, data.hitMode);
                     }
                     node.setExpanded();
-                    sumDuration(playlistNode);                
                 }
             }
         });
@@ -817,11 +819,11 @@ $js1 = <<< JS
         setTimeout(function(){
             setDevice ($('#gmsplaylistout-region_id').val()
                 , $('#gmsplaylistout-sender_id').val());
-        }, 2000);
+        }, 1000);
         setTimeout(function(){
             setTreeData ($('#gmsplaylistout-region_id').val()
                 ,$('#gmsplaylistout-sender_id').val());
-        }, 2000);        
+        }, 1000);        
     }); 
 JS;
 

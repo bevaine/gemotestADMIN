@@ -12,17 +12,16 @@ use yii\web\JsExpression;
 $this->title = $model->id;
 $this->params['breadcrumbs'][] = ['label' => 'Плейсты', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+empty($model->active) ? $activePls = 'active' : $activePls = 'block';
 ?>
 <div class="gms-playlist-out-view">
 
     <p>
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
+        <?= Html::SubmitButton($activePls == 'active' ? 'Разблокировать' : 'Заблокировать', [
+            'name' => 'active-playlist',
+            'class' => $activePls == 'active' ? 'btn btn-success' : 'btn btn-danger',
+            'value' => $activePls
         ]) ?>
     </p>
 
@@ -130,6 +129,17 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php endif; ?>
 
     </div>
+
+    <p>
+        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => 'Are you sure you want to delete this item?',
+                'method' => 'post',
+            ],
+        ]) ?>
+    </p>
 
 </div>
 

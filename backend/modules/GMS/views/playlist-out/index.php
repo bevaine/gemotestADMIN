@@ -23,7 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'id',
             'name',
-            'created_at',
+            'created_at:date',
             [
                 'filter' =>  \common\models\GmsRegions::getRegionList(),
                 'value' => function ($model) {
@@ -41,8 +41,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'sender_id'
             ],
             'device_id',
-            'dateStart:datetime',
-            'dateEnd:datetime',
+            'dateStart:date',
+            'dateEnd:date',
             'timeStart:time',
             'timeEnd:time',
             [
