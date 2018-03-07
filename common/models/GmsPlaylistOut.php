@@ -238,7 +238,11 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                 if (!empty($this->$day)) $arrDaysModel[$day] = $name;
             }
 
+            Yii::getLogger()->log(["this" => $this], Logger::LEVEL_ERROR, 'binary');
+
+
             foreach ($findModel as $model) {
+                Yii::getLogger()->log(['$model' => $model], Logger::LEVEL_ERROR, 'binary');
                 /** @var $model GmsPlaylistOut */
                 $dateCross = ($this->dateStart <= $model->dateEnd  && $this->dateEnd >= $model->dateStart);
 
