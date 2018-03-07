@@ -8,6 +8,8 @@ use common\models\GmsPlaylistOutSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\log\Logger;
+use yii\helpers\Json;
 
 /**
  * PlaylistOutController implements the CRUD actions for GmsPlaylistOut model.
@@ -51,6 +53,22 @@ class PlaylistOutController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        if (isset(Yii::$app->request->post()['active-playlist'])) {
+            $status = Yii::$app->request->post()['active-playlist'];
+            if ($status == 'block') {
+                $model->active = 0;
+            } elseif ($status == 'active') {
+                $model->active = 1;
+            }
+            if (!$model->save()) {
+                Yii::getLogger()->log([
+                    'model->DateEnd'=>$model->errors
+                ], Logger::LEVEL_ERROR, 'binary');
+            }
+        }
+
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -104,6 +122,29 @@ class PlaylistOutController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    /**
+     *
+     */
+    public function actionAjaxTimeCheck()
+    {
+        $out = [];
+        $model = new GmsPlaylistOut();
+        $model->scenario = 'findPlaylistOut';
+
+        //if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->queryParams)) {
+
+            $model->dateStart = strtotime($model->dateStart);
+            $model->dateEnd = strtotime($model->dateEnd);
+
+            $model->timeStart = GmsPlaylistOut::getTimeDate(strtotime($model->timeStart));
+            $model->timeEnd = GmsPlaylistOut::getTimeDate(strtotime($model->timeEnd));
+
+            $out = $model->checkPlaylist();
+        }
+        echo !empty($out) ? Json::encode($out) : 'null';
     }
 
     /**

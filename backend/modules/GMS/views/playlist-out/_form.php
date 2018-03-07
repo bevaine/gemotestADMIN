@@ -50,13 +50,18 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
 
     <?php $form = ActiveForm::begin(['id' => 'form']); ?>
 
+    <?= Html::hiddenInput('GmsPlaylistOut[id]', $model->id) ?>
+
     <div class="modal fade" id="check-playlist" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-
-                <div class="modal-header" id="modal-header"></div>
                 <div class="modal-body" id="modal-body">
-
+                    <div class="box box-solid box-danger">
+                        <div class="box-header with-border">
+                            <h3 class="box-title" id="box-title"></h3>
+                        </div>
+                        <div class="box-body" id="box-body"></div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
@@ -264,48 +269,47 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                         <div class="col-lg-6">
                             <div class="form-group date">
                                 <?= Html::label('Время воспроизведения') ?>
-                                <div class="row">
-                                    <div class="col-lg-5">
-                                        <?php
-                                        if (!empty($model->timeStart)) {
-                                            $model->timeStart = date('H:i', $model->timeStart);
-                                        }
-                                        echo TimePicker::widget([
-                                            'model' => $model,
-                                            'value' => date('H:i', $model->timeStart),
-                                            'attribute' => 'timeStart',
-                                            'name' => 'timeStart',
-                                            'pluginOptions' => [
-                                                'showSeconds' => false,
-                                                'showMeridian' => false,
-                                                'minuteStep' => 1,
-                                                'secondStep' => 5,
-                                            ]
-                                        ]);
-                                        ?>
-                                    </div>
-
-                                    <div class="col-lg-2" align="center">
-                                        <i class="glyphicon glyphicon-resize-horizontal"></i>
-                                    </div>
-
-                                    <div class="col-lg-5">
-                                        <?php
-                                        echo TimePicker::widget([
-                                            'model' => $model,
-                                            'value' => date('H:i', $model->isNewRecord ? time() : $model->timeEnd),
-                                            'attribute' => 'timeEnd',
-                                            'name' => 'timeEnd',
-                                            'pluginOptions' => [
-                                                'showSeconds' => false,
-                                                'showMeridian' => false,
-                                                'minuteStep' => 1,
-                                                'secondStep' => 5,
-                                            ]
-                                        ]);
-                                        ?>
-                                    </div>
-                                </div>
+                                <table style="border-width: 1px; border-color: #d2d6de; border-style: ridge; border-radius: 3px 0 0 3px;">
+                                    <tr>
+                                        <td>
+                                            <?php
+                                            $model->timeStart = date('H:i', empty($model->timeStart) ? time() : $model->timeStart);
+                                            echo TimePicker::widget([
+                                                'model' => $model,
+                                                'attribute' => 'timeStart',
+                                                'name' => 'timeStart',
+                                                'pluginOptions' => [
+                                                    'showSeconds' => false,
+                                                    'showMeridian' => false,
+                                                    'minuteStep' => 1,
+                                                    'secondStep' => 5,
+                                                ]
+                                            ]);
+                                            ?>
+                                        </td>
+                                        <td>
+                                            <span style="padding-left: 7px; padding-right: 15px">
+                                                <i class="glyphicon glyphicon-resize-horizontal"></i>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <?php
+                                            $model->timeEnd = date('H:i', empty($model->timeEnd) ? time() : $model->timeEnd);
+                                            echo TimePicker::widget([
+                                                'model' => $model,
+                                                'attribute' => 'timeEnd',
+                                                'name' => 'timeEnd',
+                                                'pluginOptions' => [
+                                                    'showSeconds' => false,
+                                                    'showMeridian' => false,
+                                                    'minuteStep' => 1,
+                                                    'secondStep' => 5,
+                                                ]
+                                            ]);
+                                            ?>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -367,6 +371,27 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
         </div>
     </div>
 
+    <?php
+//    edofre\fullcalendar\Fullcalendar::widget([
+//        'options'       => [
+//            'id'       => 'calendar',
+//            'language' => 'ru',
+//        ],
+//        'clientOptions' => [
+//            'weekNumbers' => true,
+//            'selectable'  => true,
+//            'defaultView' => 'agendaWeek',
+//            'eventResize' => new JsExpression("
+//                function(event, delta, revertFunc, jsEvent, ui, view) {
+//                    console.log(event);
+//                }
+//            "),
+//
+//        ],
+//        'events' => Url::to(['calendar/events', 'id' => 1]),
+//    ]);
+    ?>
+
     <div class="form-group">
         <?= Html::Button($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
@@ -379,6 +404,8 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
 $urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
 $urlAjaxDevice = \yii\helpers\Url::to(['/GMS/gms-devices/ajax-device-list']);
 $urlAjaxVideo = \yii\helpers\Url::to(['/GMS/gms-videos/ajax-video-active']);
+$urlAjaxTime = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-time-check']);
+
 $urlAjaxPlaylistTemplate = \yii\helpers\Url::to(['/GMS/playlist/ajax-playlist-template']);
 
 $source = [];
@@ -598,7 +625,7 @@ $js1 = <<< JS
         
         if (parentFolder.children !== null) {
             parentFolder.children.forEach(function(children) {
-                console.log(children);
+                //console.log(children);
                 var arrChildren = {};
                 var arrData = {};
                 var key = children.key;
@@ -623,30 +650,7 @@ $js1 = <<< JS
         }
     }
     
-    /**
-    * 
-    * @returns {boolean}
-    */
-    function checkJSON () 
-    {
-        var html_body = '';
-        var htm_header = 'Ошибка сохранения плейлиста';
-        var parentFolder = 
-            $("#treetable")
-            .fancytree("getTree")
-            .rootNode.children[0];
-        
-        if (parentFolder !== null && parentFolder.children !== null) {
-            addJSON(parentFolder);
-            return true;
-        } else {
-            html_body = 'Необходимо добавить хотя бы одно видео в окончательный плейлист'; 
-            $('#modal-header').html(htm_header);
-            $('#modal-body').html(html_body);
-            $('#check-playlist').modal('show');
-            return false;
-        }
-    }
+    
     
     /**
     * @param parent
@@ -673,7 +677,7 @@ $js1 = <<< JS
     function setSender(region) 
     {
         var senderSelect = $('.sender_id select');
-        var senderDisable = senderSelect.prop('disabled');        
+        var senderDisable = senderSelect.prop('disabled'); 
         senderSelect.attr('disabled', true); 
         
         $(".sender_id select option").each(function() {
@@ -797,8 +801,80 @@ $js1 = <<< JS
         });
     }
     
+    /**
+    * 
+    * @returns {boolean}
+    */
+    function checkJSON () 
+    {
+        var html_body = '';
+        var htm_header = 'Ошибка сохранения плейлиста';
+        var parentFolder = 
+            $("#treetable")
+            .fancytree("getTree")
+            .rootNode.children[0];
+        
+        if (parentFolder !== null && parentFolder.children !== null) {
+            addJSON(parentFolder);
+            return true;
+        } else {
+            html_body = 'Необходимо добавить хотя бы одно видео в окончательный плейлист'; 
+            $('#modal-header').html(htm_header);
+            $('#modal-body').html(html_body);
+            $('#check-playlist').modal('show');
+            return false;
+        }
+    }
+    
+    function checkTime () {
+        var m_data = $('#form').serialize();
+        $.ajax({
+            type: 'GET',
+            url: '{$urlAjaxTime}',
+            data: m_data,
+            success: function (res){
+                var html_body = '';
+                var htm_header = 'Ошибка добавления, временное пересечение с другим плейлистом!';
+                res = JSON.parse(res);
+                if (res !== null) {
+                    if (res.id !== undefined && res.name !== undefined) {
+                        var html  = 'Регион: <b>' + $('.region select option:selected').text() + '</b>'; 
+                        if ($('.sender_id select option:selected').text() !== '---') {
+                            html += '<br>Отделение: <b>' + $('.sender_id select option:selected').text() + '</b>'; 
+                        } 
+                        if ($('.device_id select option:selected').text() !== '---') {
+                            html += '<br>Устройство: <b>' +  + $('.device_id select option:selected').text() + '</b>'; 
+                        } 
+                        //html += 'Действует с' + res.dateStart + ' по '.res.dateEnd;
+                        html_body += 'Для параметров: <p style="margin-left:30px;">' + html + '</span>';
+                        html_body += '<p>Уже есть привязанный плейлист: ';
+                        html_body += '<b><a target="_blank" href="/GMS/playlist-out/view?id=' + res.id + '">' + res.name + '</a></b>';
+                        html_body += '</p>';
+                    }       
+
+                    if (res.date !== undefined) {
+                        html_body += 'Действует с: <b>' + res.date.start + ' г.</b> по <b>' + res.date.end + ' г.</b>';
+                    }
+                    if (res.time !== undefined) {
+                        html_body += '<br>Время проигрывания с: <b>' + res.time.start + '</b> по <b>' + res.time.end + '</b>';
+                    }
+                    if (res.week !== undefined) {
+                        html_body += '<br>Пересечение по дням: <b>' + res.week + '</b>';
+                    }
+                    html_body += '<p>Измените параметры и попробуйте ещё!</p>';
+
+                    $('#box-title').html(htm_header);
+                    $('#box-body').html(html_body);
+                    $('#check-playlist').modal('show');
+                } else {
+                    if (checkJSON()) $("#form").submit();
+                }
+            }
+        });
+    }
+    
     $(".btn-primary, .btn-success").click(function() { 
-        if (checkJSON()) $("#form").submit();
+        checkTime();
     });
     
     $(".region select").change(function() {

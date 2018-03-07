@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\components\helpers\ActiveSyncHelper;
+use common\models\GmsPlaylistOut;
 use common\models\Logins;
 use common\models\NAdUsers;
 use common\models\Permissions;
@@ -159,6 +160,15 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        //$d = strtotime("23-12-2017");
+        echo date("Y-m-d H:i:s", 1520110800)."\r\n";
+        echo date("Y-m-d H:i:s", 1520283600)."\r\n";
+//        echo date("Y-m-d H:i:s", 1520283600)."\r\n";
+//        echo date("Y-m-d H:i:s", 6060)."\r\n";
+//        echo date("Y-m-d H:i:s", 42060)."\r\n";
+
+        //$tomorrow  = mktime(0, 0, 0, date("m", $startDate)  , date("d", $startDate)+1, date("Y" , $startDate));
+        exit;
         print_r(\common\models\BranchStaffPrototype::getPrototypeList());
         exit;
         print_r(number_format(1554, 2, '.', ''));

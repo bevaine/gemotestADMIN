@@ -8,6 +8,7 @@ use yii\helpers\Html;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\db\ActiveRecord;
+use yii\log\Logger;
 
 /**
  * This is the model class for table "gms_playlist_out".
@@ -15,6 +16,7 @@ use yii\db\ActiveRecord;
  * @property integer $id
  * @property string $name
  * @property string $jsonPlaylist
+ * @property integer $region_id
  * @property integer $device_id
  * @property integer $sender_id
  * @property integer $date_play
@@ -32,6 +34,20 @@ use yii\db\ActiveRecord;
 
 class GmsPlaylistOut extends \yii\db\ActiveRecord
 {
+    CONST SCENARIO_DEFAULT_PLAYLIST = 'default';
+    CONST SCENARIO_FIND_PLAYLIST = 'findPlaylistOut';
+
+    /**
+     * @return array
+     */
+    public function scenarios()
+    {
+        return [
+            self::SCENARIO_DEFAULT_PLAYLIST => ['region_id', 'sender_id', 'device_id', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday','name', 'jsonPlaylist', 'dateStart', 'dateEnd','timeStart', 'timeEnd'],
+            self::SCENARIO_FIND_PLAYLIST => ['id', 'region_id', 'sender_id', 'device_id', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday','name', 'jsonPlaylist', 'dateStart', 'dateEnd','timeStart', 'timeEnd'],
+        ];
+    }
+
     CONST WEEK = [
         "isMonday" => "Понедельник",
         "isTuesday" => "Вторник",
@@ -76,6 +92,12 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             $this->created_at = time();
             $this->active = 1;
         }
+
+        $this->dateStart = self::getDateWithoutTime($this->dateStart);
+        $this->dateEnd = self::getDateWithoutTime($this->dateEnd);
+
+        $this->timeStart = self::getTimeDate($this->timeStart);
+        $this->timeEnd = self::getTimeDate($this->timeEnd);
 
         return parent::beforeSave($insert);
     }
@@ -187,5 +209,106 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         if (count($arr) > 0) {
             return implode('<br>', $arr);
         } else return null;
+    }
+
+    /**
+     * @return array|bool
+     */
+    public function checkPlaylist()
+    {
+        if (empty($this->region_id)) return false;
+        if (empty($this->sender_id)) $this->sender_id = null;
+        if (empty($this->device_id)) $this->device_id = null;
+
+        $findModel = self::find()
+            ->where([
+                'region_id' => $this->region_id,
+                'sender_id' => $this->sender_id,
+                'device_id' => $this->device_id])
+            ->andFilterWhere(['!=', 'id', $this->id]);
+        //print_r($findModel);
+
+        Yii::getLogger()->log(['$findModel' => ArrayHelper::toArray($findModel)], Logger::LEVEL_ERROR, 'binary');
+
+        if ($findModel) {
+
+            $arrDaysModel = [];
+
+            foreach (self::WEEK as $day => $name) {
+                if (!empty($this->$day)) $arrDaysModel[$day] = $name;
+            }
+
+            foreach ($findModel as $model) {
+                /** @var $model GmsPlaylistOut */
+                $dateCross = ($this->dateStart <= $model->dateEnd  && $this->dateEnd >= $model->dateStart);
+
+                //todo проверяем пересекается ли даты
+
+                if ($dateCross) {
+
+                    //todo проверяем пересекается ли дни недели
+                    $out = [
+                        "id" => $model->id,
+                        "name" => $model->name,
+                        "date" => [
+                            "start" => date("d-m-Y", $model->dateStart),
+                            "end" => date("d-m-Y", $model->dateEnd),
+                        ],
+                    ];
+
+                    if (!empty($arrDaysModel)) {
+
+                        $weekCross = array_intersect_key(ArrayHelper::toArray($model), $arrDaysModel);
+
+                        if (!is_array($weekCross)) return $out;
+                        $weekCross = array_filter($weekCross);
+
+                        if (!empty($weekCross)) {
+                            $sumDays = array_sum($weekCross);
+                            $returnWeek = array_intersect_key(self::WEEK, $weekCross);
+                            $implodeWeek = implode(', ', $returnWeek);
+                            if (!empty($sumDays)) $out["week"] = $implodeWeek;
+                        }
+                    }
+
+                    if (!empty($arrDaysModel) && !empty($out["week"]) || empty($arrDaysModel)) {
+                        //todo проверяем пересекается ли время
+                        $timeCross = ($this->timeStart <= $model->timeEnd && $this->timeEnd >= $model->timeStart);
+                        if ($timeCross) {
+                            $out['time'] = [
+                                "start" => date("H:i", $model->timeStart),
+                                "end" => date("H:i", $model->timeEnd)
+                            ];
+                        }
+                    }
+
+                    if (empty($out["time"])) return false;
+                    else return $out;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static function getDateWithoutTime($datetime) {
+        return mktime(
+            0,
+            0,
+            0,
+            date("m", $datetime),
+            date("d", $datetime),
+            date("Y", $datetime)
+        );
+    }
+
+    public static function getTimeDate($datetime) {
+        return mktime(
+            date("H", $datetime),
+            date("i", $datetime),
+            date("s", $datetime),
+            date("m", 0),
+            date("d", 0),
+            date("Y", 0)
+        );
     }
 }

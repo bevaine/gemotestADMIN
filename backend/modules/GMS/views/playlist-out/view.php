@@ -5,6 +5,7 @@ use yii\widgets\DetailView;
 use mihaildev\ckeditor\Assets;
 use wbraganca\fancytree\FancytreeWidget;
 use yii\web\JsExpression;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylistOut */
@@ -17,11 +18,21 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
 ?>
 <div class="gms-playlist-out-view">
 
+    <?php $form = ActiveForm::begin(['id'=>'form-input','method' => 'post']); ?>
+
     <p>
         <?= Html::SubmitButton($activePls == 'active' ? 'Разблокировать' : 'Заблокировать', [
             'name' => 'active-playlist',
             'class' => $activePls == 'active' ? 'btn btn-success' : 'btn btn-danger',
             'value' => $activePls
+        ]) ?>
+        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
+            'class' => 'btn btn-danger',
+            'data' => [
+                'confirm' => 'Are you sure you want to delete this item?',
+                'method' => 'post',
+            ],
         ]) ?>
     </p>
 
@@ -63,8 +74,22 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                     ],
                                     'dateStart:date',
                                     'dateEnd:date',
-                                    'timeStart:time',
-                                    'timeEnd:time',
+                                    [
+                                        'value' => function ($model) {
+                                            /** @var $model \common\models\GmsPlaylistOut */
+                                            return !empty($model->timeStart) ? date('H:i', $model->timeStart) : null;
+
+                                        },
+                                        'attribute' => 'timeStart'
+                                    ],
+                                    [
+                                        'value' => function ($model) {
+                                            /** @var $model \common\models\GmsPlaylistOut */
+                                            return !empty($model->timeEnd) ? date('H:i', $model->timeEnd) : null;
+
+                                        },
+                                        'attribute' => 'timeEnd'
+                                    ],
                                     [
                                         'label' => 'Воспроизводить только',
                                         'value' => $model->getDaysPlaylist(),
@@ -129,17 +154,7 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
         <?php endif; ?>
 
     </div>
-
-    <p>
-        <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
+    <?php ActiveForm::end(); ?>
 
 </div>
 
