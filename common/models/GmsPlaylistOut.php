@@ -225,7 +225,8 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                 'region_id' => $this->region_id,
                 'sender_id' => $this->sender_id,
                 'device_id' => $this->device_id])
-            ->andFilterWhere(['!=', 'id', $this->id]);
+            ->andFilterWhere(['!=', 'id', $this->id])
+            ->all();
         //print_r($findModel);
 
         Yii::getLogger()->log(['$findModel' => ArrayHelper::toArray($findModel)], Logger::LEVEL_ERROR, 'binary');
