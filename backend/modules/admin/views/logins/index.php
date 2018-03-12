@@ -178,11 +178,11 @@ $gridColumns = [
                 'label' => 'Доступ к УЗ',
                 'headerOptions' => array('style' => 'width: 100px; text-align: center;'),
                 'filter' => \common\models\Logins::getStatusesArray(),
-                'attribute' => 'date_end',
+                'attribute' => 'DateEnd',
                 'format' => 'raw',
                 'value' => function ($model) {
                     /** @var \common\models\LoginsSearch $model */
-                    $value = $model['date_end'];
+                    $value = $model['DateEnd'];
                     if (empty($value) || strtotime($value) > time()) {
                         $name = 'Активен';
                         $class = 'success';
