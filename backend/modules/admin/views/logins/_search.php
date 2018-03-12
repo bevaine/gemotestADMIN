@@ -81,7 +81,7 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'DateBeg') ?>
 
-    <?php // echo $form->field($model, 'date_end') ?>
+    <?php // echo $form->field($model, 'DateEnd') ?>
 
     <?php // echo $form->field($model, 'block_register') ?>
 

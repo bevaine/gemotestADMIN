@@ -105,10 +105,10 @@ $this->params['breadcrumbs'][] = 'Редактирование';
             ]) ?>
 
             <?php
-            echo $form->field($model, 'date_end')->widget(DateTimePicker::className(), [
-                'name' => 'Logins[date_end]',
+            echo $form->field($model, 'DateEnd')->widget(DateTimePicker::className(), [
+                'name' => 'Logins[DateEnd]',
                 'type' => DateTimePicker::TYPE_INPUT,
-                'value' => !empty($model->date_end) ? date("Y-m-d G:i:s", strtotime($model->date_end)) : '',
+                'value' => !empty($model->DateEnd) ? date("Y-m-d G:i:s", strtotime($model->DateEnd)) : '',
                 'pluginOptions' => [
                     'autoclose'=>true,
                     'format' => 'yyyy-mm-dd hh:ii:ss'

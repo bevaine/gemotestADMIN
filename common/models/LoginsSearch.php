@@ -40,7 +40,7 @@ class LoginsSearch extends Logins
     {
         return [
             [['aid', 'IsOperator', 'IsAdmin', 'OpenExcel', 'EngVersion', 'IsDoctor', 'UserType', 'InputOrder', 'PriceID', 'CanRegister', 'InputOrderRM', 'OrderEdit', 'MedReg', 'goscontract', 'FizType', 'clientmen', 'mto', 'mto_editor', 'show_preanalytic', 'parentAid', 'GarantLetter'], 'integer'],
-            [['ad_login','last_name', 'first_name', 'middle_name', 'AD_position', 'Login', 'Pass', 'Name', 'Email', 'Key', 'Logo', 'LogoText', 'LogoText2', 'LogoType', 'LogoWidth', 'TextPaddingLeft', 'tbl', 'CACHE_Login', 'LastLogin', 'DateBeg', 'date_end', 'block_register', 'last_update_password', 'role'], 'safe'],
+            [['ad_login','last_name', 'first_name', 'middle_name', 'AD_position', 'Login', 'Pass', 'Name', 'Email', 'Key', 'Logo', 'LogoText', 'LogoText2', 'LogoType', 'LogoWidth', 'TextPaddingLeft', 'tbl', 'CACHE_Login', 'LastLogin', 'DateBeg', 'DateEnd', 'block_register', 'last_update_password', 'role'], 'safe'],
         ];
     }
 
@@ -106,10 +106,10 @@ class LoginsSearch extends Logins
             $query->andWhere('([Logins].[Key] = :key) OR ([DirectorFloSender].[sender_key] = :key)', [':key' => $this->Key]);
         }
 
-        if ($this->date_end == 1) {
-            $query->andWhere(['OR', ['>', 'date_end', date("Y-m-d G:i:s:000", time())], ['date_end' => NULL]]);
-        } elseif ($this->date_end == 2) {
-            $query->andFilterWhere(['<=', 'date_end', date("Y-m-d G:i:s:000", time())]);
+        if ($this->DateEnd == 1) {
+            $query->andWhere(['OR', ['>', 'DateEnd', date("Y-m-d G:i:s:000", time())], ['DateEnd' => NULL]]);
+        } elseif ($this->DateEnd == 2) {
+            $query->andFilterWhere(['<=', 'DateEnd', date("Y-m-d G:i:s:000", time())]);
         }
 
         if ($this->block_register == 1) {

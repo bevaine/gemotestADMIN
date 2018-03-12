@@ -179,13 +179,13 @@ class LoginsController extends Controller
 
             $status = $post['block-account'];
             if ($status == 'block') {
-                $model->date_end = date("Y-m-d G:i:s.000", time());
+                $model->DateEnd = date("Y-m-d G:i:s.000", time());
             } elseif ($status == 'active') {
-                $model->date_end = NULL;
+                $model->DateEnd = NULL;
             }
             if (!$model->save()) {
                 Yii::getLogger()->log([
-                    'model->date_end'=>$model->errors
+                    'model->DateEnd'=>$model->errors
                 ], Logger::LEVEL_ERROR, 'binary');
             }
         } elseif (isset($post['block-register'])) {

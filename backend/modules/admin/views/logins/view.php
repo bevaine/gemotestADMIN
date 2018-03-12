@@ -17,8 +17,8 @@ $blockDateEnd = 'active';
 $blockRegister = 'active';
 $activeGS = 'active';
 
-if (empty($model->date_end)
-    || strtotime($model->date_end) > time()) {
+if (empty($model->DateEnd)
+    || strtotime($model->DateEnd) > time()) {
     $blockDateEnd = 'block';
 }
 if (empty($model->block_register)
@@ -153,13 +153,13 @@ if ($model->adUsers) {
                         'format' => 'datetime',
                     ],
                     [
-                        'attribute' => 'date_end',
+                        'attribute' => 'DateEnd',
                         'format' => 'html',
                         'value' => function($model){
                             /** @var $model \common\models\Logins */
-                            if (empty($model->date_end)) return NULL;
-                            $date = Yii::$app->formatter->asDatetime(substr($model->date_end, 0,-4), 'full');
-                            if (empty($model->date_end) || strtotime($model->date_end) > time()) {
+                            if (empty($model->DateEnd)) return NULL;
+                            $date = Yii::$app->formatter->asDatetime(substr($model->DateEnd, 0,-4), 'full');
+                            if (empty($model->DateEnd) || strtotime($model->DateEnd) > time()) {
                                 $style = "success";
                             } else {
                                 $style = "danger";
