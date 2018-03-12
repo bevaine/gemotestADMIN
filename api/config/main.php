@@ -44,6 +44,7 @@ return [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
             'showScriptName' => false,
+            'baseUrl' => 'http://itr-local.admin',
             'rules' => [
                 'GET /gms/playlist/<dev:\d+>' => 'gms/playlist/view',
                 'GET /gms/playlist/<dev:\d+>/<pls:\d+>' => 'gms/playlist/view',
