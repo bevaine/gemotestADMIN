@@ -27,27 +27,27 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'end_time_play') ?>
 
-    <?php // echo $form->field($model, 'isMonday') ?>
+    <?php // echo $form->field($model, 'is_monday') ?>
 
-    <?php // echo $form->field($model, 'isTuesday') ?>
+    <?php // echo $form->field($model, 'is_tuesday') ?>
 
-    <?php // echo $form->field($model, 'isWednesday') ?>
+    <?php // echo $form->field($model, 'is_wednesday') ?>
 
-    <?php // echo $form->field($model, 'isThursday') ?>
+    <?php // echo $form->field($model, 'is_thursday') ?>
 
-    <?php // echo $form->field($model, 'isFriday') ?>
+    <?php // echo $form->field($model, 'is_friday') ?>
 
-    <?php // echo $form->field($model, 'isSaturday') ?>
+    <?php // echo $form->field($model, 'is_saturday') ?>
 
-    <?php // echo $form->field($model, 'isSunday') ?>
+    <?php // echo $form->field($model, 'is_sunday') ?>
 
-    <?php // echo $form->field($model, 'timeStart') ?>
+    <?php // echo $form->field($model, 'time_start') ?>
 
-    <?php // echo $form->field($model, 'timeEnd') ?>
+    <?php // echo $form->field($model, 'time_end') ?>
 
-    <?php // echo $form->field($model, 'dateStart') ?>
+    <?php // echo $form->field($model, 'date_start') ?>
 
-    <?php // echo $form->field($model, 'dateEnd') ?>
+    <?php // echo $form->field($model, 'date_end') ?>
 
     <?php // echo $form->field($model, 'sender_id') ?>
 

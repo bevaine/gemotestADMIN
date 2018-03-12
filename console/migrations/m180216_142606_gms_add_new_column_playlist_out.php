@@ -14,17 +14,17 @@ class m180216_142606_gms_add_new_column_playlist_out extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%gms_playlist_out}}', 'isMonday', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'isTuesday', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'isWednesday', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'isThursday', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'isFriday', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'isSaturday', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'isSunday', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'timeStart', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'timeEnd', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'dateStart', Schema::TYPE_INTEGER);
-        $this->addColumn('{{%gms_playlist_out}}', 'dateEnd', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'is_monday', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'is_tuesday', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'is_wednesday', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'is_thursday', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'is_friday', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'is_saturday', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'is_sunday', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'time_start', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'time_end', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'date_start', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'date_end', Schema::TYPE_INTEGER);
     }
 
     /**
@@ -32,17 +32,17 @@ class m180216_142606_gms_add_new_column_playlist_out extends Migration
      */
     public function safeDown()
     {
-        $this->dropColumn('{{%gms_playlist_out}}', 'isMonday');
-        $this->dropColumn('{{%gms_playlist_out}}', 'isTuesday');
-        $this->dropColumn('{{%gms_playlist_out}}', 'isWednesday');
-        $this->dropColumn('{{%gms_playlist_out}}', 'isThursday');
-        $this->dropColumn('{{%gms_playlist_out}}', 'isFriday');
-        $this->dropColumn('{{%gms_playlist_out}}', 'isSaturday');
-        $this->dropColumn('{{%gms_playlist_out}}', 'isSunday');
-        $this->dropColumn('{{%gms_playlist_out}}', 'timeStart');
-        $this->dropColumn('{{%gms_playlist_out}}', 'timeEnd');
-        $this->dropColumn('{{%gms_playlist_out}}', 'dateStart');
-        $this->dropColumn('{{%gms_playlist_out}}', 'dateEnd');
+        $this->dropColumn('{{%gms_playlist_out}}', 'is_monday');
+        $this->dropColumn('{{%gms_playlist_out}}', 'is_tuesday');
+        $this->dropColumn('{{%gms_playlist_out}}', 'is_wednesday');
+        $this->dropColumn('{{%gms_playlist_out}}', 'is_thursday');
+        $this->dropColumn('{{%gms_playlist_out}}', 'is_friday');
+        $this->dropColumn('{{%gms_playlist_out}}', 'is_saturday');
+        $this->dropColumn('{{%gms_playlist_out}}', 'is_sunday');
+        $this->dropColumn('{{%gms_playlist_out}}', 'time_start');
+        $this->dropColumn('{{%gms_playlist_out}}', 'time_end');
+        $this->dropColumn('{{%gms_playlist_out}}', 'date_start');
+        $this->dropColumn('{{%gms_playlist_out}}', 'date_end');
     }
 
     /*

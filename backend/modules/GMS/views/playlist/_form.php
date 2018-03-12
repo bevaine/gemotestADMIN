@@ -301,6 +301,7 @@ use common\components\helpers\FunctionsHelper;
                 var name = children.title;
                 var typePlaylist = $('#gmsplaylist-type').val();
                 arrData["duration"] = children.data.duration;
+                arrData["file"] = children.data.file;
                 arrData["type"] = typePlaylist;
                 arrChildren["key"] = key; 
                 arrChildren["title"] = name;
@@ -439,14 +440,19 @@ use common\components\helpers\FunctionsHelper;
     $(".btn-primary").click(function() { 
         if (checkJSON()) $("#form").submit();
     });
-
-    $(document).ready(function(){  
-        setSender($(".region select").val());
-    }); 
     
     $(".region select").change(function() {
         setSender($(this).val());  
     });
 JS;
+$this->registerJs($js1);
+
+$js_ready = <<<JS
+    $(document).ready(function(){  
+        setSender($(".region select").val());
+    }); 
+JS;
+if (!$model->isNewRecord) {
     $this->registerJs($js1);
+}
 ?>

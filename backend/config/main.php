@@ -127,6 +127,7 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'baseUrl' => 'http://itr-local.admin',
             'rules' => [
                 '/signup' => '/user/user/signup',
                 '/login' => '/site/login',

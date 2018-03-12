@@ -9,6 +9,7 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Expression;
 use yii\db\ActiveRecord;
 use yii\log\Logger;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "gms_playlist_out".
@@ -20,15 +21,16 @@ use yii\log\Logger;
  * @property integer $device_id
  * @property integer $sender_id
  * @property integer $date_play
- * @property integer $timeStart
- * @property integer $timeEnd
- * @property integer $dateStart
- * @property integer $dateEnd
+ * @property integer $time_start
+ * @property integer $time_end
+ * @property integer $date_start
+ * @property integer $date_end
  * @property integer $active
  * @property integer $created_at
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsDevices $deviceModel
+ * @property array $videos
  *
  */
 
@@ -43,19 +45,19 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     public function scenarios()
     {
         return [
-            self::SCENARIO_DEFAULT_PLAYLIST => ['region_id', 'sender_id', 'device_id', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday','name', 'jsonPlaylist', 'dateStart', 'dateEnd','timeStart', 'timeEnd'],
-            self::SCENARIO_FIND_PLAYLIST => ['id', 'region_id', 'sender_id', 'device_id', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday','name', 'jsonPlaylist', 'dateStart', 'dateEnd','timeStart', 'timeEnd'],
+            self::SCENARIO_DEFAULT_PLAYLIST => ['region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday','name', 'jsonPlaylist', 'date_start', 'date_end','time_start', 'time_end'],
+            self::SCENARIO_FIND_PLAYLIST => ['id', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday','name', 'jsonPlaylist', 'date_start', 'date_end','time_start', 'time_end'],
         ];
     }
 
     CONST WEEK = [
-        "isMonday" => "Понедельник",
-        "isTuesday" => "Вторник",
-        "isWednesday" => "Среда",
-        "isThursday" => "Четверг",
-        "isFriday" => "Пятница",
-        "isSaturday" => "Суббота",
-        "isSunday" => "Воскресенье"
+        "is_monday" => "Понедельник",
+        "is_tuesday" => "Вторник",
+        "is_wednesday" => "Среда",
+        "is_thursday" => "Четверг",
+        "is_friday" => "Пятница",
+        "is_saturday" => "Суббота",
+        "is_sunday" => "Воскресенье"
     ];
 
     /**
@@ -72,10 +74,10 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['region_id', 'jsonPlaylist', 'dateStart', 'dateEnd', 'timeStart', 'timeEnd'], 'required'],
-            [['region_id', 'sender_id', 'device_id', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday'], 'integer'],
+            [['region_id', 'jsonPlaylist', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
+            [['region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],
             [['name', 'jsonPlaylist'], 'string'],
-            [['dateStart', 'dateEnd','timeStart', 'timeEnd'], 'filter', 'filter' => function ($value) {
+            [['date_start', 'date_end','time_start', 'time_end'], 'filter', 'filter' => function ($value) {
                 if (!preg_match("/^[\d\+]+$/", $value) && !empty($value)) return strtotime($value);
                 else return $value;
             }],
@@ -93,11 +95,11 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             $this->active = 1;
         }
 
-        $this->dateStart = self::getDateWithoutTime($this->dateStart);
-        $this->dateEnd = self::getDateWithoutTime($this->dateEnd);
+        $this->date_start = self::getDateWithoutTime($this->date_start);
+        $this->date_end = self::getDateWithoutTime($this->date_end);
 
-        $this->timeStart = self::getTimeDate($this->timeStart);
-        $this->timeEnd = self::getTimeDate($this->timeEnd);
+        $this->time_start = self::getTimeDate($this->time_start);
+        $this->time_end = self::getTimeDate($this->time_end);
 
         return parent::beforeSave($insert);
     }
@@ -113,10 +115,10 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             'region_id' => 'Регион',
             'sender_id' => 'Отделение',
             'device_id' => 'Устройство',
-            'dateStart' => 'Дата старта',
-            'dateEnd' => 'Дата окончания',
-            'timeStart' => 'Время старта',
-            'timeEnd' => 'Время окончания',
+            'date_start' => 'Дата старта',
+            'date_end' => 'Дата окончания',
+            'time_start' => 'Время старта',
+            'time_end' => 'Время окончания',
             'jsonPlaylist' => 'Плейлист',
             'active' => 'Статус',
             'created_at' => 'Дата создания'
@@ -224,12 +226,10 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             ->where([
                 'region_id' => $this->region_id,
                 'sender_id' => $this->sender_id,
-                'device_id' => $this->device_id])
+                'device_id' => $this->device_id,
+                'active' => '1'])
             ->andFilterWhere(['!=', 'id', $this->id])
             ->all();
-        //print_r($findModel);
-
-        Yii::getLogger()->log(['$findModel' => ArrayHelper::toArray($findModel)], Logger::LEVEL_ERROR, 'binary');
 
         if ($findModel) {
 
@@ -239,16 +239,12 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                 if (!empty($this->$day)) $arrDaysModel[$day] = $name;
             }
 
-            Yii::getLogger()->log(["this" => $this], Logger::LEVEL_ERROR, 'binary');
-
-
             foreach ($findModel as $model) {
                 Yii::getLogger()->log(['$model' => $model], Logger::LEVEL_ERROR, 'binary');
                 /** @var $model GmsPlaylistOut */
-                $dateCross = ($this->dateStart <= $model->dateEnd  && $this->dateEnd >= $model->dateStart);
+                $dateCross = ($this->date_start <= $model->date_end  && $this->date_end >= $model->date_start);
 
                 //todo проверяем пересекается ли даты
-
                 if ($dateCross) {
 
                     //todo проверяем пересекается ли дни недели
@@ -256,8 +252,8 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                         "id" => $model->id,
                         "name" => $model->name,
                         "date" => [
-                            "start" => date("d-m-Y", $model->dateStart),
-                            "end" => date("d-m-Y", $model->dateEnd),
+                            "start" => date("d-m-Y", $model->date_start),
+                            "end" => date("d-m-Y", $model->date_end),
                         ],
                     ];
 
@@ -278,16 +274,16 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
 
                     if (!empty($arrDaysModel) && !empty($out["week"]) || empty($arrDaysModel)) {
                         //todo проверяем пересекается ли время
-                        $timeCross = ($this->timeStart <= $model->timeEnd && $this->timeEnd >= $model->timeStart);
+                        $timeCross = ($this->time_start <= $model->time_end && $this->time_end >= $model->time_start);
                         if ($timeCross) {
                             $out['time'] = [
-                                "start" => date("H:i", $model->timeStart),
-                                "end" => date("H:i", $model->timeEnd)
+                                "start" => date("H:i", $model->time_start),
+                                "end" => date("H:i", $model->time_end)
                             ];
                         }
                     }
 
-                    if (empty($out["time"])) return false;
+                    if (empty($out["time"])) continue;
                     else return $out;
                 }
             }
@@ -315,5 +311,24 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             date("d", 0),
             date("Y", 0)
         );
+    }
+
+
+    /**
+     * @return array|bool
+     */
+    public function getVideos()
+    {
+        if (!empty($this->jsonPlaylist)) {
+            $jsonPlaylist = json_decode($this->jsonPlaylist);
+            if (empty($jsonPlaylist->children)) return false;
+            $arrKeys = ArrayHelper::getColumn($jsonPlaylist->children, 'key');
+            if ($findVideos = GmsVideos::find()->where(['in', 'id' , $arrKeys])->all()) {
+                $findVideos = ArrayHelper::getColumn($findVideos, 'file');
+                $findVideos = array_map(function ($val) { return Yii::$app->urlManager->createAbsoluteUrl($val); }, $findVideos);
+                return $findVideos;
+            }
+        }
+        return false;
     }
 }

@@ -58,7 +58,7 @@ class ActiveSyncController extends Controller
                     ['like', '[Name]', 'менеджер'],
                     ['like', '[Name]', 'регистрат']
                 ])
-            ->andWhere(['is', 'DateEnd', null])
+            ->andWhere(['is', 'date_end', null])
             ->all();
 
         $rowInsert = [];
@@ -160,9 +160,14 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        $d = GmsPlaylistOut::findOne(12);
+        $d->getVideos();
+
+
+    // $weekKeys = array_combine(array_keys(array_fill(1, 7, '')), array_keys(GmsPlaylistOut::WEEK));
         //$d = strtotime("23-12-2017");
-        echo date("Y-m-d H:i:s", 1520110800)."\r\n";
-        echo date("Y-m-d H:i:s", 1520283600)."\r\n";
+        print_r($a);
+        //echo date("Y-m-d H:i:s", 1520283600)."\r\n";
 //        echo date("Y-m-d H:i:s", 1520283600)."\r\n";
 //        echo date("Y-m-d H:i:s", 6060)."\r\n";
 //        echo date("Y-m-d H:i:s", 42060)."\r\n";

@@ -250,10 +250,10 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                             <div class="form-group date">
                                 <?= Html::label('Период воспроизведения') ?>
                                 <?= DatePicker::widget([
-                                    'name' => 'GmsPlaylistOut[dateStart]',
-                                    'name2' => 'GmsPlaylistOut[dateEnd]',
-                                    'value' => date('d-m-Y', $model->isNewRecord ? time() : $model->dateStart),
-                                    'value2' => date('d-m-Y', $model->isNewRecord ? time() : $model->dateEnd),
+                                    'name' => 'GmsPlaylistOut[date_start]',
+                                    'name2' => 'GmsPlaylistOut[date_end]',
+                                    'value' => date('d-m-Y', $model->isNewRecord ? time() : $model->date_start),
+                                    'value2' => date('d-m-Y', $model->isNewRecord ? time() : $model->date_end),
                                     'type' => DatePicker::TYPE_RANGE,
                                     'separator' => '<i class="glyphicon glyphicon-resize-horizontal"></i>',
                                     'layout' => $layout,
@@ -273,11 +273,11 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                     <tr>
                                         <td>
                                             <?php
-                                            $model->timeStart = date('H:i', empty($model->timeStart) ? time() : $model->timeStart);
+                                            $model->time_start = date('H:i', empty($model->time_start) ? time() : $model->time_start);
                                             echo TimePicker::widget([
                                                 'model' => $model,
-                                                'attribute' => 'timeStart',
-                                                'name' => 'timeStart',
+                                                'attribute' => 'time_start',
+                                                'name' => 'time_start',
                                                 'pluginOptions' => [
                                                     'showSeconds' => false,
                                                     'showMeridian' => false,
@@ -294,11 +294,11 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                         </td>
                                         <td>
                                             <?php
-                                            $model->timeEnd = date('H:i', empty($model->timeEnd) ? time() : $model->timeEnd);
+                                            $model->time_end = date('H:i', empty($model->time_end) ? time() : $model->time_end);
                                             echo TimePicker::widget([
                                                 'model' => $model,
-                                                'attribute' => 'timeEnd',
-                                                'name' => 'timeEnd',
+                                                'attribute' => 'time_end',
+                                                'name' => 'time_end',
                                                 'pluginOptions' => [
                                                     'showSeconds' => false,
                                                     'showMeridian' => false,
@@ -324,7 +324,7 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                     echo "<span style='padding-left: 10px'>".Html::Activecheckbox($model, $key, [
                                         'value' => "1",
                                         'label' => $value,
-                                        'data-url' => 'isMonday'
+                                        'data-url' => 'is_monday'
                                     ])."</span>";
                                 }
                                 ?>
@@ -630,6 +630,7 @@ $js1 = <<< JS
                 var arrData = {};
                 var key = children.key;
                 var name = children.title;
+                arrData["file"] = children.data.file;
                 arrData["duration"] = children.data.duration;
                 arrData["type"] = children.data.type;
                 arrChildren["key"] = key; 
@@ -845,7 +846,7 @@ $js1 = <<< JS
                         if ($('.device_id select option:selected').text() !== '---') {
                             html += '<br>Устройство: <b>' +  + $('.device_id select option:selected').text() + '</b>'; 
                         } 
-                        //html += 'Действует с' + res.dateStart + ' по '.res.dateEnd;
+                        //html += 'Действует с' + res.date_start + ' по '.res.date_end;
                         html_body += 'Для параметров: <p style="margin-left:30px;">' + html + '</span>';
                         html_body += '<p>Уже есть привязанный плейлист: ';
                         html_body += '<b><a target="_blank" href="/GMS/playlist-out/view?id=' + res.id + '">' + res.name + '</a></b>';

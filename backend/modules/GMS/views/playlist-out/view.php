@@ -72,23 +72,23 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                         },
                                         'attribute' => 'device_id'
                                     ],
-                                    'dateStart:date',
-                                    'dateEnd:date',
+                                    'date_start:date',
+                                    'date_end:date',
                                     [
                                         'value' => function ($model) {
                                             /** @var $model \common\models\GmsPlaylistOut */
-                                            return !empty($model->timeStart) ? date('H:i', $model->timeStart) : null;
+                                            return !empty($model->time_start) ? date('H:i', $model->time_start) : null;
 
                                         },
-                                        'attribute' => 'timeStart'
+                                        'attribute' => 'time_start'
                                     ],
                                     [
                                         'value' => function ($model) {
                                             /** @var $model \common\models\GmsPlaylistOut */
-                                            return !empty($model->timeEnd) ? date('H:i', $model->timeEnd) : null;
+                                            return !empty($model->time_end) ? date('H:i', $model->time_end) : null;
 
                                         },
-                                        'attribute' => 'timeEnd'
+                                        'attribute' => 'time_end'
                                     ],
                                     [
                                         'label' => 'Воспроизводить только',

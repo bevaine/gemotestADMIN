@@ -41,10 +41,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'sender_id'
             ],
             'device_id',
-            'dateStart:date',
-            'dateEnd:date',
-            'timeStart:time',
-            'timeEnd:time',
+            'date_start:date',
+            'date_end:date',
+            'time_start:time',
+            'time_end:time',
             [
                 'label' => 'Статус',
                 'headerOptions' => array('style' => 'width: 100px; text-align: center;'),

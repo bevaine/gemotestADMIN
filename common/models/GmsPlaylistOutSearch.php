@@ -18,7 +18,7 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
     public function rules()
     {
         return [
-            [['id', 'device_id', 'date_play', 'start_time_play', 'end_time_play', 'isMonday', 'isTuesday', 'isWednesday', 'isThursday', 'isFriday', 'isSaturday', 'isSunday', 'timeStart', 'timeEnd', 'dateStart', 'dateEnd', 'sender_id', 'region_id', 'created_at', 'active'], 'integer'],
+            [['id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday', 'time_start', 'time_end', 'date_start', 'date_end', 'sender_id', 'region_id', 'created_at', 'active'], 'integer'],
             [['name', 'jsonPlaylist'], 'safe'],
         ];
     }
@@ -61,20 +61,17 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
         $query->andFilterWhere([
             'id' => $this->id,
             'device_id' => $this->device_id,
-            'date_play' => $this->date_play,
-            'start_time_play' => $this->start_time_play,
-            'end_time_play' => $this->end_time_play,
-            'isMonday' => $this->isMonday,
-            'isTuesday' => $this->isTuesday,
-            'isWednesday' => $this->isWednesday,
-            'isThursday' => $this->isThursday,
-            'isFriday' => $this->isFriday,
-            'isSaturday' => $this->isSaturday,
-            'isSunday' => $this->isSunday,
-            'timeStart' => $this->timeStart,
-            'timeEnd' => $this->timeEnd,
-            'dateStart' => $this->dateStart,
-            'dateEnd' => $this->dateEnd,
+            'is_monday' => $this->is_monday,
+            'is_tuesday' => $this->is_tuesday,
+            'is_wednesday' => $this->is_wednesday,
+            'is_thursday' => $this->is_thursday,
+            'is_friday' => $this->is_friday,
+            'is_saturday' => $this->is_saturday,
+            'is_sunday' => $this->is_sunday,
+            'time_start' => $this->time_start,
+            'time_end' => $this->time_end,
+            'date_start' => $this->date_start,
+            'date_end' => $this->date_end,
             'sender_id' => $this->sender_id,
             'region_id' => $this->region_id,
             'created_at' => $this->created_at,

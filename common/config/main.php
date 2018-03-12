@@ -52,6 +52,7 @@ return [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'baseUrl' => 'http://itr-local.admin'
         ],
         'i18n' => [
             'translations' => [

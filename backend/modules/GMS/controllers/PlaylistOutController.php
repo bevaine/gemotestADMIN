@@ -64,7 +64,7 @@ class PlaylistOutController extends Controller
             }
             if (!$model->save()) {
                 Yii::getLogger()->log([
-                    'model->DateEnd'=>$model->errors
+                    '$model->save()'=>$model->errors
                 ], Logger::LEVEL_ERROR, 'binary');
             }
         }
@@ -133,14 +133,14 @@ class PlaylistOutController extends Controller
         $model = new GmsPlaylistOut();
         $model->scenario = 'findPlaylistOut';
 
-        //if ($model->load(Yii::$app->request->post())) {
+        //Yii::$app->request->post();
         if ($model->load(Yii::$app->request->queryParams)) {
 
-            $model->dateStart = strtotime($model->dateStart);
-            $model->dateEnd = strtotime($model->dateEnd);
+            $model->date_start = strtotime($model->date_start);
+            $model->date_end = strtotime($model->date_end);
 
-            $model->timeStart = GmsPlaylistOut::getTimeDate(strtotime($model->timeStart));
-            $model->timeEnd = GmsPlaylistOut::getTimeDate(strtotime($model->timeEnd));
+            $model->time_start = GmsPlaylistOut::getTimeDate(strtotime($model->time_start));
+            $model->time_end = GmsPlaylistOut::getTimeDate(strtotime($model->time_end));
 
             $out = $model->checkPlaylist();
         }
