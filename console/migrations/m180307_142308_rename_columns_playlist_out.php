@@ -26,8 +26,8 @@ class m180307_142308_rename_columns_playlist_out extends Migration
         $this->renameColumn('{{%gms_playlist_out}}', 'isSunday', 'is_sunday');
 
         $this->dropColumn('{{%gms_playlist_out}}', 'date_play');
-        $this->dropColumn('{{%gms_playlist_out}}', 'start_play_time');
-        $this->dropColumn('{{%gms_playlist_out}}', 'end_play_time');
+        $this->dropColumn('{{%gms_playlist_out}}', 'start_time_play');
+        $this->dropColumn('{{%gms_playlist_out}}', 'end_time_play');
     }
 
     /**
