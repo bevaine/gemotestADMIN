@@ -27,6 +27,13 @@ use yii\helpers\Url;
  * @property integer $date_end
  * @property integer $active
  * @property integer $created_at
+ * @property integer $is_monday
+ * @property integer $is_tuesday
+ * @property integer $is_wednesday
+ * @property integer $is_thursday
+ * @property integer $is_friday
+ * @property integer $is_saturday
+ * @property integer $is_sunday
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsDevices $deviceModel
@@ -45,7 +52,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     public function scenarios()
     {
         return [
-            self::SCENARIO_DEFAULT_PLAYLIST => ['region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday','name', 'jsonPlaylist', 'date_start', 'date_end','time_start', 'time_end'],
+            self::SCENARIO_DEFAULT_PLAYLIST => ['active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday','name', 'jsonPlaylist', 'date_start', 'date_end','time_start', 'time_end'],
             self::SCENARIO_FIND_PLAYLIST => ['id', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday','name', 'jsonPlaylist', 'date_start', 'date_end','time_start', 'time_end'],
         ];
     }
@@ -75,7 +82,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     {
         return [
             [['region_id', 'jsonPlaylist', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
-            [['region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],
+            [['active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],
             [['name', 'jsonPlaylist'], 'string'],
             [['date_start', 'date_end','time_start', 'time_end'], 'filter', 'filter' => function ($value) {
                 if (!preg_match("/^[\d\+]+$/", $value) && !empty($value)) return strtotime($value);
@@ -117,11 +124,15 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             'device_id' => 'Устройство',
             'date_start' => 'Дата старта',
             'date_end' => 'Дата окончания',
-            'time_start' => 'Время старта',
-            'time_end' => 'Время окончания',
+            'time_start' => 'Время старт',
+            'time_end' => 'Время стоп',
             'jsonPlaylist' => 'Плейлист',
             'active' => 'Статус',
-            'created_at' => 'Дата создания'
+            'created_at' => 'Дата создания',
+            'device_name' => 'Устройство',
+            'sender_name' => 'Отделение',
+            'date_start_val' => 'Дата старт',
+            'date_end_val' => 'Дата стоп',
         ];
     }
 

@@ -59,8 +59,12 @@ class PlaylistController extends ActiveController
 
         $modelDevices->last_active_at = time();
 
+        //todo проверка на авторизацию устройства
         if (!empty($modelDevices->auth_status)) {
+
             if ($modelDevices->playListOutModel) {
+
+                //todo если плейлист назначен в ручную
                 if ($modelDevices->current_pls_id != $pls) {
                     $out['state'] = 1;
                     $out['pls'] = [
@@ -70,9 +74,13 @@ class PlaylistController extends ActiveController
                     ];
                 }
             } else {
+
+                //todo поиск подходящего по параметрам плейлиста
                 $this->modelDevice = $modelDevices;
                 $plsID = $this->getCurrentPlaylist();
+
                 /** @var $plsID GmsPlaylistOut */
+                //todo проверка на соотвествие плейлиста на устройстве и подобранного автоматически
                 if ($plsID && $plsID->id != $pls) {
                     $out['state'] = 1;
                     $out['pls'] = [
@@ -96,10 +104,6 @@ class PlaylistController extends ActiveController
 
         $response->addData($out);
         return $response;
-    }
-
-    public static function setJsonOut () {
-
     }
 
     /**

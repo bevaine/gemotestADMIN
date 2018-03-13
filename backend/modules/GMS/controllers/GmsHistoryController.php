@@ -3,18 +3,16 @@
 namespace app\modules\GMS\controllers;
 
 use Yii;
-use common\models\GmsPlaylistOut;
-use common\models\GmsPlaylistOutSearch;
+use common\models\GmsHistory;
+use common\models\GmsHistorySearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\log\Logger;
-use yii\helpers\Json;
 
 /**
- * PlaylistOutController implements the CRUD actions for GmsPlaylistOut model.
+ * GmsHistoryController implements the CRUD actions for GmsHistory model.
  */
-class PlaylistOutController extends Controller
+class GmsHistoryController extends Controller
 {
     /**
      * @inheritdoc
@@ -32,12 +30,12 @@ class PlaylistOutController extends Controller
     }
 
     /**
-     * Lists all GmsPlaylistOut models.
+     * Lists all GmsHistory models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new GmsPlaylistOutSearch();
+        $searchModel = new GmsHistorySearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -47,41 +45,25 @@ class PlaylistOutController extends Controller
     }
 
     /**
-     * Displays a single GmsPlaylistOut model.
+     * Displays a single GmsHistory model.
      * @param integer $id
      * @return mixed
      */
     public function actionView($id)
     {
-        $model = $this->findModel($id);
-
-        if (isset(Yii::$app->request->post()['active-playlist'])) {
-            $status = Yii::$app->request->post()['active-playlist'];
-            if ($status == 'block') {
-                $model->active = 0;
-            } elseif ($status == 'active') {
-                $model->active = 1;
-            }
-            if (!$model->save()) {
-                Yii::getLogger()->log([
-                    '$model->save()'=>$model->errors
-                ], Logger::LEVEL_ERROR, 'binary');
-            }
-        }
-
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
     }
 
     /**
-     * Creates a new GmsPlaylistOut model.
+     * Creates a new GmsHistory model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new GmsPlaylistOut();
+        $model = new GmsHistory();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -93,7 +75,7 @@ class PlaylistOutController extends Controller
     }
 
     /**
-     * Updates an existing GmsPlaylistOut model.
+     * Updates an existing GmsHistory model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -112,7 +94,7 @@ class PlaylistOutController extends Controller
     }
 
     /**
-     * Deletes an existing GmsPlaylistOut model.
+     * Deletes an existing GmsHistory model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -125,37 +107,15 @@ class PlaylistOutController extends Controller
     }
 
     /**
-     *
-     */
-    public function actionAjaxTimeCheck()
-    {
-        $out = [];
-        $model = new GmsPlaylistOut();
-        $model->scenario = 'findPlaylistOut';
-
-        if ($model->load(Yii::$app->request->queryParams)) {
-
-            $model->date_start = strtotime($model->date_start);
-            $model->date_end = strtotime($model->date_end);
-
-            $model->time_start = GmsPlaylistOut::getTimeDate(strtotime($model->time_start));
-            $model->time_end = GmsPlaylistOut::getTimeDate(strtotime($model->time_end));
-
-            $out = $model->checkPlaylist();
-        }
-        echo !empty($out) ? Json::encode($out) : 'null';
-    }
-
-    /**
-     * Finds the GmsPlaylistOut model based on its primary key value.
+     * Finds the GmsHistory model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return GmsPlaylistOut the loaded model
+     * @return GmsHistory the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = GmsPlaylistOut::findOne($id)) !== null) {
+        if (($model = GmsHistory::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

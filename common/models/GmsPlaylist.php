@@ -19,7 +19,7 @@ use Yii;
  * @property string $jsonPlaylist
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
- * @property GmsSenders $deviceModel
+ * @property GmsDevices $deviceModel
  */
 
 class GmsPlaylist extends \yii\db\ActiveRecord
