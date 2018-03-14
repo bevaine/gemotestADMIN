@@ -21,10 +21,10 @@ class HistoryController extends ActiveController
     public function actionAjaxHistoryPost()
     {
         $model = new GmsHistory();
-        Yii::getLogger()->log(Yii::$app->request->post(), Logger::LEVEL_ERROR, 'binary');
+        $model->load(Yii::$app->request->post());
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return;
+        if (!$model->save()) {
+            Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
         }
     }
 }
