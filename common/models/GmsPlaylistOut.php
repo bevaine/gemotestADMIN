@@ -335,7 +335,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             $arrKeys = ArrayHelper::getColumn($jsonPlaylist->children, 'key');
             if ($findVideos = GmsVideos::find()->where(['in', 'id' , $arrKeys])->all()) {
                 $findVideos = ArrayHelper::getColumn($findVideos, 'file');
-                $findVideos = array_map(function ($val) { return Yii::$app->urlManager->createAbsoluteUrl($val); }, $findVideos);
+                //$findVideos = array_map(function ($val) { return Yii::$app->urlManager->createAbsoluteUrl($val); }, $findVideos);
                 return $findVideos;
             }
         }
