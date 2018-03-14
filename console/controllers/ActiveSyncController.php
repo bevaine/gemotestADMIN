@@ -160,6 +160,33 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+
+        $curl_output =    "#EXTM3U
+                #ID:5
+                #PLAYLIST:Новый плейлист
+                #EXTINF:190,Без имени
+                /storage/videos/15210217505aa8f3364dcd89.28265324.mp4
+                #EXTINF:606,Видео 2
+                /storage/videos/15210148015aa8d8114f0129.42381134.mp4
+                #EXTINF:606,CATS you will remember and LAUGH all day! - World's funniest cat videos
+                /storage/videos/15210148005aa8d81056e5a5.22559992.mp4
+                #EXTINF:228,Без имени
+                /storage/videos/15210217485aa8f334146673.38266542.mp4";
+
+
+        $pieces = explode("\n", $curl_output);
+        if (is_array($pieces) && count($pieces) > 3) {
+            $pieces = array_slice($pieces, 3);
+            $pieces = array_map('trim', $pieces);
+        } else return false;
+
+        $pieces = array_chunk($pieces, 2); // group them by two's
+        for ($i=0; $i < count($pieces); $i++) {
+            if (isset($pieces[$i][1])) $arr_files[] = basename($pieces[$i][1]);
+        }
+
+        print_r($arr_files);
+        exit;
         $d = GmsPlaylistOut::findOne(12);
         $d->getVideos();
 

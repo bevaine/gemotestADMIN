@@ -47,7 +47,6 @@ return [
             'baseUrl' => 'http://itr-local.admin',
             'rules' => [
                 'GET /gms/playlist/<dev>' => 'gms/playlist/view',
-                'GET /gms/playlist/<dev>/<pls:\d+>' => 'gms/playlist/view',
                 'POST /gms/history' => 'gms/history/ajax-history-post',
             ],
         ]

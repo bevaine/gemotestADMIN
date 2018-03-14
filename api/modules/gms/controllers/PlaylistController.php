@@ -38,11 +38,10 @@ class PlaylistController extends ActiveController
 
     /**
      * @param null $dev
-     * @param null $pls
      * @return ResponseObject
      * @throws ForbiddenHttpException
      */
-    public function actionView($dev = null, $pls = null)
+    public function actionView($dev = null)
     {
         $out['state'] = 0;
         $response = new ResponseObject();
@@ -65,23 +64,20 @@ class PlaylistController extends ActiveController
             if ($modelDevices->playListOutModel) {
 
                 //todo если плейлист назначен в ручную
-                if ($modelDevices->current_pls_id != $pls) {
-                    $out['state'] = 1;
-                    $out['pls'] = [
-                        'id' => $modelDevices->playListOutModel->id,
-                        'files' => $modelDevices->playListOutModel->getVideos(),
-                        'm3u' => Json::decode($modelDevices->playListOutModel->jsonPlaylist)
-                    ];
-                }
+                $out['state'] = 1;
+                $out['pls'] = [
+                    'id' => $modelDevices->playListOutModel->id,
+                    'files' => $modelDevices->playListOutModel->getVideos(),
+                    'm3u' => Json::decode($modelDevices->playListOutModel->jsonPlaylist)
+                ];
             } else {
 
                 //todo поиск подходящего по параметрам плейлиста
                 $this->modelDevice = $modelDevices;
-                $plsID = $this->getCurrentPlaylist();
 
                 /** @var $plsID GmsPlaylistOut */
                 //todo проверка на соотвествие плейлиста на устройстве и подобранного автоматически
-                if ($plsID && $plsID->id != $pls) {
+                if ($plsID = $this->getCurrentPlaylist()) {
                     $out['state'] = 1;
                     $out['pls'] = [
                         'id' => $plsID->id,
