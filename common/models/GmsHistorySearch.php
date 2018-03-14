@@ -10,11 +10,15 @@ use common\models\GmsHistory;
 /**
  * GmsHistorySearch represents the model behind the search form about `common\models\GmsHistory`.
  * @property string $pls_name
+ * @property $created_at_from
+ * @property $created_at_to
  */
 
 class GmsHistorySearch extends GmsHistory
 {
     public $pls_name;
+    public $created_at_from;
+    public $created_at_to;
 
     /**
      * @inheritdoc
@@ -22,7 +26,7 @@ class GmsHistorySearch extends GmsHistory
     public function rules()
     {
         return [
-            [['id', 'pls_id', 'device_id', 'created_at', 'status'], 'integer'],
+            [['id', 'created_at', 'created_at_from', 'created_at_to', 'pls_id', 'device_id', 'status'], 'integer'],
             [['pls_name','log_text'], 'safe'],
         ];
     }
@@ -75,11 +79,26 @@ class GmsHistorySearch extends GmsHistory
             'id' => $this->id,
             'pls_id' => $this->pls_id,
             'device_id' => $this->device_id,
-            'created_at' => $this->created_at,
             'status' => $this->status,
         ]);
 
         $query->andFilterWhere(['like', 'gms_playlist_out.name', $this->pls_name]);
+
+        $end_date = mktime(
+            date("H", 23),
+            date("i", 59),
+            date("s", 59),
+            date("m", strtotime($this->created_at_to)),
+            date("d", strtotime($this->created_at_to)),
+            date("Y", strtotime($this->created_at_to))
+        );
+
+        if ($this->created_at_from) {
+            $query->andFilterWhere(['>=', 'gms_history.created_at', strtotime($this->created_at_from)]);
+        }
+        if ($this->created_at_to) {
+            $query->andFilterWhere(['<=', 'gms_history.created_at', $end_date]);
+        }
 
         return $dataProvider;
     }

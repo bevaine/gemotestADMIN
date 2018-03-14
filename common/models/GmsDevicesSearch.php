@@ -103,17 +103,17 @@ class GmsDevicesSearch extends GmsDevices
             ->andFilterWhere(['like', 'gms_playlist_out.name', $this->current_pls_name]);
 
         if ($this->created_at_from) {
-            $query->andFilterWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($this->created_at_from))]);
+            $query->andFilterWhere(['>=', 'created_at', date('Y-m-d 00:00:00', strtotime($this->created_at_from))]);
         }
         if ($this->created_at_to) {
-            $query->andFilterWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($this->created_at_to))]);
+            $query->andFilterWhere(['<=', 'created_at', date('Y-m-d 23:59:59', strtotime($this->created_at_to))]);
         }
 
         if ($this->last_active_at_from) {
-            $query->andFilterWhere(['>=', 'date', date('Y-m-d 00:00:00', strtotime($this->last_active_at_from))]);
+            $query->andFilterWhere(['>=', 'last_active_at', date('Y-m-d 00:00:00', strtotime($this->last_active_at_from))]);
         }
         if ($this->last_active_at_to) {
-            $query->andFilterWhere(['<=', 'date', date('Y-m-d 23:59:59', strtotime($this->last_active_at_to))]);
+            $query->andFilterWhere(['<=', 'last_active_at', date('Y-m-d 23:59:59', strtotime($this->last_active_at_to))]);
         }
 
         return $dataProvider;

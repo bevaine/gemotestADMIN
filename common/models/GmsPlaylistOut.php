@@ -237,8 +237,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             ->where([
                 'region_id' => $this->region_id,
                 'sender_id' => $this->sender_id,
-                'device_id' => $this->device_id,
-                'active' => '1'])
+                'device_id' => $this->device_id])
             ->andFilterWhere(['!=', 'id', $this->id])
             ->all();
 
