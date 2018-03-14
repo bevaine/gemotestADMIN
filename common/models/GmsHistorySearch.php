@@ -26,8 +26,8 @@ class GmsHistorySearch extends GmsHistory
     public function rules()
     {
         return [
-            [['id', 'created_at', 'created_at_from', 'created_at_to', 'pls_id', 'device_id', 'status'], 'integer'],
-            [['pls_name','log_text'], 'safe'],
+            [['id', 'created_at', 'created_at_from', 'created_at_to', 'pls_id', 'status'], 'integer'],
+            [['device_id', 'pls_name', 'log_text'], 'safe'],
         ];
     }
 
