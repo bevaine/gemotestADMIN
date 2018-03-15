@@ -38,13 +38,13 @@ class PlaylistController extends ActiveController
 
     /**
      * @param null $dev
-     * @return ResponseObject
+     * @return array
      * @throws ForbiddenHttpException
      */
     public function actionView($dev = null)
     {
         $out['state'] = 0;
-        $response = new ResponseObject();
+        $response = [];
 
         if (!$modelDevices = GmsDevices::findOne(['device' => $dev])) {
             $modelDevices = new GmsDevices();
@@ -98,7 +98,7 @@ class PlaylistController extends ActiveController
             throw new ForbiddenHttpException('The requested page does not exist.');
         }
 
-        $response->addData($out);
+        $response['result'] = $out;
         return $response;
     }
 
