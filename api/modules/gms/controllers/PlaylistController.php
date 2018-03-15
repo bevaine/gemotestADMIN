@@ -121,7 +121,7 @@ class PlaylistController extends ActiveController
         }
 
         $response['result'] = $out;
-        return $response;
+        return json_encode($response);
     }
 
     /**
