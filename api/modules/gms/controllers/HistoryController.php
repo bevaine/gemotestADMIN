@@ -38,9 +38,11 @@ class HistoryController extends ActiveController
     {
         $model = new GmsHistory();
         $model->load(Yii::$app->request->post());
-        Yii::getLogger()->log(['$model' => $model], Logger::LEVEL_ERROR, 'binary');
-        //todo если плейлист не изменился то историю не сохраняем
-        if ($model->status == 1) return json_encode(['state' => 1]);
+
+        //todo если плейлист не изменился или нет подходящего плейлиста то историю не сохраняем
+        if (in_array($model->status, [1,3])){
+            return json_encode(['state' => 0]);
+        }
 
         if ($model->save()) {
             return json_encode(['state' => 1]);
