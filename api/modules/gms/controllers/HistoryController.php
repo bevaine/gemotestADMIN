@@ -12,11 +12,27 @@ use yii\rest\ActiveController;
 use yii;
 use common\models\GmsHistory;
 use yii\log\Logger;
+use yii\filters\VerbFilter;
 
 
 class HistoryController extends ActiveController
 {
     public $modelClass = 'common\models\GmsHistory';
+
+    /**
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'], //delete this string to may GET
+                ],
+            ],
+        ];
+    }
 
     public function actionAjaxHistoryPost()
     {

@@ -37,12 +37,34 @@ class PlaylistController extends ActiveController
     }
 
     /**
-     * @param null $dev
+     * @return array
+     */
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                    'delete' => ['post'], //delete this string to may GET
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @return array
      * @throws ForbiddenHttpException
      */
-    public function actionView($dev = null)
+    public function actionView()
     {
+        if (empty(Yii::$app->request->post()['dev']) || empty(Yii::$app->request->post()['time'])) {
+            throw new ForbiddenHttpException('The requested page does not exist.');
+        }
+
+        $post = Yii::$app->request->post();
+        $dev = $post['dev'];
+        $time = $post['time'];
+
         $out['state'] = 0;
         $response = [];
 
