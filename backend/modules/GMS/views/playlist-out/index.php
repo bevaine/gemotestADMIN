@@ -3,7 +3,6 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use kartik\date\DatePicker;
-date_default_timezone_set("Europe/Moscow");
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsPlaylistOutSearch */

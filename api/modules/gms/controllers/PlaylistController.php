@@ -70,7 +70,6 @@ class PlaylistController extends ActiveController
         $response = [];
         $out['state'] = 0;
         $timezone = "Europe/Moscow";
-        date_default_timezone_set($timezone);
         $dev = Yii::$app->request->post()['dev'];
         $dt = new DateTime('now', new DateTimeZone($timezone));
         $date_db = $dt->format("Y-m-d H:i:s P");
