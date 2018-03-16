@@ -87,6 +87,9 @@ class PlaylistController extends ActiveController
             if (!empty($modelDevices->timezone)) {
                 $timezone = $modelDevices->timezone;
             }
+            Yii::getLogger()->log([
+                'timezone' => $dt->getTimezone()
+            ], 1, 'binary');
             $this->timeForTimeZone = FunctionsHelper::getTimestampForTimeZone($dt->getTimestamp(), $timezone);
             $last_active_at = new DateTime('now', new DateTimeZone($timezone));
             $modelDevices->last_active_at = $last_active_at->format("Y-m-d H:i:s P");
