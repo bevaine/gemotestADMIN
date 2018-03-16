@@ -78,7 +78,7 @@ class PlaylistController extends ActiveController
         ], 1, 'binary');
 
         Yii::getLogger()->log([
-            '$dt->getTimestamp()' => date("Y-m-d H:i:s P", $dt->getTimestamp())
+            '$dt->getTimestamp()' => date("Y-m-d H:i:s P", $dt->format('U'))
         ], 1, 'binary');
 
         $date_db = $dt->format("Y-m-d H:i:s P");
