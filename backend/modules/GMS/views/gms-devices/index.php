@@ -45,12 +45,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $img_name = 'icon-time3.jpg';
                                 if (!empty($value)) {
                                     $dt1 = new DateTime('now');
-                                    $dt2 = $dt3 = new DateTime($value);
+                                    $dt2 = $dt3 = $dt4 = new DateTime($value);
                                     $dt2->add(new DateInterval('P1D')); // +1 день
                                     $dt3->add(new DateInterval('P2D')); // +2 дня
-                                    if ($dt2 <= $dt1) {
+                                    $dt4->add(new DateInterval('P3D')); // +3 дня
+                                    if ($dt2 >= $dt1) {
                                         $img_name = 'icon-time1.jpg';
-                                    } elseif ($dt3 <= $dt1) {
+                                    } elseif ($dt2 >= $dt1) {
                                         $img_name = 'icon-time2.jpg';
                                     }
                                 }
