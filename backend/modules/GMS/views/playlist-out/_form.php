@@ -10,6 +10,7 @@ use kartik\form\ActiveForm;
 use yii\web\JsExpression;
 use wbraganca\fancytree\FancytreeWidget;
 use mihaildev\ckeditor\Assets;
+date_default_timezone_set("Europe/Moscow");
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylistOut */
