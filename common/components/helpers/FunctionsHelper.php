@@ -81,6 +81,13 @@ class FunctionsHelper
         $dateTimeZoneTo = date_create('now', timezone_open($ZoneTo));
         $dateTimeZoneFrom = date_create('now', timezone_open($ZoneFrom));
 
+        Yii::getLogger()->log([
+            '$dateTimeZoneTo' => $dateTimeZoneTo
+        ], 1, 'binary');
+        Yii::getLogger()->log([
+            '$dateTimeZoneFrom' => $dateTimeZoneFrom
+        ], 1, 'binary');
+
         $difference = date_offset_get($dateTimeZoneFrom) - date_offset_get($dateTimeZoneTo);
         return $time - $difference;
     }
