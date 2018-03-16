@@ -78,24 +78,11 @@ class FunctionsHelper
      */
     static function getTimestampForTimeZone($time, $ZoneTo, $ZoneFrom = 'Europe/Moscow')
     {
-        Yii::getLogger()->log([
-
-            '$time' => date("Y-m-d H:i:s P", $time)
-        ], 1, 'binary');
-
         $dateTimeZoneTo = date_create('now', timezone_open($ZoneTo));
         $dateTimeZoneFrom = date_create('now', timezone_open($ZoneFrom));
         $difference = date_offset_get($dateTimeZoneFrom) - date_offset_get($dateTimeZoneTo);
-        $ret = $time - $difference;
-        Yii::getLogger()->log([
-            '$dateTimeZoneTo' => $dateTimeZoneTo ,
-            '$dateTimeZoneFrom' => $dateTimeZoneFrom,
-            '$difference' => $difference,
-            '$return' => date("Y-m-d H:i:s", $ret),
-            '$time' => date("Y-m-d H:i:s", $time)
-        ], 1, 'binary');
 
-        return $ret;
+        return $time - $difference;
     }
 
     /**

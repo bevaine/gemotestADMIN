@@ -69,20 +69,12 @@ class PlaylistController extends ActiveController
 
         $response = [];
         $out['state'] = 0;
-        $dev = Yii::$app->request->post()['dev'];
         $timezone = "Europe/Moscow";
         date_default_timezone_set($timezone);
+        $dev = Yii::$app->request->post()['dev'];
         $dt = new DateTime('now', new DateTimeZone($timezone));
-
-        Yii::getLogger()->log([
-            '$dt' => $dt
-        ], 1, 'binary');
-
-        Yii::getLogger()->log([
-            '$dt->getTimestamp()' => date("Y-m-d H:i:s P", $dt->format('U'))
-        ], 1, 'binary');
-
         $date_db = $dt->format("Y-m-d H:i:s P");
+
         if (!$modelDevices = GmsDevices::findOne(['device' => $dev])) {
             $modelDevices = new GmsDevices();
             $modelDevices->scenario = 'addDevice';
@@ -91,14 +83,10 @@ class PlaylistController extends ActiveController
             $modelDevices->created_at = $date_db;
             $modelDevices->last_active_at = $date_db;
         } else {
-
             $modelDevices->scenario = 'editDevice';
             if (!empty($modelDevices->timezone)) {
                 $timezone = $modelDevices->timezone;
             }
-            Yii::getLogger()->log([
-                'timezone' => $dt->getTimezone()
-            ], 1, 'binary');
             $this->timeForTimeZone = FunctionsHelper::getTimestampForTimeZone($dt->getTimestamp(), $timezone);
             $last_active_at = new DateTime('now', new DateTimeZone($timezone));
             $modelDevices->last_active_at = $last_active_at->format("Y-m-d H:i:s P");
