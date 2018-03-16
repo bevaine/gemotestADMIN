@@ -67,4 +67,13 @@ class GmsHistory extends \yii\db\ActiveRecord
     {
         return $this->hasOne(GmsPlaylistOut::className(), ['id' => 'pls_id']);
     }
+
+    /**
+     * @param null $id
+     * @return array|mixed
+     */
+    public static function getStatusTypeArray($id = null) {
+        $arr =  ['0' => 'Ошибка', '1' => 'Не изменился', '2' => 'Изменился'];
+        return is_null($id) ? $arr : $arr[$id];
+    }
 }

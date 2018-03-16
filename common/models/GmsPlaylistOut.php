@@ -173,7 +173,6 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         return $this->hasOne(GmsDevices::className(), ['id' => 'device_id']);
     }
 
-
     /**
      * @param null $auth
      * @return array|mixed
@@ -250,7 +249,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             }
 
             foreach ($findModel as $model) {
-                Yii::getLogger()->log(['$model' => $model], Logger::LEVEL_ERROR, 'binary');
+
                 /** @var $model GmsPlaylistOut */
                 $dateCross = ($this->date_start <= $model->date_end  && $this->date_end >= $model->date_start);
 

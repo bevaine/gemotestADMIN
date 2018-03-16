@@ -8,14 +8,11 @@ use common\models\GmsPlaylistOut;
 use yii\web\ForbiddenHttpException;
 use yii\rest\ActiveController;
 use yii\filters\VerbFilter;
-use api\helpers\ResponseObject;
 use yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-use yii\data\ActiveDataProvider;
 use DateTime;
 use DateTimeZone;
-use yii\log\Logger;
 
 /**
  * @property GmsDevices $modelDevice
@@ -144,12 +141,6 @@ class PlaylistController extends ActiveController
         $currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
         $currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
 
-        Yii::getLogger()->log([
-            '$this->timeForTimeZone' => date("Y-m-d H:i:s P", $this->timeForTimeZone),
-            '$currentDate'=>date("Y-m-d H:i:s P", $currentDate),
-            '$currentTime'=>date("Y-m-d H:i:s P", $currentTime)
-        ], Logger::LEVEL_ERROR, 'binary');
-
         $findPlaylist = GmsPlaylistOut::find()
             ->andFilterWhere(['region_id' => $this->modelDevice->region_id])
             ->andFilterWhere(['sender_id' => $this->modelDevice->sender_id])
@@ -189,5 +180,3 @@ class PlaylistController extends ActiveController
         }
     }
 }
-
-

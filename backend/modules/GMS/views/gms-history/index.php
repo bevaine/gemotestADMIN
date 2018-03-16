@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use common\models\GmsHistory;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsHistorySearch */
@@ -19,15 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            [
-                'value' => function ($model) {
-                    /** @var $model \common\models\GmsHistory */
-                    return !empty($model->playlistOutModel) ? $model->playlistOutModel->name.", ID:".$model->playlistOutModel->id : null;
-
-                },
-                'attribute' => 'pls_name'
-            ],
-            'device_id',
             [
                 'headerOptions' => array('style' => 'width: 196px; text-align: center;'),
                 'attribute' => 'created_at',
@@ -57,8 +49,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                 'format' => 'html', // datetime
             ],
-            'created_at',
-            'status',
+            [
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsHistory */
+                    return !empty($model->playlistOutModel) ? $model->playlistOutModel->name.", ID:".$model->playlistOutModel->id : null;
+
+                },
+                'attribute' => 'pls_name'
+            ],
+            'device_id',
+
+            [
+                'attribute' => 'status',
+                'filter' => GmsHistory::getStatusTypeArray(),
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsHistory */
+                    return  !empty($model->status) ? GmsHistory::getStatusTypeArray($model->status) : null;
+                }
+            ],
 
             [
                 'class' => 'yii\grid\ActionColumn',
