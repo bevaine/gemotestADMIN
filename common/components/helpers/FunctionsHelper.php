@@ -79,7 +79,8 @@ class FunctionsHelper
     static function getTimestampForTimeZone($time, $ZoneTo, $ZoneFrom = 'Europe/Moscow')
     {
         Yii::getLogger()->log([
-            '$time' => $time
+
+            '$time' => date("Y-m-d H:i:s P", $time)
         ], 1, 'binary');
 
         $dateTimeZoneTo = date_create('now', timezone_open($ZoneTo));
