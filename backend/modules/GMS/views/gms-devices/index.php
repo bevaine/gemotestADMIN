@@ -40,20 +40,23 @@ $this->params['breadcrumbs'][] = $this->title;
                             },
                             'format' => 'raw',
                             'value' => function ($model) {
-                                /** @var \common\models\LoginsSearch $model */
+                                /** @var \common\models\GmsDevicesSearch $model */
                                 $value = $model['last_active_at'];
                                 $img_name = 'icon-time3.jpg';
                                 if (!empty($value)) {
-                                    $dt1 = new DateTime('now');
-                                    $dt2 = $dt3 = $dt4 = new DateTime($value);
-                                    $dt2->add(new DateInterval('P1D')); // +1 день
-                                    $dt3->add(new DateInterval('P2D')); // +2 дня
-                                    $dt4->add(new DateInterval('P3D')); // +3 дня
-                                    if ($dt2 >= $dt1) {
-                                        $img_name = 'icon-time1.jpg';
-                                    } elseif ($dt2 >= $dt1) {
-                                        $img_name = 'icon-time2.jpg';
-                                    }
+                                    try {
+                                        $dt2 = new DateTime($value);
+                                        $dt3 = new DateTime($value);
+                                        $tz = $dt2->getTimezone();
+                                        $dt1 = new DateTime('now', new DateTimeZone($tz->getName()));
+                                        $dt2->add(new DateInterval('P1D')); // +1 день
+                                        $dt3->add(new DateInterval('P2D')); // +2 дня
+                                        if ($dt2 >= $dt1) {
+                                            $img_name = 'icon-time1.jpg';
+                                        } elseif ($dt3 >= $dt1) {
+                                            $img_name = 'icon-time2.jpg';
+                                        }
+                                    } catch (Exception $e) {}
                                 }
                                 return Html::img('/img/'.$img_name, [
                                     "alt" => 'Последняя активность была '.$value,
