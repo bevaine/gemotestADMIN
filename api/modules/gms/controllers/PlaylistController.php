@@ -73,7 +73,7 @@ class PlaylistController extends ActiveController
         $timezone = "Europe/Moscow";
         $dt = new DateTime('now', new DateTimeZone($timezone));
         Yii::getLogger()->log([
-            '$dt' => date("Y-m-d H:i:s P", $dt)
+            '$dt' => date("Y-m-d H:i:s P", $dt->getTimestamp())
         ], 1, 'binary');
         $date_db = $dt->format("Y-m-d H:i:s P");
 
