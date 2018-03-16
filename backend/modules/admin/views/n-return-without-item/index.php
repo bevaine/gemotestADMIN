@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\helpers\Url;
+use common\models\NReturnWithoutItem;
+use common\models\NPay;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\NReturnWithoutItemSearch */
@@ -88,7 +90,7 @@ $this->params['breadcrumbs'][] = [
                 'width'=>'150px',
                 'filter' => \common\models\NPay::getPayTypeArray(),
                 'value' => function ($model) {
-                    return  \common\models\NPay::getPayTypeArray($model['pay_type']);
+                    return  !empty($model['pay_type']) ? NPay::getPayTypeArray($model['pay_type']) : null;
                 }
             ],
             'kkm',
@@ -99,7 +101,7 @@ $this->params['breadcrumbs'][] = [
                 'width'=>'150px',
                 'filter' => \common\models\NReturnWithoutItem::getBaseArray(),
                 'value' => function ($model) {
-                    return  \common\models\NReturnWithoutItem::getBaseArray($model['base']);
+                    return !empty($model['base']) ? NReturnWithoutItem::getBaseArray($model['base']) : null;
                 }
             ],
             'agreement_status',

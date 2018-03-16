@@ -301,6 +301,10 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         return false;
     }
 
+    /**
+     * @param $datetime
+     * @return false|int
+     */
     public static function getDateWithoutTime($datetime) {
         return mktime(
             0,
@@ -312,11 +316,15 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         );
     }
 
+    /**
+     * @param $datetime
+     * @return false|int
+     */
     public static function getTimeDate($datetime) {
         return mktime(
             date("H", $datetime),
             date("i", $datetime),
-            date("s", $datetime),
+            date("s", 0),
             date("m", 0),
             date("d", 0),
             date("Y", 0)
@@ -335,7 +343,6 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             $arrKeys = ArrayHelper::getColumn($jsonPlaylist->children, 'key');
             if ($findVideos = GmsVideos::find()->where(['in', 'id' , $arrKeys])->all()) {
                 $findVideos = ArrayHelper::getColumn($findVideos, 'file');
-                //$findVideos = array_map(function ($val) { return Yii::$app->urlManager->createAbsoluteUrl($val); }, $findVideos);
                 return $findVideos;
             }
         }
