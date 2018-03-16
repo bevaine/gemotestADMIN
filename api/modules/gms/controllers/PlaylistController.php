@@ -145,11 +145,11 @@ class PlaylistController extends ActiveController
         $currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
         $currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
 
-//        Yii::getLogger()->log([
-//            '$this->timeForTimeZone' => date("Y-m-d H:i:s", $this->timeForTimeZone),
-//            '$currentDate'=>date("Y-m-d H:i:s", $currentDate),
-//            '$currentTime'=>date("Y-m-d H:i:s", $currentTime)
-//        ], Logger::LEVEL_ERROR, 'binary');
+        Yii::getLogger()->log([
+            '$this->timeForTimeZone' => date("Y-m-d H:i:s P", $this->timeForTimeZone),
+            '$currentDate'=>date("Y-m-d H:i:s P", $currentDate),
+            '$currentTime'=>date("Y-m-d H:i:s P", $currentTime)
+        ], Logger::LEVEL_ERROR, 'binary');
 
         $findPlaylist = GmsPlaylistOut::find()
             ->andFilterWhere(['region_id' => $this->modelDevice->region_id])
