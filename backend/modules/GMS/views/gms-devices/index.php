@@ -44,13 +44,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $value = $model['last_active_at'];
                                 $img_name = 'icon-time3.jpg';
                                 if (!empty($value)) {
-                                    $dt1 = new DateTime($value);
-                                    $dt2 = $dt3 = new DateTime('now');
+                                    $dt1 = new DateTime('now');
+                                    $dt2 = $dt3 = new DateTime($value);
                                     $dt2->add(new DateInterval('P1D')); // +1 день
                                     $dt3->add(new DateInterval('P2D')); // +2 дня
-                                    if ($dt1 <= $dt2) {
+                                    if ($dt2 <= $dt1) {
                                         $img_name = 'icon-time1.jpg';
-                                    } elseif ($dt1 <= $dt3) {
+                                    } elseif ($dt3 <= $dt1) {
                                         $img_name = 'icon-time2.jpg';
                                     }
                                 }
