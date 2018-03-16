@@ -80,6 +80,8 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
      */
     public function rules()
     {
+        $timezone = "Europe/Moscow";
+        date_default_timezone_set($timezone);
         return [
             [['region_id', 'jsonPlaylist', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
             [['active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],

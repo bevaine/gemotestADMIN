@@ -7,6 +7,8 @@ use wbraganca\fancytree\FancytreeWidget;
 use yii\web\JsExpression;
 use yii\widgets\ActiveForm;
 
+date_default_timezone_set("Europe/Moscow");
+
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylistOut */
 
