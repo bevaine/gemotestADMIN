@@ -2,6 +2,7 @@
 
 namespace api\modules\gms\controllers;
 
+use common\components\helpers\FunctionsHelper;
 use common\models\GmsDevices;
 use common\models\GmsPlaylistOut;
 use yii\web\ForbiddenHttpException;
@@ -12,9 +13,12 @@ use yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use yii\data\ActiveDataProvider;
+use DateTime;
+use DateTimeZone;
 
 /**
  * @property GmsDevices $modelDevice
+ * @property integer $timeForTimeZone
  * Country Controller API
  *
  * @author Budi Irawan <deerawan@gmail.com>
@@ -22,6 +26,7 @@ use yii\data\ActiveDataProvider;
 class PlaylistController extends ActiveController
 {
     public $modelDevice;
+    public $timeForTimeZone;
 
     /**
      * @var string
@@ -57,28 +62,31 @@ class PlaylistController extends ActiveController
      */
     public function actionView()
     {
-        if (empty(Yii::$app->request->post()['dev']) || empty(Yii::$app->request->post()['time'])) {
+        if (empty(Yii::$app->request->post()['dev'])) {
             throw new ForbiddenHttpException('The requested page does not exist.');
         }
 
-        $post = Yii::$app->request->post();
-        $dev = $post['dev'];
-        $time = $post['time'];
-
-        $out['state'] = 0;
         $response = [];
+        $out['state'] = 0;
+        $dev = Yii::$app->request->post()['dev'];
 
         if (!$modelDevices = GmsDevices::findOne(['device' => $dev])) {
             $modelDevices = new GmsDevices();
             $modelDevices->scenario = 'addDevice';
             $modelDevices->device = $dev;
             $modelDevices->auth_status = 0;
-            $modelDevices->created_at = time();
+            $modelDevices->created_at = date("Y-m-d H:i:s P");
+            $modelDevices->last_active_at = date("Y-m-d H:i:s P");
         } else {
+            $timezone = "Europe/Moscow";
             $modelDevices->scenario = 'editDevice';
+            if (!empty($modelDevices->timezone)) {
+                $timezone = $modelDevices->timezone;
+            }
+            $this->timeForTimeZone = FunctionsHelper::getTimestampForTimeZone(time(), $timezone);
+            $last_active_at = new DateTime('now', new DateTimeZone($timezone));
+            $modelDevices->last_active_at = $last_active_at->format("Y-m-d H:i:s P");
         }
-
-        $modelDevices->last_active_at = time();
 
         //todo проверка на авторизацию устройства
         if (!empty($modelDevices->auth_status)) {
@@ -130,8 +138,8 @@ class PlaylistController extends ActiveController
      */
     private function getPlaylist($day = false)
     {
-        $currentDate = GmsPlaylistOut::getDateWithoutTime(time());
-        $currentTime = GmsPlaylistOut::getTimeDate(time());
+        $currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
+        $currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
 
         $findPlaylist = GmsPlaylistOut::find()
             ->andFilterWhere(['region_id' => $this->modelDevice->region_id])

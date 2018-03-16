@@ -34,6 +34,10 @@ use common\models\GmsPlaylistOut;
         <?= $form->field($model, 'current_pls_id')->dropDownList(GmsPlaylistOut::getPlayListArray(), ['prompt' => '---']); ?>
     </div>
 
+    <div class="form-group timezone">
+        <?= $form->field($model, 'timezone')->dropDownList(\common\components\helpers\FunctionsHelper::getTimeZonesList(), ['prompt' => '---']); ?>
+    </div>
+
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>

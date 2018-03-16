@@ -11,6 +11,7 @@ use Yii;
  * @property string $sender_id
  * @property string $host_name
  * @property string $device
+ * @property string $timezone
  * @property integer $created_at
  * @property integer $last_active_at
  * @property integer $region_id
@@ -33,7 +34,7 @@ class GmsDevices extends \yii\db\ActiveRecord
     {
         return [
             self::SCENARIO_ADD_DEVICE => ['device', 'created_at', 'last_active_at', 'auth_status'],
-            self::SCENARIO_EDIT_DEVICE => ['device', 'created_at', 'last_active_at', 'auth_status', 'sender_id', 'region_id', 'current_pls_id'],
+            self::SCENARIO_EDIT_DEVICE => ['device', 'created_at', 'last_active_at', 'auth_status', 'sender_id', 'region_id', 'current_pls_id', 'timezone'],
         ];
     }
 
@@ -52,9 +53,9 @@ class GmsDevices extends \yii\db\ActiveRecord
     {
         return [
             [['device'], 'required', 'on' => 'addDevice'],
-            [['region_id', 'device'], 'required', 'on' => 'editDevice'],
+            [['region_id', 'device', 'timezone'], 'required', 'on' => 'editDevice'],
             [['created_at', 'sender_id', 'last_active_at', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
-            [['host_name', 'device'], 'string', 'max' => 255],
+            [['host_name', 'device', 'timezone'], 'string', 'max' => 255],
             ['auth_status', 'default', 'value' => 0],
         ];
     }
@@ -76,6 +77,7 @@ class GmsDevices extends \yii\db\ActiveRecord
             'current_pls_id' => 'Плейлист',
             'sender_name' => 'Отделение',
             'current_pls_name' => 'Плейлист',
+            'timezone' => 'Временная зона'
         ];
     }
 

@@ -11,9 +11,80 @@ namespace common\components\helpers;
 use FFMpeg\FFProbe;
 use Yii;
 use yii\log\Logger;
+use DateTimeZone;
+use DateTime;
 
 class FunctionsHelper
 {
+    static $timezone = [
+        '2' => 'Europe/Kaliningrad',
+        '3' => 'Europe/Moscow',
+        '4' => 'Europe/Samara',
+        '5' => 'Asia/Yekaterinburg',
+        '6' => 'Asia/Novosibirsk',
+        '7' => 'Asia/Novokuznetsk',
+        '8' => 'Asia/Irkutsk',
+        '9' => 'Asia/Yakutsk',
+        '10' => 'Asia/Magadan',
+        '11' => 'Asia/Sakhalin',
+        '12' => 'Asia/Kamchatka',
+    ];
+
+    static $timezones = [
+        'Europe/Kaliningrad',
+        'Europe/Moscow',
+        'Europe/Samara',
+        'Asia/Yekaterinburg',
+        'Asia/Novosibirsk',
+        'Asia/Novokuznetsk',
+        'Asia/Irkutsk',
+        'Asia/Yakutsk',
+        'Asia/Magadan',
+        'Asia/Sakhalin',
+        'Asia/Kamchatka',
+    ];
+
+    /**
+     * @return array
+     */
+    static function getTimeZonesList() {
+        $arr_out = [];
+        foreach (self::$timezones as $timezone) {
+            $MNTTZ = new DateTimeZone($timezone);
+            $dt = new DateTime(null, $MNTTZ);
+            $arr_out[$timezone] = $timezone." ".$dt->format('P');
+        }
+        return $arr_out;
+    }
+
+    /**
+     * @return array
+     */
+    static function getHourZonesList() {
+        $arr_out = [];
+        foreach (self::$timezones as $timezone) {
+            $MNTTZ = new DateTimeZone($timezone);
+            $dt = new DateTime(null, $MNTTZ);
+            $arr_out[$timezone] = $dt->format('P');
+        }
+        return $arr_out;
+    }
+
+    /**
+     * @param $time
+     * @param $ZoneTo
+     * @param string $ZoneFrom
+     * @return mixed
+     */
+    static function getTimestampForTimeZone($time, $ZoneTo, $ZoneFrom = 'Europe/Moscow')
+    {
+        $dateTimeZoneTo = date_create('now', timezone_open($ZoneTo));
+        $dateTimeZoneFrom = date_create('now', timezone_open($ZoneFrom));
+
+        $difference = date_offset_get($dateTimeZoneFrom) - date_offset_get($dateTimeZoneTo);
+        return $time - $difference;
+    }
+
     /**
      * @param $url
      * @return string
