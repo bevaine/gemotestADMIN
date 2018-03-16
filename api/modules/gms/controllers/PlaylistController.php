@@ -72,16 +72,16 @@ class PlaylistController extends ActiveController
         $dev = Yii::$app->request->post()['dev'];
         $timezone = "Europe/Moscow";
         $dt = new DateTime('now', new DateTimeZone($timezone));
+
         Yii::getLogger()->log([
-            '$dt' => date("Y-m-d H:i:s P", $dt->getTimestamp())
+            '$dt' => $dt
         ], 1, 'binary');
+
+        Yii::getLogger()->log([
+            '$dt->getTimestamp()' => date("Y-m-d H:i:s P", $dt->getTimestamp())
+        ], 1, 'binary');
+
         $date_db = $dt->format("Y-m-d H:i:s P");
-
-        Yii::getLogger()->log([
-            '$dt->getTimestamp()' => $dt->getTimestamp()
-        ], 1, 'binary');
-
-
         if (!$modelDevices = GmsDevices::findOne(['device' => $dev])) {
             $modelDevices = new GmsDevices();
             $modelDevices->scenario = 'addDevice';
