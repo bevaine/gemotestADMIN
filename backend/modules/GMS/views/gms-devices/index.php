@@ -44,15 +44,19 @@ $this->params['breadcrumbs'][] = $this->title;
                                 $value = $model['last_active_at'];
                                 $img_name = 'icon-time3.jpg';
                                 if (!empty($value)) {
-                                    if ($value <= strtotime("+1 day")) {
+                                    $dt1 = new DateTime($value);
+                                    $dt2 = $dt3 = new DateTime('now');
+                                    $dt2->add(new DateInterval('P1D')); // +1 день
+                                    $dt3->add(new DateInterval('P2D')); // +2 дня
+                                    if ($dt1 <= $dt2) {
                                         $img_name = 'icon-time1.jpg';
-                                    } elseif ($value <= strtotime("+2 day")) {
+                                    } elseif ($dt1 <= $dt3) {
                                         $img_name = 'icon-time2.jpg';
                                     }
                                 }
                                 return Html::img('/img/'.$img_name, [
-                                    "alt" => 'Последняя активность была '.date("d-m-Y H:i:s", $value),
-                                    "title" => 'Последняя активность была '.date("d-m-Y H:i:s", $value)
+                                    "alt" => 'Последняя активность была '.$value,
+                                    "title" => 'Последняя активность была '.$value
                                 ]);
                             }
                         ],
@@ -65,7 +69,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'created_at',
                             'value' => function ($model) {
                                 /** @var $model \common\models\GmsDevices */
-                                return !empty($model->created_at) ? date("d-m-Y H:i:s", $model->created_at) : null;
+                                return !empty($model->created_at) ? $model->created_at : null;
                             },
                             'filter' => \kartik\date\DatePicker::widget([
                                 'model' => $searchModel,
