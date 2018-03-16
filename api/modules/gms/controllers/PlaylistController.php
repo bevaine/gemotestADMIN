@@ -15,6 +15,7 @@ use yii\helpers\Json;
 use yii\data\ActiveDataProvider;
 use DateTime;
 use DateTimeZone;
+use yii\log\Logger;
 
 /**
  * @property GmsDevices $modelDevice
@@ -143,6 +144,9 @@ class PlaylistController extends ActiveController
     {
         $currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
         $currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
+
+        Yii::getLogger()->log(['$currentDate'=>date("Y-m-d H:i:s", $currentDate)], Logger::LEVEL_ERROR, 'binary');
+        Yii::getLogger()->log(['$currentTime'=>date("Y-m-d H:i:s", $currentTime)], Logger::LEVEL_ERROR, 'binary');
 
         $findPlaylist = GmsPlaylistOut::find()
             ->andFilterWhere(['region_id' => $this->modelDevice->region_id])
