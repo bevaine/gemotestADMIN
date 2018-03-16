@@ -7,6 +7,7 @@ $params = array_merge(
 );
 
 return [
+    'timeZone' => 'Europe/Moscow',
     'id' => 'app-api',
     'basePath' => dirname(__DIR__),    
     'bootstrap' => ['log'],

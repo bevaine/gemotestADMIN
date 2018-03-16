@@ -1,5 +1,6 @@
 <?php
 return [
+    'timeZone' => 'Europe/Moscow',
     'language' => 'ru',
     'name' => 'GemoFix:Админка',
     'vendorPath' => dirname(dirname(__DIR__)) . '/vendor',
