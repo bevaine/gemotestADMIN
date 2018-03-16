@@ -121,7 +121,7 @@ class NPay extends \yii\db\ActiveRecord
      * @return array|mixed
      */
     public static function getPayTypeArray($id = null) {
-        $arr =  ['0' => 'Наличные', '1' => 'Кред. карта'];
+        $arr =  ['0' => 'Наличные', '1' => 'Кред. карта', '2' => 'Безналичный'];
         return is_null($id) ? $arr : $arr[$id];
     }
 }
