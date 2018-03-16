@@ -12,8 +12,8 @@ use Yii;
  * @property string $host_name
  * @property string $device
  * @property string $timezone
- * @property integer $created_at
- * @property integer $last_active_at
+ * @property string $created_at
+ * @property string $last_active_at
  * @property integer $region_id
  * @property integer $auth_status
  * @property integer $current_pls_id
@@ -54,8 +54,8 @@ class GmsDevices extends \yii\db\ActiveRecord
         return [
             [['device'], 'required', 'on' => 'addDevice'],
             [['region_id', 'device', 'timezone'], 'required', 'on' => 'editDevice'],
-            [['created_at', 'sender_id', 'last_active_at', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
-            [['host_name', 'device', 'timezone'], 'string', 'max' => 255],
+            [['sender_id', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
+            [['host_name', 'created_at', 'last_active_at', 'device', 'timezone'], 'string', 'max' => 255],
             ['auth_status', 'default', 'value' => 0],
         ];
     }

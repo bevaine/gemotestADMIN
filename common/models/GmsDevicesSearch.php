@@ -31,8 +31,8 @@ class GmsDevicesSearch extends GmsDevices
     public function rules()
     {
         return [
-            [['id', 'created_at',  'created_at_from', 'created_at_to', 'last_active_at', 'last_active_at_from', 'last_active_at_to', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
-            [['sender_name', 'current_pls_name', 'sender_id', 'host_name', 'device', 'timezone'], 'safe'],
+            [['id', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
+            [['sender_name', 'created_at', 'created_at_from', 'created_at_to', 'last_active_at', 'last_active_at_from', 'last_active_at_to', 'current_pls_name', 'sender_id', 'host_name', 'device', 'timezone'], 'safe'],
         ];
     }
 
