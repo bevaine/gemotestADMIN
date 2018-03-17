@@ -65,6 +65,7 @@ class HistoryController extends ActiveController
             Yii::getLogger()->log($findModel, Logger::LEVEL_ERROR, 'binary');
 
             if ($findModel && $findModel->video_key == $model->video_key) {
+                $findModel->created_at = $findModel->oldAttributes['created_at'];
                 $findModel->last_at = $model->created_at;
                 if ($findModel->load(Yii::$app->request->post()) && $findModel->save()) {
                     return json_encode(['state' => 1]);
