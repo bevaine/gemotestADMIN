@@ -40,7 +40,7 @@ class HistoryController extends ActiveController
         $model = new GmsHistory();
 
         //todo если плейлист не изменился или нет подходящего плейлиста то историю не сохраняем
-        if ($model->save() && $model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return json_encode(['state' => 1]);
         } else {
             Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
@@ -52,8 +52,7 @@ class HistoryController extends ActiveController
     {
         $model = new GmsVideoHistory();
 
-        if ($model->save() && $model->load(Yii::$app->request->post())) {
-            Yii::getLogger()->log(Yii::$app->request->post(), Logger::LEVEL_ERROR, 'binary');
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return json_encode(['state' => 1]);
         } else {
             Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
