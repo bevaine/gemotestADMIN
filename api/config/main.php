@@ -50,6 +50,7 @@ return [
                 'POST /gms/playlist' => 'gms/playlist/view',
                 //'GET /gms/playlist' => 'gms/playlist/view',
                 'POST /gms/history' => 'gms/history/ajax-history-post',
+                'POST /gms/video-history' => 'gms/history/ajax-video-history-post',
             ],
         ]
     ],

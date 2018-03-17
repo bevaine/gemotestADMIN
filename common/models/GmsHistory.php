@@ -31,8 +31,8 @@ class GmsHistory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pls_id', 'created_at', 'status'], 'integer'],
-            [['device_id', 'log_text'], 'string'],
+            [['pls_id', 'status'], 'integer'],
+            [['device_id', 'log_text', 'created_at'], 'string'],
         ];
     }
 
@@ -53,9 +53,9 @@ class GmsHistory extends \yii\db\ActiveRecord
             'id' => 'ID',
             'pls_id' => 'Плейлист',
             'device_id' => 'Устройство',
-            'created_at' => 'Создан',
+            'created_at' => 'Дата события',
             'status' => 'Статус',
-            'log_text' => 'Log',
+            'log_text' => 'События',
             'pls_name' => 'Плейлист'
         ];
     }
