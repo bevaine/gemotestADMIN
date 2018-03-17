@@ -19,7 +19,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
     {
         return [
             [['id', 'pls_id', 'video_key'], 'integer'],
-            [['device_id', 'created_at'], 'safe'],
+            [['device_id', 'created_at', 'last_at'], 'safe'],
         ];
     }
 

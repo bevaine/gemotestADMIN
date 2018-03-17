@@ -11,6 +11,7 @@ use Yii;
  * @property integer $pls_id
  * @property string $device_id
  * @property string $created_at
+ * @property string $last_at
  * @property integer $video_key
  */
 class GmsVideoHistory extends \yii\db\ActiveRecord
@@ -30,7 +31,7 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
     {
         return [
             [['pls_id', 'video_key'], 'integer'],
-            [['device_id', 'created_at'], 'string', 'max' => 255],
+            [['device_id', 'created_at', 'last_at'], 'string', 'max' => 255],
         ];
     }
 
@@ -44,6 +45,7 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
             'pls_id' => 'Pls ID',
             'device_id' => 'Device ID',
             'created_at' => 'Created At',
+            'last_at' => 'Created At',
             'video_key' => 'Video Key',
         ];
     }

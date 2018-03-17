@@ -52,6 +52,16 @@ class HistoryController extends ActiveController
     {
         $model = new GmsVideoHistory();
 
+        if ($model->load(Yii::$app->request->post())) {
+            $findModel = GmsVideoHistory::find()
+                ->where([
+                    'device_id' => $model->device_id,
+                    'pls_id' => $model->pls_id,
+                    'video_key' => $model->video_key
+                ])->orderBy(['created_at' => 'desc'])
+                ->offset(1)->one();
+            Yii::getLogger()->log($findModel, Logger::LEVEL_ERROR, 'binary');
+        }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return json_encode(['state' => 1]);
         } else {

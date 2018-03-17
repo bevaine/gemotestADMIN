@@ -27,6 +27,7 @@ class m180317_184238_new_table_gms_video_history extends Migration
             'pls_id' => Schema::TYPE_INTEGER,
             'device_id' => Schema::TYPE_STRING,
             'created_at' => Schema::TYPE_STRING,
+            'last_at' => Schema::TYPE_STRING,
             'video_key' => Schema::TYPE_INTEGER,
         ], $tableOptions);
     }
