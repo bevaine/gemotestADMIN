@@ -40,10 +40,6 @@ class HistoryController extends ActiveController
         $model->load(Yii::$app->request->post());
 
         //todo если плейлист не изменился или нет подходящего плейлиста то историю не сохраняем
-        if (in_array($model->status, [1,3])){
-            return json_encode(['state' => 0]);
-        }
-
         if ($model->save()) {
             return json_encode(['state' => 1]);
         } else {

@@ -73,7 +73,7 @@ class GmsHistory extends \yii\db\ActiveRecord
      * @return array|mixed
      */
     public static function getStatusTypeArray($id = null) {
-        $arr =  ['0' => 'Ошибка', '1' => 'Не изменился', '2' => 'Изменился'];
+        $arr =  ['0' => 'Ошибка', '1' => 'Не изменился', '2' => 'Изменился', '3' => 'Нет подход. плейлистов'];
         return is_null($id) ? $arr : $arr[$id];
     }
 }
