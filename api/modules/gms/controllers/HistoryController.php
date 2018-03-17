@@ -59,7 +59,7 @@ class HistoryController extends ActiveController
                     'pls_id' => $model->pls_id,
                     'video_key' => $model->video_key
                 ])->orderBy(['created_at' => 'desc'])
-                ->offset(1)->one();
+                ->limit(1)->one();
             Yii::getLogger()->log($findModel, Logger::LEVEL_ERROR, 'binary');
         }
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
