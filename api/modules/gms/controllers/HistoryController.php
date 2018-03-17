@@ -53,20 +53,31 @@ class HistoryController extends ActiveController
         $model = new GmsVideoHistory();
 
         if ($model->load(Yii::$app->request->post())) {
+
+            /** @var GmsVideoHistory $findModel */
             $findModel = GmsVideoHistory::find()
                 ->where([
                     'device_id' => $model->device_id,
                     'pls_id' => $model->pls_id,
-                    'video_key' => $model->video_key
-                ])->orderBy(['created_at' => 'desc'])
-                ->limit(1)->one();
-            Yii::getLogger()->log($findModel, Logger::LEVEL_ERROR, 'binary');
-        }
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return json_encode(['state' => 1]);
-        } else {
-            Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
-            return json_encode(['state' => 0]);
-        }
+                    //'video_key' => $model->video_key
+                ])->limit(1)->orderBy(['created_at' => SORT_DESC])->one();
+
+            if ($findModel->video_key == $model->video_key) {
+                $findModel->last_at = $model->created_at;
+                if ($findModel->load(Yii::$app->request->post()) && $findModel->save()) {
+                    return json_encode(['state' => 1]);
+                } else {
+                    Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
+                    return json_encode(['state' => 0]);
+                }
+            } else {
+                if ($model->save()) {
+                    return json_encode(['state' => 1]);
+                } else {
+                    Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
+                    return json_encode(['state' => 0]);
+                }
+            }
+        } else return json_encode(['state' => 0]);
     }
 }
