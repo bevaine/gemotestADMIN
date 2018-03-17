@@ -53,6 +53,7 @@ class HistoryController extends ActiveController
         $model = new GmsVideoHistory();
 
         if ($model->save() && $model->load(Yii::$app->request->post())) {
+            print_r($model->load(Yii::$app->request->post()));
             return json_encode(['state' => 1]);
         } else {
             Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
