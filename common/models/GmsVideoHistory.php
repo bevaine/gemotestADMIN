@@ -42,11 +42,11 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'pls_id' => 'Pls ID',
-            'device_id' => 'Device ID',
-            'created_at' => 'Created At',
-            'last_at' => 'Created At',
-            'video_key' => 'Video Key',
+            'pls_id' => 'Плейлист',
+            'device_id' => 'Устройство',
+            'created_at' => 'Начало',
+            'last_at' => 'Окончание',
+            'video_key' => 'Видео',
         ];
     }
 }
