@@ -54,6 +54,7 @@ class HistoryController extends ActiveController
 
         if ($model->load(Yii::$app->request->post())) {
 
+            $model->last_at = $model->created_at;
             /** @var GmsVideoHistory $findModel */
             $findModel = GmsVideoHistory::find()
                 ->where([
