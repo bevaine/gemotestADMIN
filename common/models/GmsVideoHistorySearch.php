@@ -68,14 +68,19 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             ->andFilterWhere(['like', 'LOWER(t3.name)', strtolower($this->pls_name)]);
 
         $dataProvider = new SqlDataProvider([
-            'sql' => $query->createCommand()->getRawSql()
+            'sql' => $query->createCommand()->getRawSql(),
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_DESC
+                ]
+            ],
         ]);
 
         $sort = $dataProvider->getSort();
         $sort->attributes = array_merge($sort->attributes, [
             'id' => [
                 'asc' => ['vh_id' => SORT_ASC],
-                'desc' => ['vh_id' => SORT_DESC]
+                'desc' => ['vh_id' => SORT_DESC],
             ],
             'region_id' => [
                 'asc' => ['t1.region_name' => SORT_ASC],
@@ -106,6 +111,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
                 'desc' => ['t.last_at' => SORT_DESC]
             ],
         ]);
+
         $dataProvider->setSort($sort);
 
         return $dataProvider;
