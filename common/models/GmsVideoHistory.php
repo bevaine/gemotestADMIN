@@ -54,7 +54,8 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
             'video_key' => 'Видео',
             'sender_name' => 'Отделение',
             'pls_name' => 'Плейлист',
-            'region_id' => 'Регион'
+            'region_id' => 'Регион',
+            'date_at' => 'Период воспр.'
         ];
     }
 

@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use mihaildev\ckeditor\Assets;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsVideoHistorySearch */
@@ -56,7 +57,6 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'headerOptions' => array('style' => 'width: 30px; text-align: center;'),
                 'value' => function ($model) {
-                    /** @var $model \common\models\GmsVideoHistory */
                     return !empty($model["vh_id"]) ? $model["vh_id"] : null;
                 },
                 'attribute' => 'id'
@@ -65,7 +65,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'headerOptions' => array('style' => 'width: 200px;'),
                 'label' => 'Видео',
                 'value' => function($model) {
-                    /** @var \common\models\GmsVideoHistory $model */
                     if (empty($model['video_name'])
                         || empty($model['thumbnail'])
                         || empty($model['file'])) {
@@ -110,28 +109,88 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'filter' =>  \common\models\GmsRegions::getRegionList(),
                 'value' => function ($model) {
-                    /** @var $model \common\models\GmsDevices */
                     return !empty($model["region_name"]) ? $model["region_name"] : null;
                 },
                 'attribute' => 'region_id'
             ],
             [
                 'value' => function ($model) {
-                    /** @var $model \common\models\GmsVideoHistory */
                     return !empty($model["sender_name"]) ? $model["sender_name"] : null;
                 },
                 'attribute' => 'sender_name'
             ],
-            'device_id',
-            'created_at:datetime',
-            'last_at:datetime',
             [
-                'value' => function ($model) {
-                    /** @var $model \common\models\GmsVideoHistory */
-                    return !empty($model["pls_name"]) ? $model["pls_name"] : null;
-
+                'attribute' => 'device_id',
+                'width'=>'120px',
+                'value' => function($model) {
+                    return Html::a(
+                        $model['device_id'],
+                        Url::to(["/GMS/gms-devices/view?id=".$model['dev_id']]),
+                        [
+                            'title' => $model['device_id'],
+                            'target' => '_blank'
+                        ]
+                    );
                 },
-                'attribute' => 'pls_name'
+                'format' => 'raw',
+            ],
+            [
+                'width'=>'196px',
+                'attribute' => 'date_at',
+                'value' => function($model) {
+                    $html = '';
+                    if (!empty($model['created_at'])) {
+                        $html .= 'с '.$model['created_at'];
+                    } else {
+                        $html .= "с <span style='font: inherit'>не определено</span>";
+                    }
+                    $html .= "<br>";
+                    if (!empty($model['last_at'])) {
+                        $html .= 'по '.$model['last_at'];
+                    } else {
+                        $html .= "по <span style='font: inherit'>не определено</span>";
+                    }
+                    return $html;
+                },
+                'filter' => \kartik\date\DatePicker::widget([
+                    'model' => $searchModel,
+                    'attribute' => 'date_from',
+                    'attribute2' => 'date_to',
+                    'options' => [
+                        'placeholder' => 'от',
+                        'style'=>['width' => '98px']
+                    ],
+                    'options2' => [
+                        'placeholder' => 'до',
+                        'style'=>['width' => '98px']
+                    ],
+                    'separator' => 'По',
+                    'readonly' => false,
+                    'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                    'pluginOptions' => [
+                        'format' => 'yyyy-mm-dd',
+                        'autoclose' => true,
+                    ]
+                ]),
+                'format' => 'html', // datetime
+            ],
+            //'created_at:datetime',
+            //'last_at:datetime',
+            [
+                'attribute' => 'pls_name',
+                'width'=>'120px',
+                'value' => function($model) {
+                    /** @var \common\models\LoginsSearch $model */
+                    return Html::a(
+                        $model['pls_name'],
+                        Url::to(["/GMS/playlist-out/view?id=".$model['pls_id']]),
+                        [
+                            'title' => $model['pls_name'],
+                            'target' => '_blank'
+                        ]
+                    );
+                },
+                'format' => 'raw',
             ],
 
             ['class' => 'yii\grid\ActionColumn'],

@@ -22,12 +22,14 @@ class GmsVideoHistorySearch extends GmsVideoHistory
     public $region_id;
     public $sender_name;
     public $pls_name;
+    public $date_from;
+    public $date_to;
 
     public function rules()
     {
         return [
             [['id', 'pls_id', 'video_key', 'region_id'], 'integer'],
-            [['sender_name', 'pls_name', 'device_id', 'created_at', 'last_at'], 'safe'],
+            [['date_from', 'date_to', 'sender_name', 'pls_name', 'device_id', 'created_at', 'last_at'], 'safe'],
         ];
     }
 
@@ -54,7 +56,8 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             ->joinWith('senderModel t2')
             ->joinWith('playListOutModel t3')
             ->joinWith('videoModel t4')
-            ->select("t.*, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.name video_name, t4.thumbnail, t4.file");
+            ->joinWith('deviceModel t5')
+            ->select("t.*, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.name video_name, t4.thumbnail, t4.file, t5.id dev_id");
 
         // grid filtering conditions
         $query->andFilterWhere(['t.id' => $this->id]);
@@ -66,6 +69,17 @@ class GmsVideoHistorySearch extends GmsVideoHistory
         $query->andFilterWhere(['t1.id' => $this->region_id])
             ->andFilterWhere(['like', 't2.sender_name', $this->sender_name])
             ->andFilterWhere(['like', 'LOWER(t3.name)', strtolower($this->pls_name)]);
+
+        if ($this->date_from) {
+            $query->andFilterWhere(['>=', 't.created_at', date('Y-m-d 00:00:00 P', strtotime($this->date_from))]);
+            $query->andFilterWhere(['>=', 't.last_at', date('Y-m-d 00:00:00 P', strtotime($this->date_from))]);
+
+        }
+
+        if ($this->date_to) {
+            $query->andFilterWhere(['<=', 't.created_at', date('Y-m-d 23:59:59 P', strtotime($this->date_to))]);
+            $query->andFilterWhere(['<=', 't.last_at', date('Y-m-d 23:59:59 P', strtotime($this->date_to))]);
+        }
 
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),
@@ -102,13 +116,9 @@ class GmsVideoHistorySearch extends GmsVideoHistory
                 'asc' => ['t.device_id' => SORT_ASC],
                 'desc' => ['t.device_id' => SORT_DESC]
             ],
-            'created_at' => [
+            'date_at' => [
                 'asc' => ['t.created_at' => SORT_ASC],
                 'desc' => ['t.created_at' => SORT_DESC]
-            ],
-            'last_at' => [
-                'asc' => ['t.last_at' => SORT_ASC],
-                'desc' => ['t.last_at' => SORT_DESC]
             ],
         ]);
 
