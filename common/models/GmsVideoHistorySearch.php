@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\GmsVideoHistory;
+use yii\data\SqlDataProvider;
 
 /**
  * GmsVideoHistorySearch represents the model behind the search form about `common\models\GmsVideoHistory`.
@@ -40,30 +41,42 @@ class GmsVideoHistorySearch extends GmsVideoHistory
     }
 
     /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
+     * @param $params
+     * @return SqlDataProvider
      */
     public function search($params)
     {
+        $this->load($params);
+
         $query = GmsVideoHistory::find()
             ->from('gms_video_history t')
             ->joinWith('regionModel t1')
             ->joinWith('senderModel t2')
-            ->joinWith('deviceModel t3')
-            ->joinWith('playListOutModel t4')
-            ->select('t.*, t1.*, t2.*, t3.*, t4.name, t4.id');
+            ->joinWith('playListOutModel t3')
+            ->joinWith('videoModel t4')
+            ->select("t.*, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.name video_name, t4.thumbnail, t4.file");
 
-        // add conditions that should always apply here
+        // grid filtering conditions
+        $query->andFilterWhere(['t.id' => $this->id]);
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+        $query->andFilterWhere(['like', 't.created_at', $this->created_at])
+              ->andFilterWhere(['like', 't.device_id', $this->device_id]);
+
+
+        $query->andFilterWhere(['t1.id' => $this->region_id])
+            ->andFilterWhere(['like', 't2.sender_name', $this->sender_name])
+            ->andFilterWhere(['like', 'LOWER(t3.name)', strtolower($this->pls_name)]);
+
+        $dataProvider = new SqlDataProvider([
+            'sql' => $query->createCommand()->getRawSql()
         ]);
 
         $sort = $dataProvider->getSort();
         $sort->attributes = array_merge($sort->attributes, [
+            'id' => [
+                'asc' => ['vh_id' => SORT_ASC],
+                'desc' => ['vh_id' => SORT_DESC]
+            ],
             'region_id' => [
                 'asc' => ['t1.region_name' => SORT_ASC],
                 'desc' => ['t1.region_name' => SORT_DESC]
@@ -77,10 +90,13 @@ class GmsVideoHistorySearch extends GmsVideoHistory
                 'desc' => ['t3.device' => SORT_DESC]
             ],
             'pls_name' => [
-                'asc' => ['t4.name' => SORT_ASC],
-                'desc' => ['t4.name' => SORT_DESC]
+                'asc' => ['pls_name' => SORT_ASC],
+                'desc' => ['pls_name' => SORT_DESC]
             ],
-
+            'device_id' => [
+                'asc' => ['t.device_id' => SORT_ASC],
+                'desc' => ['t.device_id' => SORT_DESC]
+            ],
             'created_at' => [
                 'asc' => ['t.created_at' => SORT_ASC],
                 'desc' => ['t.created_at' => SORT_DESC]
@@ -91,28 +107,6 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             ],
         ]);
         $dataProvider->setSort($sort);
-
-        $this->load($params);
-
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
-
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'pls_id' => $this->pls_id,
-            'video_key' => $this->video_key,
-        ]);
-
-        $query->andFilterWhere(['like', 't.created_at', $this->created_at]);
-
-        $query->andFilterWhere(['t1.id' => $this->region_id])
-            ->andFilterWhere(['like', 't2.sender1_name', $this->sender_name])
-            ->andFilterWhere(['like', 't3.device', $this->device_id])
-            ->andFilterWhere(['like', 'LOWER(t4.name)', strtolower($this->pls_name)]);
 
         return $dataProvider;
     }

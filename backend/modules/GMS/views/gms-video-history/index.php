@@ -54,31 +54,38 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             [
-                'attribute' => 'id',
                 'headerOptions' => array('style' => 'width: 30px; text-align: center;'),
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsVideoHistory */
+                    return !empty($model["vh_id"]) ? $model["vh_id"] : null;
+                },
+                'attribute' => 'id'
             ],
             [
                 'headerOptions' => array('style' => 'width: 200px;'),
                 'label' => 'Видео',
                 'value' => function($model) {
                     /** @var \common\models\GmsVideoHistory $model */
-                    if (empty($model->videoModel)) {
+                    if (empty($model['video_name'])
+                        || empty($model['thumbnail'])
+                        || empty($model['file'])) {
                         return null;
                     }
+
                     return Html::a(
-                        Html::img($model->videoModel->thumbnail),
+                        Html::img($model["thumbnail"]),
                         null,
                         [
                             'style' => [
                                 'cursor' => 'pointer'
                             ],
-                            'title' => $model->videoModel->name,
+                            'title' => $model['video_name'],
                             'target' => '_blank',
                             'onclick' => "
                                 var player = videojs('my-player');
-                                var modalPlayer = player.createModal('{$model->videoModel->name}');
+                                var modalPlayer = player.createModal('{$model['video_name']}');
                                 var modalHtml = $('#deactivate-user');
-                                player.src('{$model->videoModel->file}');
+                                player.src('{$model["file"]}');
                                 player.ready(function() {
                                     player.play(); 
                                 });
@@ -104,15 +111,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 'filter' =>  \common\models\GmsRegions::getRegionList(),
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsDevices */
-                    return !empty($model->regionModel) ? $model->regionModel->region_name : null;
+                    return !empty($model["region_name"]) ? $model["region_name"] : null;
                 },
                 'attribute' => 'region_id'
             ],
             [
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsVideoHistory */
-                    return !empty($model->senderModel) ? $model->senderModel->sender_name : null;
-
+                    return !empty($model["sender_name"]) ? $model["sender_name"] : null;
                 },
                 'attribute' => 'sender_name'
             ],
@@ -122,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsVideoHistory */
-                    return !empty($model->playListOutModel) ? $model->playListOutModel->name : null;
+                    return !empty($model["pls_name"]) ? $model["pls_name"] : null;
 
                 },
                 'attribute' => 'pls_name'
