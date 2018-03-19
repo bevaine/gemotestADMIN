@@ -110,7 +110,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
         $query->andFilterWhere(['like', 't.created_at', $this->created_at]);
 
         $query->andFilterWhere(['t1.id' => $this->region_id])
-            ->andFilterWhere(['like', 't2.sender_name', $this->sender_name])
+            ->andFilterWhere(['like', 't2.sender1_name', $this->sender_name])
             ->andFilterWhere(['like', 't3.device', $this->device_id])
             ->andFilterWhere(['like', 'LOWER(t4.name)', strtolower($this->pls_name)]);
 
