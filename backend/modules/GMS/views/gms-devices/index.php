@@ -68,6 +68,8 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'id',
                             'headerOptions' => array('style' => 'width: 30px; text-align: center;'),
                         ],
+                        'last_active_at',
+
                         [
                             'width'=>'196px',
                             'attribute' => 'created_at',

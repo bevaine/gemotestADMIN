@@ -13,6 +13,11 @@ use Yii;
  * @property string $created_at
  * @property string $last_at
  * @property integer $video_key
+ * @property GmsDevices $deviceModel
+ * @property GmsRegions $regionModel
+ * @property GmsSenders $senderModel
+ * @property GmsPlaylistOut $playListOutModel
+ * @property GmsVideos $videoModel
  */
 class GmsVideoHistory extends \yii\db\ActiveRecord
 {
@@ -47,6 +52,49 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
             'created_at' => 'Начало',
             'last_at' => 'Окончание',
             'video_key' => 'Видео',
+            'sender_name' => 'Отделение',
+            'pls_name' => 'Плейлист',
+            'region_id' => 'Регион'
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeviceModel()
+    {
+        return $this->hasOne(GmsDevices::className(), ['device' => 'device_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRegionModel()
+    {
+        return $this->hasOne(GmsRegions::className(), ['id' => 'region_id'])->via('deviceModel');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSenderModel()
+    {
+        return $this->hasOne(GmsSenders::className(), ['id' => 'sender_id'])->via('deviceModel');
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPlayListOutModel()
+    {
+        return $this->hasOne(GmsPlaylistOut::className(), ['id' => 'pls_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVideoModel()
+    {
+        return $this->hasOne(GmsVideos::className(), ['id' => 'video_key']);
     }
 }
