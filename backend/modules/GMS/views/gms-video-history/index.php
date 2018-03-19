@@ -142,13 +142,13 @@ $this->params['breadcrumbs'][] = $this->title;
                     if (!empty($model['created_at'])) {
                         $html .= 'с '.$model['created_at'];
                     } else {
-                        $html .= "с <span style='font: inherit'>не определено</span>";
+                        $html .= "по <span class='not-set'>(не задано)</span>";
                     }
                     $html .= "<br>";
                     if (!empty($model['last_at'])) {
                         $html .= 'по '.$model['last_at'];
                     } else {
-                        $html .= "по <span style='font: inherit'>не определено</span>";
+                        $html .= "по <span class='not-set'>(не задано)</span>";
                     }
                     return $html;
                 },
