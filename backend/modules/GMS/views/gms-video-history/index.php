@@ -186,17 +186,22 @@ $this->params['breadcrumbs'][] = $this->title;
     $searchModel = $dataProvider->getModels();
     foreach ($searchModel as $model) {
         /** @var \common\models\GmsVideoHistory $model */
+        $dateTime1 = strtotime($model['created_at']);
+        $dateTime2 = strtotime($model['last_at']);
         $event = new Event([
             'id'               => uniqid(),
             'title'            => $model['video_name'],
-            'start'            => $model['created_at'],
-            'end'              => $model['last_at'],
+            'start'            => date("Y-m-d\TH:i:s", $dateTime1),
+            'end'              => date("Y-m-d\TH:i:s", $dateTime2),
+            'url'              => 'https://github.com/Edofre/yii2-fullcalendar/blob/master/README.md',
             'editable'         => true,
             'startEditable'    => false,
             'durationEditable' => true,
         ]);
         $events[] = $event;
     }
+    print_r($events);
+    //exit;
 
 //    $events = [
 //        new Event([
