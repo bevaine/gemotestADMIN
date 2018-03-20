@@ -95,18 +95,19 @@ class GmsVideosController extends Controller
 
                 if (!empty(Yii::$app->request->post())) {
                     $post = Yii::$app->request->post();
-                    if (!empty($imageFile->name)) {
-                        $nameBase64 = base64_encode($imageFile->name);
-                        if (!empty($post["GmsVideos"][$nameBase64]['name'])) {
-                            $model->name = $post["GmsVideos"][$nameBase64]['name'];
+                    if (!empty($imageFile->size)) {
+                        $fileSize = $imageFile->size;
+                        if (!empty($post["GmsVideos"][$fileSize]['name'])) {
+                            $model->name = $post["GmsVideos"][$fileSize]['name'];
                         }
-                        if (!empty($post["GmsVideos"][$nameBase64]['comment'])) {
-                            $model->comment = $post["GmsVideos"][$nameBase64]['comment'];
+                        if (!empty($post["GmsVideos"][$fileSize]['comment'])) {
+                            $model->comment = $post["GmsVideos"][$fileSize]['comment'];
                         }
                     }
                 }
 
                 if ($model->save()) {
+
                     return Json::encode([
                         'files' => [
                             [
@@ -126,7 +127,6 @@ class GmsVideosController extends Controller
                 }
             }
         }
-
         return '';
     }
 

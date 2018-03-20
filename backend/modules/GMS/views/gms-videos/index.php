@@ -18,6 +18,9 @@ $this->params['breadcrumbs'][] = $this->title;
             top: 50%;
             transform: translate(-50%, -50%);
         }
+        .custom-video-controls {
+            z-index: 2147483647;
+        }
     </style>
 
     <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
@@ -25,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <video
                     id="my-player"
                     class="video-js"
-                    controls
+                    controls="controls"
                     preload="auto"
                     poster="../../img/logo.jpg"
                     width="783"
@@ -68,27 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             'title' => $model['name'],
                             'target' => '_blank',
-                            'onclick' => "
-                                var player = videojs('my-player');
-                                var modalPlayer = player.createModal('{$model['name']}');
-                                var modalHtml = $('#deactivate-user');
-                                player.src('{$model['file']}');
-                                player.ready(function() {
-                                    player.play(); 
-                                });
-                                player.addChild(modalPlayer);
-                                modalPlayer.addClass('vjs-my-fancy-modal');
-                                modalPlayer.on('modalclose', function() {
-                                    modalHtml.modal('hide');
-                                    player.pause();
-                                });
-                                modalHtml.on('hidden.bs.modal', function () {
-                                    modalPlayer.close();
-                                    player.pause();
-                                });
-                                modalHtml.modal('show');
-                                modalPlayer.open();"
-
+                            'onclick' => "playVideo('{$model['id']}', '{$model['file']}')"
                         ]
                     );
                 },
@@ -114,7 +97,29 @@ $this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
 $this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
 
 $js1 = <<< JS
-
+    function playVideo(name, file) {
+        $('.video-js').prop('controls',true);
+        var player = videojs('my-player');
+        var modalPlayer = player.createModal(name);
+        var modalHtml = $('#deactivate-user');
+        player.src(file);
+        player.ready(function() {
+            player.play(); 
+        });
+        player.addChild(modalPlayer);
+        modalPlayer.addClass('vjs-my-fancy-modal');
+        $('.vjs-my-fancy-modal').css('height', '93%');
+        modalPlayer.on('modalclose', function() {
+            modalHtml.modal('hide');
+            player.pause();
+        });
+        modalHtml.on('hidden.bs.modal', function () {
+            modalPlayer.close();
+            player.pause();
+        });
+        modalHtml.modal('show');
+        modalPlayer.open();
+    }
 JS;
-$this->registerJs($js1);
+$this->registerJs($js1, yii\web\View::POS_HEAD);
 ?>

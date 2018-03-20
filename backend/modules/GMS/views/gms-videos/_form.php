@@ -11,16 +11,17 @@ $htmlFileUpload = <<<HTML
         var index = data.index,
             file = data.files[index],
             node = $(data.context.children()[index]);
-            
-        var fileName = btoa(file.name);    
 
-        if (file.preview) {   
-            file.preview.width = 750;     
+        if (file.preview !== undefined && file.name !== undefined && file.size !== undefined) {
+            var fileName = baseName(file.name),  
+            txt_val = escapeHtml(fileName),
+            fileSize = file.size;            
+            file.preview.width = 720;     
             var html_text = "<div class='row'><div class='col-lg-10'>";
             html_text += "<label for='{class:control-label}'>Название</label>"
-            html_text += "<p><input type='text' class='form-control' name='GmsVideos[" + fileName + "][name]'></p>";
+            html_text += "<p><input type='text' value='" + txt_val + "' class='form-control' name='GmsVideos[" + fileSize + "][name]'></p>";
             html_text += "<label for='{class:control-label}'>Комментарий</label>";
-            html_text += "<p><textarea class='form-control' name='GmsVideos[" + fileName + "][comment]' rows='6'></textarea></p>";
+            html_text += "<p><textarea class='form-control' name='GmsVideos[" + fileSize + "][comment]' rows='6'></textarea></p>";
             html_text += "</div></div>"
             node
                 .prepend("<br>")
@@ -61,3 +62,33 @@ HTML;
     <?php ActiveForm::end(); ?>
 
 </div>
+<?php
+$js = <<< JS
+var entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;',
+  '`': '&#x60;',
+  '=': '&#x3D;'
+};
+
+function escapeHtml(string) 
+{
+    return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+        return entityMap[s];
+    });
+}
+
+function baseName(str)
+{
+    var base = new String(str).substring(str.lastIndexOf('/') + 1);
+    if(base.lastIndexOf(".") != -1)
+        base = base.substring(0, base.lastIndexOf("."));
+    return base;
+}
+JS;
+$this->registerJs($js);
+?>

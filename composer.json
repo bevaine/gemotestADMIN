@@ -48,7 +48,8 @@
         "2amigos/yii2-file-upload-widget": "~1.0",
         "2amigos/yii2-multi-select-widget": "*",
         "kartik-v/yii2-widget-timepicker": "*",
-        "edofre/yii2-fullcalendar": "V1.0.11"
+        "edofre/yii2-fullcalendar": "V1.0.11",
+        "sjaakp/yii2-timeline": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

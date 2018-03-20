@@ -20,6 +20,7 @@ $this->params['breadcrumbs'][] = $this->title;
         top: 50%;
         transform: translate(-50%, -50%);
     }
+
 </style>
 
 <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
@@ -27,11 +28,11 @@ $this->params['breadcrumbs'][] = $this->title;
         <video
                 id="my-player"
                 class="video-js"
-                controls
                 preload="auto"
                 poster="../../img/logo.jpg"
                 width="783"
-                data-setup='{}'>
+                controls
+                data-setup='{ "inactivityTimeout": 0 }'>
             <p class="vjs-no-js">
                 To view this video please enable JavaScript, and consider upgrading to a
                 web browser that
@@ -90,6 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 });
                                 player.addChild(modalPlayer);
                                 modalPlayer.addClass('vjs-my-fancy-modal');
+                                $('.vjs-my-fancy-modal').css('height', '93%');
                                 modalPlayer.on('modalclose', function() {
                                     modalHtml.modal('hide');
                                     player.pause();
