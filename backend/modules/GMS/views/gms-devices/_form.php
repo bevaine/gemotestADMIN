@@ -53,15 +53,16 @@ $js1 = <<< JS
     * @param region
     */
     function setSender(region) {
-        var senderSelect = $('.sender_id select');
-        var senderDisable = senderSelect.prop('disabled');        
-        senderSelect.attr('disabled', true);
+        var senderDisable = $('.sender_id select').prop('disabled'); 
+        console.log(senderDisable);
+        $('.sender_id select').attr('disabled', true);
         $.ajax({
             url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
                 res = JSON.parse(res);
                 var optionsAsString = "<option value=''>---</option>";
+                if (res === null) return;
                 if (res.results !== undefined && res.results.length > 0) {
                     var results = res.results; 
                     for (var i = 0; i < results.length; i++) {
@@ -73,10 +74,10 @@ $js1 = <<< JS
                 $(".sender_id select option").each(function() {
                     $(this).remove();
                 });
-                senderSelect.append( optionsAsString );
-                senderSelect.attr('disabled', senderDisable);
+                $('.sender_id select').append(optionsAsString);
             }
         });
+        $('.sender_id select').attr('disabled', senderDisable);
     }
 
     $(".region_id select").change(function() {
