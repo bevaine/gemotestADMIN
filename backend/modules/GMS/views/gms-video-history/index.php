@@ -4,6 +4,9 @@ use yii\helpers\Html;
 use kartik\grid\GridView;
 use mihaildev\ckeditor\Assets;
 use yii\helpers\Url;
+use sjaakp\timeline\Timeline;
+use edofre\fullcalendar\Fullcalendar;
+use edofre\fullcalendar\models\Event;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsVideoHistorySearch */
@@ -81,28 +84,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             'title' => $model['video_name'],
                             'target' => '_blank',
-                            'onclick' => "
-                                var player = videojs('my-player');
-                                var modalPlayer = player.createModal('{$model['video_name']}');
-                                var modalHtml = $('#deactivate-user');
-                                player.src('{$model["file"]}');
-                                player.ready(function() {
-                                    player.play(); 
-                                });
-                                player.addChild(modalPlayer);
-                                modalPlayer.addClass('vjs-my-fancy-modal');
-                                $('.vjs-my-fancy-modal').css('height', '93%');
-                                modalPlayer.on('modalclose', function() {
-                                    modalHtml.modal('hide');
-                                    player.pause();
-                                });
-                                modalHtml.on('hidden.bs.modal', function () {
-                                    modalPlayer.close();
-                                    player.pause();
-                                });
-                                modalHtml.modal('show');
-                                modalPlayer.open();"
-
+                            'onclick' => "playVideo('{$model['id']}', '{$model['file']}')"
                         ]
                     );
                 },
@@ -198,9 +180,104 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
+
+    <?php
+    $events = [];
+    $searchModel = $dataProvider->getModels();
+    foreach ($searchModel as $model) {
+        /** @var \common\models\GmsVideoHistory $model */
+        $event = new Event([
+            'id'               => uniqid(),
+            'title'            => $model['video_name'],
+            'start'            => $model['created_at'],
+            'end'              => $model['last_at'],
+            'editable'         => true,
+            'startEditable'    => false,
+            'durationEditable' => true,
+        ]);
+        $events[] = $event;
+    }
+
+//    $events = [
+//        new Event([
+//            'title' => 'Appointment #' . rand(1, 999),
+//            'start' => '2016-03-18T14:00:00',
+//        ]),
+//        // Everything editable
+//        new Event([
+//            'id'               => uniqid(),
+//            'title'            => 'Appointment #' . rand(1, 999),
+//            'start'            => '2018-03-20T12:30:00',
+//            'end'              => '2018-03-25T13:30:00',
+//            'editable'         => true,
+//            'startEditable'    => true,
+//            'durationEditable' => true,
+//        ]),
+//        // No overlap
+//        new Event([
+//            'id'               => uniqid(),
+//            'title'            => 'Appointment #' . rand(1, 999),
+//            'start'            => '2018-03-20T15:30:00',
+//            'end'              => '2018-03-25T19:30:00',
+//            'overlap'          => false, // Overlap is default true
+//            'editable'         => true,
+//            'startEditable'    => true,
+//            'durationEditable' => true,
+//        ]),
+//        // Only duration editable
+//        new Event([
+//            'id'               => uniqid(),
+//            'title'            => 'Appointment #' . rand(1, 999),
+//            'start'            => '2016-03-16T11:00:00',
+//            'end'              => '2016-03-16T11:30:00',
+//            'startEditable'    => false,
+//            'durationEditable' => true,
+//        ]),
+//        // Only start editable
+//        new Event([
+//            'id'               => uniqid(),
+//            'title'            => 'Appointment #' . rand(1, 999),
+//            'start'            => '2016-03-15T14:00:00',
+//            'end'              => '2016-03-15T15:30:00',
+//            'startEditable'    => true,
+//            'durationEditable' => false,
+//        ]),
+//    ];
+    ?>
+
+    <?= edofre\fullcalendar\Fullcalendar::widget([
+        'events'        => $events
+    ]);
+    ?>
 </div>
 
 <?php
 $this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
 $this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
+$js1 = <<< JS
+    function playVideo(name, file) {
+        $('.video-js').prop('controls',true);
+        var player = videojs('my-player');
+        var modalPlayer = player.createModal(name);
+        var modalHtml = $('#deactivate-user');
+        player.src(file);
+        player.ready(function() {
+            player.play(); 
+        });
+        player.addChild(modalPlayer);
+        modalPlayer.addClass('vjs-my-fancy-modal');
+        $('.vjs-my-fancy-modal').css('height', '93%');
+        modalPlayer.on('modalclose', function() {
+            modalHtml.modal('hide');
+            player.pause();
+        });
+        modalHtml.on('hidden.bs.modal', function () {
+            modalPlayer.close();
+            player.pause();
+        });
+        modalHtml.modal('show');
+        modalPlayer.open();
+    }
+JS;
+$this->registerJs($js1, yii\web\View::POS_HEAD);
 ?>

@@ -65,6 +65,10 @@ class GmsVideosSearch extends GmsVideos
             'created_at' => $this->created_at,
         ]);
 
+        if ($this->created_at) {
+            $query->andFilterWhere(['>=', 'date_start', strtotime($this->date_start_val)]);
+        }
+
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'file', $this->file]);
 

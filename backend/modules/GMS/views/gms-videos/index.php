@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use kartik\grid\GridView;
 use mihaildev\ckeditor\Assets;
+use kartik\date\DatePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsVideosSearch */
@@ -78,7 +79,25 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
             ],
             'name',
-            'created_at:datetime',
+            [
+                'headerOptions' => array('style' => 'width: 195px; text-align: center;'),
+                'attribute' => 'created_at',
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsVideos */
+                    return isset($model->created_at) ? date('d-m-Y', $model->created_at) : null;
+                },
+                'filter' => \kartik\date\DatePicker::widget([
+                    'model' => $searchModel,
+                    'name' => 'created_at',
+                    'attribute' => 'created_at',
+                    'type' => DatePicker::TYPE_COMPONENT_PREPEND,
+                    'pluginOptions' => [
+                        'autoclose' => true,
+                        'format' => 'dd-mm-yyyy'
+                    ]
+                ]),
+                'format' => 'html', // datetime
+            ],
             'type',
             [
                 'attribute' => 'time',
@@ -95,9 +114,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 $this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
 $this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
-
 $js1 = <<< JS
-    function playVideo(name, file) {
+    function playVideo(name, file) 
+    {
         $('.video-js').prop('controls',true);
         var player = videojs('my-player');
         var modalPlayer = player.createModal(name);
