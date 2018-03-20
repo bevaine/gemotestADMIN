@@ -31,7 +31,6 @@
         "budyaga/yii2-users": "*",
         "kartik-v/yii2-export": "*",
         "trntv/yii2-datetime-widget": "^1.0",
-        "phpoffice/phpexcel": "*",
         "arturoliveira/yii2-excelview": "*",
         "meysampg/yii2-treeview": "*",
         "kartik-v/yii2-field-range": "*",
