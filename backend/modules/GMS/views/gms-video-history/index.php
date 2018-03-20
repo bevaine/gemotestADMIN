@@ -7,6 +7,7 @@ use yii\helpers\Url;
 use sjaakp\timeline\Timeline;
 use edofre\fullcalendar\Fullcalendar;
 use edofre\fullcalendar\models\Event;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsVideoHistorySearch */
@@ -180,80 +181,50 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
-
-    <?php
-    $events = [];
-    $searchModel = $dataProvider->getModels();
-    foreach ($searchModel as $model) {
-        /** @var \common\models\GmsVideoHistory $model */
-        $dateTime1 = strtotime($model['created_at']);
-        $dateTime2 = strtotime($model['last_at']);
-        $event = new Event([
-            'id'               => uniqid(),
-            'title'            => $model['video_name'],
-            'start'            => date("Y-m-d\TH:i:s", $dateTime1),
-            'end'              => date("Y-m-d\TH:i:s", $dateTime2),
-            'url'              => 'https://github.com/Edofre/yii2-fullcalendar/blob/master/README.md',
-            'editable'         => true,
-            'startEditable'    => false,
-            'durationEditable' => true,
-        ]);
-        $events[] = $event;
-    }
-    print_r($events);
-    //exit;
-
-//    $events = [
-//        new Event([
-//            'title' => 'Appointment #' . rand(1, 999),
-//            'start' => '2016-03-18T14:00:00',
-//        ]),
-//        // Everything editable
-//        new Event([
-//            'id'               => uniqid(),
-//            'title'            => 'Appointment #' . rand(1, 999),
-//            'start'            => '2018-03-20T12:30:00',
-//            'end'              => '2018-03-25T13:30:00',
-//            'editable'         => true,
-//            'startEditable'    => true,
-//            'durationEditable' => true,
-//        ]),
-//        // No overlap
-//        new Event([
-//            'id'               => uniqid(),
-//            'title'            => 'Appointment #' . rand(1, 999),
-//            'start'            => '2018-03-20T15:30:00',
-//            'end'              => '2018-03-25T19:30:00',
-//            'overlap'          => false, // Overlap is default true
-//            'editable'         => true,
-//            'startEditable'    => true,
-//            'durationEditable' => true,
-//        ]),
-//        // Only duration editable
-//        new Event([
-//            'id'               => uniqid(),
-//            'title'            => 'Appointment #' . rand(1, 999),
-//            'start'            => '2016-03-16T11:00:00',
-//            'end'              => '2016-03-16T11:30:00',
-//            'startEditable'    => false,
-//            'durationEditable' => true,
-//        ]),
-//        // Only start editable
-//        new Event([
-//            'id'               => uniqid(),
-//            'title'            => 'Appointment #' . rand(1, 999),
-//            'start'            => '2016-03-15T14:00:00',
-//            'end'              => '2016-03-15T15:30:00',
-//            'startEditable'    => true,
-//            'durationEditable' => false,
-//        ]),
-//    ];
-    ?>
-
-    <?= edofre\fullcalendar\Fullcalendar::widget([
-        'events'        => $events
-    ]);
-    ?>
+    <div class="row">
+        <div class="col-lg-11">
+            <?php
+            $events = [];
+            $searchModel = $dataProvider->getModels();
+            foreach ($searchModel as $model) {
+                /** @var \common\models\GmsVideoHistory $model */
+                $dateTime1 = strtotime($model['created_at']);
+                $dateTime2 = strtotime($model['last_at']);
+                $event = new Event([
+                    'id'               => uniqid(),
+                    'title'            => $model['video_name'],
+                    'start'            => date("Y-m-d\TH:i:s", $dateTime1),
+                    'source'            => 'qweqweqweqw',
+                    'end'              => date("Y-m-d\TH:i:s", $dateTime2),
+                    'url'              => 'https://github.com/Edofre/yii2-fullcalendar/blob/master/README.md',
+                    'editable'         => true,
+                    'startEditable'    => false,
+                    'durationEditable' => true,
+                ]);
+                $events[] = $event;
+            }
+            ?>
+            <?
+//            edofre\fullcalendar\Fullcalendar::widget([
+//                    'options'       => [
+//                        'id'       => 'calendar',
+//                        'language' => 'ru',
+//                    ],
+//                    'clientOptions' => [
+//                        'weekNumbers' => true,
+//                        'selectable'  => true,
+//                        'defaultView' => 'agendaWeek',
+//                        'eventResize' => new JsExpression("
+//                            function(event, delta, revertFunc, jsEvent, ui, view) {
+//                                console.log(event);
+//                            }
+//                        "),
+//                    ],
+//                    'events' => $events
+//            ]);
+            ?>
+        </div>
+    </div>
 </div>
 
 <?php
