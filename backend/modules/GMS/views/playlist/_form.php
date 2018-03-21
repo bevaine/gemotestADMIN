@@ -6,6 +6,7 @@ use wbraganca\fancytree\FancytreeWidget;
 use yii\web\JsExpression;
 use common\models\GmsVideos;
 use common\components\helpers\FunctionsHelper;
+use mihaildev\ckeditor\Assets;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylist */
@@ -13,7 +14,7 @@ use common\components\helpers\FunctionsHelper;
 ?>
 <style type="text/css">
     span.fancytree-title {
-        font-size: large;
+        font-size: small;
     }
 </style>
 
@@ -37,186 +38,157 @@ use common\components\helpers\FunctionsHelper;
     </div>
 
     <div class="row">
-        <div class="col-lg-9">
-            <div class="form-group region">
-                <?= $form->field($model, 'region')->dropDownList(\common\models\GmsRegions::getRegionList(), [
-                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                ]);
-                ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-9">
-            <div class="form-group sender_id">
-                <?= $form->field($model, 'sender_id')->dropDownList([], [
-                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                ]);
-                ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-9">
-            <?= $form->field($model, 'type')->dropDownList(\common\models\GmsPlaylist::getPlayListType(), [
-                'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-            ]);
-            ?>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="form-group">
-                <div class="box box-primary">
-                    <div class="box-header with-border">
-                        <h3 class="box-title">Видео в шаблоне плейлиста</h3>
+        <div class="col-xs-7">
+            <div class="box box-solid box-success">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Перетащите видо-ролики для шаблона плейлиста</h3>
+                </div>
+                <div class="box-body">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group region">
+                                <?= $form->field($model, 'region')->dropDownList(\common\models\GmsRegions::getRegionList(), [
+                                    'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                ]);
+                                ?>
+                            </div>
+                        </div>
                     </div>
-                    <div class="box-body">
-                        <?php
-                        $source = [];
-                        $playListKey = 1;
-                        $playListKeyStr = 'playList['.$playListKey.']';
-                        if ($model->isNewRecord) {
-                            $source =  [
-                                [
-                                    'title' => 'Новый шаблон',
-                                    'key' => $playListKeyStr,
-                                    'folder' => true,
-                                    'expanded' => true
-                                ]
-                            ];
-                        } else {
-                            if (!empty($model->jsonPlaylist)) {
-                                $source = new JsExpression('['.$model->jsonPlaylist.']');
-                            }
-                        }
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group sender_id">
+                                <?= $form->field($model, 'sender_id')->dropDownList([], [
+                                    'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                ]);
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="form-group type">
+                                <?= $form->field($model, 'type')->dropDownList(\common\models\GmsPlaylist::getPlayListType(), [
+                                    'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                ]);
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <div class="form-group">
+                                <div class="box box-primary">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Все видео-ролики</h3>
+                                    </div>
+                                    <div class="box-body">
+                                        <table id="treetable1">
+                                            <colgroup>
+                                                <col width="50px">
+                                                <col width="490px">
+                                                <col width="80px">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Название</th>
+                                                <th>Длител.</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                            </tbody>
+                                            <thead>
+                                            <tr>
+                                                <th style="font-size: smaller" colspan="2">Итого</th>
+                                                <th colspan="3"><div class="duration-summ" id="duration-summ"></div></th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                        echo FancytreeWidget::widget([
-                            'id' => 'output_list',
-                            'options' =>[
-                                'extensions' => ['dnd', 'edit'],
-                                'source' => $source,
-                                'edit' => [
-                                    'triggerStart' => ["clickActive", "dblclick"],
-                                    'beforeEdit' =>  new JsExpression('function(event, data){
-                                        return data.node.isFolder()
-                                    }'),
-                                    'inputCss' => [
-                                        'color' => 'black'
-                                    ],
-                                    'edit' => new JsExpression('function(event, data){
-                                    }'),
-                                    'beforeClose' => new JsExpression('function(event, data){
-                                    }'),
-                                    'save' => new JsExpression('function(event, data){
-                                        setTimeout(function(){
-                                            $(data.node.span).removeClass("pending");
-                                            data.node.setTitle(data.node.title);
-                                        }, 2000);
-                                        return true;
-                                    }'),
-                                    'close' => new JsExpression('function(event, data){
-                                        if(data.save) {
-                                            $(data.node.span).addClass("pending");
-                                        }
-                                    }'),
-                                ],
-                                'dnd' => [
-                                    'autoExpandMS' => 400,
-                                    'minExpandLevel' => 3,
-                                    'dragStart' => new JsExpression('function(node, data) {
-                                        if (node.isFolder()) return false;
-                                        else return true;
-                                    }'),
-                                    'dragEnter' => new JsExpression('function(node, data) {
-                                        return true;
-                                    }'),
-                                    'dragDrag'=> new JsExpression('function(node, data) {
-                                        data.dataTransfer.dropEffect = "move";
-                                    }'),
-                                    'dragDrop' => new JsExpression('function(node, data) {
-                                        if (data.otherNode) {
-                                            var playListKey = "'.$playListKeyStr.'";
-                                            var playlistNode = data.tree.getNodeByKey(playListKey);
-                                            data.otherNode.moveTo(node, data.hitMode);
-                                            if (data.otherNode.parent.key !== playListKey 
-                                                || data.otherNode.parent.isRoot() === true) {
-                                                    data.otherNode.moveTo(playlistNode, "over");
-                                            }        
-                                        } else if( data.otherNodeData ) {
-                                            node.addChild(data.otherNodeData, data.hitMode);
-                                        } else {
-                                            node.addNode({
-                                                title: transfer.getData("text")
-                                            }, data.hitMode);
-                                        }
-                                    }'),
-                                ],
-                            ]
-                        ]);
-                        ?>
+                        <div class="col-lg-7">
+                            <div class="form-group">
+                                <div class="box box-warning">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Шаблон плейлиста</h3>
+                                    </div>
+                                    <div class="box-body">
+                                        <table id="treetable2">
+                                            <colgroup>
+                                                <col width="50px">
+                                                <col width="470px">
+                                                <col width="150px">
+                                                <col width="100px">
+                                                <col width="30px">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Плейлист</th>
+                                                <th>Тип ролика</th>
+                                                <th>Длит.</th>
+                                                <th></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td style="text-align: center;"></td>
+                                            </tr>
+                                            </tbody>
+                                            <thead>
+                                            <tr>
+                                                <th style="font-size: smaller" colspan="2">Итого</th>
+                                                <th colspan="3"><div class="duration-summ" id="duration-summ"></div></th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-xs-1 text-center">
-            <button class="btn btn-default" type="button"><span class="glyphicon glyphicon-arrow-left"></span></button>
-        </div>
-        <div class="col-lg-4">
+
+        <div class="col-xs-5">
             <div class="form-group">
-                <div class="box box-warning">
+                <div class="box box-solid box-primary">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Видеофайлы для добавления</h3>
+                        <h3 class="box-title">Информация о ролике</h3>
                     </div>
                     <div class="box-body">
-                        <?php
-                        echo FancytreeWidget::widget([
-                            'id' => 'input_list',
-                            'options' =>[
-                                'source' => [
-                                    [
-                                        'title' => 'Все видео',
-                                        'folder' => true,
-                                        'key' => 'playList[all]',
-                                        'expanded' => true,
-                                        'children' => GmsVideos::getVideosTree()
-                                    ]
-                                ],
-                                'extensions' => ['dnd'],
-                                'dnd' => [
-                                    'preventVoidMoves' => true,
-                                    'preventRecursiveMoves' => true,
-                                    'autoExpandMS' => 400,
-                                    'dragStart' => new JsExpression('function(node, data) {
-                                        return !node.isFolder()
-                                    }'),
-                                    'dragEnter' => new JsExpression('function(node, data) {
-                                        return true;
-                                    }'),
-                                    'dragDrop' => new JsExpression('function(node, data) {
-                                        if (data.otherNode) {
-                                            var playListKey = "playList[all]";
-                                            var playlistNode = data.tree.getNodeByKey(playListKey);
-                                            data.otherNode.moveTo(node, data.hitMode);
-                                            if (data.otherNode.parent.key !== playListKey 
-                                                || data.otherNode.parent.isRoot() === true) {
-                                                    data.otherNode.moveTo(playlistNode, "over");
-                                            }        
-                                        } else if (data.otherNodeData) {
-                                            node.addChild(data.otherNodeData, data.hitMode);
-                                        } else {
-                                            node.addNode({
-                                                title: transfer.getData("text")
-                                            }, data.hitMode);
-                                        }
-                                    }'),
-                                ],
-                            ]
-                        ]);
-                        ?>
+                        <video
+                                id="my-player"
+                                class="video-js"
+                                controls
+                                preload="auto"
+                                poster="../../img/logo.jpg"
+                                width="645"
+                                data-setup='{}'>
+                            <p class="vjs-no-js">
+                                To view this video please enable JavaScript, and consider upgrading to a
+                                web browser that
+                                <a href="http://videojs.com/html5-video-support/" target="_blank">
+                                    supports HTML5 video
+                                </a>
+                            </p>
+                        </video>
+                        <div class="video-info" id="video-info">
+                            Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -232,14 +204,248 @@ use common\components\helpers\FunctionsHelper;
 </div>
 
 <?php
-    $urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
 
-    if ($model->isNewRecord === false && !empty($model->jsonPlaylist)) {
-        $varJSON = $model->jsonPlaylist;
-        $this->registerJs("removeInputJSON({$varJSON});");
+$urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
+$urlAjaxVideo = \yii\helpers\Url::to(['/GMS/gms-videos/ajax-video-active']);
+
+$videof = [
+    [
+        'title' => 'Все видео',
+        'key' => 'playList[all]',
+        'folder' => true,
+        'expanded' => true,
+        'icon' => '../../img/video1.png',
+        'children' => GmsVideos::getVideosTree()
+    ]
+];
+
+$standartf =  [
+    [
+        'title' => 'Стандартный',
+        'key' => 'playList[1]',
+        'folder' => true,
+        'expanded' => true,
+        'icon' => '../../img/gemotest.jpg'
+    ]
+];
+
+$commercef =  [
+    [
+        'title' => 'Коммерческий',
+        'key' => 'playList[1]',
+        'folder' => true,
+        'expanded' => true,
+        'icon' => '../../img/dollar.png'
+    ]
+];
+
+$videof = json_encode($videof);
+$standartf = json_encode($standartf);
+$commercef = json_encode($commercef);
+
+if (!$model->isNewRecord && !empty($model->jsonPlaylist)) {
+    $standartf = new JsExpression('['.$model->jsonPlaylist.']');
+    $varJSON = $model->jsonPlaylist;
+    $this->registerJs("removeInputJSON({$varJSON});");
+}
+
+$js1 = <<< JS
+ 
+    $(function()
+    {
+        var tree1 = $("#treetable1");
+        tree1.fancytree({
+            extensions: ["table", "dnd"],
+            table: {
+                indentation: 20,
+                nodeColumnIdx: 1,
+                checkboxColumnIdx: 0
+            },                
+            source: {$videof},
+            dblclick: function(event, data) {
+            },
+            beforeActivate: function(event, data) {
+            },
+            renderColumns: function(event, data) {
+                var node = data.node, tdList = $(node.tr).find(">td");
+                tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
+                if (node.data.duration !== undefined) {
+                    var time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
+                    tdList.eq(2).text(time);
+                } 
+                sumDuration(node.parent);
+            },
+            dnd: {
+                preventVoidMoves : true,
+                preventRecursiveMoves : true,
+                autoExpandMS :400,
+                dragStart : function(node, data) {
+                    return !node.isFolder();
+                },
+                dragEnter : function(node, data) {
+                    return true;
+                },
+                dragOver : function(node, data) {
+                },
+                dragDrop : function(node, data) {
+                    return false;
+                }
+            }
+        });
+        
+        var tree2 = $("#treetable2");
+        tree2.fancytree({
+            extensions: ["table", "dnd", "edit"],
+            table: {
+                indentation: 20,
+                nodeColumnIdx: 1,
+                checkboxColumnIdx: 0
+            },                
+            source: {$standartf},
+            dblclick: function(event, data) {
+                var videoKey = data.node.key;
+                $.ajax({
+                    url: '{$urlAjaxVideo}',
+                    data: {video: videoKey},
+                    success: function (res) {
+                        var htm_table = null;
+                        res = JSON.parse(res);
+                        if (res !== null && res.results.file !== undefined) {
+                            var videoPath = res.results.file; 
+                            var myPlayer = videojs('my-player');
+                            myPlayer.src(videoPath);
+                            myPlayer.ready(function() {
+                                this.play();
+                            });
+                        }
+                        if (res.results.table !== undefined) {
+                            htm_table = res.results.table;
+                        }
+                        resetPlayer(htm_table);
+                    }
+                });
+            },
+            beforeActivate: function(event, data) {
+            },
+            renderColumns: function(event, data) {
+                var node = data.node, tdList = $(node.tr).find(">td");
+                tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
+
+                var typePlaylist = ''; 
+                if ( $('#gmsplaylist-type').val() === '1') {
+                    typePlaylist = 'Стандартный';                     
+                } else if ( $('#gmsplaylist-type').val() === '2') {
+                    typePlaylist = 'Коммерческий';
+                }
+                if (typePlaylist !== '' && !node.isFolder()) {
+                    tdList.eq(2).text(typePlaylist);
+                }                
+                
+                if (node.data.duration !== undefined) {
+                    var time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
+                    tdList.eq(3).text(time);
+                } 
+                
+                if (!node.isFolder()) {
+                    tdList.eq(4).html('<span id="trash-node" style="cursor:pointer;" class="glyphicon glyphicon-trash"></span>');
+                }
+                sumDuration(node.parent);
+            },
+            edit: {
+                triggerStart: ["clickActive", "dblclick"],
+                beforeEdit : function(event, data){
+                    return data.node.isFolder()
+                },
+                edit : function(event, data){
+                },
+                beforeClose : function(event, data){
+                },
+                save : function(event, data){
+                    setTimeout(function(){
+                        $(data.node.span).removeClass("pending");
+                        data.node.setTitle(data.node.title);
+                    }, 2000);
+                    return true;
+                },
+                close : function(event, data){
+                    if(data.save) {
+                        $(data.node.span).addClass("pending");
+                    }
+                }
+            },
+            dnd: {
+                preventVoidMoves : true,
+                preventRecursiveMoves : true,
+                autoExpandMS :400,
+                dragStart : function(node, data) {
+                    return !node.isFolder();
+                },
+                dragEnter : function(node, data) {
+                    return true;
+                },
+                dragOver : function(node, data) {
+                },
+                dragDrop : function(node, data) {
+                    if (data.otherNode) {
+                        var sameTree = (data.otherNode.tree === data.tree);
+                        var playlistNode = data.tree.getNodeByKey('playList[1]');
+                        if (!sameTree) {
+                            if (data.otherNode.isFolder()) {
+                                playlistNode.addNode(data.otherNode.children, 'child');                           
+                            } else {
+                                var addChild = [];
+                                addChild.push(data.otherNode);
+                                playlistNode.addNode(addChild, 'child');
+                            }  
+                        } else {
+                            data.otherNode.moveTo(node, data.hitMode); 
+                            if (!data.otherNode.isChildOf(playlistNode)) {
+                                data.otherNode.moveTo(playlistNode, "child");
+                            }
+                            data.otherNode.render(true);
+                        }
+                    } else if (data.otherNodeData) {
+                        node.addChild(data.otherNodeData, data.hitMode);
+                    } else {
+                        node.addNode({
+                          title: transfer.getData("text")
+                        }, data.hitMode);
+                    }
+                    node.setExpanded();
+                }
+            }
+        });
+        
+        tree2.delegate("span[id=trash-node]", "click", function(e){
+            var node = $.ui.fancytree.getNode(e);
+            var parent = node.parent;
+            e.stopPropagation(); 
+            node.remove();
+            node.render(true);
+            sumDuration(parent);
+        });
+    });
+    
+    /**
+    * @param parent
+    */
+    function sumDuration (parent) 
+    {
+        var total = 0;
+        var totalStr = '';
+        if (parent.getChildren() === undefined) return;
+        $.each(parent.getChildren(), function() {
+            if (this.data.duration !== undefined) {
+                total += parseInt(this.data.duration, 10);
+            }
+        });
+        if (total > 0) {
+            totalStr = moment.unix(total).utc().format("HH:mm:ss");
+        }
+        $('#duration-summ').html(totalStr);
     }
-
-    $js1 = <<< JS
+    
+    
     /**
     * @param jsonPlaylist
     */
@@ -429,6 +635,37 @@ use common\components\helpers\FunctionsHelper;
         });
     }
     
+    /**
+    * 
+    */
+    function disableTree(val) 
+    {
+        console.log(val);       
+        if (val === '1') {
+            emptyList = {$standartf};                     
+        } else if (val === '2') {
+            emptyList = {$commercef};
+        }
+        
+        var regionObject = $("#treetable2");
+        var regionTree = regionObject.fancytree("getTree");        
+        
+        regionTree.reload(emptyList);
+        resetPlayer();
+    }
+    
+    function resetPlayer(htm_table = null) {
+        var myPlayer = videojs('my-player');
+        if (htm_table === null) {
+            htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
+        }
+        myPlayer.reset();
+        myPlayer.poster("../../img/logo.jpg");
+        $('#video-info')
+            .addClass('video-info-normal')
+            .html(htm_table);        
+    }
+    
     $(".btn-success").click(function() {
         checkList(
             $('#gmsplaylist-region').val(),
@@ -443,6 +680,10 @@ use common\components\helpers\FunctionsHelper;
     
     $(".region select").change(function() {
         setSender($(this).val());  
+    });    
+    
+    $(".type select").change(function() {
+        disableTree($(this).val());
     });
 JS;
 $this->registerJs($js1);
@@ -455,4 +696,17 @@ JS;
 if (!$model->isNewRecord) {
     $this->registerJs($js1);
 }
+
+$this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
+$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
+
+$this->registerCssFile('http://wwwendt.de/tech/fancytree/src/skin-win8/ui.fancytree.css');
+
+$this->registerJsFile('//code.jquery.com/ui/1.12.1/jquery-ui.min.js', ['depends' => [Assets::className()]]);
+$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.js', ['depends' => [Assets::className()]]);
+$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.dnd.js', ['depends' => [Assets::className()]]);
+$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.edit.js', ['depends' => [Assets::className()]]);
+$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.table.js', ['depends' => [Assets::className()]]);
+
+$this->registerJsFile('http://momentjs.com/downloads/moment.js', ['depends' => [Assets::className()]]);
 ?>
