@@ -8,6 +8,8 @@ use common\models\GmsVideos;
 use common\components\helpers\FunctionsHelper;
 use mihaildev\ckeditor\Assets;
 
+\backend\assets\GmsAsset::register($this);
+
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylist */
 /* @var $form yii\widgets\ActiveForm */
@@ -705,15 +707,4 @@ JS;
 if (!$model->isNewRecord) {
     $this->registerJs($js_ready);
 }
-
-$this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
-$this->registerCssFile('http://wwwendt.de/tech/fancytree/src/skin-win8/ui.fancytree.css');
-
-$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
-$this->registerJsFile('//code.jquery.com/ui/1.12.1/jquery-ui.min.js', ['depends' => [Assets::className()]]);
-$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.js', ['depends' => [Assets::className()]]);
-$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.dnd.js', ['depends' => [Assets::className()]]);
-$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.edit.js', ['depends' => [Assets::className()]]);
-$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.table.js', ['depends' => [Assets::className()]]);
-$this->registerJsFile('http://momentjs.com/downloads/moment.js', ['depends' => [Assets::className()]]);
 ?>
