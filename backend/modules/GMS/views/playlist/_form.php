@@ -105,7 +105,7 @@ use mihaildev\ckeditor\Assets;
                                             <thead>
                                             <tr>
                                                 <th style="font-size: smaller" colspan="2">Итого</th>
-                                                <th colspan="3"><div class="duration-summ" id="duration-summ"></div></th>
+                                                <th colspan="3"><div class="duration-summ1" id="duration-summ1"></div></th>
                                             </tr>
                                             </thead>
                                         </table>
@@ -150,7 +150,7 @@ use mihaildev\ckeditor\Assets;
                                             <thead>
                                             <tr>
                                                 <th style="font-size: smaller" colspan="2">Итого</th>
-                                                <th colspan="3"><div class="duration-summ" id="duration-summ"></div></th>
+                                                <th colspan="3"><div class="duration-summ2" id="duration-summ2"></div></th>
                                             </tr>
                                             </thead>
                                         </table>
@@ -245,15 +245,15 @@ $commercef = json_encode($commercef);
 
 if (!$model->isNewRecord && !empty($model->jsonPlaylist)) {
     $standartf = new JsExpression('['.$model->jsonPlaylist.']');
-    $varJSON = $model->jsonPlaylist;
-    $this->registerJs("removeInputJSON({$varJSON});");
 }
 
 $js1 = <<< JS
- 
+    
+    var tree1 = $("#treetable1");
+    var tree2 = $("#treetable2"); 
+        
     $(function()
     {
-        var tree1 = $("#treetable1");
         tree1.fancytree({
             extensions: ["table", "dnd"],
             table: {
@@ -263,6 +263,12 @@ $js1 = <<< JS
             },                
             source: {$videof},
             dblclick: function(event, data) {
+                var playlistNode = tree2
+                    .fancytree("getTree")
+                    .getNodeByKey('playList[1]');
+                var addChild = [];
+                addChild.push(data.node);
+                playlistNode.addNode(addChild, 'child');
             },
             beforeActivate: function(event, data) {
             },
@@ -273,7 +279,7 @@ $js1 = <<< JS
                     var time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
                     tdList.eq(2).text(time);
                 } 
-                sumDuration(node.parent);
+                sumDuration(node.parent, '#duration-summ1');
             },
             dnd: {
                 preventVoidMoves : true,
@@ -292,8 +298,7 @@ $js1 = <<< JS
                 }
             }
         });
-        
-        var tree2 = $("#treetable2");
+
         tree2.fancytree({
             extensions: ["table", "dnd", "edit"],
             table: {
@@ -349,7 +354,7 @@ $js1 = <<< JS
                 if (!node.isFolder()) {
                     tdList.eq(4).html('<span id="trash-node" style="cursor:pointer;" class="glyphicon glyphicon-trash"></span>');
                 }
-                sumDuration(node.parent);
+                sumDuration(node.parent, '#duration-summ2');
             },
             edit: {
                 triggerStart: ["clickActive", "dblclick"],
@@ -422,14 +427,16 @@ $js1 = <<< JS
             e.stopPropagation(); 
             node.remove();
             node.render(true);
-            sumDuration(parent);
+            sumDuration(parent, '#duration-summ2');
         });
     });
     
     /**
+    * 
     * @param parent
+    * @param span
     */
-    function sumDuration (parent) 
+    function sumDuration (parent, span) 
     {
         var total = 0;
         var totalStr = '';
@@ -442,7 +449,7 @@ $js1 = <<< JS
         if (total > 0) {
             totalStr = moment.unix(total).utc().format("HH:mm:ss");
         }
-        $('#duration-summ').html(totalStr);
+        $(span).html(totalStr);
     }
     
     
@@ -456,7 +463,7 @@ $js1 = <<< JS
             jsonPlaylist.children.forEach(function(children) {            
                 
                 var childrenKey = children.key;
-                var childrenNode = $("#fancyree_input_list")
+                var childrenNode = tree2
                     .fancytree("getTree")
                     .getNodeByKey(childrenKey);
                 
@@ -476,7 +483,8 @@ $js1 = <<< JS
         var arrOut = {};
         var arrChildrenOne = [];
         var playListKey = "playList[1]";
-        var rootTitle = parentFolder.title;        
+        var rootTitle = parentFolder.title;
+        var rootIcon = parentFolder.icon;
         
         if ($("input").is("#gmsplaylist-jsonplaylist")) {
             $("#gmsplaylist-jsonplaylist").remove();
@@ -488,6 +496,7 @@ $js1 = <<< JS
 
         arrOut["key"] = playListKey;
         arrOut["title"] = rootTitle;
+        arrOut["icon"] = rootIcon;
         arrOut["folder"] = "true";
         arrOut["expanded"] = "true";
 
@@ -535,9 +544,9 @@ $js1 = <<< JS
     {
         var html_body = '';
         var htm_header = 'Ошибка сохранения плейлиста';
-        var parentFolder = $("#fancyree_output_list")
+        var parentFolder = tree2
             .fancytree("getTree")
-            .getNodeByKey("playList[{$playListKey}]"); 
+            .getNodeByKey("playList[1]"); 
         
         if (parentFolder !== null && parentFolder.children !== null) {
             addJSON(parentFolder);
@@ -609,30 +618,34 @@ $js1 = <<< JS
     */
     function setSender(region) 
     {
+        console.log(region);
         var senderSelect = $('.sender_id select');
-        var senderDisable = senderSelect.prop('disabled');
-        senderSelect.attr('disabled', true);
+        var senderDisable = senderSelect.prop('disabled'); 
+        senderSelect.attr('disabled', true); 
+        
+        $(".sender_id select option").each(function() {
+            $(this).remove();
+        }); 
+        senderSelect.append("<option value=''>---</option>");
+        
         $.ajax({
             url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
                 res = JSON.parse(res);
-                var optionsAsString = "<option value=''>---</option>";
-                if (res.results !== undefined && res.results.length > 0) {
+                var optionsAsString = "";
+                if (res !== null && res.results !== undefined && res.results.length > 0) {
                     var results = res.results; 
                     for (var i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
                         optionsAsString += results[i].id == '{$model->sender_id}' ? 'selected' : '';
                         optionsAsString += ">" + results[i].name + "</option>"
-                    }
+                     }
                 }
-                $(".sender_id select option").each(function() {
-                    $(this).remove();
-                });
-                $(".sender_id select").append( optionsAsString );
-                senderSelect.attr('disabled', senderDisable);
+                senderSelect.append( optionsAsString );
             }
         });
+        senderSelect.attr('disabled', senderDisable);
     }
     
     /**
@@ -640,16 +653,10 @@ $js1 = <<< JS
     */
     function disableTree(val) 
     {
-        console.log(val);       
-        if (val === '1') {
-            emptyList = {$standartf};                     
-        } else if (val === '2') {
-            emptyList = {$commercef};
-        }
-        
+        var emptyList;
+        val === '1' ?  emptyList = {$standartf} : emptyList = {$commercef};
         var regionObject = $("#treetable2");
         var regionTree = regionObject.fancytree("getTree");        
-        
         regionTree.reload(emptyList);
         resetPlayer();
     }
@@ -661,6 +668,8 @@ $js1 = <<< JS
         }
         myPlayer.reset();
         myPlayer.poster("../../img/logo.jpg");
+        myPlayer.width("645");
+        
         $('#video-info')
             .addClass('video-info-normal')
             .html(htm_table);        
@@ -694,19 +703,17 @@ $js_ready = <<<JS
     }); 
 JS;
 if (!$model->isNewRecord) {
-    $this->registerJs($js1);
+    $this->registerJs($js_ready);
 }
 
 $this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
-$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
-
 $this->registerCssFile('http://wwwendt.de/tech/fancytree/src/skin-win8/ui.fancytree.css');
 
+$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
 $this->registerJsFile('//code.jquery.com/ui/1.12.1/jquery-ui.min.js', ['depends' => [Assets::className()]]);
 $this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.js', ['depends' => [Assets::className()]]);
 $this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.dnd.js', ['depends' => [Assets::className()]]);
 $this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.edit.js', ['depends' => [Assets::className()]]);
 $this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.table.js', ['depends' => [Assets::className()]]);
-
 $this->registerJsFile('http://momentjs.com/downloads/moment.js', ['depends' => [Assets::className()]]);
 ?>
