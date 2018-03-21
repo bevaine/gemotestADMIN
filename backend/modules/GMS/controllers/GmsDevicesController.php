@@ -104,6 +104,38 @@ class GmsDevicesController extends Controller
         }
     }
 
+    public function actionActivate($id)
+    {
+        if ($model = $this->findModel($id)) {
+            $model->scenario = 'editDevice';
+            $model->auth_status = 1;
+            if (!$model->save()) {
+                print_r($model->errors);
+            } else {
+                //print_r($model);
+            }
+
+        }
+
+        return $this->redirect(['/GMS/gms-devices/index/auth']);
+    }
+
+    public function actionDeactivate($id)
+    {
+        if ($model = $this->findModel($id)) {
+            $model->scenario = 'editDevice';
+            $model->auth_status = 0;
+            //print_r($model);
+            if (!$model->save()) {
+                print_r($model->errors);
+            } else {
+
+            }
+        }
+
+        return $this->redirect(['index']);
+    }
+
     /**
      * Deletes an existing GmsDevices model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

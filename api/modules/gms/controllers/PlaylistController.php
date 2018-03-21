@@ -138,6 +138,10 @@ class PlaylistController extends ActiveController
      */
     private function getPlaylist($day = false)
     {
+        Yii::getLogger()->log([
+            '$this->modelDevice'=>$this->modelDevice
+        ], 1, 'binary');
+
         $currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
         $currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
 
@@ -150,6 +154,10 @@ class PlaylistController extends ActiveController
             ->andWhere(['<=', 'time_start', $currentTime])
             ->andWhere(['>=', 'time_end', $currentTime])
             ->andWhere(['=', 'active', 1]);
+
+        Yii::getLogger()->log([
+            '$findPlaylist'=>$findPlaylist->createCommand()->getRawSql()
+        ], 1, 'binary');
 
         if ($day) {
             $weekKeys = array_combine(array_keys(array_fill(1, 7, ''))

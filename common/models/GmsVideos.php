@@ -69,6 +69,7 @@ class GmsVideos extends \yii\db\ActiveRecord
             $modules[] = [
                 'key' => $model->id,
                 'title' => $model->name,
+                'icon' => '../../img/video1.png',
                 'data' => [
                     'duration' => $model->time,
                     'file' => $file_name

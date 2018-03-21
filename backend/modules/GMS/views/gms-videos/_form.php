@@ -19,9 +19,9 @@ $htmlFileUpload = <<<HTML
             file.preview.width = 720;     
             var html_text = "<div class='row'><div class='col-lg-10'>";
             html_text += "<label for='{class:control-label}'>Название</label>"
-            html_text += "<p><input type='text' value='" + txt_val + "' class='form-control' name='GmsVideos[" + fileSize + "][name]'></p>";
+            html_text += "<p><input style='width: 720px' type='text' value='" + txt_val + "' class='form-control' name='GmsVideos[" + fileSize + "][name]'></p>";
             html_text += "<label for='{class:control-label}'>Комментарий</label>";
-            html_text += "<p><textarea class='form-control' name='GmsVideos[" + fileSize + "][comment]' rows='6'></textarea></p>";
+            html_text += "<p><textarea style='width: 720px' class='form-control' name='GmsVideos[" + fileSize + "][comment]' rows='6'></textarea></p>";
             html_text += "</div></div>"
             node
                 .prepend("<br>")

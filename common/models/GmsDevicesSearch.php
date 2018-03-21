@@ -68,6 +68,15 @@ class GmsDevicesSearch extends GmsDevices
             ],
         ]);
 
+        $sort = $dataProvider->getSort();
+        $sort->attributes = array_merge($sort->attributes, [
+            'sender_name' => [
+                'asc' => ['gms_senders.sender_name' => SORT_ASC],
+                'desc' => ['gms_senders.sender_name' => SORT_DESC]
+            ]
+        ]);
+        $dataProvider->setSort($sort);
+
         $this->load($params);
 
         if (!$this->validate()) {
@@ -82,6 +91,7 @@ class GmsDevicesSearch extends GmsDevices
             'gms_devices.region_id' => $this->region_id,
             'auth_status' => $this->auth_status,
             'current_pls_id' => $this->current_pls_id,
+            'timezone' => $this->timezone,
         ]);
 
         if ($param == 'auth') {

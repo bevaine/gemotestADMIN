@@ -16,19 +16,19 @@ use DateTime;
 
 class FunctionsHelper
 {
-    static $timezone = [
-        '2' => 'Europe/Kaliningrad',
-        '3' => 'Europe/Moscow',
-        '4' => 'Europe/Samara',
-        '5' => 'Asia/Yekaterinburg',
-        '6' => 'Asia/Novosibirsk',
-        '7' => 'Asia/Novokuznetsk',
-        '8' => 'Asia/Irkutsk',
-        '9' => 'Asia/Yakutsk',
-        '10' => 'Asia/Magadan',
-        '11' => 'Asia/Sakhalin',
-        '12' => 'Asia/Kamchatka',
-    ];
+//    static $timezone = [
+//        '2' => 'Europe/Kaliningrad',
+//        '3' => 'Europe/Moscow',
+//        '4' => 'Europe/Samara',
+//        '5' => 'Asia/Yekaterinburg',
+//        '6' => 'Asia/Novosibirsk',
+//        '7' => 'Asia/Novokuznetsk',
+//        '8' => 'Asia/Irkutsk',
+//        '9' => 'Asia/Yakutsk',
+//        '10' => 'Asia/Magadan',
+//        '11' => 'Asia/Sakhalin',
+//        '12' => 'Asia/Kamchatka',
+//    ];
 
     static $timezones = [
         'Europe/Kaliningrad',

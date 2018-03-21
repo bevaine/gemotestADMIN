@@ -214,7 +214,7 @@ $videof = [
         'key' => 'playList[all]',
         'folder' => true,
         'expanded' => true,
-        'icon' => '../../img/video1.png',
+        'icon' => '../../img/playlist.png',
         'children' => GmsVideos::getVideosTree()
     ]
 ];

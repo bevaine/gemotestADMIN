@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use kartik\grid\GridView;
 use yii\helpers\Url;
 use common\models\GmsDevices;
+use common\components\helpers\FunctionsHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsDevicesSearch */
@@ -65,31 +66,36 @@ $this->params['breadcrumbs'][] = $this->title;
                             }
                         ],
                         [
-                            'attribute' => 'id',
-                            'headerOptions' => array('style' => 'width: 30px; text-align: center;'),
+                            'value' => function ($model) {
+                                /** @var $model \common\models\GmsDevices */
+                                return !empty($model->last_active_at)
+                                    ? date("Y-m-d H:i:s T", strtotime($model->last_active_at))
+                                    : null;
+                            },
+                            'attribute' => 'last_active_at'
                         ],
-                        'last_active_at',
-
                         [
                             'width'=>'196px',
                             'attribute' => 'created_at',
                             'value' => function ($model) {
                                 /** @var $model \common\models\GmsDevices */
-                                return !empty($model->created_at) ? $model->created_at : null;
+                                return !empty($model->created_at)
+                                    ? date("Y-m-d H:i:s T", strtotime($model->created_at))
+                                    : null;
                             },
                             'filter' => \kartik\date\DatePicker::widget([
                                 'model' => $searchModel,
                                 'attribute' => 'created_at_from',
                                 'attribute2' => 'created_at_to',
                                 'options' => [
-                                    'placeholder' => 'От',
+                                    'placeholder' => 'от',
                                     'style'=>['width' => '98px']
                                 ],
                                 'options2' => [
-                                    'placeholder' => 'До',
+                                    'placeholder' => 'до',
                                     'style'=>['width' => '98px']
                                 ],
-                                'separator' => 'По',
+                                'separator' => '-',
                                 'readonly' => false,
                                 'type' => \kartik\date\DatePicker::TYPE_RANGE,
                                 'pluginOptions' => [
@@ -117,6 +123,18 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'sender_name'
                         ],
                         [
+                            'headerOptions' => array('style' => 'width: 75px;'),
+                            'attribute' => 'timezone',
+                            'filter' => FunctionsHelper::getTimeZonesList(),
+                            'format' => 'text',
+                            'value' => function ($model) {
+                                /** @var \common\models\GmsDevicesSearch $model */
+                                if (array_key_exists($model['timezone'], FunctionsHelper::getTimeZonesList())) {
+                                    return FunctionsHelper::getTimeZonesList()[$model['timezone']];
+                                } else return null;
+                            }
+                        ],
+                        [
                             'value' => function ($model) {
                                 /** @var $model \common\models\GmsDevices */
                                 return !empty($model->playListOutModel) ? $model->playListOutModel->name : null;
@@ -137,6 +155,39 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $html;
                             }
                         ],
+                        [
+                            'headerOptions' => array('style' => 'text-align: center;'),
+                            'contentOptions' => function ($model, $key, $index, $column){
+                                return ['style' => 'text-align: center;'];
+                            },
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                /** @var \common\models\GmsDevicesSearch $model */
+                                if (empty($model['region_id'])
+                                    || empty($model['timezone'])
+                                    || empty($model['device']))
+                                    return "";
+
+                                $value = $model['auth_status'];
+                                if (!empty($value)) {
+                                    $img_name = 'on.jpg';
+                                    $title = "Заблокировать";
+                                    $action = "deactivate";
+                                } else {
+                                    $img_name = 'off.jpg';
+                                    $title = "Авторизировать";
+                                    $action = "activate";
+                                }
+                                return Html::a(
+                                    Html::img('/img/'.$img_name),
+                                    Url::to(["/GMS/gms-devices/".$action."/".$model['id']]),
+                                    [
+                                        'title' => $title,
+                                    ]
+                                );
+                            }
+                        ],
+
                         ['class' => 'yii\grid\ActionColumn'],
                     ],
                 ]); ?>
