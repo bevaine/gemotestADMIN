@@ -475,7 +475,7 @@ $js1 = <<< JS
     {
         var arrOut = {};
         var arrChildrenOne = [];
-        var playListKey = "playList[{$playListKey}]";
+        var playListKey = "playList[1]";
         var rootTitle = parentFolder.title;        
         
         if ($("input").is("#gmsplaylist-jsonplaylist")) {
