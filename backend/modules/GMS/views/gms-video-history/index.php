@@ -196,9 +196,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 $js1 = <<< JS
     
-    Timeline_ajax_url="http://itr-local.admin/timeline/timeline_ajax/simile-ajax-api.js";
-    Timeline_urlPrefix='http://itr-local.admin/timeline/timeline_js/';
-    Timeline_parameters='bundle=true';
+    Timeline_ajax_url = "../../timeline/timeline_ajax/simile-ajax-api.js";
+    Timeline_urlPrefix = '../../timeline/timeline_js/';
+    Timeline_parameters = 'bundle=true';
     
     $(function()
     {
