@@ -5,12 +5,15 @@ use kartik\grid\GridView;
 use mihaildev\ckeditor\Assets;
 use kartik\date\DatePicker;
 
+\backend\assets\GmsAsset::register($this);
+
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsVideosSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Видео библиотека';
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
     <style>
         .center {
@@ -112,8 +115,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <?php
-$this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
-$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
 $js1 = <<< JS
     function playVideo(name, file) 
     {

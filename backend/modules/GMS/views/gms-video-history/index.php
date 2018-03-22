@@ -2,12 +2,13 @@
 
 use yii\helpers\Html;
 use kartik\grid\GridView;
-use mihaildev\ckeditor\Assets;
 use yii\helpers\Url;
 use sjaakp\timeline\Timeline;
 use edofre\fullcalendar\Fullcalendar;
 use edofre\fullcalendar\models\Event;
 use yii\web\JsExpression;
+
+\backend\assets\GmsAsset::register($this);
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsVideoHistorySearch */
@@ -184,28 +185,26 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="row">
         <div class="col-lg-11">
             <?php
-            $events = [];
-            $searchModel = $dataProvider->getModels();
-            foreach ($searchModel as $model) {
-                /** @var \common\models\GmsVideoHistory $model */
-                $dateTime1 = strtotime($model['created_at']);
-                $dateTime2 = strtotime($model['last_at']);
-                $event = new Event([
-                    'id'               => uniqid(),
-                    'title'            => $model['video_name'],
-                    'start'            => date("Y-m-d\TH:i:s", $dateTime1),
-                    'source'            => 'qweqweqweqw',
-                    'end'              => date("Y-m-d\TH:i:s", $dateTime2),
-                    'url'              => 'https://github.com/Edofre/yii2-fullcalendar/blob/master/README.md',
-                    'editable'         => true,
-                    'startEditable'    => false,
-                    'durationEditable' => true,
-                ]);
-                $events[] = $event;
-            }
-            ?>
-            <?
-//            edofre\fullcalendar\Fullcalendar::widget([
+//            $events = [];
+//            $searchModel = $dataProvider->getModels();
+//            foreach ($searchModel as $model) {
+//                /** @var \common\models\GmsVideoHistory $model */
+//                $dateTime1 = strtotime($model['created_at']);
+//                $dateTime2 = strtotime($model['last_at']);
+//                $event = new Event([
+//                    'id'               => uniqid(),
+//                    'title'            => $model['video_name'],
+//                    'start'            => date("Y-m-d\TH:i:s", $dateTime1),
+//                    'source'            => 'qweqweqweqw',
+//                    'end'              => date("Y-m-d\TH:i:s", $dateTime2),
+//                    'url'              => 'https://github.com/Edofre/yii2-fullcalendar/blob/master/README.md',
+//                    'editable'         => true,
+//                    'startEditable'    => false,
+//                    'durationEditable' => true,
+//                ]);
+//                $events[] = $event;
+//            }
+//            echo edofre\fullcalendar\Fullcalendar::widget([
 //                    'options'       => [
 //                        'id'       => 'calendar',
 //                        'language' => 'ru',
@@ -228,8 +227,6 @@ $this->params['breadcrumbs'][] = $this->title;
 </div>
 
 <?php
-$this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
-$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
 $js1 = <<< JS
     function playVideo(name, file) {
         $('.video-js').prop('controls',true);
