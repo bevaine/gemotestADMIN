@@ -265,5 +265,5 @@ $js1 = <<< JS
     }
 JS;
 $this->registerJs($js1, yii\web\View::POS_HEAD);
-$this->registerJsFile('http://itr-local.admin/timeline/timeline-api.js', ['position' => yii\web\View::POS_HEAD]);
+$this->registerJsFile('../../timeline/timeline-api.js', ['position' => yii\web\View::POS_HEAD]);
 ?>
