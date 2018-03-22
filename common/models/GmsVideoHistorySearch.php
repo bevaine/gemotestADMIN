@@ -81,8 +81,8 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             $query->andFilterWhere(['<=', 't.last_at', date('Y-m-d 23:59:59 P', strtotime($this->date_to))]);
         }
 
-        $dataProvider = new SqlDataProvider([
-            'sql' => $query->createCommand()->getRawSql(),
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
             'sort' => [
                 'defaultOrder' => [
                     'id' => SORT_DESC
@@ -116,9 +116,13 @@ class GmsVideoHistorySearch extends GmsVideoHistory
                 'asc' => ['t.device_id' => SORT_ASC],
                 'desc' => ['t.device_id' => SORT_DESC]
             ],
-            'date_at' => [
+            'created_at' => [
                 'asc' => ['t.created_at' => SORT_ASC],
                 'desc' => ['t.created_at' => SORT_DESC]
+            ],
+            'last_at' => [
+                'asc' => ['t.last_at' => SORT_ASC],
+                'desc' => ['t.last_at' => SORT_DESC]
             ],
         ]);
 

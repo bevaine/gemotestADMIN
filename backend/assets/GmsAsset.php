@@ -16,7 +16,7 @@ class GmsAsset extends AssetBundle
 
     public $css = [
         'css/fancytree/ui.fancytree.css',
-        'css/video-js.css'
+        'css/video-js.css',
     ];
     public $js = [
         'js/jquery-ui.min.js',
