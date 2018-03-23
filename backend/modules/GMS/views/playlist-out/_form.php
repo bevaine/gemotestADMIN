@@ -11,6 +11,8 @@ use yii\web\JsExpression;
 use wbraganca\fancytree\FancytreeWidget;
 use mihaildev\ckeditor\Assets;
 
+\backend\assets\GmsAsset::register($this);
+
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylistOut */
 /* @var $form yii\widgets\ActiveForm */
@@ -903,13 +905,5 @@ $js1 = <<< JS
         }, 1000);        
     }); 
 JS;
-
-$this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
-$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
-
-$this->registerCssFile('http://wwwendt.de/tech/fancytree/src/skin-win8/ui.fancytree.css');
-$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.js', ['depends' => [Assets::className()]]);
-$this->registerJsFile('http://wwwendt.de/tech/fancytree/src/jquery.fancytree.table.js', ['depends' => [Assets::className()]]);
-$this->registerJsFile('http://momentjs.com/downloads/moment.js', ['depends' => [Assets::className()]]);
 $this->registerJs($js1);
 ?>

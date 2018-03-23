@@ -25,7 +25,6 @@ $this->params['breadcrumbs'][] = $this->title;
         top: 50%;
         transform: translate(-50%, -50%);
     }
-
 </style>
 
 
@@ -196,8 +195,8 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php
 $js1 = <<< JS
     
-    Timeline_ajax_url = "../../timeline/timeline_ajax/simile-ajax-api.js";
-    Timeline_urlPrefix = '../../timeline/timeline_js/';
+    Timeline_ajax_url = "../../timeline/simile-ajax-api.js";
+    Timeline_urlPrefix = '../../timeline/';
     Timeline_parameters = 'bundle=true';
     
     $(function()
@@ -224,14 +223,14 @@ $js1 = <<< JS
             
             tl = Timeline.create(document.getElementById("tl"), bandInfos, Timeline.HORIZONTAL);
             // stop browser caching of data during testing...
-            tl.loadJSON("../../cubism.js", function(json, url) {
+            tl.loadJSON("../../cubism.json", function(json, url) {
                 eventSource.loadJSON(json, url);
             });
     });
 
     var resizeTimerID = null;
     function onResize() {
-        if (resizeTimerID == null) {
+        if (resizeTimerID === null) {
             resizeTimerID = window.setTimeout(function() {
                 resizeTimerID = null;
                 tl.layout();
