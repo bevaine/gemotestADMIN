@@ -17,6 +17,8 @@ use DateTimeZone;
 /**
  * @property GmsDevices $modelDevice
  * @property integer $timeForTimeZone
+ * @property integer $currentDate
+ * @property integer $currentTime
  * Country Controller API
  *
  * @author Budi Irawan <deerawan@gmail.com>
@@ -25,6 +27,8 @@ class PlaylistController extends ActiveController
 {
     public $modelDevice;
     public $timeForTimeZone;
+    public $currentDate;
+    public $currentTime;
 
     /**
      * @var string
@@ -134,41 +138,51 @@ class PlaylistController extends ActiveController
 
     /**
      * @param bool $day
-     * @return yii\db\ActiveRecord
+     * @return bool|GmsPlaylistOut
      */
     private function getPlaylist($day = false)
     {
-        Yii::getLogger()->log([
-            '$this->modelDevice'=>$this->modelDevice
-        ], 1, 'binary');
+        $arr_with_dev = '';
+        $arr_without_dev = '';
 
-        $currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
-        $currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
+        $this->currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
+        $this->currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
 
         $findPlaylist = GmsPlaylistOut::find()
             ->andFilterWhere(['region_id' => $this->modelDevice->region_id])
             ->andFilterWhere(['sender_id' => $this->modelDevice->sender_id])
-            ->andFilterWhere(['device_id' => $this->modelDevice->id])
-            ->andWhere(['<=', 'date_start', $currentDate])
-            ->andWhere(['>=', 'date_end', $currentDate])
-            ->andWhere(['<=', 'time_start', $currentTime])
-            ->andWhere(['>=', 'time_end', $currentTime])
+            ->andWhere([
+                'OR',
+                ['device_id' => $this->modelDevice->id],
+                ['is', 'device_id' , null]
+            ])
+            ->andWhere(['<=', 'date_start', $this->currentDate])
+            ->andWhere(['>=', 'date_end', $this->currentDate])
+            ->andWhere(['<=', 'time_start', $this->currentTime])
+            ->andWhere(['>=', 'time_end', $this->currentTime])
             ->andWhere(['=', 'active', 1]);
 
-        Yii::getLogger()->log([
-            '$findPlaylist'=>$findPlaylist->createCommand()->getRawSql()
-        ], 1, 'binary');
-
         if ($day) {
-            $weekKeys = array_combine(array_keys(array_fill(1, 7, ''))
-                , array_keys(GmsPlaylistOut::WEEK));
+            $weekKeys = array_combine(
+                array_keys(
+                    array_fill(1, 7, '')
+                ), array_keys(GmsPlaylistOut::WEEK)
+            );
 
             $currentDay = date("N", time());
             $currentDayField = $weekKeys[$currentDay];
-
             $findPlaylist->andWhere(['=', $currentDayField, 1]);
         }
-        return $findPlaylist->one();
+
+        foreach ($findPlaylist->each() as $model) {
+            /** @var GmsPlaylistOut $model */
+            if (!empty($model->device_id)) $arr_with_dev = $model;
+            else $arr_without_dev = $model;
+        }
+
+        if (!empty($arr_with_dev)) return $arr_with_dev;
+        elseif (!empty($arr_without_dev)) return $arr_without_dev;
+        else return false;
     }
 
     /**

@@ -160,11 +160,12 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
-        echo rawurldecode(base64_decode("%u0420%u0435%u043A%u043E%u043C%u0435%u043D%u0434%u0443%u0435%u043C%21%20%u041C%u0435%u0434%u0438%u0446%u0438%u043D%u0441%u043A%u0430%u044F%20%u043B%u0430%u0431%u043E%u0440%u0430%u0442%u043E%u0440%u0438%u044F%20%27%u0413%u0435%u043C%u043E%u0442%u0435%u0441%u0442%27"));
-        echo '\r\n';
-        echo rawurldecode(base64_decode("%D0%A0%D0%B5%D0%BA%D0%BE%D0%BC%D0%B5%D0%BD%D0%B4%D1%83%D0%B5%D0%BC%21%20%D0%9C%D0%B5%D0%B4%D0%B8%D1%86%D0%B8%D0%BD%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BB%D0%B0%D0%B1%D0%BE%D1%80%D0%B0%D1%82%D0%BE%D1%80%D0%B8%D1%8F%20%27%D0%93%D0%B5%D0%BC%D0%BE%D1%82%D0%B5%D1%81%D1%82%27"));
-
-
+        $s = GmsPlaylistOut::find()->where(['device_id' => 5]);
+        foreach ($s->each() as $customer) {
+            print_r($customer);
+            // $customer - это объекта класса Customer
+        }
+        //print_r($s);
         exit;
         $array1 = array("a" => "green", "red", "blue", "red");
         $array2 = array("b" => "green", "yellow", "red");
