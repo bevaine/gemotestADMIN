@@ -137,14 +137,10 @@ class PlaylistController extends ActiveController
     }
 
     /**
-     * @param bool $day
-     * @return bool|GmsPlaylistOut
+     * @return array|bool
      */
-    private function getPlaylist($day = false)
+    private function getPlaylist()
     {
-        $arr_with_dev = '';
-        $arr_without_dev = '';
-
         $this->currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
         $this->currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
 
@@ -160,29 +156,61 @@ class PlaylistController extends ActiveController
             ->andWhere(['>=', 'date_end', $this->currentDate])
             ->andWhere(['<=', 'time_start', $this->currentTime])
             ->andWhere(['>=', 'time_end', $this->currentTime])
-            ->andWhere(['=', 'active', 1]);
+            ->andWhere(['=', 'active', 1])->asArray()->all();
 
-        if ($day) {
-            $weekKeys = array_combine(
-                array_keys(
-                    array_fill(1, 7, '')
-                ), array_keys(GmsPlaylistOut::WEEK)
-            );
+        if (!$findPlaylist) return false;
 
-            $currentDay = date("N", time());
-            $currentDayField = $weekKeys[$currentDay];
-            $findPlaylist->andWhere(['=', $currentDayField, 1]);
+        $weekKeys = array_combine(
+            array_keys(
+                array_fill(1, 7, '')
+            ), array_keys(GmsPlaylistOut::WEEK)
+        );
+
+        $currentDay = date("N", time());
+        $currentDayField = $weekKeys[$currentDay];
+
+        $key_set = ArrayHelper::getColumn($findPlaylist, 'id');
+        $dev_set = array_combine($key_set, ArrayHelper::getColumn($findPlaylist, 'device_id'));
+        $day_set = array_combine($key_set, ArrayHelper::getColumn($findPlaylist, $currentDayField));
+        $created_set = array_combine($key_set, ArrayHelper::getColumn($findPlaylist, 'created_at'));
+
+        //todo если установлен день и устройство
+        foreach ($key_set as $key) {
+            if (!empty($day_set[$key]) && !empty($dev_set[$key])) {
+                return [
+                    "model" => GmsPlaylistOut::findOne($key),
+                    "state" => 1
+                ];
+            }
         }
 
-        foreach ($findPlaylist->each() as $model) {
-            /** @var GmsPlaylistOut $model */
-            if (!empty($model->device_id)) $arr_with_dev = $model;
-            else $arr_without_dev = $model;
+        //todo если нет дня но есть устройство
+        foreach ($key_set as $key) {
+            if (empty($day_set[$key]) && !empty($dev_set[$key])) {
+                return [
+                    "model" => GmsPlaylistOut::findOne($key),
+                    "state" => 2
+                ];
+            }
         }
 
-        if (!empty($arr_with_dev)) return $arr_with_dev;
-        elseif (!empty($arr_without_dev)) return $arr_without_dev;
-        else return false;
+        //todo если есть день но нет устройства
+        foreach ($key_set as $key) {
+           if (!empty($day_set[$key]) && empty($dev_set[$key])) {
+               return [
+                   "model" => GmsPlaylistOut::findOne($key),
+                   "state" => 3
+               ];
+            }
+        }
+
+        //todo если пустой день и нет устройства, возвращаем по дате создания
+        $key_min = min($created_set);
+        $key = array_search($key_min, $created_set);
+        return [
+            "model" => GmsPlaylistOut::findOne($key),
+            "state" => 4
+        ];
     }
 
     /**
@@ -190,15 +218,12 @@ class PlaylistController extends ActiveController
      */
     private function getCurrentPlaylist ()
     {
-        if ($findPlaylist = self::getPlaylist(true)) {
-            return $findPlaylist;
-        } elseif ($findPlaylist = self::getPlaylist(false)) {
-            $weekCross = array_intersect_key(ArrayHelper::toArray($findPlaylist), GmsPlaylistOut::WEEK);
-            $weekCross = array_filter($weekCross);
-            if (empty($weekCross)) return $findPlaylist;
-            else return false;
-        } else {
-            return false;
-        }
+        if ($findPlaylist = self::getPlaylist()) {
+            $model = $findPlaylist["model"];
+            Yii::getLogger()->log([
+                '$findPlaylist' => $findPlaylist
+            ], 1, 'binary');
+            return $model;
+        } else return false;
     }
 }
