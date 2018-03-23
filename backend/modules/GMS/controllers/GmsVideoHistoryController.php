@@ -121,4 +121,35 @@ class GmsVideoHistoryController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+    public function actionAjaxVideoList()
+    {
+        $searchModel = new GmsVideoHistorySearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        echo $this->createJson($dataProvider->getModels());
+    }
+
+    public function createJson($model)
+    {
+        $node = [];
+        if ($model && is_array($model)) {
+            foreach ($model as $field) {
+                $node[] = [
+                    'start' => $field['created_at'],
+                    'end' => $field['last_at'],
+                    'title' => $field['name'],
+                    'description' => $field['comment'],
+                    'image' => $field['thumbnail'],
+                    'link' => $field['file'],
+                ];
+            }
+        }
+        $arrJson = [
+            'dateTimeFormat' => 'iso8601',
+            'wikiURL' => 'https://corptv.gemotest.ru/wiki/content/admin',
+            'wikiSection' => 'Просмотр истории показанных видео-роликов',
+            'events' => $node
+        ];
+        echo json_encode($arrJson);
+    }
 }

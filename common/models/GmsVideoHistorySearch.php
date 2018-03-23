@@ -24,6 +24,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
     public $pls_name;
     public $date_from;
     public $date_to;
+    public $sender_id;
 
     public function rules()
     {
@@ -57,7 +58,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             ->joinWith('playListOutModel t3')
             ->joinWith('videoModel t4')
             ->joinWith('deviceModel t5')
-            ->select("t.*, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.name video_name, t4.thumbnail, t4.file, t5.id dev_id");
+            ->select("t.*, t.created_at start_at, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.*, t5.id dev_id");
 
         // grid filtering conditions
         $query->andFilterWhere(['t.id' => $this->id]);
@@ -81,8 +82,8 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             $query->andFilterWhere(['<=', 't.last_at', date('Y-m-d 23:59:59 P', strtotime($this->date_to))]);
         }
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
+        $dataProvider = new SqlDataProvider([
+            'sql' => $query->createCommand()->rawSql,
             'sort' => [
                 'defaultOrder' => [
                     'id' => SORT_DESC
