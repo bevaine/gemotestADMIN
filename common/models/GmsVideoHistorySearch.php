@@ -58,7 +58,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             ->joinWith('playListOutModel t3')
             ->joinWith('videoModel t4')
             ->joinWith('deviceModel t5')
-            ->select("t.*, t.created_at start_at, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.*, t4.name video_name, t5.id dev_id");
+            ->select("t.*, t.id hv_id, t.created_at start_at, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.*, t4.name video_name, t5.id dev_id");
 
         // grid filtering conditions
         $query->andFilterWhere(['t.id' => $this->id]);

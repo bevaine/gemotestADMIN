@@ -4,11 +4,13 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 use mihaildev\ckeditor\Assets;
 
+\backend\assets\GmsAsset::register($this);
+
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsVideos */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Gms Videos', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Библиотека видео', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 
 $htmlPlayer = <<<HTML
@@ -69,20 +71,3 @@ HTML;
     ]) ?>
 
 </div>
-
-<?php
-$js1 = <<< JS
-  
-    $(function()
-    {
-        var videoPath = res.results.file; 
-        var myPlayer = videojs('my-player');
-        //myPlayer.src(videoPath);
-        //myPlayer.ready(function() {
-            //this.play();
-        //});   
-    });
-JS;
-$this->registerCssFile("https://unpkg.com/video.js/dist/video-js.css");
-$this->registerJsFile('https://unpkg.com/video.js/dist/video.js', ['depends' => [Assets::className()]]);
-?>
