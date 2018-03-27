@@ -182,7 +182,21 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
             ],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'GMS/gms-video-history/view',
+                            'id' => $model['vh_id']
+                        ]);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                    },
+                ],
+                'template' => '{view}'
+            ]
         ],
     ]);
     ?>
