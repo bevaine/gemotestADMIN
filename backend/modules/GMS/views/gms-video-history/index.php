@@ -70,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'attribute' => 'id'
             ],
-            [
+             [
                 'headerOptions' => array('style' => 'width: 200px;'),
                 'label' => 'Видео',
                 'value' => function($model) {
@@ -96,40 +96,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
             ],
             [
-                'filter' =>  \common\models\GmsRegions::getRegionList(),
-                'value' => function ($model) {
-                    return !empty($model["region_name"]) ? $model["region_name"] : null;
-                },
-                'attribute' => 'region_id'
-            ],
-            [
-                'value' => function ($model) {
-                    return !empty($model["sender_name"]) ? $model["sender_name"] : null;
-                },
-                'attribute' => 'sender_name'
-            ],
-            [
-                'attribute' => 'device_id',
-                'width'=>'120px',
-                'value' => function($model) {
-                    return Html::a(
-                        $model['device_id'],
-                        Url::to(["/GMS/gms-devices/view?id=".$model['dev_id']]),
-                        [
-                            'title' => $model['device_id'],
-                            'target' => '_blank'
-                        ]
-                    );
-                },
-                'format' => 'raw',
-            ],
-            [
                 'width'=>'196px',
                 'attribute' => 'date_at',
                 'value' => function($model) {
                     $html = '';
-                    if (!empty($model['created_at'])) {
-                        $html .= 'с '.$model['created_at'];
+                    if (!empty($model['start_at'])) {
+                        $html .= 'с '.$model['start_at'];
                     } else {
                         $html .= "по <span class='not-set'>(не задано)</span>";
                     }
@@ -162,6 +134,34 @@ $this->params['breadcrumbs'][] = $this->title;
                     ]
                 ]),
                 'format' => 'html', // datetime
+            ],
+            [
+                'filter' =>  \common\models\GmsRegions::getRegionList(),
+                'value' => function ($model) {
+                    return !empty($model["region_name"]) ? $model["region_name"] : null;
+                },
+                'attribute' => 'region_id'
+            ],
+            [
+                'value' => function ($model) {
+                    return !empty($model["sender_name"]) ? $model["sender_name"] : null;
+                },
+                'attribute' => 'sender_name'
+            ],
+            [
+                'attribute' => 'device_id',
+                'width'=>'120px',
+                'value' => function($model) {
+                    return Html::a(
+                        $model['device_id'],
+                        Url::to(["/GMS/gms-devices/view?id=".$model['dev_id']]),
+                        [
+                            'title' => $model['device_id'],
+                            'target' => '_blank'
+                        ]
+                    );
+                },
+                'format' => 'raw',
             ],
             //'created_at:datetime',
             //'last_at:datetime',
@@ -455,8 +455,9 @@ $js1 = <<< JS
         });
         deviceSelect.attr('disabled', deviceDisable);
     }
+JS;
 
-
+$js2 = <<< JS
     function playVideo(name, file) {
         $('.video-js').prop('controls',true);
         var player = videojs('my-player');
@@ -484,5 +485,5 @@ JS;
 
 //$this->registerJsFile('../../timeline/timeline-api.js?bundle=true', ['position' => yii\web\View::POS_HEAD]);
 //$this->registerJsFile('../../timeline/scripts/examples.js', ['position' => yii\web\View::POS_HEAD]);
-//$this->registerJs($js1, yii\web\View::POS_HEAD);
+$this->registerJs($js2, yii\web\View::POS_HEAD);
 ?>
