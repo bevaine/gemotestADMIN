@@ -185,67 +185,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]);
-
     ?>
-<!--    <div class="gms-playlist-out-form">-->
-<!---->
-<!--        <div class="row">-->
-<!--            <div class="col-lg-11">-->
-<!--                <div id="tl" class="timeline-default" style="height: 300px;"></div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        <div class="row">-->
-<!--            <div class="col-lg-11">-->
-<!--                <div class="controls" id="controls"></div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        --><?php //$form = ActiveForm::begin(['id' => 'form']); ?>
-<!--        <div class="row">-->
-<!--            <div class="col-xs-5">-->
-<!--                <div class="row">-->
-<!--                    <div class="col-xs-12">-->
-<!--                        <div class="form-group region_id">-->
-<!--                            --><?//= $form->field($searchModel, 'region_id')->dropDownList(GmsRegions::getRegionList()); ?>
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="row">-->
-<!--                    <div class="col-xs-12">-->
-<!--                        <div class="form-group sender_id">-->
-<!--                            --><?//= $form->field($searchModel, 'sender_id')->dropDownList([], ['prompt' => '---']); ?>
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="row">-->
-<!--                    <div class="col-xs-12">-->
-<!--                        <div class="form-group device_id">-->
-<!--                            --><?//= $form->field($searchModel, 'device_id')->dropDownList([], ['prompt' => '---']);
-//                            ?>
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="col-xs-6">-->
-<!--                <video-->
-<!--                        id="my-player"-->
-<!--                        class="video-js"-->
-<!--                        controls-->
-<!--                        preload="auto"-->
-<!--                        poster="../../img/logo.jpg"-->
-<!--                        width="783"-->
-<!--                        data-setup='{}'>-->
-<!--                    <p class="vjs-no-js">-->
-<!--                        To view this video please enable JavaScript, and consider upgrading to a-->
-<!--                        web browser that-->
-<!--                        <a href="http://videojs.com/html5-video-support/" target="_blank">-->
-<!--                            supports HTML5 video-->
-<!--                        </a>-->
-<!--                    </p>-->
-<!--                </video>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--        --><?php //ActiveForm::end(); ?>
-<!--    </div>-->
 </div>
 
 <?php
@@ -542,7 +482,7 @@ $js1 = <<< JS
     }
 JS;
 
-$this->registerJsFile('../../timeline/timeline-api.js?bundle=true', ['position' => yii\web\View::POS_HEAD]);
-$this->registerJsFile('../../timeline/scripts/examples.js', ['position' => yii\web\View::POS_HEAD]);
-$this->registerJs($js1, yii\web\View::POS_HEAD);
+//$this->registerJsFile('../../timeline/timeline-api.js?bundle=true', ['position' => yii\web\View::POS_HEAD]);
+//$this->registerJsFile('../../timeline/scripts/examples.js', ['position' => yii\web\View::POS_HEAD]);
+//$this->registerJs($js1, yii\web\View::POS_HEAD);
 ?>
