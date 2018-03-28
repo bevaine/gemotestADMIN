@@ -79,7 +79,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return null;
                 },
                 'format' => 'html',
-                'group'=> false,
+                'group'=> true,
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
             [
