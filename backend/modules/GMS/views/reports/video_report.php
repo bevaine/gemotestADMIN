@@ -47,6 +47,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
             [
+                'value' => function ($model) {
+                    return !empty($model["start_at"]) ? date("Y-m-d H:i:s T", strtotime($model["start_at"])) : null;
+                },
+                'attribute' => 'start_at',
+                'group'=> false,
+                'pageSummaryOptions'=>['class'=>'text-right']
+            ],
+            [
+                'value' => function ($model) {
+                    return !empty($model["last_at"]) ? date("Y-m-d H:i:s T", strtotime($model["last_at"])) : null;
+                },
+                'attribute' => 'last_at',
+                'group'=> false,
+                'pageSummaryOptions'=>['class'=>'text-right']
+            ],
+            [
                 'filter' =>  \common\models\GmsRegions::getRegionList(),
                 'value' => function ($model) {
                     return !empty($model["region_name"]) ? $model["region_name"] : null;
@@ -115,25 +131,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     return null;
                 },
                 'format' => 'html',
-                'group'=> true,
+                'group'=> false,
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
-            [
-                'value' => function ($model) {
-                    return !empty($model["start_at"]) ? $model["start_at"] : null;
-                },
-                'attribute' => 'start_at',
-                'group'=> true,
-                'pageSummaryOptions'=>['class'=>'text-right']
-            ],
-            [
-                'value' => function ($model) {
-                    return !empty($model["last_at"]) ? $model["last_at"] : null;
-                },
-                'attribute' => 'last_at',
-                'group'=> true,
-                'pageSummaryOptions'=>['class'=>'text-right']
-            ],
+
         ],
     ]);
     ?>
