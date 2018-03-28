@@ -10,7 +10,7 @@ use common\models\GmsPlaylistOut;
 /* @var $searchModel common\models\GmsVideoHistorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Gms Video Histories';
+$this->title = 'Отчет по воспроизведенным видео';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-video-history-index">
@@ -28,6 +28,22 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'kartik\grid\SerialColumn'],
 
+            [
+                'value' => function ($model) {
+                    return !empty($model["start_at"]) ? date("Y-m-d H:i:s T", strtotime($model["start_at"])) : null;
+                },
+                'attribute' => 'start_at',
+                'group'=> false,
+                'pageSummaryOptions'=>['class'=>'text-right']
+            ],
+            [
+                'value' => function ($model) {
+                    return !empty($model["last_at"]) ? date("Y-m-d H:i:s T", strtotime($model["last_at"])) : null;
+                },
+                'attribute' => 'last_at',
+                'group'=> false,
+                'pageSummaryOptions'=>['class'=>'text-right']
+            ],
             [
                 'headerOptions' => array('style' => 'width: 200px;'),
                 'label' => 'Видео',
@@ -47,18 +63,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
             [
-                'value' => function ($model) {
-                    return !empty($model["start_at"]) ? date("Y-m-d H:i:s T", strtotime($model["start_at"])) : null;
+                'headerOptions' => array('style' => 'width: 200px;'),
+                'label' => 'Тип видео',
+                'value' => function($model) {
+                    /** @var $model \common\models\GmsVideoHistory */
+                    if (!$findModel = GmsPlaylistOut::findOne($model['pls_id'])) return null;
+                    if ($data = $findModel->getVideoData($model['video_key'])) {
+                        if (empty($data->type)) return null;
+                        if ($data->type == 1) {
+                            return 'Стандартный';
+                        } elseif ($data->type == 2) {
+                            return 'Коммерческий';
+                        }
+                    }
+                    return null;
                 },
-                'attribute' => 'start_at',
-                'group'=> false,
-                'pageSummaryOptions'=>['class'=>'text-right']
-            ],
-            [
-                'value' => function ($model) {
-                    return !empty($model["last_at"]) ? date("Y-m-d H:i:s T", strtotime($model["last_at"])) : null;
-                },
-                'attribute' => 'last_at',
+                'format' => 'html',
                 'group'=> false,
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
@@ -114,27 +134,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'group'=> true,
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
-            [
-                'headerOptions' => array('style' => 'width: 200px;'),
-                'label' => 'Тип видео',
-                'value' => function($model) {
-                    /** @var $model \common\models\GmsVideoHistory */
-                    if (!$findModel = GmsPlaylistOut::findOne($model['pls_id'])) return null;
-                    if ($data = $findModel->getVideoData($model['video_key'])) {
-                        if (empty($data->type)) return null;
-                        if ($data->type == 1) {
-                            return 'Стандартный';
-                        } elseif ($data->type == 2) {
-                            return 'Коммерческий';
-                        }
-                    }
-                    return null;
-                },
-                'format' => 'html',
-                'group'=> false,
-                'pageSummaryOptions'=>['class'=>'text-right']
-            ],
-
         ],
     ]);
     ?>
