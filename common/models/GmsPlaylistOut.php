@@ -37,6 +37,7 @@ use yii\helpers\Url;
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsDevices $deviceModel
+ * @property integer $videoType
  * @property array $videos
  *
  */
@@ -343,6 +344,22 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             if ($findVideos = GmsVideos::find()->where(['in', 'id' , $arrKeys])->all()) {
                 $findVideos = ArrayHelper::getColumn($findVideos, 'file');
                 return $findVideos;
+            }
+        }
+        return false;
+    }
+
+    public function getVideoData($video_key)
+    {
+        /** @var GmsPlaylistOut $findModel */
+        if (!empty($this->jsonPlaylist)) {
+            $jsonPlaylist = json_decode($this->jsonPlaylist);
+            if (empty($jsonPlaylist->children)) return false;
+            $arrTypes = ArrayHelper::getColumn($jsonPlaylist->children, 'data');
+            $arrKeys = ArrayHelper::getColumn($jsonPlaylist->children, 'key');
+            $arr_comb = array_combine($arrKeys , $arrTypes);
+            if (array_key_exists($video_key, $arr_comb)) {
+                return $arr_comb[$video_key];
             }
         }
         return false;
