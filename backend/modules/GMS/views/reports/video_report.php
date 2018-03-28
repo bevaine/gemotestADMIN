@@ -95,6 +95,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     );
                 },
                 'format' => 'raw',
+                'group'=> true,
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
             [
@@ -114,6 +115,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return null;
                 },
                 'format' => 'html',
+                'group'=> true,
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
             [
@@ -121,6 +123,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return !empty($model["start_at"]) ? $model["start_at"] : null;
                 },
                 'attribute' => 'start_at',
+                'group'=> true,
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
             [
@@ -128,6 +131,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return !empty($model["last_at"]) ? $model["last_at"] : null;
                 },
                 'attribute' => 'last_at',
+                'group'=> true,
                 'pageSummaryOptions'=>['class'=>'text-right']
             ],
         ],
