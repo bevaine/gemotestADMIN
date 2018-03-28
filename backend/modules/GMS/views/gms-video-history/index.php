@@ -10,6 +10,7 @@ use yii\web\JsExpression;
 use common\models\GmsRegions;
 use yii\widgets\ActiveForm;
 use yii\web\JqueryAsset;
+use common\models\GmsPlaylistOut;
 
 \backend\assets\GmsAsset::register($this);
 
@@ -89,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             'title' => $model['video_name'],
                             'target' => '_blank',
-                            'onclick' => "playVideo('{$model['id']}', '{$model['file']}')"
+                            'onclick' => "playVideo('{$model['video_key']}', '{$model['file']}')"
                         ]
                     );
                 },
@@ -180,6 +181,24 @@ $this->params['breadcrumbs'][] = $this->title;
                     );
                 },
                 'format' => 'raw',
+            ],
+            [
+                'headerOptions' => array('style' => 'width: 200px;'),
+                'label' => 'Тип видео',
+                'value' => function($model) {
+                    /** @var $model \common\models\GmsVideoHistory */
+                    if (!$findModel = GmsPlaylistOut::findOne($model['pls_id'])) return null;
+                    if ($data = $findModel->getVideoData($model['video_key'])) {
+                        if (empty($data->type)) return null;
+                        if ($data->type == 1) {
+                            return 'Стандартный';
+                        } elseif ($data->type == 2) {
+                            return 'Коммерческий';
+                        }
+                    }
+                    return null;
+                },
+                'format' => 'html',
             ],
 
             [

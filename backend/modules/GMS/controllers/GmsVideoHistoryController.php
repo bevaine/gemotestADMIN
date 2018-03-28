@@ -135,7 +135,7 @@ class GmsVideoHistoryController extends Controller
         if ($model && is_array($model)) {
             foreach ($model as $field) {
                 $node[] = [
-                    'start' => $field['created_at'],
+                    'start' => $field['start_at'],
                     'end' => $field['last_at'],
                     'title' => $field['name'],
                     'description' => $field['comment'],
