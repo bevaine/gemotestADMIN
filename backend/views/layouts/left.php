@@ -26,6 +26,14 @@
                             ['label' => 'Устройства', 'icon' => 'file-code-o', 'url' => ['/GMS/gms-devices']],
                             ['label' => 'Плейлисты', 'icon' => 'file-code-o', 'url' => ['/GMS/playlist-out']],
                             ['label' => 'Шаблоны', 'icon' => 'file-code-o', 'url' => ['/GMS/playlist']],
+                            ['label' => 'Отчеты',
+                                'icon' => 'circle-o',
+                                'url' => '#',
+                                'active' => true,
+                                'items' => [
+                                    ['label' => 'Видео', 'icon' => 'dashboard', 'url' => '/GMS/reports/video'],
+                                ]
+                            ],
                             ['label' => 'История',
                                 'icon' => 'circle-o',
                                 'url' => '#',

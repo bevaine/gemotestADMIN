@@ -10,9 +10,10 @@ use yii\data\SqlDataProvider;
 
 /**
  * GmsVideoHistorySearch represents the model behind the search form about `common\models\GmsVideoHistory`.
- * @property string $pls_name;
- * @property integer $region_id;
- * @property string $sender_name;
+ * @property string $pls_name
+ * @property integer $region_id
+ * @property string $sender_name
+ * @property string $video_name
  */
 class GmsVideoHistorySearch extends GmsVideoHistory
 {
@@ -25,12 +26,13 @@ class GmsVideoHistorySearch extends GmsVideoHistory
     public $date_from;
     public $date_to;
     public $sender_id;
+    public $video_name;
 
     public function rules()
     {
         return [
             [['id', 'pls_id', 'video_key', 'region_id'], 'integer'],
-            [['date_from', 'date_to', 'sender_name', 'pls_name', 'device_id', 'created_at', 'last_at'], 'safe'],
+            [['date_from', 'video_name', 'date_to', 'sender_name', 'pls_name', 'device_id', 'created_at'], 'safe'],
         ];
     }
 
@@ -69,12 +71,12 @@ class GmsVideoHistorySearch extends GmsVideoHistory
 
         $query->andFilterWhere(['t1.id' => $this->region_id])
             ->andFilterWhere(['like', 't2.sender_name', $this->sender_name])
-            ->andFilterWhere(['like', 'LOWER(t3.name)', strtolower($this->pls_name)]);
+            ->andFilterWhere(['like', 'LOWER(t3.name)', strtolower($this->pls_name)])
+            ->andFilterWhere(['like', 'LOWER(t4.name)', strtolower($this->video_name)]);
 
         if ($this->date_from) {
             $query->andFilterWhere(['>=', 't.created_at', date('Y-m-d 00:00:00 P', strtotime($this->date_from))]);
             $query->andFilterWhere(['>=', 't.last_at', date('Y-m-d 00:00:00 P', strtotime($this->date_from))]);
-
         }
 
         if ($this->date_to) {
@@ -117,17 +119,21 @@ class GmsVideoHistorySearch extends GmsVideoHistory
                 'asc' => ['t.device_id' => SORT_ASC],
                 'desc' => ['t.device_id' => SORT_DESC]
             ],
-//            'created_at' => [
-//                'asc' => ['t.created_at' => SORT_ASC],
-//                'desc' => ['t.created_at' => SORT_DESC]
-//            ],
-//            'last_at' => [
-//                'asc' => ['t.last_at' => SORT_ASC],
-//                'desc' => ['t.last_at' => SORT_DESC]
-//            ],
+            'start_at' => [
+                'asc' => ['t.created_at' => SORT_ASC],
+                'desc' => ['t.created_at' => SORT_DESC]
+            ],
+            'last_at' => [
+                'asc' => ['t.last_at' => SORT_ASC],
+                'desc' => ['t.last_at' => SORT_DESC]
+            ],
             'date_at' => [
                 'asc' => ['t.created_at' => SORT_ASC],
                 'desc' => ['t.created_at' => SORT_DESC]
+            ],
+            'video_name' => [
+                'asc' => ['t4.name' => SORT_ASC],
+                'desc' => ['t4.name' => SORT_DESC]
             ],
         ]);
 

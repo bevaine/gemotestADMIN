@@ -90,7 +90,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             'title' => $model['video_name'],
                             'target' => '_blank',
-                            'onclick' => "playVideo('{$model['video_key']}', '{$model['file']}')"
+                            'onclick' => "playVideo('{$model['video_name']}', '{$model['file']}')"
                         ]
                     );
                 },
