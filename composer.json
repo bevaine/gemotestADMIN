@@ -3,7 +3,7 @@
     "description": "Yii 2 Advanced Project Template",
     "keywords": ["yii2", "framework", "advanced", "project template"],
     "homepage": "http://www.yiiframework.com/",
-    "type": "project",
+    "type": "library",
     "license": "BSD-3-Clause",
     "support": {
         "issues": "https://github.com/yiisoft/yii2/issues?state=open",
@@ -47,7 +47,8 @@
         "2amigos/yii2-multi-select-widget": "*",
         "kartik-v/yii2-widget-timepicker": "*",
         "edofre/yii2-fullcalendar": "V1.0.11",
-        "sjaakp/yii2-timeline": "*"
+        "sjaakp/yii2-timeline": "*",
+        "kartik-v/yii2-export": "@dev"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
@@ -59,6 +60,7 @@
     },
     "config": {
         "process-timeout": 1800,
+        "secure-http": true,
         "fxp-asset":{
             "installer-paths": {
                 "npm-asset-library": "vendor/npm",
