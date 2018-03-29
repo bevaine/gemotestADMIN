@@ -157,9 +157,179 @@ class ActiveSyncController extends Controller
 
         }
     }
+    public function sumArr ($n) {
+
+    }
+
+    public function calcViewCount($all_time, $arr_commerce, $arr_standart, $minimal_std = 60)
+    {
+        $f = [];
+        $s = [];
+        $sum = 0;
+        $std_time = 0;
+        $com_time = 0;
+
+        foreach ($arr_commerce as $input) {
+            $sum += $input['duration'] * $input['repeat'];
+        }
+        $play_standart = ($all_time - $sum) / array_sum(ArrayHelper::getColumn($arr_commerce, 'repeat'));
+        $play_standart = round($play_standart);
+
+        if ($play_standart >= $minimal_std) {
+
+            foreach ($arr_commerce as $commerce) {
+                $arr = array_fill(0, $commerce['repeat'], [
+                    'file' => $commerce['file'],
+                    'key' => $commerce['key'],
+                    'start' => 0,
+                    'end' => $commerce['duration']
+                ]);
+                if (empty($f)) $f = $arr;
+                else $f = array_merge($f, $arr);
+                if (!empty($f)) shuffle($f);
+            }
+
+            foreach ($arr_standart as $time) {
+                for ($a = 0; ;($a = $a + $play_standart)) {
+                    $b = $a - $play_standart;
+                    if ($a > $time['duration']) {
+                        $s[] = [
+                            'file' => $time['file'],
+                            'key' => $time['key'],
+                            'start' => $b,
+                            'end' => $time['duration']
+                        ];
+                        $std_time = $std_time + ($time['duration'] - $b);
+                        break;
+                    } elseif ($a > 0) {
+                        $val = each($f)['value'];
+                        if (empty($val)) {
+                            $s[] = [
+                                'file' => $time['file'],
+                                'key' => $time['key'],
+                                'start' => $b,
+                                'end' => $time['duration']
+                            ];
+                            $std_time = $std_time + ($time['duration'] - $b);
+                            break;
+                        }
+                        $s[] = [
+                            'file' => $time['file'],
+                            'key' => $time['key'],
+                            'start' => $b,
+                            'end' => $a
+                        ];
+                        $s[] = $val;
+                        $std_time = $std_time + ($a - $b);
+                        $com_time = $com_time + $val['end'];
+                    }
+                }
+            }
+
+            if (!empty($s)) {
+                return [
+                    'com_time' => $com_time,
+                    'std_time' => $std_time,
+                    'state' => 1,
+                    'info' => $s
+                ];
+            } else {
+                return [
+                    'state' => 0,
+                    'message' => 'Ошибка формирования плейлиста дневного эфира!'
+                ];
+            }
+        } else {
+            $message = 'Слишком короткий интервал бесплатного эфирного время ' . $play_standart . 'сек. (из допущенного ' . $minimal_std . ' сек.)';
+            $message .= '<br>Уменьшите интервал и/или кол-во просмотра коммерческого видео, чтобы уложиться в время дневого эфира - '.$all_time.' сек.';
+            return [
+                'state' => 0,
+                'message' => $message
+            ];
+        }
+    }
 
     public function actionTest ()
     {
+        $date = date_create();
+        echo date_format($date, 'U = Y-m-d H:i:s P') . "\n";
+
+        date_timestamp_set($date, 606);
+        echo date_format($date, 'U = Y-m-d H:i:s P') . "\n";
+
+        //print_r(date("Y-m-d H:i:s", 486000 / 1000));
+        exit;
+        $arr_standart = [
+            [
+                'file' => 'file1',
+                'key' => 54,
+                'duration' => 2355,
+            ],
+            [
+                'file' => 'file2',
+                'key' => 34,
+                'duration' => 415,
+            ],
+            [
+                'file' => 'file3',
+                'key' => 25,
+                'duration' => 8559,
+            ],
+            [
+                'file' => 'file4',
+                'key' => 28,
+                'duration' => 85,
+            ],
+
+        ];
+
+        $arr_commerce = [
+            [
+                'file' => 'file11',
+                'key' => 1,
+                'duration' => 455,
+                'repeat' => 21
+            ],
+            [
+                'file' => 'file12',
+                'key' => 2,
+                'duration' => 1545,
+                'repeat' => 5
+            ],
+            [
+                'file' => 'file13',
+                'key' => 3,
+                'duration' => 455,
+                'repeat' => 5
+            ],
+        ];
+        $all_time_day = 28800; //todo продожительно эфирного дневного времени
+        //$all_time_day = array_sum(ArrayHelper::getColumn($arr_standart, 'duration'));
+        $arr = $this->calcViewCount($all_time_day, $arr_commerce, $arr_standart);
+        print_r($arr);
+        exit;
+
+        $sum_time_commerce = array_sum(ArrayHelper::getColumn($arr_commerce, 'duration'));
+        $sum_repeat = array_sum(ArrayHelper::getColumn($arr_commerce, 'repeat'));
+
+        //todo максимальное колво повоторов ком. ролика
+        $max_count_play_com = $all_time_day / ($min_play_standart + $sum_time_commerce);
+        $max_count_play_com = round($max_count_play_com);
+        echo $max_count_play_com."\r\n";
+
+        if ($play_count <= $max_count_play_com) {
+            $play_standart = ($all_time_day - ($play_count * $sum_time_commerce)) / $play_count;
+            $play_standart = round($play_standart);
+        }
+
+        echo $play_standart."\r\n";
+        //exit;
+
+
+        print_r($s);
+        exit;
+
+
         $s = GmsPlaylistOut::find()->where(['device_id' => 5]);
         foreach ($s->each() as $customer) {
             print_r($customer);

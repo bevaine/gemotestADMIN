@@ -178,7 +178,7 @@
              */
             if (bundle) {
                 includeJavascriptFiles(Timeline.urlPrefix, [ "timeline-bundle.js" ]);
-                includeCssFiles(Timeline.urlPrefix, [ "timeline-bundle.css" ]);
+                includeCssFiles(Timeline.urlPrefix, [ "styles/timeline-bundle.css" ]);
             } else {
                 includeJavascriptFiles(Timeline.urlPrefix + "scripts/", javascriptFiles);
                 includeCssFiles(Timeline.urlPrefix + "styles/", cssFiles);
