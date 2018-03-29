@@ -251,8 +251,8 @@ if (!$model->isNewRecord && !empty($model->jsonPlaylist)) {
 
 $js1 = <<< JS
     
-    var tree1 = $("#treetable1");
-    var tree2 = $("#treetable2"); 
+    const tree1 = $("#treetable1");
+    const tree2 = $("#treetable2"); 
         
     $(function()
     {
@@ -265,20 +265,20 @@ $js1 = <<< JS
             },                
             source: {$videof},
             dblclick: function(event, data) {
-                var playlistNode = tree2
+                const playlistNode = tree2
                     .fancytree("getTree")
                     .getNodeByKey('playList[1]');
-                var addChild = [];
+                const addChild = [];
                 addChild.push(data.node);
                 playlistNode.addNode(addChild, 'child');
             },
             beforeActivate: function(event, data) {
             },
             renderColumns: function(event, data) {
-                var node = data.node, tdList = $(node.tr).find(">td");
+                const node = data.node, tdList = $(node.tr).find(">td");
                 tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
                 if (node.data.duration !== undefined) {
-                    var time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
+                    const time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
                     tdList.eq(2).text(time);
                 } 
                 sumDuration(node.parent, '#duration-summ1');
@@ -310,16 +310,16 @@ $js1 = <<< JS
             },                
             source: {$standartf},
             dblclick: function(event, data) {
-                var videoKey = data.node.key;
+                const videoKey = data.node.key;
                 $.ajax({
                     url: '{$urlAjaxVideo}',
                     data: {video: videoKey},
                     success: function (res) {
-                        var htm_table = null;
+                        let htm_table = null;
                         res = JSON.parse(res);
                         if (res !== null && res.results.file !== undefined) {
-                            var videoPath = res.results.file; 
-                            var myPlayer = videojs('my-player');
+                            const videoPath = res.results.file; 
+                            const myPlayer = videojs('my-player');
                             myPlayer.src(videoPath);
                             myPlayer.ready(function() {
                                 this.play();
@@ -335,10 +335,10 @@ $js1 = <<< JS
             beforeActivate: function(event, data) {
             },
             renderColumns: function(event, data) {
-                var node = data.node, tdList = $(node.tr).find(">td");
+                const node = data.node, tdList = $(node.tr).find(">td");
                 tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
 
-                var typePlaylist = ''; 
+                let typePlaylist = ''; 
                 if ( $('#gmsplaylist-type').val() === '1') {
                     typePlaylist = 'Стандартный';                     
                 } else if ( $('#gmsplaylist-type').val() === '2') {
@@ -349,7 +349,7 @@ $js1 = <<< JS
                 }                
                 
                 if (node.data.duration !== undefined) {
-                    var time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
+                    const time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
                     tdList.eq(3).text(time);
                 } 
                 
@@ -394,13 +394,13 @@ $js1 = <<< JS
                 },
                 dragDrop : function(node, data) {
                     if (data.otherNode) {
-                        var sameTree = (data.otherNode.tree === data.tree);
-                        var playlistNode = data.tree.getNodeByKey('playList[1]');
+                        let sameTree = (data.otherNode.tree === data.tree);
+                        const playlistNode = data.tree.getNodeByKey('playList[1]');
                         if (!sameTree) {
                             if (data.otherNode.isFolder()) {
                                 playlistNode.addNode(data.otherNode.children, 'child');                           
                             } else {
-                                var addChild = [];
+                                const addChild = [];
                                 addChild.push(data.otherNode);
                                 playlistNode.addNode(addChild, 'child');
                             }  
@@ -424,8 +424,8 @@ $js1 = <<< JS
         });
         
         tree2.delegate("span[id=trash-node]", "click", function(e){
-            var node = $.ui.fancytree.getNode(e);
-            var parent = node.parent;
+            const node = $.ui.fancytree.getNode(e);
+            const parent = node.parent;
             e.stopPropagation(); 
             node.remove();
             node.render(true);
@@ -440,8 +440,8 @@ $js1 = <<< JS
     */
     function sumDuration (parent, span) 
     {
-        var total = 0;
-        var totalStr = '';
+        let total = 0;
+        let totalStr = '';
         if (parent.getChildren() === undefined) return;
         $.each(parent.getChildren(), function() {
             if (this.data.duration !== undefined) {
@@ -464,8 +464,8 @@ $js1 = <<< JS
         && jsonPlaylist.children.length > 0) {
             jsonPlaylist.children.forEach(function(children) {            
                 
-                var childrenKey = children.key;
-                var childrenNode = tree2
+                const childrenKey = children.key;
+                const childrenNode = tree2
                     .fancytree("getTree")
                     .getNodeByKey(childrenKey);
                 
@@ -482,11 +482,11 @@ $js1 = <<< JS
     */
     function addJSON (parentFolder) 
     {
-        var arrOut = {};
-        var arrChildrenOne = [];
-        var playListKey = "playList[1]";
-        var rootTitle = parentFolder.title;
-        var rootIcon = parentFolder.icon;
+        const arrOut = {};
+        const arrChildrenOne = [];
+        const playListKey = "playList[1]";
+        const rootTitle = parentFolder.title;
+        const rootIcon = parentFolder.icon;
         
         if ($("input").is("#gmsplaylist-jsonplaylist")) {
             $("#gmsplaylist-jsonplaylist").remove();
@@ -512,11 +512,11 @@ $js1 = <<< JS
         if (parentFolder.children !== null) {
             parentFolder.children.forEach(function(children) {
                 console.log(children);
-                var arrChildren = {};
-                var arrData = {};
-                var key = children.key;
-                var name = children.title;
-                var typePlaylist = $('#gmsplaylist-type').val();
+                const arrChildren = {};
+                const arrData = {};
+                const key = children.key;
+                const name = children.title;
+                const typePlaylist = $('#gmsplaylist-type').val();
                 arrData["duration"] = children.data.duration;
                 arrData["file"] = children.data.file;
                 arrData["type"] = typePlaylist;
@@ -527,7 +527,7 @@ $js1 = <<< JS
             });
 
             arrOut["children"] = arrChildrenOne;
-            var jsonStr = JSON.stringify(arrOut);
+            const jsonStr = JSON.stringify(arrOut);
 
             $("<input>").attr({
                 type: "hidden",
@@ -544,9 +544,9 @@ $js1 = <<< JS
     */
     function checkJSON () 
     {
-        var html_body = '';
-        var htm_header = 'Ошибка сохранения плейлиста';
-        var parentFolder = tree2
+        let html_body = '';
+        const htm_header = 'Ошибка сохранения плейлиста';
+        const parentFolder = tree2
             .fancytree("getTree")
             .getNodeByKey("playList[1]"); 
         
@@ -574,8 +574,8 @@ $js1 = <<< JS
         sender_id = null, 
         type_list = null
     ) {
-        var html_body = '';
-        var htm_header = 'Ошибка сохранения плейлиста';       
+        let html_body = '';
+        const htm_header = 'Ошибка сохранения плейлиста';       
         $.ajax({
             url: '/GMS/playlist/ajax-playlist-active',
             data: {
@@ -588,12 +588,12 @@ $js1 = <<< JS
                     if (checkJSON()) $("#form").submit();
                 } else {
                     res = JSON.parse(res);
-                    var html_body = "";
-                    var region = res.region;
-                    var sender = res.sender;
-                    var type = res.type;
-                    var name = res.name;
-                    var playlist_Id = res.id;
+                    let html_body = "";
+                    const region = res.region;
+                    const sender = res.sender;
+                    const type = res.type;
+                    const name = res.name;
+                    const playlist_Id = res.id;
                     
                     if (region !== undefined) {
                         if (sender !== undefined) {
@@ -621,8 +621,8 @@ $js1 = <<< JS
     function setSender(region) 
     {
         console.log(region);
-        var senderSelect = $('.sender_id select');
-        var senderDisable = senderSelect.prop('disabled'); 
+        const senderSelect = $('.sender_id select');
+        const senderDisable = senderSelect.prop('disabled'); 
         senderSelect.attr('disabled', true); 
         
         $(".sender_id select option").each(function() {
@@ -635,10 +635,10 @@ $js1 = <<< JS
             data: {region: region},
             success: function (res) {
                 res = JSON.parse(res);
-                var optionsAsString = "";
+                let optionsAsString = "";
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
-                    var results = res.results; 
-                    for (var i = 0; i < results.length; i++) {
+                    const results = res.results; 
+                    for (let i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
                         optionsAsString += results[i].id == '{$model->sender_id}' ? 'selected' : '';
                         optionsAsString += ">" + results[i].name + "</option>"
@@ -655,16 +655,16 @@ $js1 = <<< JS
     */
     function disableTree(val) 
     {
-        var emptyList;
+        let emptyList;
         val === '1' ?  emptyList = {$standartf} : emptyList = {$commercef};
-        var regionObject = $("#treetable2");
-        var regionTree = regionObject.fancytree("getTree");        
+        const regionObject = $("#treetable2");
+        const regionTree = regionObject.fancytree("getTree");        
         regionTree.reload(emptyList);
         resetPlayer();
     }
     
     function resetPlayer(htm_table = null) {
-        var myPlayer = videojs('my-player');
+        const myPlayer = videojs('my-player');
         if (htm_table === null) {
             htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
         }

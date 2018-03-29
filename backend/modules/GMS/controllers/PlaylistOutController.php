@@ -143,7 +143,10 @@ class PlaylistOutController extends Controller
 
             $out = $model->checkPlaylist();
         }
-        echo !empty($out) ? Json::encode($out) : 'null';
+
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        echo !empty($out) ? $out : null;
     }
 
     /**

@@ -26,9 +26,19 @@ $layout = <<< HTML
     </span>
 HTML;
 
-$this->registerCss("td.alignRight { text-align: right }; td:hover.reg { background : #20b426 }; td.com { color : #df8505 }; ");
-?>
-<style type="text/css">
+$css = <<<CSS
+    td.alignRight {
+        text-align: right 
+    }
+    td.alignCenter {
+        text-align: center 
+    }
+    td:hover.reg {
+        background: #20b426 
+    } 
+    td.com {
+        color: #df8505 
+    }
     .reg {
         color: #fff;
         background: #00a65a;
@@ -46,6 +56,34 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
         padding-top: 10px;
         font-style: normal;
     }
+    /* fallback */
+    @font-face {
+        font-family: 'Material Icons';
+        font-style: normal;
+        font-weight: 400;
+        src: url(../../fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+    }
+    .material-icons {
+        font-family: 'Material Icons';
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: 'liga';
+        -webkit-font-smoothing: antialiased;
+    }
+CSS;
+$this->registerCss($css);
+
+?>
+<style type="text/css">
+
 </style>
 
 <div class="gms-playlist-out-form">
@@ -74,6 +112,98 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
 
     <div class="row">
         <div class="col-xs-6">
+            <div class="box box-solid box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Привязка плейлиста и параметры воспроизведения</h3>
+                </div>
+                <div class="box-body">
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="form-group date">
+                                <?= Html::label('Период воспроизведения') ?>
+                                <?= DatePicker::widget([
+                                    'name' => 'GmsPlaylistOut[date_start]',
+                                    'name2' => 'GmsPlaylistOut[date_end]',
+                                    'value' => date('d-m-Y', $model->isNewRecord ? time() : $model->date_start),
+                                    'value2' => date('d-m-Y', $model->isNewRecord ? time() : $model->date_end),
+                                    'type' => DatePicker::TYPE_RANGE,
+                                    'separator' => '<i class="glyphicon glyphicon-resize-horizontal"></i>',
+                                    'layout' => $layout,
+                                    'pluginOptions' => [
+                                        'autoclose' => true,
+                                        'format' => 'dd-mm-yyyy'
+                                    ]
+                                ]);
+                                ?>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <?= Html::label('Время воспроизведения') ?>
+                            <table style="border-width: 1px; border-color: #d2d6de; border-style: ridge; border-radius: 3px 0 0 3px;">
+                                <tr>
+                                    <td>
+                                        <div class="form-control-wrapper">
+                                            <?= Html::input(
+                                                'text',
+                                                'GmsPlaylistOut[time_start]',
+                                                date("H:i", $model->time_start),
+                                                [
+                                                    'id' => 'gmsplaylistout-time_start',
+                                                    'class' => 'form-control floating-label',
+                                                    'placeholder' => 'начало'
+                                                ]
+                                            );
+                                            ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span style="padding-left: 7px; padding-right: 15px">
+                                            <i class="glyphicon glyphicon-resize-horizontal"></i>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="form-control-wrapper">
+                                            <?= Html::input(
+                                                'text',
+                                                'GmsPlaylistOut[time_end]',
+                                                date("H:i", $model->time_end),
+                                                [
+                                                    'id' => 'gmsplaylistout-time_end',
+                                                    'class' => 'form-control floating-label',
+                                                    'placeholder' => 'конец'
+                                                ]
+                                            );
+                                            ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-10">
+                            <div class="form-group week">
+                                <?= Html::label('Воспроизводить только в') ?>
+                                <p>
+                                    <?php
+                                    foreach ($model::WEEK as $key => $value) {
+                                        echo "<span style='padding-left: 10px'>".Html::Activecheckbox($model, $key, [
+                                                'value' => "1",
+                                                'label' => $value,
+                                                'data-url' => 'is_monday'
+                                            ])."</span>";
+                                    }
+                                    ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
             <div class="box box-solid box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title">Выберите регион (отделение) для отображения доступных шаблонов</h3>
@@ -162,8 +292,8 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                                     'autoExpandMS' => 400,
                                                     'dragStart' => new JsExpression('function(node, data) {
                                                         if (!data.tree.options.disabled) {
-                                                            return true;
-                                                            //return !node.isFolder();
+                                                            //return true;
+                                                            return !node.isFolder();
                                                         } else return false;
                                                     }'),
                                                     'dragEnter' => new JsExpression('function(node, data) {
@@ -194,17 +324,21 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                         <table id="treetable">
                                             <colgroup>
                                                 <col width="50px">
-                                                <col width="470px">
-                                                <col width="100px">
+                                                <col width="500px">
                                                 <col width="150px">
+                                                <col width="100px">
+                                                <col width="70px">
+                                                <col width="70px">
                                                 <col width="30px">
                                             </colgroup>
                                             <thead>
                                             <tr>
                                                 <th>#</th>
                                                 <th>Плейлист</th>
-                                                <th>Продолжит.</th>
                                                 <th>Тип ролика</th>
+                                                <th>Продолжител.</th>
+                                                <th>Кол-во показ.</th>
+                                                <th>Общая продолж.</th>
                                                 <th></th>
                                             </tr>
                                             </thead>
@@ -214,13 +348,15 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                                                     <td></td>
                                                     <td></td>
                                                     <td></td>
+                                                    <td></td>
+                                                    <td></td>
                                                     <td style="text-align: center;"></td>
                                                 </tr>
                                             </tbody>
                                             <thead>
                                                 <tr>
-                                                    <th style="font-size: smaller" colspan="2">Итого</th>
-                                                    <th colspan="3"><div class="duration-summ" id="duration-summ"></div></th>
+                                                    <th style="font-size: smaller" colspan="5">Итого</th>
+                                                    <th colspan="6"><div class="duration-summ" id="duration-summ"></div></th>
                                                 </tr>
                                             </thead>
                                         </table>
@@ -231,13 +367,11 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                     </div>
                 </div>
             </div>
-
-            <div class="box box-solid box-info">
+            <div class="box box-solid box-default">
                 <div class="box-header with-border">
-                    <h3 class="box-title">Привязка плейлиста и параметры воспроизведения</h3>
+                    <h3 class="box-title">Привязка устройства</h3>
                 </div>
                 <div class="box-body">
-
                     <div class="row">
                         <div class="col-lg-6">
                             <div class="form-group device_id">
@@ -246,95 +380,6 @@ $this->registerCss("td.alignRight { text-align: right }; td:hover.reg { backgrou
                             </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group date">
-                                <?= Html::label('Период воспроизведения') ?>
-                                <?= DatePicker::widget([
-                                    'name' => 'GmsPlaylistOut[date_start]',
-                                    'name2' => 'GmsPlaylistOut[date_end]',
-                                    'value' => date('d-m-Y', $model->isNewRecord ? time() : $model->date_start),
-                                    'value2' => date('d-m-Y', $model->isNewRecord ? time() : $model->date_end),
-                                    'type' => DatePicker::TYPE_RANGE,
-                                    'separator' => '<i class="glyphicon glyphicon-resize-horizontal"></i>',
-                                    'layout' => $layout,
-                                    'pluginOptions' => [
-                                        'autoclose' => true,
-                                        'format' => 'dd-mm-yyyy'
-                                    ]
-                                ]);
-                                ?>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="form-group date">
-                                <?= Html::label('Время воспроизведения') ?>
-                                <table style="border-width: 1px; border-color: #d2d6de; border-style: ridge; border-radius: 3px 0 0 3px;">
-                                    <tr>
-                                        <td>
-                                            <?php
-                                            $model->time_start = date('H:i', empty($model->time_start) ? time() : $model->time_start);
-                                            echo TimePicker::widget([
-                                                'model' => $model,
-                                                'attribute' => 'time_start',
-                                                'name' => 'time_start',
-                                                'pluginOptions' => [
-                                                    'showSeconds' => false,
-                                                    'showMeridian' => false,
-                                                    'minuteStep' => 1,
-                                                    'secondStep' => 5,
-                                                ]
-                                            ]);
-                                            ?>
-                                        </td>
-                                        <td>
-                                            <span style="padding-left: 7px; padding-right: 15px">
-                                                <i class="glyphicon glyphicon-resize-horizontal"></i>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <?php
-                                            $model->time_end = date('H:i', empty($model->time_end) ? time() : $model->time_end);
-                                            echo TimePicker::widget([
-                                                'model' => $model,
-                                                'attribute' => 'time_end',
-                                                'name' => 'time_end',
-                                                'pluginOptions' => [
-                                                    'showSeconds' => false,
-                                                    'showMeridian' => false,
-                                                    'minuteStep' => 1,
-                                                    'secondStep' => 5,
-                                                ]
-                                            ]);
-                                            ?>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-lg-10">
-                            <div class="form-group week">
-                                <?= Html::label('Воспроизводить только в') ?>
-                                <p>
-                                <?php
-                                foreach ($model::WEEK as $key => $value) {
-                                    echo "<span style='padding-left: 10px'>".Html::Activecheckbox($model, $key, [
-                                        'value' => "1",
-                                        'label' => $value,
-                                        'data-url' => 'is_monday'
-                                    ])."</span>";
-                                }
-                                ?>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -407,7 +452,6 @@ $urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
 $urlAjaxDevice = \yii\helpers\Url::to(['/GMS/gms-devices/ajax-device-list']);
 $urlAjaxVideo = \yii\helpers\Url::to(['/GMS/gms-videos/ajax-video-active']);
 $urlAjaxTime = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-time-check']);
-
 $urlAjaxPlaylistTemplate = \yii\helpers\Url::to(['/GMS/playlist/ajax-playlist-template']);
 
 $source = [];
@@ -433,7 +477,7 @@ if ($model->isNewRecord) {
 
 $js1 = <<< JS
 
-    var newPlayList = [
+    const newPlayList = [
         {
             "title" : "Новый плейлист", 
             "key" : "PlayList[1]", 
@@ -443,10 +487,23 @@ $js1 = <<< JS
         }
     ];
 
+    function resetPlayer(htm_table = null) {
+        const myPlayer = videojs('my-player');
+        if (htm_table === null) {
+            htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
+        }
+        myPlayer.reset();
+        myPlayer.poster("../../img/logo.jpg");
+        myPlayer.width("783");
+        
+        $('#video-info')
+            .addClass('video-info-normal')
+            .html(htm_table);        
+    }
   
     $(function()
     {
-        var tree = $("#treetable");
+        const tree = $("#treetable");
         
         tree.fancytree({
             extensions: ["table", "dnd", "edit"],
@@ -454,75 +511,114 @@ $js1 = <<< JS
                 indentation: 20,
                 nodeColumnIdx: 1,
                 checkboxColumnIdx: 0
-            },                
+            },
+            renderStatusColumns: true,
             source: {$source},
             dblclick: function(event, data) {
-                var videoKey = data.node.key;
-                $.ajax({
-                    url: '{$urlAjaxVideo}',
-                    data: {video: videoKey},
-                    success: function (res) {
-                        var htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
-                        res = JSON.parse(res);
-                        if (res !== null && res.results.file !== undefined) {
-                            var videoPath = res.results.file; 
-                            var myPlayer = videojs('my-player');
-                            myPlayer.src(videoPath);
-                            myPlayer.ready(function() {
-                                this.play();
-                            });
-                        }
-                        if (res.results.table !== undefined) {
-                            htm_table = res.results.table;
-                        }
-                        $('#video-info')
-                            .addClass('video-info-normal')
-                            .html(htm_table);
-                    }
-                });
             },
             beforeActivate: function(event, data) {
             },
-            renderColumns: function(event, data) {
-                var node = data.node, tdList = $(node.tr).find(">td");
+            renderColumns: function(event, data) 
+            {
+                let time = 0;
+                const node = data.node, tdList = $(node.tr).find(">td");
                 tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
             
-                if (node.data.duration !== undefined) {
-                    var time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
-                    tdList.eq(2).text(time);
-                } 
+                tdList.eq(1).addClass('dblclick');
                 
-                if (node.data.type !== undefined) {
-                    var icon = '';
-                    var typePlaylist = '';
+                if (node.data.duration !== undefined) {
+                    time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
+                    //tdList.eq(2).text(time);
+                }
+
+                if (node.data.type !== undefined) 
+                {
+                    let icon = '';
+                    let html = '';
+                    let typePlaylist;
+                    
                     if (node.data.type === '1') {
                         icon = 'gemotest.jpg';
-                        typePlaylist = 'Стандартный'; 
+                        typePlaylist = 'Стандартный';
+                        tdList.eq(2).text(typePlaylist);
+                        
+                        if (time !== 0) {
+                            node.data.total = node.data.duration;
+                            tdList.eq(3).text(time); 
+                            tdList.eq(5).text(time);
+                        } 
                     } else if (node.data.type === '2') {
                         icon = 'dollar.png';
                         typePlaylist = 'Коммерческий';
-                    }                        
+                        tdList.eq(2).text(typePlaylist);
+                        
+                        html = '<input style="width:50px" type="number" id="count_view[' + node.key + ']" min="0" step="1"/>';
+                        tdList.eq(4).html(html).addClass('alignCenter');
+                        tdList.eq(4).find("input").change(function(){
+                            node.data.views = $(this).val();
+                            if (updateTotal(node)) {
+                                const time_views = moment.unix(node.data.total).utc().format("HH:mm:ss");
+                                tdList.eq(5).text(time_views);  
+                            }
+                            sumDuration(node.parent);
+                        });
+                        
+                        if (time !== 0) {
+                            html = '<div class="input-group bootstrap-timepicker timepicker">';
+                            html += '<input id="time_com[' + node.key + ']" type="text" class="form-control input-small">';
+                            html += '</div>';
+                            tdList.eq(3).html(html);
+                            tdList.eq(3).find("input").timepicker({
+                                minuteStep: 1,
+                                template: 'modal',
+                                appendWidgetTo: 'body',
+                                showSeconds: true,
+                                showMeridian: false,
+                                defaultTime: time
+                            }).on('changeTime.timepicker', function(e) {
+                                const date1 = new Date('1976-01-01 ' + time);
+                                const date2 = new Date('1976-01-01 ' + e.time.value);
+                                const minDate = new Date('1976-01-01 00:00:10');
+                                if (date2 > date1 || date2 < minDate) {
+                                    $(this).timepicker('setTime', time);
+                                } else {
+                                    const m1 = moment('1976-01-01T00:00:00');
+                                    const splitDate2 = e.time.value.split(':');
+                                    const m2 = moment('1976-01-01T00:00:00').set({
+                                        'hour': splitDate2[0], 
+                                        'minute': splitDate2[1], 
+                                        'second' : splitDate2[2]
+                                    });
+                                    let timestamp = (m2.diff(m1, 'ms'));
+                                    timestamp = timestamp / 1000;
+                                    node.data.duration = timestamp;
+                                    if (updateTotal(node)) {
+                                        const time_views = moment.unix(node.data.total).utc().format("HH:mm:ss");
+                                        tdList.eq(5).text(time_views);  
+                                    }
+                                    sumDuration(node.parent);
+                                }
+                            });                            
+                        }
+                    }
                     if (icon !== '') {
-                        var span = $(node.span);
+                        const span = $(node.span);
                         span.find("> span.fancytree-icon").css({
                             backgroundImage: "url(../../img/" + icon + ")",
                             backgroundPosition: "0 0"
                         });
                     }
-                    if (typePlaylist !== '') {
-                        tdList.eq(3).text(typePlaylist);
-                    }
                 }
-                
+
                 if (!node.isFolder()) {
-                    tdList.eq(4).html('<span id="trash-node" style="cursor:pointer;" class="glyphicon glyphicon-trash"></span>');
+                    tdList.eq(6).html('<span id="trash-node" style="cursor:pointer;" class="glyphicon glyphicon-trash"></span>');
                 }
                 sumDuration(node.parent);
             },
             edit: {
-                triggerStart: ["clickActive", "dblclick"],
+                triggerStart: ["clickActive"],
                 beforeEdit : function(event, data){
-                    return data.node.isFolder()
+                    return !!(data.node.isFolder() && data.node.key !== 'ComFolder'); 
                 },
                 edit : function(event, data){
                 },
@@ -553,18 +649,41 @@ $js1 = <<< JS
                 },
                 dragOver : function(node, data) {
                 },
-                dragDrop : function(node, data) {
+                dragDrop : function(node, data) 
+                {
                     if (data.otherNode) {
-                        var sameTree = (data.otherNode.tree === data.tree);
-                        var playlistNode = data.tree.getNodeByKey('PlayList[1]');
+                        
+                        let sameTree = (data.otherNode.tree === data.tree);
+                        const playlistNode = data.tree.getNodeByKey('PlayList[1]');                    
+
+                        if (data.otherNode.data.type === '2') {
+                            let folderNode = data.tree.getNodeByKey('ComFolder');  
+                            if (folderNode === null) {
+                                const newFolderNode = [
+                                    {
+                                        "title" : "Коммерческие ролики", 
+                                        "key" : "ComFolder", 
+                                        "folder" : true, 
+                                        "expanded" : true, 
+                                        "icon" : "../../img/dollar.png"
+                                    }
+                                ];
+                                playlistNode.addNode(newFolderNode, 'child');
+                            }
+                            folderNode = data.tree.getNodeByKey('ComFolder');
+                            data.otherNode.moveTo(folderNode, "child");
+                            return;
+                        }   
+                        
                         if (!sameTree) {
                             if (data.otherNode.isFolder()) {
                                 playlistNode.addNode(data.otherNode.children, 'child');                           
                             } else {
-                                var addChild = [];
+                                const addChild = [];
                                 addChild.push(data.otherNode);
                                 playlistNode.addNode(addChild, 'child');
-                            }  
+                            }
+                            
                         } else {
                             data.otherNode.moveTo(node, data.hitMode); 
                             if (!data.otherNode.isChildOf(playlistNode)) {
@@ -572,6 +691,8 @@ $js1 = <<< JS
                             }
                             data.otherNode.render(true);
                         }
+                        playlistNode.setExpanded();
+                        sumDuration(node.parent);
                     } else if (data.otherNodeData) {
                         node.addChild(data.otherNodeData, data.hitMode);
                     } else {
@@ -584,15 +705,77 @@ $js1 = <<< JS
             }
         });
         
-        tree.delegate("span[id=trash-node]", "click", function(e){
-            var node = $.ui.fancytree.getNode(e);
-            var parent = node.parent;
-            e.stopPropagation(); 
-            node.remove();
-            node.render(true);
+        tree.delegate("span[id=trash-node]", "click", function(e)
+        {
+            const node = $.ui.fancytree.getNode(e),           
+                tdList = $(node.tr),
+                parent = node.parent;
+
+            if (parent.key === 'ComFolder') {
+                const commercialObject = $("#fancyree_template_commercial"), 
+                    commercialTree = commercialObject.fancytree("getTree"), 
+                    folderNode = commercialTree.getNodeByKey("playList[1]");
+                
+                node.moveTo(folderNode, "child");
+                folderNode.setExpanded();
+                tdList.remove();
+                if (parent.countChildren() === 0) {
+                    parent.remove();
+                    parent.render(true); 
+                }
+            } else {
+                node.remove();
+            }
+            node.render(true); 
+            e.stopPropagation();  
             sumDuration(parent);
+            resetPlayer();
+        });
+        
+        tree.delegate(".dblclick", "dblclick", function(e)
+        {
+            const node = $.ui.fancytree.getNode(e);
+            if (node.isFolder()) {
+                e.stopPropagation();
+                return;
+            } 
+            const videoKey = node.key;
+            
+            $.ajax({
+                url: '{$urlAjaxVideo}',
+                data: {video: videoKey},
+                success: function (res) {
+                    let htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
+                    //res = JSON.parse(res);
+                    if (res !== null && res.results.file !== undefined) {
+                        const videoPath = res.results.file; 
+                        const myPlayer = videojs('my-player');
+                        myPlayer.src(videoPath);
+                        myPlayer.ready(function() {
+                            this.play();
+                        });
+                    }
+                    if (res.results.table !== undefined) {
+                        htm_table = res.results.table;
+                    }
+                    $('#video-info')
+                        .addClass('video-info-normal')
+                        .html(htm_table);
+                }
+            });
+            e.stopPropagation(); 
         });
     });
+    
+    function updateTotal(node) {
+        if (node.data.views === undefined || node.data.views === 0) {
+            return false;
+        }
+        if (node.data.duration === undefined || node.data.duration === 0) {
+            return false;
+        }
+        node.data.total = node.data.views * node.data.duration;
+    }
     
     /**
     * 
@@ -600,16 +783,17 @@ $js1 = <<< JS
     */
     function addJSON (parentFolder) 
     {
-        var arrOut = {};
-        var arrChildrenOne = [];
-        var playListKey = parentFolder.key;
-        var rootTitle = parentFolder.title;        
+        const arrOut = {};
+        const arrChildrenOne = [];
+        const playListKey = parentFolder.key;
+        const rootTitle = parentFolder.title;
+        const inputVar = $("input");
         
-        if ($("input").is("#gmsplaylistout-jsonplaylist")) {
+        if (inputVar.is("#gmsplaylistout-jsonplaylist")) {
             $("#gmsplaylistout-jsonplaylist").remove();
         }                    
         
-        if ($("input").is("#gmsplaylistout-name")) {
+        if (inputVar.is("#gmsplaylistout-name")) {
             $("#gmsplaylistout-name").remove();
         }
 
@@ -628,10 +812,10 @@ $js1 = <<< JS
         if (parentFolder.children !== null) {
             parentFolder.children.forEach(function(children) {
                 //console.log(children);
-                var arrChildren = {};
-                var arrData = {};
-                var key = children.key;
-                var name = children.title;
+                const arrChildren = {};
+                const arrData = {};
+                const key = children.key;
+                const name = children.title;
                 arrData["file"] = children.data.file;
                 arrData["duration"] = children.data.duration;
                 arrData["type"] = children.data.type;
@@ -642,7 +826,7 @@ $js1 = <<< JS
             });
 
             arrOut["children"] = arrChildrenOne;
-            var jsonStr = JSON.stringify(arrOut);
+            const jsonStr = JSON.stringify(arrOut);
 
             $("<input>").attr({
                 type: "hidden",
@@ -652,21 +836,23 @@ $js1 = <<< JS
             }).appendTo("form");
         }
     }
-    
-    
-    
+
     /**
     * @param parent
     */
     function sumDuration (parent) 
     {
-        var total = 0;
-        var totalStr = '';
+        let total = 0;
+        let totalStr = '';
         if (parent.getChildren() === undefined) return;
         $.each(parent.getChildren(), function() {
-            if (this.data.duration !== undefined) {
-                total += parseInt(this.data.duration, 10);
+            let views = 1;
+            if (this.data.duration === undefined) return;            
+            if (this.data.views !== undefined 
+                && this.data.views !== 0) {
+                views = this.data.views;
             }
+            total += parseInt(this.data.duration, 10) * views;
         });
         if (total > 0) {
             totalStr = moment.unix(total).utc().format("HH:mm:ss");
@@ -679,8 +865,8 @@ $js1 = <<< JS
     */
     function setSender(region) 
     {
-        var senderSelect = $('.sender_id select');
-        var senderDisable = senderSelect.prop('disabled'); 
+        const senderSelect = $('.sender_id select');
+        const senderDisable = senderSelect.prop('disabled'); 
         senderSelect.attr('disabled', true); 
         
         $(".sender_id select option").each(function() {
@@ -692,11 +878,12 @@ $js1 = <<< JS
             url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
-                res = JSON.parse(res);
-                var optionsAsString = "";
+                //console.log(res);
+                //res = JSON.parse(res);
+                let optionsAsString = "";
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
-                    var results = res.results; 
-                    for (var i = 0; i < results.length; i++) {
+                    const results = res.results; 
+                    for (let i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
                         optionsAsString += results[i].id == '{$model->sender_id}' ? 'selected' : '';
                         optionsAsString += ">" + results[i].name + "</option>"
@@ -715,8 +902,8 @@ $js1 = <<< JS
     */
     function setDevice(region = null, sender = null) 
     {
-        var deviceSelect = $('.device_id select');
-        var deviceDisable = deviceSelect.prop('disabled');
+        const deviceSelect = $('.device_id select');
+        const deviceDisable = deviceSelect.prop('disabled');
         deviceSelect.attr('disabled', true); 
         
         $(".device_id select option").each(function() {
@@ -731,11 +918,11 @@ $js1 = <<< JS
                 sender: sender
             },
             success: function (res) {
-                var optionsAsString = "";
-                res = JSON.parse(res);
+                let optionsAsString = "";
+                //res = JSON.parse(res);
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
-                    var results = res.results; 
-                    for (var i = 0; i < results.length; i++) {
+                    const results = res.results; 
+                    for (let i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
                         optionsAsString += results[i].id == '{$model->device_id}' ? 'selected' : '';
                         optionsAsString += ">" + results[i].name + "</option>"
@@ -752,16 +939,16 @@ $js1 = <<< JS
     */
     function disableTree() 
     {
-        var emptyList = [{ 
+        const emptyList = [{ 
             title : 'уточните параметры для отображения', 
             folder : false 
         }];
         
-        var regionObject = $("#fancyree_template_region");
-        var regionTree = regionObject.fancytree("getTree");        
+        const regionObject = $("#fancyree_template_region");
+        const regionTree = regionObject.fancytree("getTree");        
         
-        var commercialObject = $("#fancyree_template_commercial");
-        var commercialTree = commercialObject.fancytree("getTree");
+        const commercialObject = $("#fancyree_template_commercial");
+        const commercialTree = commercialObject.fancytree("getTree");
         
         regionTree.reload(emptyList);
         regionObject.fancytree("disable");        
@@ -769,18 +956,18 @@ $js1 = <<< JS
         commercialTree.reload(emptyList);
         commercialObject.fancytree("disable");
         
-        var outObject = $("#treetable");
-        var outTree = outObject.fancytree("getTree");
+        const outObject = $("#treetable");
+        const outTree = outObject.fancytree("getTree");
         outTree.reload(newPlayList);      
     }
     
     function setTreeData (region = null, sender = null) 
     {
-        var regionObject = $("#fancyree_template_region");
-        var regionTree = regionObject.fancytree("getTree");
+        const regionObject = $("#fancyree_template_region");
+        const regionTree = regionObject.fancytree("getTree");
         
-        var commercialObject = $("#fancyree_template_commercial");
-        var commercialTree = commercialObject.fancytree("getTree");
+        const commercialObject = $("#fancyree_template_commercial");
+        const commercialTree = commercialObject.fancytree("getTree");
         
         $.ajax({
             url: '{$urlAjaxPlaylistTemplate}',
@@ -789,7 +976,7 @@ $js1 = <<< JS
                 sender_id: sender
             },
             success: function (res) {
-                res = JSON.parse(res);
+                //res = JSON.parse(res);
                 if (res !== null) {
                     if (res.result[1] !== undefined) {
                         regionObject.fancytree("enable");
@@ -810,9 +997,9 @@ $js1 = <<< JS
     */
     function checkJSON () 
     {
-        var html_body = '';
-        var htm_header = 'Ошибка сохранения плейлиста';
-        var parentFolder = 
+        let html_body = '';
+        const htm_header = 'Ошибка сохранения плейлиста';
+        const parentFolder = 
             $("#treetable")
             .fancytree("getTree")
             .rootNode.children[0];
@@ -830,18 +1017,18 @@ $js1 = <<< JS
     }
     
     function checkTime () {
-        var m_data = $('#form').serialize();
+        const m_data = $('#form').serialize();
         $.ajax({
             type: 'GET',
             url: '{$urlAjaxTime}',
             data: m_data,
             success: function (res){
-                var html_body = '';
-                var htm_header = 'Ошибка добавления, временное пересечение с другим плейлистом!';
-                res = JSON.parse(res);
+                let html_body = '';
+                const htm_header = 'Ошибка добавления, временное пересечение с другим плейлистом!';
+                //res = JSON.parse(res);
                 if (res !== null) {
                     if (res.id !== undefined && res.name !== undefined) {
-                        var html  = 'Регион: <b>' + $('.region select option:selected').text() + '</b>'; 
+                        let html  = 'Регион: <b>' + $('.region select option:selected').text() + '</b>'; 
                         if ($('.sender_id select option:selected').text() !== '---') {
                             html += '<br>Отделение: <b>' + $('.sender_id select option:selected').text() + '</b>'; 
                         } 
@@ -893,7 +1080,20 @@ $js1 = <<< JS
         setTreeData ($('#gmsplaylistout-region_id').val(), $(this).val());
     });
     
-    $(document).ready(function(){  
+    $(document).ready(function()
+    {  
+        $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker({ 
+            date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
+        });
+        
+        $('#gmsplaylistout-time_start').bootstrapMaterialDatePicker({
+            date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
+        }).on('change', function(e, date) {
+            $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker('setMinDate', date);
+        });
+
+        //$.material.init();
+			
         setSender ($('#gmsplaylistout-region_id').val());
         setTimeout(function(){
             setDevice ($('#gmsplaylistout-region_id').val()
