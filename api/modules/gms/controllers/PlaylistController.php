@@ -160,7 +160,7 @@ class PlaylistController extends ActiveController
             ->andWhere(['>=', 'time_end', $this->currentTime])
             ->andWhere(['=', 'active', 1])->asArray()->all();
 
-        Yii::getLogger()->log(['$findPlaylist'=>$findPlaylist], 1, 'binary');
+        //Yii::getLogger()->log(['$findPlaylist'=>$findPlaylist], 1, 'binary');
         if (!$findPlaylist) return false;
 
         $weekKeys = array_combine(
@@ -180,7 +180,7 @@ class PlaylistController extends ActiveController
         //todo если установлен день и устройство
         foreach ($key_set as $key) {
             if (!empty($day_set[$key]) && !empty($dev_set[$key])) {
-                Yii::getLogger()->log(['getPlaylist'=>'установлен день и устройство'], 1, 'binary');
+                //Yii::getLogger()->log(['getPlaylist'=>'установлен день и устройство'], 1, 'binary');
                 return [
                     "model" => GmsPlaylistOut::findOne($key),
                     "state" => 1
@@ -191,7 +191,7 @@ class PlaylistController extends ActiveController
         //todo если нет дня но есть устройство
         foreach ($key_set as $key) {
             if (empty($day_set[$key]) && !empty($dev_set[$key])) {
-                Yii::getLogger()->log(['getPlaylist'=>'нет дня но есть устройство'], 1, 'binary');
+                //Yii::getLogger()->log(['getPlaylist'=>'нет дня но есть устройство'], 1, 'binary');
                 return [
                     "model" => GmsPlaylistOut::findOne($key),
                     "state" => 2
@@ -202,7 +202,7 @@ class PlaylistController extends ActiveController
         //todo если есть день но нет устройства
         foreach ($key_set as $key) {
            if (!empty($day_set[$key]) && empty($dev_set[$key])) {
-               Yii::getLogger()->log(['getPlaylist'=>'есть день но нет устройства'], 1, 'binary');
+               //Yii::getLogger()->log(['getPlaylist'=>'есть день но нет устройства'], 1, 'binary');
                return [
                    "model" => GmsPlaylistOut::findOne($key),
                    "state" => 3
@@ -226,9 +226,9 @@ class PlaylistController extends ActiveController
     {
         if ($findPlaylist = self::getPlaylist()) {
             $model = $findPlaylist["model"];
-            Yii::getLogger()->log([
-                '$findPlaylist' => $findPlaylist
-            ], 1, 'binary');
+//            Yii::getLogger()->log([
+//                '$findPlaylist' => $findPlaylist
+//            ], 1, 'binary');
             return $model;
         } else return false;
     }
