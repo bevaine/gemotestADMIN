@@ -131,6 +131,7 @@ class GmsSendersController extends Controller
 
     /**
      * @param null $region
+     * @return string
      */
     public function actionAjaxSendersList($region = null)
     {
@@ -141,11 +142,15 @@ class GmsSendersController extends Controller
         foreach ($data as $userData) {
             $out['results'][] = ['id' => $userData->id, 'name' => $userData->sender_name];
         }
-        echo !empty($out) ? Json::encode($out) : 'null';
+
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 
     /**
      * @param null $sender
+     * @return array
      */
     public function actionAjaxGetRegion($sender = null)
     {
@@ -164,7 +169,8 @@ class GmsSendersController extends Controller
                 'name' => $userData->region_name
             ];
         }
-
-        echo Json::encode($out);
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 }

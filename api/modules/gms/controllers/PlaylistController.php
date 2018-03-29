@@ -59,7 +59,7 @@ class PlaylistController extends ActiveController
     }
 
     /**
-     * @return array
+     * @return array|null
      * @throws ForbiddenHttpException
      */
     public function actionView()
@@ -68,7 +68,7 @@ class PlaylistController extends ActiveController
             throw new ForbiddenHttpException('The requested page does not exist.');
         }
 
-        $response = [];
+        $resp = [];
         $out['state'] = 0;
         $timezone = "Europe/Moscow";
         $dev = Yii::$app->request->post()['dev'];
@@ -132,8 +132,10 @@ class PlaylistController extends ActiveController
             throw new ForbiddenHttpException('The requested page does not exist.');
         }
 
-        $response['result'] = $out;
-        return json_encode($response);
+        $resp['result'] = $out;
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($resp) ? $resp : null;
     }
 
     /**
@@ -158,6 +160,7 @@ class PlaylistController extends ActiveController
             ->andWhere(['>=', 'time_end', $this->currentTime])
             ->andWhere(['=', 'active', 1])->asArray()->all();
 
+        Yii::getLogger()->log(['$findPlaylist'=>$findPlaylist], 1, 'binary');
         if (!$findPlaylist) return false;
 
         $weekKeys = array_combine(
@@ -177,6 +180,7 @@ class PlaylistController extends ActiveController
         //todo если установлен день и устройство
         foreach ($key_set as $key) {
             if (!empty($day_set[$key]) && !empty($dev_set[$key])) {
+                Yii::getLogger()->log(['getPlaylist'=>'установлен день и устройство'], 1, 'binary');
                 return [
                     "model" => GmsPlaylistOut::findOne($key),
                     "state" => 1
@@ -187,6 +191,7 @@ class PlaylistController extends ActiveController
         //todo если нет дня но есть устройство
         foreach ($key_set as $key) {
             if (empty($day_set[$key]) && !empty($dev_set[$key])) {
+                Yii::getLogger()->log(['getPlaylist'=>'нет дня но есть устройство'], 1, 'binary');
                 return [
                     "model" => GmsPlaylistOut::findOne($key),
                     "state" => 2
@@ -197,6 +202,7 @@ class PlaylistController extends ActiveController
         //todo если есть день но нет устройства
         foreach ($key_set as $key) {
            if (!empty($day_set[$key]) && empty($dev_set[$key])) {
+               Yii::getLogger()->log(['getPlaylist'=>'есть день но нет устройства'], 1, 'binary');
                return [
                    "model" => GmsPlaylistOut::findOne($key),
                    "state" => 3

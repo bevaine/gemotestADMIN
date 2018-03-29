@@ -139,6 +139,7 @@ class PlaylistController extends Controller
      * @param null $region
      * @param null $sender_id
      * @param null $type_list
+     * @return array|null
      */
     public function actionAjaxPlaylistActive(
         $region = null,
@@ -168,12 +169,15 @@ class PlaylistController extends Controller
             }
         }
 
-        echo !empty($out) ? Json::encode($out) : 'null';
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 
     /**
      * @param null $region
      * @param null $sender_id
+     * @return null
      */
     public function actionAjaxPlaylistTemplate(
         $region = null,
@@ -193,6 +197,8 @@ class PlaylistController extends Controller
             $out["result"][$model->type][] = Json::decode($model->jsonPlaylist);
         }
 
-        echo !empty($out) ? Json::encode($out) : 'null';
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 }

@@ -35,23 +35,34 @@ class HistoryController extends ActiveController
         ];
     }
 
+    /**
+     * @return array
+     */
     public function actionAjaxHistoryPost()
     {
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+
         $model = new GmsHistory();
 
         //todo если плейлист не изменился или нет подходящего плейлиста то историю не сохраняем
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return json_encode(['state' => 1]);
+            return ['state' => 1];
         } else {
             Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
-            return json_encode(['state' => 0]);
+            return ['state' => 0];
         }
     }
 
+    /**
+     * @return array
+     */
     public function actionAjaxVideoHistoryPost()
     {
-        $model = new GmsVideoHistory();
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
 
+        $model = new GmsVideoHistory();
         if ($model->load(Yii::$app->request->post())) {
 
             $model->last_at = $model->created_at;
@@ -69,22 +80,21 @@ class HistoryController extends ActiveController
                 $findModel->last_at = $model->created_at;
                 $findModel->created_at = $findModel->oldAttributes['created_at'];
                 if ($findModel->save()) {
-                    return json_encode(['state' => 1]);
+                    return ['state' => 1];
                 } else {
                     Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
-                    return json_encode(['state' => 0]);
+                    return ['state' => 0];
                 }
             }
 
             if ($model->save()) {
-                return json_encode(['state' => 1]);
+                return ['state' => 1];
             } else {
                 Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
-                return json_encode(['state' => 0]);
+                return ['state' => 0];
             }
 
         }
-
-        return json_encode(['state' => 0]);
+        return ['state' => 0];
     }
 }

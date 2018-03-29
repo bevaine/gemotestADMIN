@@ -122,6 +122,9 @@ class GmsVideoHistoryController extends Controller
         }
     }
 
+    /**
+     *
+     */
     public function actionAjaxVideoList()
     {
         $searchModel = new GmsVideoHistorySearch();
@@ -129,6 +132,10 @@ class GmsVideoHistoryController extends Controller
         echo $this->createJson($dataProvider->getModels());
     }
 
+    /**
+     * @param $model
+     * @return array
+     */
     public function createJson($model)
     {
         $node = [];
@@ -150,6 +157,8 @@ class GmsVideoHistoryController extends Controller
             'wikiSection' => 'Просмотр истории показанных видео-роликов',
             'events' => $node
         ];
-        echo json_encode($arrJson);
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return $arrJson;
     }
 }

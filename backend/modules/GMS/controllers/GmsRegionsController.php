@@ -126,6 +126,7 @@ class GmsRegionsController extends Controller
     /**
      * @param null $search
      * @param null $id
+     * @return array
      */
     public function actionAjaxRegionsList($search = null, $id = null)
     {
@@ -145,6 +146,8 @@ class GmsRegionsController extends Controller
             $out['results'] = ['id' => $id, 'text' => GmsRegions::findOne(['id' =>$id])->region_name];
         }
 
-        echo Json::encode($out);
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 }

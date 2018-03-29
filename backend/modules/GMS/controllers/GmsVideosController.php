@@ -191,6 +191,8 @@ class GmsVideosController extends Controller
 
         $modelVideo->delete();
 
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
         return Json::encode($output);
     }
 
@@ -298,6 +300,7 @@ class GmsVideosController extends Controller
 
     /**
      * @param null $video
+     * @return array|null
      */
     public function actionAjaxVideoActive($video = null)
     {
@@ -332,7 +335,10 @@ class GmsVideosController extends Controller
                 if (!empty($data->file)) $out['results']['file'] = $data->file;
             }
         }
-        echo !empty($out) ? Json::encode($out) : null;
+
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 
 

@@ -168,6 +168,7 @@ class GmsDevicesController extends Controller
     /**
      * @param null $region
      * @param null $sender
+     * @return string
      */
     public function actionAjaxDeviceList($region = null, $sender = null)
     {
@@ -183,7 +184,8 @@ class GmsDevicesController extends Controller
         foreach ($data as $userData) {
             $out['results'][] = ['id' => $userData->id, 'name' => $userData->device];
         }
-
-        echo !empty($out) ? Json::encode($out) : 'null';
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 }
