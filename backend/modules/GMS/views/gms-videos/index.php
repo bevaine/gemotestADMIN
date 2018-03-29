@@ -75,7 +75,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             ],
                             'title' => $model['name'],
                             'target' => '_blank',
-                            'onclick' => "playVideo('{$model['id']}', '{$model['file']}')"
+                            'onclick' => "playVideo('".htmlspecialchars($model['name'], ENT_QUOTES)."', '{$model['file']}')"
                         ]
                     );
                 },
@@ -116,12 +116,35 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php
 $js1 = <<< JS
+    /**
+    * 
+    * @param str
+    */
+    function decodeHtml(str)
+    {
+        const map =
+        {
+            '&amp;': '&',
+            '&lt;': '<',
+            '&gt;': '>',
+            '&quot;': '"',
+            '&#039;': "'"
+        };
+        return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
+    }
+    
+    /**
+    * 
+    * @param name
+    * @param file
+    */
     function playVideo(name, file) 
     {
+        name = decodeHtml(name);
         $('.video-js').prop('controls',true);
-        var player = videojs('my-player');
-        var modalPlayer = player.createModal(name);
-        var modalHtml = $('#deactivate-user');
+        const player = videojs('my-player');
+        const modalPlayer = player.createModal(name);
+        const modalHtml = $('#deactivate-user');
         player.src(file);
         player.ready(function() {
             player.play(); 
