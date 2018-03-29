@@ -30,7 +30,6 @@
         "kartik-v/yii2-icons": "@dev",
         "budyaga/yii2-users": "*",
         "trntv/yii2-datetime-widget": "^1.0",
-        "arturoliveira/yii2-excelview": "*",
         "meysampg/yii2-treeview": "*",
         "kartik-v/yii2-field-range": "*",
         "kartik-v/yii2-detail-view": "*",
@@ -47,8 +46,7 @@
         "2amigos/yii2-multi-select-widget": "*",
         "kartik-v/yii2-widget-timepicker": "*",
         "edofre/yii2-fullcalendar": "V1.0.11",
-        "sjaakp/yii2-timeline": "*",
-        "kartik-v/yii2-export": "@dev"
+        "sjaakp/yii2-timeline": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",
