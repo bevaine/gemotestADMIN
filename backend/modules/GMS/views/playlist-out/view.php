@@ -183,8 +183,8 @@ if (!empty($model->jsonPlaylist)) {
 
 $js1 = <<< JS
     
-    var tree1 = $("#treetable1");
-    var tree2 = $("#treetable2"); 
+    const tree1 = $("#treetable1");
+    const tree2 = $("#treetable2"); 
         
     $(function()
     {
@@ -197,15 +197,14 @@ $js1 = <<< JS
             },                
             source: {$standartf},
             dblclick: function(event, data) {
-                var videoKey = data.node.key;
+                const videoKey = data.node.key;
                 $.ajax({
                     url: '{$urlAjaxVideo}',
                     data: {video: videoKey},
                     success: function (res) {
-                        res = JSON.parse(res);
                         if (res !== null && res.results.file !== undefined) {
-                            var videoPath = res.results.file; 
-                            var myPlayer = videojs('my-player');
+                            const videoPath = res.results.file; 
+                            const myPlayer = videojs('my-player');
                             myPlayer.src(videoPath);
                             myPlayer.ready(function() {
                                 this.play();
@@ -217,10 +216,10 @@ $js1 = <<< JS
             beforeActivate: function(event, data) {
             },
             renderColumns: function(event, data) {
-                var node = data.node, tdList = $(node.tr).find(">td");
+                const node = data.node, tdList = $(node.tr).find(">td");
                 tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
                 if (node.data.duration !== undefined) {
-                    var time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
+                    const time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
                     tdList.eq(2).text(time);
                 } 
                 sumDuration(node.parent, '#duration-summ1');
@@ -251,8 +250,8 @@ $js1 = <<< JS
     */
     function sumDuration (parent, span) 
     {
-        var total = 0;
-        var totalStr = '';
+        let total = 0;
+        let totalStr = '';
         if (parent.getChildren() === undefined) return;
         $.each(parent.getChildren(), function() {
             if (this.data.duration !== undefined) {

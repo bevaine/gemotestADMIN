@@ -159,7 +159,6 @@ $js1 = <<< JS
                     url: '{$urlAjaxVideo}',
                     data: {video: videoKey},
                     success: function (res) {
-                        res = JSON.parse(res);
                         if (res !== null && res.results.file !== undefined) {
                             var videoPath = res.results.file; 
                             var myPlayer = videojs('my-player');

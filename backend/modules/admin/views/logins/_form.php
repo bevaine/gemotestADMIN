@@ -97,12 +97,10 @@ use yii\helpers\Url;
                 if (res === 'null') {
                     $("#form-input").submit();
                 } else {
-                    res = JSON.parse(res);
-                    console.log(res.length);
                     if (res.length > 1) {
-                        var html = "";
-                        var htm_header = "";
-                        for(var i = 0; i < res.length; i++){
+                        let html = "";
+                        let htm_header = "";
+                        for(let i = 0; i < res.length; i++){
                             html += '<label><input type="radio" name="radioAccountsList" value="'+res[i].account+'">'+res[i].account+' (email: '+res[i].email+')</label>';
                             html += '<input type="hidden" name="hiddenEmailList['+res[i].account+']" value="'+res[i].email+'">';
                         }
@@ -114,7 +112,7 @@ use yii\helpers\Url;
                         $('#modal-body').html(html);
                         $('#deactivate-user').modal('show');
                     } else if(res.length === 1) {
-                        var html1 = "";
+                        let html1 = "";
                         html1 += '<input type="hidden" name="radioAccountsList" value="'+res[0].account+'">';
                         html1 += '<input type="hidden" name="hiddenEmailList['+res[0].account+']" value="'+res[0].email+'">';
                         $('#account-hide').html(html1);

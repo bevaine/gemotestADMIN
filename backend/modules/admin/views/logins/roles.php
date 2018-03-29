@@ -102,14 +102,13 @@ UsersAsset::register($this);
             department: department
         },
         success: function(res) {
-            res = JSON.parse(res);
-            var optionsAsString1 = 0;
-            var permission = res.permission;
-            var erp_groups = res.erp_groups;
-            var erp_nurse = res.erp_nurse;
+            let optionsAsString1 = 0;
+            const permission = res.permission;
+            const erp_groups = res.erp_groups;
+            const erp_nurse = res.erp_nurse;
 
             if (permission !== undefined && permission.length > 0) {
-                for (var i1 = 0; i1 < permission.length; i1++) {
+                for (let i1 = 0; i1 < permission.length; i1++) {
                     optionsAsString1 += "<option value='" + permission[i1]['id'] + "'>" + permission[i1]['text'] + "</option>";
                 }
             }

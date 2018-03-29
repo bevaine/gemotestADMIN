@@ -746,7 +746,6 @@ $js1 = <<< JS
                 data: {video: videoKey},
                 success: function (res) {
                     let htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
-                    //res = JSON.parse(res);
                     if (res !== null && res.results.file !== undefined) {
                         const videoPath = res.results.file; 
                         const myPlayer = videojs('my-player');
@@ -878,8 +877,6 @@ $js1 = <<< JS
             url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
-                //console.log(res);
-                //res = JSON.parse(res);
                 let optionsAsString = "";
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
                     const results = res.results; 
@@ -919,7 +916,6 @@ $js1 = <<< JS
             },
             success: function (res) {
                 let optionsAsString = "";
-                //res = JSON.parse(res);
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
                     const results = res.results; 
                     for (let i = 0; i < results.length; i++) {
@@ -976,7 +972,6 @@ $js1 = <<< JS
                 sender_id: sender
             },
             success: function (res) {
-                //res = JSON.parse(res);
                 if (res !== null) {
                     if (res.result[1] !== undefined) {
                         regionObject.fancytree("enable");
@@ -1025,7 +1020,6 @@ $js1 = <<< JS
             success: function (res){
                 let html_body = '';
                 const htm_header = 'Ошибка добавления, временное пересечение с другим плейлистом!';
-                //res = JSON.parse(res);
                 if (res !== null) {
                     if (res.id !== undefined && res.name !== undefined) {
                         let html  = 'Регион: <b>' + $('.region select option:selected').text() + '</b>'; 

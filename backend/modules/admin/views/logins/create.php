@@ -227,22 +227,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         if (res === 'null') {
                             $("#form-input").submit();
                         } else {
-                            res = JSON.parse(res);
-                            var html = "";
-                            var AD_text = "";
-                            var GS_text = "";
-                            var GD_text = "";
-                            var AD_html_text = "";
-                            var GS_html_text = "";
-                            var ad = res.ad;
-                            var gd = res.gd;
-                            var gs = res.gs;
-                            var htm_header = 'Информация по учетным записям';
+                            let html = "";
+                            let AD_text = "";
+                            let GS_text = "";
+                            let GD_text = "";
+                            let AD_html_text = "";
+                            let GS_html_text = "";
+                            const ad = res.ad;
+                            const gd = res.gd;
+                            const gs = res.gs;
+                            const htm_header = 'Информация по учетным записям';
                             if (gs !== undefined && gs.length > 0) {
                                 GS_text += '<p>Пользователь уже имеет учетные записи в GemoSytems</p>';
                                 GS_text += 'Выбирите аккаунт на основании которого нужно создать УЗ GemoSystem:';
-                                for (var e = 0; e < gs.length; e++) {
-                                    var checked = '';
+                                for (let e = 0; e < gs.length; e++) {
+                                    let checked = '';
                                     if (e === 0) checked = 'checked';
                                     GS_text += '<p><label><input type="radio" name="radioAIDList" value="' + gs[e].aid + '" ' + checked + '>' + gs[e].Name + '</label></p>';
                                 }
@@ -251,14 +250,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             if (ad !== undefined && ad.length > 0) {
                                 AD_text += '<p>Пользователь уже имеет учетные записи в Active Directory</p>';
                                 AD_text += 'Выбирите аккаунт AD на основании которого нужно создать УЗ GemoSystem:';
-                                for (var i = 0; i < ad.length; i++) {
-                                    var style = "";
-                                    var txtComment = "";
+                                for (let i = 0; i < ad.length; i++) {
+                                    let style = "";
+                                    let txtComment = "";
                                     if (ad[i].active === 1) {
                                         style = ' style="color:#ec1c24;font-weight:bold;" ';
                                         txtComment = ' - уже используется';
                                     }
-                                    var dataUser = ad[i].name + '<br>(' + ad[i].account + ', email: ' + ad[i].email + ')' + txtComment;
+                                    const dataUser = ad[i].name + '<br>(' + ad[i].account + ', email: ' + ad[i].email + ')' + txtComment;
                                     AD_text += '<label' + style + '><input type="radio" name="radioAccountsList" value="' + ad[i].account + '">' + dataUser +'</label>';
                                     AD_text += '<input type="hidden" name="hiddenEmailList[' + ad[i].account + ']" value="' + ad[i].email + '">';
                                 }

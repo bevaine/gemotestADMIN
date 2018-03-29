@@ -126,6 +126,7 @@ class KontragentsController extends Controller
     /**
      * @param null $search
      * @param null $id
+     * @return array|null
      */
     public function actionAjaxKontragentsList($search = null, $id = null)
     {
@@ -142,9 +143,11 @@ class KontragentsController extends Controller
                 $out['results'][] = ['id' => $userData->Key, 'text' => $userData->Name];
             }
         } elseif (isset($id)) {
-            $out['results'] = ['id' => $id, 'text' => Kontragents::findOne(['key' =>$id])->Name];
+            $out['results'] = ['id' => $id, 'text' => Kontragents::findOne(['Key' =>$id])->Name];
         }
 
-        echo Json::encode($out);
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 }

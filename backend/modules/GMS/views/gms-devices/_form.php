@@ -54,8 +54,8 @@ $js1 = <<< JS
     */
     function setSender(region) 
     {
-        var senderSelect = $('.sender_id select');
-        var senderDisable = senderSelect.prop('disabled'); 
+        const senderSelect = $('.sender_id select');
+        const senderDisable = senderSelect.prop('disabled'); 
         senderSelect.attr('disabled', true); 
         
         $(".sender_id select option").each(function() {
@@ -67,11 +67,10 @@ $js1 = <<< JS
             url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
-                res = JSON.parse(res);
-                var optionsAsString = "";
+                let optionsAsString = "";
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
-                    var results = res.results; 
-                    for (var i = 0; i < results.length; i++) {
+                    const results = res.results; 
+                    for (let i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
                         optionsAsString += results[i].id == '{$model->sender_id}' ? 'selected' : '';
                         optionsAsString += ">" + results[i].name + "</option>"

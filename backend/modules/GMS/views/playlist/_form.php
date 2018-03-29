@@ -316,7 +316,6 @@ $js1 = <<< JS
                     data: {video: videoKey},
                     success: function (res) {
                         let htm_table = null;
-                        res = JSON.parse(res);
                         if (res !== null && res.results.file !== undefined) {
                             const videoPath = res.results.file; 
                             const myPlayer = videojs('my-player');
@@ -587,7 +586,6 @@ $js1 = <<< JS
                 if (res === 'null') {
                     if (checkJSON()) $("#form").submit();
                 } else {
-                    res = JSON.parse(res);
                     let html_body = "";
                     const region = res.region;
                     const sender = res.sender;
@@ -634,7 +632,6 @@ $js1 = <<< JS
             url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
-                res = JSON.parse(res);
                 let optionsAsString = "";
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
                     const results = res.results; 

@@ -595,6 +595,10 @@ class LoginsController extends Controller
         $first_name = null,
         $middle_name = null
     ) {
+
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+
         //todo проверяем существует ли УЗ
         $arrAccountAD = [];
         $activeSyncHelper = new ActiveSyncHelper();
@@ -651,9 +655,9 @@ class LoginsController extends Controller
         }
 
         if (!$arrAccountAD || !is_array($arrAccountAD)){
-            exit('null') ;
+            return null;
         } else {
-            echo Json::encode($arrAccountAD);
+            return $arrAccountAD;
         }
     }
 
@@ -703,7 +707,9 @@ class LoginsController extends Controller
             $out['results'] = ['id' => $id, 'text' => Logins::findOne($id)->Name];
         }
 
-        echo Json::encode($out);
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 
     /**
@@ -738,7 +744,9 @@ class LoginsController extends Controller
             }
         }
 
-        echo Json::encode($out);
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 
     /**
@@ -783,6 +791,8 @@ class LoginsController extends Controller
             }
         }
 
-        echo Json::encode($out);
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : null;
     }
 }

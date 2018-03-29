@@ -231,7 +231,7 @@ $js1 = <<< JS
     Timeline_ajax_url = "../../timeline/simile-ajax-api.js";
     Timeline_urlPrefix = '../../timeline/';
     Timeline_parameters = 'bundle=true';
-    var resizeTimerID = null;
+    let resizeTimerID = null;
     
     $(function()
     {
@@ -286,9 +286,9 @@ $js1 = <<< JS
             return false;
         }
         
-        var eventSource = new Timeline.DefaultEventSource();
+        const eventSource = new Timeline.DefaultEventSource();
             
-        var zones = [
+        const zones = [
             {   start:    "2018-03-15 23:40:00 +03:00",
                 end:      "2018-03-20 23:40:00 +03:00",
                 magnify:  10,
@@ -312,7 +312,7 @@ $js1 = <<< JS
                 multiple: 5
             }
         ];
-        var zones2 = [
+        const zones2 = [
             {   start:    "Fri Nov 22 1963 00:00:00 GMT-0600",
                 end:      "Mon Nov 25 1963 00:00:00 GMT-0600",
                 magnify:  10,
@@ -337,11 +337,11 @@ $js1 = <<< JS
             }
         ];
         
-        var theme = Timeline.ClassicTheme.create();
+        const theme = Timeline.ClassicTheme.create();
         theme.event.bubble.width = 250;
         
-        var date = "Fri Nov 22 1963 13:00:00 GMT-0600";
-        var bandInfos = [
+        const date = "Fri Nov 22 1963 13:00:00 GMT-0600";
+        const bandInfos = [
             Timeline.createHotZoneBandInfo({
                 width:          "80%", 
                 intervalUnit:   Timeline.DateTime.WEEK, 
@@ -367,7 +367,7 @@ $js1 = <<< JS
         bandInfos[1].syncWith = 0;
         bandInfos[1].highlight = true;
         
-        for (var i = 0; i < bandInfos.length; i++) {
+        for (let i = 0; i < bandInfos.length; i++) {
             bandInfos[i].decorators = [
                 new Timeline.SpanHighlightDecorator({
                     startDate:  "Fri Nov 22 1963 12:30:00 GMT-0600",
@@ -394,7 +394,7 @@ $js1 = <<< JS
         }
         
         tl = Timeline.create(document.getElementById("tl"), bandInfos, Timeline.HORIZONTAL);        
-        var url = '{$urlAjaxVideoHistory}'; 
+        let url = '{$urlAjaxVideoHistory}'; 
         url += '?GmsVideoHistorySearch[region_id]=' + region_id;
         url += '&GmsVideoHistorySearch[sender_id]=' + sender_id;
         url += '&GmsVideoHistorySearch[device_id]=' + device_id;
@@ -423,8 +423,8 @@ $js1 = <<< JS
     */
     function setSender(region) 
     {
-        var senderSelect = $('.sender_id select');
-        var senderDisable = senderSelect.prop('disabled'); 
+        const senderSelect = $('.sender_id select');
+        const senderDisable = senderSelect.prop('disabled'); 
         senderSelect.attr('disabled', true); 
         
         $(".sender_id select option").each(function() {
@@ -436,11 +436,10 @@ $js1 = <<< JS
             url: '{$urlAjaxSender}',
             data: {region: region},
             success: function (res) {
-                res = JSON.parse(res);
-                var optionsAsString = "";
+                let optionsAsString = "";
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
-                    var results = res.results; 
-                    for (var i = 0; i < results.length; i++) {
+                    const results = res.results; 
+                    for (let i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
                         optionsAsString += ">" + results[i].name + "</option>"
                     }
@@ -458,8 +457,8 @@ $js1 = <<< JS
     */
     function setDevice(region = null, sender = null) 
     {
-        var deviceSelect = $('.device_id select');
-        var deviceDisable = deviceSelect.prop('disabled');
+        const deviceSelect = $('.device_id select');
+        const deviceDisable = deviceSelect.prop('disabled');
         deviceSelect.attr('disabled', true); 
         
         $(".device_id select option").each(function() {
@@ -474,11 +473,10 @@ $js1 = <<< JS
                 sender: sender
             },
             success: function (res) {
-                var optionsAsString = "";
-                res = JSON.parse(res);
+                let optionsAsString = "";
                 if (res !== null && res.results !== undefined && res.results.length > 0) {
-                    var results = res.results; 
-                    for (var i = 0; i < results.length; i++) {
+                    const results = res.results; 
+                    for (let i = 0; i < results.length; i++) {
                         optionsAsString += "<option value='" + results[i].id + "' ";
                         optionsAsString += ">" + results[i].name + "</option>"
                     }
@@ -493,9 +491,9 @@ JS;
 $js2 = <<< JS
     function playVideo(name, file) {
         $('.video-js').prop('controls',true);
-        var player = videojs('my-player');
-        var modalPlayer = player.createModal(name);
-        var modalHtml = $('#deactivate-user');
+        const player = videojs('my-player');
+        const modalPlayer = player.createModal(name);
+        const modalHtml = $('#deactivate-user');
         player.src(file);
         player.ready(function() {
             player.play(); 
