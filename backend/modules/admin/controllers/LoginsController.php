@@ -586,6 +586,7 @@ class LoginsController extends Controller
      * @param null $last_name
      * @param null $first_name
      * @param null $middle_name
+     * @return array|string
      */
     public function actionAjaxForActive(
         $type = null,
@@ -627,7 +628,7 @@ class LoginsController extends Controller
 
         if (!empty(trim($activeSyncHelper->lastName))) {
             $activeSyncHelper->fullName = trim($activeSyncHelper->lastName);
-        } else exit('null') ;
+        } else return 'null';
 
         if (!empty(trim($activeSyncHelper->firstName))) {
             $activeSyncHelper->fullName .= " " . trim($activeSyncHelper->firstName);
@@ -654,8 +655,8 @@ class LoginsController extends Controller
             }
         }
 
-        if (!$arrAccountAD || !is_array($arrAccountAD)){
-            return null;
+        if (!$arrAccountAD || !is_array($arrAccountAD)) {
+            return 'null';
         } else {
             return $arrAccountAD;
         }
@@ -687,6 +688,7 @@ class LoginsController extends Controller
     /**
      * @param null $search
      * @param null $id
+     * @return array|string
      */
     public function actionAjaxUserDataList($search = null, $id = null)
     {
@@ -709,12 +711,13 @@ class LoginsController extends Controller
 
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
-        return !empty($out) ? $out : null;
+        return !empty($out) ? $out : 'null';
     }
 
     /**
      * @param null $search
      * @param null $id
+     * @return array|string
      */
     public function actionAjaxZaborList($search = null, $id = null)
     {
@@ -746,7 +749,7 @@ class LoginsController extends Controller
 
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
-        return !empty($out) ? $out : null;
+        return !empty($out) ? $out : 'null';
     }
 
     /**
@@ -765,6 +768,7 @@ class LoginsController extends Controller
 
     /**
      * @param bool $department
+     * @return null
      */
     public function actionAjaxListName($department = false)
     {
