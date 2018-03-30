@@ -1801,9 +1801,9 @@ class ActiveSyncHelper
         $findUsersLogins = Logins::findOne(['aid' => $aid]);
         if (!$findUsersLogins) return false;
 
-        if (time() > strtotime($findUsersLogins->date_end)
+        if (time() > strtotime($findUsersLogins->DateEnd)
             || time() > strtotime($findUsersLogins->block_register)) {
-            $findUsersLogins->date_end = NULL;
+            $findUsersLogins->DateEnd = NULL;
             $findUsersLogins->block_register = NULL;
             if ($findUsersLogins->save()) {
                 $message = '<p>У данного пользователя учетная запись разблокирована!</p>';
