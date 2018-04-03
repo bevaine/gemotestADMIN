@@ -28,22 +28,6 @@ $action = 'org';
 
     <?= $form->field($model, 'BlankName')->textInput() ?>
 
-<!--    --><?//= $form->field($model, 'mapPoint1.address')->textInput() ?>
-<!---->
-<!--    --><?//= $form->field($model, 'mapPoint1.zip_code')->textInput() ?>
-<!---->
-<!--    --><?//= $form->field($model, 'mapPoint1.area')->textInput() ?>
-<!---->
-<!--    --><?//= $form->field($model, 'mapPoint1.city')->textInput() ?>
-<!---->
-<!--    --><?//= $form->field($model, 'mapPoint1.street')->textInput() ?>
-<!---->
-<!--    --><?//= $form->field($model, 'mapPoint1.house')->textInput() ?>
-<!---->
-<!--    --><?//= $form->field($model, 'mapPoint1.housing')->textInput() ?>
-<!---->
-<!--    --><?//= $form->field($model, 'mapPoint1.region')->textInput() ?>
-
     <?= $form->field($model, 'isDelete')->textInput() ?>
 
     <?= $form->field($model, 'PayType')->textInput() ?>
@@ -103,72 +87,6 @@ $action = 'org';
     <?= $form->field($model, 'ext_num_mask')->textInput() ?>
 
     <?= $form->field($model, 'salt')->textInput() ?>
-
-    <div class="logins-create">
-        <div class="nav-tabs-custom">
-
-            <ul class="nav nav-tabs">
-                <li class="<?= ($action == 'org') ? "active" : '' ?>"><a href="<?php echo Url::to(["logins/create/org"]) ?>">Юр. лица</a></li>
-            </ul>
-
-            <div class="tab-content">
-                <div class="tab-pane active" id="tab_1">
-                    <div class="logins-form">
-
-                        <?php $form = ActiveForm::begin(['id'=>'form-input']); ?>
-
-                        <div name="account-hide" id="account-hide"></div>
-
-                        <?php if ($action == 'org') : ?>
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <? //$form->field($model, 'name')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <? //$form->field($model, 'key')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <? //$form->field($model, 'login')->textInput() ?>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <? //$form->field($model, 'email')->textInput() ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4">
-                                    <div class="form-group">
-                                        <? //$form->field($model, 'blankText')->textarea() ?>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-
-                        <div class="form-group">
-                            <?php
-                            if ($action == 'user' || $action == 'franch' || $action == 'doc') {
-                                echo Html::Button('Создать', ['class' => 'btn btn-success']);
-                            } else {
-                                //echo Html::submitButton('Создать', ['class' => 'btn btn-success']);
-                            }
-                            ?>
-                        </div>
-
-                        <?php ActiveForm::end(); ?>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
