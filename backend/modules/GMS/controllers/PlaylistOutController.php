@@ -10,6 +10,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\log\Logger;
 use yii\helpers\Json;
+use yii\helpers\ArrayHelper;
 
 /**
  * PlaylistOutController implements the CRUD actions for GmsPlaylistOut model.
@@ -146,7 +147,185 @@ class PlaylistOutController extends Controller
 
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
-        echo !empty($out) ? $out : null;
+        return !empty($out) ? $out : 'null';
+    }
+
+    /**
+     * @return array|bool
+     */
+    public function actionAjaxCheckPlaylist()
+    {
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+
+        $f = [];
+        $s = [];
+        $sum = 0;
+        $std_time = 0;
+        $com_time = 0;
+        $minimal_std = 60;
+
+        if ($post = Yii::$app->request->post()) {
+            $all_time = $post['all_time'];
+            $arr_commerce = $post['arr_commerce'];
+            $arr_standart = $post['arr_standart'];
+        } else return false;
+
+        if (empty($arr_standart) || empty($all_time)) {
+            return [
+                'state' => 0,
+                'message' => 'Ошибка формирования плейлиста дневного эфира!'
+            ];
+        }
+
+        if (empty($arr_commerce)) {
+            return $this->getStandartPls($arr_standart);
+        }
+
+        foreach ($arr_commerce as $input) {
+            $sum += $input['duration'] * $input['views'];
+        }
+        $play_standart = ($all_time - $sum) / array_sum(ArrayHelper::getColumn($arr_commerce, 'views'));
+        $play_standart = ceil($play_standart);
+
+        if ($play_standart >= $minimal_std) {
+
+            foreach ($arr_commerce as $commerce) {
+                $arr = array_fill(0, $commerce['views'], [
+                    'file' => $commerce['file'],
+                    'key' => $commerce['key'],
+                    'start' => 0,
+                    'end' => (int)$commerce['duration'],
+                    'type' => 2
+                ]);
+                if (empty($f)) $f = $arr;
+                else $f = array_merge($f, $arr);
+                if (!empty($f)) shuffle($f);
+            }
+
+            while(list($key, $time) = each($arr_standart))
+            {
+                if ($play_standart >= $time['duration'])
+                {
+                    $val = each($f)['value'];
+                    $s[] = [
+                        'file' => $time['file'],
+                        'key' => $time['key'],
+                        'start' => 0,
+                        'end' => (int)$time['duration'],
+                        'type' => 1
+                    ];
+
+                    $std_time += array_sum(ArrayHelper::getColumn($time, 'duration'));
+                    if (!empty($val)) {
+                        $s[] = $val;
+                        $com_time += array_sum(ArrayHelper::getColumn($val, 'duration'));
+                    }
+
+                } else if ($play_standart < $time['duration'])
+                {
+                    for ($a = 0; ;($a = $a + $play_standart))
+                    {
+                        $b = $a - $play_standart;
+                        if ($a > $time['duration']) {
+                            $val = each($f)['value'];
+                            $s[] = [
+                                'file' => $time['file'],
+                                'key' => $time['key'],
+                                'start' => (int)$b,
+                                'end' => (int)$time['duration'],
+                                'type' => 1
+                            ];
+                            $s[] = $val;
+                            $std_time += $time['duration'] - $b;
+                            $com_time += $val['end'];
+                            break;
+                        } elseif ($a > 0)
+                        {
+                            $val = each($f)['value'];
+                            if (empty($val)) {
+                                $s[] = [
+                                    'file' => $time['file'],
+                                    'key' => $time['key'],
+                                    'start' => (int)$b,
+                                    'end' => (int)$time['duration'],
+                                    'type' => 1
+                                ];
+                                $std_time += $time['duration'] - $b;
+                                break;
+                            }
+                            $s[] = [
+                                'file' => $time['file'],
+                                'key' => $time['key'],
+                                'start' => (int)($b),
+                                'end' => (int)$a,
+                                'type' => 1
+                            ];
+                            $s[] = $val;
+                            $std_time += $a - $b;
+                            $com_time += $val['end'];
+                        }
+                    }
+                }
+
+                if (!empty($val) && $key == count($arr_standart) - 1) {
+                    reset($arr_standart);
+                }
+            }
+
+            if (!empty($s)) {
+                return [
+                    'com_time' => $com_time,
+                    'std_time' => $std_time,
+                    'state' => 1,
+                    'info' => $s
+                ];
+            } else {
+                return [
+                    'state' => 0,
+                    'message' => 'Ошибка формирования плейлиста дневного эфира!'
+                ];
+            }
+        } else {
+            if ($all_time > 60) {
+                $all_time = date("H:i:s", mktime(null, null, $all_time));
+            } else {
+                $all_time = $all_time.' сек.';
+            }
+            $message = 'Слишком короткий интервал бесплатного эфирного время ' . $play_standart . ' сек. (из допущенного ' . $minimal_std . ' сек.)';
+            $message .= '<br>Уменьшите интервал и/или кол-во просмотра коммерческого видео, чтобы уложиться в время дневого эфира - '.$all_time;
+            return [
+                'state' => 0,
+                'message' => $message
+            ];
+        }
+    }
+
+    public function getStandartPls($arr_standart)
+    {
+        $std_time = array_sum(ArrayHelper::getColumn($arr_standart, 'duration'));
+
+        foreach ($arr_standart as $time) {
+            $s[] = [
+                'file' => $time['file'],
+                'key' => $time['key'],
+                'start' => 0,
+                'end' => (int)$time['duration']
+            ];
+        }
+        if (!empty($s)) {
+            return [
+                'com_time' => 0,
+                'std_time' => $std_time,
+                'state' => 1,
+                'info' => $s
+            ];
+        } else {
+            return [
+                'state' => 0,
+                'message' => 'Ошибка формирования плейлиста дневного эфира!'
+            ];
+        }
     }
 
     /**

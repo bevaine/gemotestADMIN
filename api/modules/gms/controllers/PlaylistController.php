@@ -116,7 +116,8 @@ class PlaylistController extends ActiveController
                     $out['pls'] = [
                         'id' => $plsID->id,
                         'files' => $plsID->getVideos(),
-                        'm3u' => Json::decode($plsID->jsonPlaylist)
+                        'm3u' => Json::decode($plsID->jsonPlaylist),
+                        'kodi' => Json::decode($plsID->jsonKodi),
                     ];
                 }
             }

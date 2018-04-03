@@ -614,7 +614,7 @@ class LoginsController extends Controller
                 'Is_Cons' => '4'
             ]);
 
-            if (!$doctorModel) exit('null') ;
+            if (!$doctorModel) return 'null';
 
             $activeSyncHelper->lastName = $doctorModel->LastName;
             $expName = explode(" ", $doctorModel->Name);
@@ -682,7 +682,7 @@ class LoginsController extends Controller
                 $out['gd'] = $fullName;
             }
         }
-        return $out;
+        return !empty($out) ? $out : 'null';
     }
 
     /**
@@ -797,6 +797,6 @@ class LoginsController extends Controller
 
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
-        return !empty($out) ? $out : null;
+        return !empty($out) ? $out : 'null';
     }
 }

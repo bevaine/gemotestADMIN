@@ -268,9 +268,13 @@ $js1 = <<< JS
                 const playlistNode = tree2
                     .fancytree("getTree")
                     .getNodeByKey('playList[1]');
-                const addChild = [];
-                addChild.push(data.node);
-                playlistNode.addNode(addChild, 'child');
+                if ($('#gmsplaylist-type').val() === '1') {
+                    const addChild = [];
+                    addChild.push(data.node);
+                    playlistNode.addNode(addChild, 'child');
+                } else if ($('#gmsplaylist-type').val() === '2') {
+                    data.node.moveTo(playlistNode, "child");
+                }
             },
             beforeActivate: function(event, data) {
             },

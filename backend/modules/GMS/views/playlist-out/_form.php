@@ -42,7 +42,6 @@ $css = <<<CSS
     .reg {
         color: #fff;
         background: #00a65a;
-        background-color: #00a65a;
         text-shadow: 0 0 black;
     }
     .vjs-big-play-button {
@@ -61,10 +60,10 @@ $css = <<<CSS
         font-family: 'Material Icons';
         font-style: normal;
         font-weight: 400;
-        src: url(../../fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2) format('woff2');
+        /*src: url("../../fonts/flUhRq6tzZclQEJ-Vdg-IuiaDsNc.woff2") format('woff2');*/
     }
     .material-icons {
-        font-family: 'Material Icons';
+        font-family: 'Material Icons',serif;
         font-weight: normal;
         font-style: normal;
         font-size: 24px;
@@ -148,7 +147,7 @@ $this->registerCss($css);
                                             <?= Html::input(
                                                 'text',
                                                 'GmsPlaylistOut[time_start]',
-                                                date("H:i", $model->time_start),
+                                                date("H:i", $model->isNewRecord ? mktime(7, 0) : $model->time_start),
                                                 [
                                                     'id' => 'gmsplaylistout-time_start',
                                                     'class' => 'form-control floating-label',
@@ -168,7 +167,7 @@ $this->registerCss($css);
                                             <?= Html::input(
                                                 'text',
                                                 'GmsPlaylistOut[time_end]',
-                                                date("H:i", $model->time_end),
+                                                date("H:i", $model->isNewRecord ? mktime(18, 0) : $model->time_end),
                                                 [
                                                     'id' => 'gmsplaylistout-time_end',
                                                     'class' => 'form-control floating-label',
@@ -242,6 +241,16 @@ $this->registerCss($css);
                                                     ]
                                                 ],
                                                 'extensions' => ['dnd'],
+                                                'dblclick' => new JsExpression('function(node, data) {
+                                                    if (!data.node.isFolder()) {
+                                                        const playlistNode = $("#treetable")
+                                                            .fancytree("getTree")
+                                                            .getNodeByKey("playlist"),
+                                                            addChild = [];
+                                                        addChild.push(data.node);
+                                                        playlistNode.addNode(addChild, "child");
+                                                    }
+                                                }'),
                                                 'dnd' => [
                                                     'preventVoidMoves' => true,
                                                     'preventRecursiveMoves' => true,
@@ -286,13 +295,21 @@ $this->registerCss($css);
                                                     ]
                                                 ],
                                                 'extensions' => ['dnd'],
+                                                'dblclick' => new JsExpression('function(node, data) {
+                                                    if (!data.node.isFolder()) {
+                                                        const playlistNode = $("#treetable")
+                                                            .fancytree("getTree")
+                                                            .getNodeByKey("playlist"),
+                                                            addChild = [];
+                                                        data.node.moveTo(playlistNode, "child");
+                                                    }
+                                                }'),
                                                 'dnd' => [
                                                     'preventVoidMoves' => true,
                                                     'preventRecursiveMoves' => true,
                                                     'autoExpandMS' => 400,
                                                     'dragStart' => new JsExpression('function(node, data) {
                                                         if (!data.tree.options.disabled) {
-                                                            //return true;
                                                             return !node.isFolder();
                                                         } else return false;
                                                     }'),
@@ -355,8 +372,17 @@ $this->registerCss($css);
                                             </tbody>
                                             <thead>
                                                 <tr>
-                                                    <th style="font-size: smaller" colspan="5">Итого</th>
-                                                    <th colspan="6"><div class="duration-summ" id="duration-summ"></div></th>
+                                                    <th style="font-size: smaller">Итого:</th>
+                                                    <th style="font-size: smaller" colspan="1">
+                                                        <span class="day-summ" id="day-summ"></span>
+                                                    </th>
+                                                    <th style="text-align: right;" colspan="3">
+                                                        <span style="padding: 4px" class="error_span" id="error_span"></span>
+                                                    </th>
+                                                    <th>
+                                                        <div class="duration-summ" id="duration-summ"></div>
+                                                    </th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                         </table>
@@ -453,16 +479,15 @@ $urlAjaxDevice = \yii\helpers\Url::to(['/GMS/gms-devices/ajax-device-list']);
 $urlAjaxVideo = \yii\helpers\Url::to(['/GMS/gms-videos/ajax-video-active']);
 $urlAjaxTime = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-time-check']);
 $urlAjaxPlaylistTemplate = \yii\helpers\Url::to(['/GMS/playlist/ajax-playlist-template']);
+$urlAjaxCheckPlaylist = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-check-playlist']);
 
+$pls_id = 'null';
 $source = [];
-$playListKey = 1;
-$playListKeyStr = 'playList['.$playListKey.']';
-
 if ($model->isNewRecord) {
     $source =  [
         [
             'title' => 'Новый плейлист',
-            'key' => $playListKeyStr,
+            'key' => 'playlist',
             'folder' => true,
             'expanded' => true,
             'icon' => '../../img/video1.png'
@@ -470,6 +495,7 @@ if ($model->isNewRecord) {
     ];
     $source = json_encode($source);
 } else {
+    $pls_id = $model->id;
     if (!empty($model->jsonPlaylist)) {
         $source = new JsExpression('['.$model->jsonPlaylist.']');
     }
@@ -480,13 +506,17 @@ $js1 = <<< JS
     const newPlayList = [
         {
             "title" : "Новый плейлист", 
-            "key" : "PlayList[1]", 
+            "key" : "playlist", 
             "folder" : true, 
             "expanded" : true, 
             "icon" : "../../img/video1.png"
         }
     ];
 
+    /**
+    * 
+    * @param htm_table
+    */
     function resetPlayer(htm_table = null) {
         const myPlayer = videojs('my-player');
         if (htm_table === null) {
@@ -501,6 +531,9 @@ $js1 = <<< JS
             .html(htm_table);        
     }
   
+    /**
+    * 
+    */
     $(function()
     {
         const tree = $("#treetable");
@@ -522,13 +555,11 @@ $js1 = <<< JS
             {
                 let time = 0;
                 const node = data.node, tdList = $(node.tr).find(">td");
-                tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
             
                 tdList.eq(1).addClass('dblclick');
                 
                 if (node.data.duration !== undefined) {
                     time = moment.unix(node.data.duration).utc().format("HH:mm:ss");
-                    //tdList.eq(2).text(time);
                 }
 
                 if (node.data.type !== undefined) 
@@ -536,13 +567,15 @@ $js1 = <<< JS
                     let icon = '';
                     let html = '';
                     let typePlaylist;
+                    let views_str = '';
                     
                     if (node.data.type === '1') {
                         icon = 'gemotest.jpg';
                         typePlaylist = 'Стандартный';
-                        tdList.eq(2).text(typePlaylist);
                         
+                        tdList.eq(2).text(typePlaylist);
                         if (time !== 0) {
+                            node.data.views = 1;
                             node.data.total = node.data.duration;
                             tdList.eq(3).text(time); 
                             tdList.eq(5).text(time);
@@ -550,17 +583,32 @@ $js1 = <<< JS
                     } else if (node.data.type === '2') {
                         icon = 'dollar.png';
                         typePlaylist = 'Коммерческий';
-                        tdList.eq(2).text(typePlaylist);
                         
-                        html = '<input style="width:50px" type="number" id="count_view[' + node.key + ']" min="0" step="1"/>';
+                        const folderNode = $("#fancyree_template_commercial")
+                                .fancytree("getTree")
+                                .getNodeByKey(node.key);
+                        
+                        if (folderNode) folderNode.remove();    
+                        
+                        tdList.eq(2).text(typePlaylist);
+                        if (node.data.views !== undefined) {
+                            views_str = "value = '" + node.data.views + "'";
+                        }
+                        
+                        html = '<input style="width:50px" type="number" id="count_view[' + node.key + ']" min="0" step="1" ' + views_str + '/>';
                         tdList.eq(4).html(html).addClass('alignCenter');
+                        if (node.data.total !== undefined) {
+                            const total_str = moment.unix(node.data.total).utc().format("HH:mm:ss");
+                            tdList.eq(5).text(total_str); 
+                        }
+                        
                         tdList.eq(4).find("input").change(function(){
                             node.data.views = $(this).val();
                             if (updateTotal(node)) {
                                 const time_views = moment.unix(node.data.total).utc().format("HH:mm:ss");
                                 tdList.eq(5).text(time_views);  
                             }
-                            sumDuration(node.parent);
+                            sumDuration();
                         });
                         
                         if (time !== 0) {
@@ -596,11 +644,12 @@ $js1 = <<< JS
                                         const time_views = moment.unix(node.data.total).utc().format("HH:mm:ss");
                                         tdList.eq(5).text(time_views);  
                                     }
-                                    sumDuration(node.parent);
+                                    sumDuration();
                                 }
                             });                            
                         }
                     }
+                    
                     if (icon !== '') {
                         const span = $(node.span);
                         span.find("> span.fancytree-icon").css({
@@ -612,13 +661,13 @@ $js1 = <<< JS
 
                 if (!node.isFolder()) {
                     tdList.eq(6).html('<span id="trash-node" style="cursor:pointer;" class="glyphicon glyphicon-trash"></span>');
+                    sumDuration();
                 }
-                sumDuration(node.parent);
             },
             edit: {
                 triggerStart: ["clickActive"],
                 beforeEdit : function(event, data){
-                    return !!(data.node.isFolder() && data.node.key !== 'ComFolder'); 
+                    return (data.node.isFolder() && data.node.key !== 'ComFolder'); 
                 },
                 edit : function(event, data){
                 },
@@ -642,6 +691,9 @@ $js1 = <<< JS
                 preventRecursiveMoves : true,
                 autoExpandMS :400,
                 dragStart : function(node, data) {
+                    if (node.data.type !== undefined && node.data.type === '2') {
+                        return false;
+                    }
                     return !node.isFolder();
                 },
                 dragEnter : function(node, data) {
@@ -654,26 +706,7 @@ $js1 = <<< JS
                     if (data.otherNode) {
                         
                         let sameTree = (data.otherNode.tree === data.tree);
-                        const playlistNode = data.tree.getNodeByKey('PlayList[1]');                    
-
-                        if (data.otherNode.data.type === '2') {
-                            let folderNode = data.tree.getNodeByKey('ComFolder');  
-                            if (folderNode === null) {
-                                const newFolderNode = [
-                                    {
-                                        "title" : "Коммерческие ролики", 
-                                        "key" : "ComFolder", 
-                                        "folder" : true, 
-                                        "expanded" : true, 
-                                        "icon" : "../../img/dollar.png"
-                                    }
-                                ];
-                                playlistNode.addNode(newFolderNode, 'child');
-                            }
-                            folderNode = data.tree.getNodeByKey('ComFolder');
-                            data.otherNode.moveTo(folderNode, "child");
-                            return;
-                        }   
+                        const playlistNode = data.tree.getNodeByKey('playlist');                    
                         
                         if (!sameTree) {
                             if (data.otherNode.isFolder()) {
@@ -681,9 +714,12 @@ $js1 = <<< JS
                             } else {
                                 const addChild = [];
                                 addChild.push(data.otherNode);
-                                playlistNode.addNode(addChild, 'child');
+                                if (data.otherNode.data.type === '2') {
+                                    data.otherNode.moveTo(playlistNode, "child");
+                                } else if (data.otherNode.data.type === '1') {
+                                    playlistNode.addNode(addChild, 'child');
+                                }
                             }
-                            
                         } else {
                             data.otherNode.moveTo(node, data.hitMode); 
                             if (!data.otherNode.isChildOf(playlistNode)) {
@@ -692,7 +728,6 @@ $js1 = <<< JS
                             data.otherNode.render(true);
                         }
                         playlistNode.setExpanded();
-                        sumDuration(node.parent);
                     } else if (data.otherNodeData) {
                         node.addChild(data.otherNodeData, data.hitMode);
                     } else {
@@ -710,25 +745,29 @@ $js1 = <<< JS
             const node = $.ui.fancytree.getNode(e),           
                 tdList = $(node.tr),
                 parent = node.parent;
-
-            if (parent.key === 'ComFolder') {
+            
+            if (node.data.type === undefined) return;
+            
+            if (node.data.type  === '2') {
                 const commercialObject = $("#fancyree_template_commercial"), 
                     commercialTree = commercialObject.fancytree("getTree"), 
                     folderNode = commercialTree.getNodeByKey("playList[1]");
                 
-                node.moveTo(folderNode, "child");
-                folderNode.setExpanded();
-                tdList.remove();
-                if (parent.countChildren() === 0) {
-                    parent.remove();
-                    parent.render(true); 
+                if (!commercialTree.getNodeByKey(node.key)) {
+                    node.moveTo(folderNode, "child");
+                } else {
+                    node.remove();
                 }
-            } else {
+                
+                folderNode.setExpanded();
+                tdList.remove(); 
+
+            } else if (node.data.type  === '1') {
                 node.remove();
             }
             node.render(true); 
             e.stopPropagation();  
-            sumDuration(parent);
+            sumDuration();
             resetPlayer();
         });
         
@@ -766,6 +805,121 @@ $js1 = <<< JS
         });
     });
     
+    /**
+    * 
+    * @returns {*}
+    */
+    function getTimeDay() {
+        const datePicker1 = $('#gmsplaylistout-time_start').val(),
+            datePicker2 = $('#gmsplaylistout-time_end').val(),
+            date1 = new Date('1976-01-01 ' + datePicker1),
+            date2 = new Date('1976-01-01 ' + datePicker2);
+        if (datePicker2 > datePicker1) {
+            const splitDate1 = datePicker1.split(':'),
+                splitDate2 = datePicker2.split(':'),            
+                m1 = moment('1976-01-01T00:00:00').set({
+                    'hour': splitDate1[0], 
+                    'minute': splitDate1[1], 
+                    'second' : splitDate1[2]
+                }),
+                m2 = moment('1976-01-01T00:00:00').set({
+                    'hour': splitDate2[0], 
+                    'minute': splitDate2[1], 
+                    'second' : splitDate2[2]
+                });
+            let timestamp = (m2.diff(m1, 'ms'));
+            return timestamp / 1000;
+        }
+        return false;
+    }
+    
+    /**
+    * 
+    * @returns {boolean}
+    */
+    function sumDuration() 
+    {
+        let i = 0;
+        let total = 0;
+        let tdList = '';
+        let totalStr = '00:00:00';
+        
+        const treeObject = $("#treetable"), 
+            tree = treeObject.fancytree("getTree"),
+            parent = tree.getNodeByKey("playlist");
+        
+        if (parent === undefined 
+            || parent.getChildren() === null) 
+            return false;
+
+        $.each(parent.getChildren(), function() 
+        {
+            if (this.data.type !== undefined) {
+                tdList = $(this.tr).find(">td");
+                if (this.data.type === '1') {
+                    tdList.eq(0).text(++i).addClass("alignRight");
+                } else if (this.data.type === '2') {
+                    tdList.eq(0).append().css({
+                        backgroundImage: "url(../../img/rand.png)",
+                        backgroundPosition: "0 0",
+                        backgroundRepeat: "no-repeat"
+                    });
+                }
+            }
+            
+            if (this.data.total !== undefined) {
+                total += parseInt(this.data.total, 10);                
+            }
+        });
+        let color = 'black', error = '';
+        if (total > 0) {
+            totalStr = moment.unix(total).utc().format("HH:mm:ss");
+            let timeDay = getTimeDay();
+            if (timeDay && total > timeDay) {
+                color = "red";
+                error = 'Превышен лимит за указанное время:';
+            }
+        }
+        $('#duration-summ').html(totalStr).css({
+            color : color
+        });
+        $('#error_span').html(error).css({
+            color : color
+        });
+        return color!=='red';
+    }
+    
+    /**
+    * 
+    * @returns {*}
+    */
+    function getSum() 
+    {
+        let total = 0;
+        
+        const treeObject = $("#treetable"), 
+            tree = treeObject.fancytree("getTree"),
+            parent = tree.getNodeByKey("playlist");
+        
+        if (parent === undefined 
+            || parent.getChildren() === undefined) 
+            return false;
+        
+        $.each(parent.getChildren(), function() 
+        { 
+            if (this.data.total !== undefined) {
+                total += parseInt(this.data.total, 10);                
+            } 
+        });
+        if (total > 0) return total;
+        return false;
+    }   
+    
+    /**
+    * 
+    * @param node
+    * @returns {boolean}
+    */
     function updateTotal(node) {
         if (node.data.views === undefined || node.data.views === 0) {
             return false;
@@ -774,91 +928,9 @@ $js1 = <<< JS
             return false;
         }
         node.data.total = node.data.views * node.data.duration;
-    }
-    
-    /**
-    * 
-    * @param parentFolder
-    */
-    function addJSON (parentFolder) 
-    {
-        const arrOut = {};
-        const arrChildrenOne = [];
-        const playListKey = parentFolder.key;
-        const rootTitle = parentFolder.title;
-        const inputVar = $("input");
-        
-        if (inputVar.is("#gmsplaylistout-jsonplaylist")) {
-            $("#gmsplaylistout-jsonplaylist").remove();
-        }                    
-        
-        if (inputVar.is("#gmsplaylistout-name")) {
-            $("#gmsplaylistout-name").remove();
-        }
-
-        arrOut["key"] = playListKey;
-        arrOut["title"] = rootTitle;
-        arrOut["folder"] = "true";
-        arrOut["expanded"] = "true";
-
-        $("<input>").attr({
-            type: "hidden",
-            id: "gmsplaylistout-name",
-            name: "GmsPlaylistOut[name]",
-            value: rootTitle
-        }).appendTo("form");
-        
-        if (parentFolder.children !== null) {
-            parentFolder.children.forEach(function(children) {
-                //console.log(children);
-                const arrChildren = {};
-                const arrData = {};
-                const key = children.key;
-                const name = children.title;
-                arrData["file"] = children.data.file;
-                arrData["duration"] = children.data.duration;
-                arrData["type"] = children.data.type;
-                arrChildren["key"] = key; 
-                arrChildren["title"] = name;
-                arrChildren["data"] = arrData;
-                arrChildrenOne.push(arrChildren); 
-            });
-
-            arrOut["children"] = arrChildrenOne;
-            const jsonStr = JSON.stringify(arrOut);
-
-            $("<input>").attr({
-                type: "hidden",
-                id: "gmsplaylistout-jsonplaylist",
-                name: "GmsPlaylistOut[jsonPlaylist]",
-                value: jsonStr
-            }).appendTo("form");
-        }
+        return true;
     }
 
-    /**
-    * @param parent
-    */
-    function sumDuration (parent) 
-    {
-        let total = 0;
-        let totalStr = '';
-        if (parent.getChildren() === undefined) return;
-        $.each(parent.getChildren(), function() {
-            let views = 1;
-            if (this.data.duration === undefined) return;            
-            if (this.data.views !== undefined 
-                && this.data.views !== 0) {
-                views = this.data.views;
-            }
-            total += parseInt(this.data.duration, 10) * views;
-        });
-        if (total > 0) {
-            totalStr = moment.unix(total).utc().format("HH:mm:ss");
-        }
-        $('#duration-summ').html(totalStr);
-    }
-    
     /**
     * @param region
     */
@@ -965,14 +1037,20 @@ $js1 = <<< JS
         const commercialObject = $("#fancyree_template_commercial");
         const commercialTree = commercialObject.fancytree("getTree");
         
+        const parentFolder = $("#treetable")
+            .fancytree("getTree")
+            .getNodeByKey("playlist");
+
         $.ajax({
             url: '{$urlAjaxPlaylistTemplate}',
             data: {
                 region: region,
-                sender_id: sender
+                sender_id: sender,
+                pls_out_id: {$pls_id}
             },
             success: function (res) {
-                if (res !== null) {
+                if (res !== 'null') {
+                    console.log(res.result[1]);
                     if (res.result[1] !== undefined) {
                         regionObject.fancytree("enable");
                         regionTree.reload(res.result[1]);
@@ -988,30 +1066,194 @@ $js1 = <<< JS
     
     /**
     * 
+    * @returns {Array}
+    */
+    function addJSON() 
+    {
+        let arrOut = {},
+            arrChildrenOne = [],
+            arrStandartChildren = [],
+            arrCommercialChildren = [],
+            htm_header = 'Ошибка сохранения плейлиста';
+        
+        const inputVar = $("input"), 
+            treeObject = $("#treetable"), 
+            tree = treeObject.fancytree("getTree"),
+            parentFolder = tree.getNodeByKey("playlist"),
+            rootTitle = parentFolder.title,
+            playListKey = parentFolder.key,
+            timeDay = getTimeDay();
+
+        if (parentFolder.children === null) return false;
+        
+        parentFolder.children.forEach(function(children) 
+        {
+            let arrChildren = {}, 
+                arrChildrenKodi = {},
+                key = children.key,
+                title = children.title,
+                type = children.data.type,
+                duration = children.data.duration,
+                file = children.data.file,
+                views = children.data.views,
+                total = children.data.total;
+            
+            if (views === undefined || views < 0) 
+                views = 0;
+            if (duration === undefined || duration < 0) 
+                duration = 0;
+            if (total === undefined || total < 0) 
+                total = 0;
+            
+            if (type === '2' && (
+                views === 0 || 
+                duration === 0 || 
+                total === 0)
+            ) {
+                return true;
+            }
+
+            arrChildrenKodi.title = title;
+            arrChildrenKodi.key = key;
+            arrChildrenKodi.data = {};
+            arrChildrenKodi.data.type = type;
+            arrChildrenKodi.data.file = file;
+            arrChildrenKodi.data.views = views;
+            arrChildrenKodi.data.duration = duration;
+            arrChildrenKodi.data.total = total;
+            arrChildrenOne.push(arrChildrenKodi);                    
+
+            arrChildren.key = key; 
+            arrChildren.title = title;
+            arrChildren.type = type;
+            arrChildren.file = file;
+            arrChildren.duration = duration;
+            arrChildren.views = views;
+            arrChildren.total = total;
+            
+            if (type === '1') {
+                arrStandartChildren.push(arrChildren); 
+            } else if (type === '2') {
+                arrCommercialChildren.push(arrChildren); 
+            }
+        });
+        
+        arrOut["key"] = playListKey;
+        arrOut["title"] = rootTitle;
+        arrOut["folder"] = "true";
+        arrOut["expanded"] = "true"; 
+        arrOut["children"] = arrChildrenOne;
+        const jsonStr = JSON.stringify(arrOut);
+        
+        if (inputVar.is("#gmsplaylistout-jsonplaylist")) {
+            $("#gmsplaylistout-jsonplaylist").remove();
+        }
+        
+        if (inputVar.is("#gmsplaylistout-jsonKodi")) {
+            $("#gmsplaylistout-jsonKodi").remove();
+        }  
+        
+        if (inputVar.is("#gmsplaylistout-name")) {
+            $("#gmsplaylistout-name").remove();
+        }
+
+        $("<input>").attr({
+            type: "hidden",
+            id: "gmsplaylistout-name",
+            name: "GmsPlaylistOut[name]",
+            value: rootTitle
+        }).appendTo("form");
+        
+        $("<input>").attr({
+            type: "hidden",
+            id: "gmsplaylistout-jsonplaylist",
+            name: "GmsPlaylistOut[jsonPlaylist]",
+            value: jsonStr
+        }).appendTo("form");
+
+        $.ajax({
+            type : 'POST',
+            url: '{$urlAjaxCheckPlaylist}',
+            data: {
+                all_time: timeDay,
+                arr_commerce: arrCommercialChildren,
+                arr_standart: arrStandartChildren
+            },
+            success: function (res) {
+                if (res !== 'null') {
+                    console.log(res);
+                    if (res.state === 0) {
+                        const html_body = res.message; 
+                        $('#modal-header').html(htm_header);        
+                        $('#modal-body').html(html_body);
+                        $('#check-playlist').modal('show');
+                        return false;
+                    } else {
+                        $("<input>").attr({
+                            type: "hidden",
+                            id: "gmsplaylistout-jsonkodi",
+                            name: "GmsPlaylistOut[jsonKodi]",
+                            value: JSON.stringify(res.info)
+                        }).appendTo("form");
+                        $("#form").submit();
+                    }
+                }
+            }
+        });
+    }
+    
+    /**
+    * 
     * @returns {boolean}
     */
     function checkJSON () 
     {
         let html_body = '';
-        const htm_header = 'Ошибка сохранения плейлиста';
-        const parentFolder = 
-            $("#treetable")
-            .fancytree("getTree")
-            .rootNode.children[0];
         
-        if (parentFolder !== null && parentFolder.children !== null) {
-            addJSON(parentFolder);
-            return true;
-        } else {
+        const htm_header = 'Ошибка сохранения плейлиста',
+            treeObject = $("#treetable"), 
+            tree = treeObject.fancytree("getTree"),
+            parentFolder = tree.getNodeByKey("playlist"),
+            timeDay = getTimeDay(),
+            timeSum = getSum(),       
+            strTimeDay = moment.unix(timeDay).utc().format("HH:mm:ss"),
+            strTimeSum = moment.unix(timeSum).utc().format("HH:mm:ss");
+       
+        if (parentFolder === null || parentFolder.children === null) {
             html_body = 'Необходимо добавить хотя бы одно видео в окончательный плейлист'; 
-            $('#modal-header').html(htm_header);
+        }
+
+        if (timeDay === false) {
+            html_body = 'Некорректно указано время дневного эфира'; 
+        } 
+
+        if (timeSum === false) {
+            html_body = 'Некорректная итоговая продолжительность роликов';
+        }
+        
+        if (timeSum > timeDay) {
+            html_body = 'Превышен лимит в ' + strTimeSum + ' за указанное время ' + strTimeDay;
+        }        
+
+        if (timeDay === false ||
+             timeSum === false || 
+             timeSum > timeDay || 
+             parentFolder === null || 
+             parentFolder.children === null
+         ) {
+            $('#modal-header').html(htm_header);        
             $('#modal-body').html(html_body);
             $('#check-playlist').modal('show');
             return false;
         }
+        
+        addJSON(); 
     }
     
-    function checkTime () {
+    /**
+    * 
+    */
+    function checkTime() {
         const m_data = $('#form').serialize();
         $.ajax({
             type: 'GET',
@@ -1020,7 +1262,7 @@ $js1 = <<< JS
             success: function (res){
                 let html_body = '';
                 const htm_header = 'Ошибка добавления, временное пересечение с другим плейлистом!';
-                if (res !== null) {
+                if (res !== 'null') {
                     if (res.id !== undefined && res.name !== undefined) {
                         let html  = 'Регион: <b>' + $('.region select option:selected').text() + '</b>'; 
                         if ($('.sender_id select option:selected').text() !== '---') {
@@ -1051,48 +1293,65 @@ $js1 = <<< JS
                     $('#box-body').html(html_body);
                     $('#check-playlist').modal('show');
                 } else {
-                    if (checkJSON()) $("#form").submit();
+                    checkJSON();
                 }
             }
         });
     }
     
-    $(".btn-primary, .btn-success").click(function() { 
-        checkTime();
-    });
-    
-    $(".region select").change(function() {
-        disableTree();
-        setSender ($(this).val());
-        setDevice ($(this).val(), $('#gmsplaylistout-sender_id').val());
-        setTreeData ($(this).val(), $('#gmsplaylistout-sender_id').val());
-    });
-    
-    $(".sender_id select").change(function() {
-        disableTree();
-        setDevice ($('#gmsplaylistout-region_id').val(), $(this).val());
-        setTreeData ($('#gmsplaylistout-region_id').val(), $(this).val());
-    });
+    function setDayTime() {
+        let timeDuration;
+        if (timeDuration = getTimeDay()) {
+            timeDuration = 'Продолжительность рабочего дня: ' + moment.unix(timeDuration).utc().format("HH:mm:ss");
+        }
+        $('#day-summ').html(timeDuration);        
+    }
     
     $(document).ready(function()
     {  
-        $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker({ 
-            date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
+        $(".btn-primary, .btn-success").click(function() { 
+            checkTime();
         });
         
-        $('#gmsplaylistout-time_start').bootstrapMaterialDatePicker({
+        $(".region select").change(function() {
+            disableTree();
+            setSender ($(this).val());
+            setDevice ($(this).val(), $('#gmsplaylistout-sender_id').val());
+            setTreeData ($(this).val(), $('#gmsplaylistout-sender_id').val());
+        });
+        
+        $(".sender_id select").change(function() {
+            disableTree();
+            setDevice ($('#gmsplaylistout-region_id').val(), $(this).val());
+            setTreeData ($('#gmsplaylistout-region_id').val(), $(this).val());
+        });
+    
+        $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker({ 
             date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
-        }).on('change', function(e, date) {
-            $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker('setMinDate', date);
+        }).on('change', function(e, date) 
+        {
+            setDayTime();
+            sumDuration();
         });
 
-        //$.material.init();
-			
+        $('#gmsplaylistout-time_start').bootstrapMaterialDatePicker({
+            date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
+        }).on('change', function(e, date) 
+        {
+            $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker('setMinDate', date);
+            setDayTime();
+            sumDuration();
+        });
+
+        setDayTime();
+		            
         setSender ($('#gmsplaylistout-region_id').val());
+        
         setTimeout(function(){
             setDevice ($('#gmsplaylistout-region_id').val()
                 , $('#gmsplaylistout-sender_id').val());
         }, 1000);
+        
         setTimeout(function(){
             setTreeData ($('#gmsplaylistout-region_id').val()
                 ,$('#gmsplaylistout-sender_id').val());

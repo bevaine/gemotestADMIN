@@ -2,9 +2,11 @@
 
 namespace app\modules\GMS\controllers;
 
+use common\models\GmsPlaylistOut;
 use Yii;
 use common\models\GmsPlaylist;
 use common\models\GmsPlaylistSearch;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -175,16 +177,41 @@ class PlaylistController extends Controller
     }
 
     /**
+     * @param $children
+     * @return array|bool
+     */
+    public function parseJSON($children)
+    {
+        if (!empty($children)) {
+            $key = ArrayHelper::getColumn($children, 'key');
+            return array_filter(
+                array_combine($key, $children),
+                function($v) {return $v['data']['type'] == 2;}
+            );
+        }
+        return false;
+    }
+
+    /**
      * @param null $region
      * @param null $sender_id
+     * @param null $pls_out_id
      * @return null
      */
     public function actionAjaxPlaylistTemplate(
         $region = null,
-        $sender_id = null
+        $sender_id = null,
+        $pls_out_id = null
     ) {
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+
+        $out = [];
+        $diffArr = '';
+        $plsDataJSON = false;
+
         if (empty($sender_id)) $sender_id = null;
-        if (empty($region)) exit('null');
+        if (empty($region)) return 'null';
 
         $findModel = GmsPlaylist::findAll([
             'region' => $region,
@@ -194,11 +221,31 @@ class PlaylistController extends Controller
         foreach ($findModel as $model) {
             /** @var $model GmsPlaylist */
             if (!isset($model->type)) continue;
-            $out["result"][$model->type][] = Json::decode($model->jsonPlaylist);
+            $out["result"][$model->type][] = ArrayHelper::toArray(json_decode($model->jsonPlaylist));
         }
 
-        $response = Yii::$app->response;
-        $response->format = yii\web\Response::FORMAT_JSON;
+        if (!empty($pls_out_id) && !empty($out["result"][2][0])) {
+
+            $children = $out["result"][2][0]['children'];
+            $comDataJSON = $this->parseJSON($children);
+
+            if ($findPlsModel = GmsPlaylistOut::findOne($pls_out_id)) {
+                $jsonModel = ArrayHelper::toArray(json_decode($findPlsModel->jsonPlaylist));
+                $plsDataJSON = $this->parseJSON($jsonModel['children']);
+            }
+
+            if (empty($plsDataJSON)) return $out;
+
+            if ($comDataJSON && $plsDataJSON) {
+                $diffArr = array_diff_key($comDataJSON, $plsDataJSON);
+            }
+
+            unset($out["result"][2][0]['children']);
+            if (!empty($diffArr)) {
+                $out["result"][2][0]['children'] = array_values($diffArr);
+            }
+        }
+
         return !empty($out) ? $out : null;
     }
 }
