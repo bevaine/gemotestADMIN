@@ -12,10 +12,8 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="kontragents-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Сохранить', ['update', 'id' => $model->AID], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Редактировать', ['update', 'id' => $model->AID], ['class' => 'btn btn-primary']) ?>
     </p>
 
     <?= DetailView::widget([
