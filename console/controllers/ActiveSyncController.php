@@ -251,6 +251,8 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        echo date("U", strtotime('1970-01-01 00:00:10') * 10000);
+        exit;
         $date = date_create();
         echo date_format($date, 'U = Y-m-d H:i:s P') . "\n";
 

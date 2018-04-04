@@ -1049,15 +1049,18 @@ $js1 = <<< JS
                 pls_out_id: {$pls_id}
             },
             success: function (res) {
+                console.log(res);
                 if (res !== 'null') {
-                    console.log(res.result[1]);
-                    if (res.result[1] !== undefined) {
+                    const pls_id = [];
+                    if (res.result[1]['inf'] !== undefined) {
+                        document.cookie = 'pls_std_id =' + res.result[1]['pls'] + ';';
                         regionObject.fancytree("enable");
-                        regionTree.reload(res.result[1]);
+                        regionTree.reload(res.result[1]['inf']);
                     }                  
-                    if (res.result[2] !== undefined) {
+                    if (res.result[2]['inf'] !== undefined) {
+                        document.cookie = 'pls_com_id =' + res.result[2]['pls'] + ';';
                         commercialObject.fancytree("enable");
-                        commercialTree.reload(res.result[2]);
+                        commercialTree.reload(res.result[2]['inf']);
                     } 
                 }
             }
@@ -1066,12 +1069,26 @@ $js1 = <<< JS
     
     /**
     * 
+    * @param cookie_name
+    * @returns {*}
+    */
+    function get_cookie (cookie_name)
+    {
+        let results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
+        if (results)
+            return decodeURI(results[2]);
+        else
+            return null;
+    }
+    
+    /**
+    * 
     * @returns {Array}
     */
     function addJSON() 
     {
-        let arrOut = {},
-            arrChildrenOne = [],
+        let arrOutPls = {},
+            arrChildrenOnePls = [],
             arrStandartChildren = [],
             arrCommercialChildren = [],
             htm_header = 'Ошибка сохранения плейлиста';
@@ -1086,15 +1103,15 @@ $js1 = <<< JS
 
         if (parentFolder.children === null) return false;
         
+        console.log(parentFolder.children);
+        
         parentFolder.children.forEach(function(children) 
         {
             let arrChildren = {}, 
-                arrChildrenKodi = {},
+                arrChildrenPls = {},
                 key = children.key,
-                title = children.title,
                 type = children.data.type,
                 duration = children.data.duration,
-                file = children.data.file,
                 views = children.data.views,
                 total = children.data.total;
             
@@ -1109,27 +1126,22 @@ $js1 = <<< JS
                 views === 0 || 
                 duration === 0 || 
                 total === 0)
-            ) {
-                return true;
-            }
+            ) return true;
 
-            arrChildrenKodi.title = title;
-            arrChildrenKodi.key = key;
-            arrChildrenKodi.data = {};
-            arrChildrenKodi.data.type = type;
-            arrChildrenKodi.data.file = file;
-            arrChildrenKodi.data.views = views;
-            arrChildrenKodi.data.duration = duration;
-            arrChildrenKodi.data.total = total;
-            arrChildrenOne.push(arrChildrenKodi);                    
+            arrChildrenPls.title = children.title;
+            arrChildrenPls.key = children.key;
+            arrChildrenPls.data = {};
+            arrChildrenPls.data.type = children.data.type;
+            arrChildrenPls.data.file = children.data.file;
+            arrChildrenPls.data.views = children.data.views;
+            arrChildrenPls.data.duration = children.data.duration;
+            arrChildrenPls.data.total = children.data.total;                            
+            arrChildrenOnePls.push(arrChildrenPls); 
 
             arrChildren.key = key; 
-            arrChildren.title = title;
             arrChildren.type = type;
-            arrChildren.file = file;
-            arrChildren.duration = duration;
             arrChildren.views = views;
-            arrChildren.total = total;
+            arrChildren.duration = duration;
             
             if (type === '1') {
                 arrStandartChildren.push(arrChildren); 
@@ -1138,12 +1150,12 @@ $js1 = <<< JS
             }
         });
         
-        arrOut["key"] = playListKey;
-        arrOut["title"] = rootTitle;
-        arrOut["folder"] = "true";
-        arrOut["expanded"] = "true"; 
-        arrOut["children"] = arrChildrenOne;
-        const jsonStr = JSON.stringify(arrOut);
+        arrOutPls["key"] = playListKey;
+        arrOutPls["title"] = rootTitle;
+        arrOutPls["folder"] = "true";
+        arrOutPls["expanded"] = "true"; 
+        arrOutPls["children"] = arrChildrenOnePls;
+        const jsonStrPls = JSON.stringify(arrOutPls);
         
         if (inputVar.is("#gmsplaylistout-jsonplaylist")) {
             $("#gmsplaylistout-jsonplaylist").remove();
@@ -1168,7 +1180,7 @@ $js1 = <<< JS
             type: "hidden",
             id: "gmsplaylistout-jsonplaylist",
             name: "GmsPlaylistOut[jsonPlaylist]",
-            value: jsonStr
+            value: jsonStrPls
         }).appendTo("form");
 
         $.ajax({
@@ -1176,12 +1188,14 @@ $js1 = <<< JS
             url: '{$urlAjaxCheckPlaylist}',
             data: {
                 all_time: timeDay,
+                pls_commerce: get_cookie('pls_com_id'),
+                pls_standart: get_cookie('pls_std_id'),
                 arr_commerce: arrCommercialChildren,
                 arr_standart: arrStandartChildren
             },
             success: function (res) {
+                let arrOut = {};
                 if (res !== 'null') {
-                    console.log(res);
                     if (res.state === 0) {
                         const html_body = res.message; 
                         $('#modal-header').html(htm_header);        
@@ -1189,12 +1203,18 @@ $js1 = <<< JS
                         $('#check-playlist').modal('show');
                         return false;
                     } else {
+                        arrOut["key"] = playListKey;
+                        arrOut["title"] = rootTitle;
+                        arrOut["children"] = res.info;
+                        const jsonStr = JSON.stringify(arrOut);
+                        
                         $("<input>").attr({
                             type: "hidden",
                             id: "gmsplaylistout-jsonkodi",
                             name: "GmsPlaylistOut[jsonKodi]",
-                            value: JSON.stringify(res.info)
+                            value: jsonStr
                         }).appendTo("form");
+                        
                         $("#form").submit();
                     }
                 }

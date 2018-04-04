@@ -2,6 +2,7 @@
 
 namespace app\modules\GMS\controllers;
 
+use common\models\GmsPlaylist;
 use Yii;
 use common\models\GmsPlaylistOut;
 use common\models\GmsPlaylistOutSearch;
@@ -169,7 +170,10 @@ class PlaylistOutController extends Controller
             $all_time = $post['all_time'];
             $arr_commerce = $post['arr_commerce'];
             $arr_standart = $post['arr_standart'];
-        } else return false;
+            $pls_commerce = $post['pls_commerce'];
+            $pls_standart = $post['pls_standart'];
+        } else
+            return false;
 
         if (empty($arr_standart) || empty($all_time)) {
             return [
@@ -185,35 +189,57 @@ class PlaylistOutController extends Controller
         foreach ($arr_commerce as $input) {
             $sum += $input['duration'] * $input['views'];
         }
-        $play_standart = ($all_time - $sum) / array_sum(ArrayHelper::getColumn($arr_commerce, 'views'));
+
+        $play_standart = ($all_time - $sum)
+            / array_sum(ArrayHelper::getColumn($arr_commerce, 'views'));
+
         $play_standart = ceil($play_standart);
 
         if ($play_standart >= $minimal_std) {
 
+            $findCommerceModel = GmsPlaylist::findOne($pls_commerce);
+
             foreach ($arr_commerce as $commerce) {
+
+                if ($dataCommerce = $findCommerceModel->getVideoData($commerce['key'])) {
+                    $dataCommerce = ArrayHelper::toArray($dataCommerce);
+                } else
+                    continue;
+
                 $arr = array_fill(0, $commerce['views'], [
-                    'file' => $commerce['file'],
+                    'title' => $dataCommerce['title'],
+                    'type' => 2,
                     'key' => $commerce['key'],
+                    'file' => $dataCommerce['file'],
+                    'duration' => $dataCommerce['duration'],
                     'start' => 0,
-                    'end' => (int)$commerce['duration'],
-                    'type' => 2
+                    'end' => (int)$commerce['duration']
                 ]);
                 if (empty($f)) $f = $arr;
                 else $f = array_merge($f, $arr);
                 if (!empty($f)) shuffle($f);
             }
 
+            $findStandartModel = GmsPlaylist::findOne($pls_standart);
+
             while(list($key, $time) = each($arr_standart))
             {
+                if ($dataStandart = $findStandartModel->getVideoData($time['key'])) {
+                    $dataStandart = ArrayHelper::toArray($dataStandart);
+                } else
+                    continue;
+
                 if ($play_standart >= $time['duration'])
                 {
                     $val = each($f)['value'];
                     $s[] = [
-                        'file' => $time['file'],
+                        'type' => 1,
                         'key' => $time['key'],
+                        'title' => $dataStandart['title'],
+                        'duration' => $dataStandart['duration'],
+                        'file' => $dataStandart['file'],
                         'start' => 0,
-                        'end' => (int)$time['duration'],
-                        'type' => 1
+                        'end' => (int)$time['duration']
                     ];
 
                     $std_time += array_sum(ArrayHelper::getColumn($time, 'duration'));
@@ -230,11 +256,13 @@ class PlaylistOutController extends Controller
                         if ($a > $time['duration']) {
                             $val = each($f)['value'];
                             $s[] = [
-                                'file' => $time['file'],
+                                'type' => 1,
                                 'key' => $time['key'],
+                                'title' => $dataStandart['title'],
+                                'duration' => $dataStandart['duration'],
+                                'file' => $dataStandart['file'],
                                 'start' => (int)$b,
-                                'end' => (int)$time['duration'],
-                                'type' => 1
+                                'end' => (int)$time['duration']
                             ];
                             $s[] = $val;
                             $std_time += $time['duration'] - $b;
@@ -245,21 +273,25 @@ class PlaylistOutController extends Controller
                             $val = each($f)['value'];
                             if (empty($val)) {
                                 $s[] = [
-                                    'file' => $time['file'],
+                                    'type' => 1,
                                     'key' => $time['key'],
+                                    'title' => $dataStandart['title'],
+                                    'duration' => $dataStandart['duration'],
+                                    'file' => $dataStandart['file'],
                                     'start' => (int)$b,
-                                    'end' => (int)$time['duration'],
-                                    'type' => 1
+                                    'end' => (int)$time['duration']
                                 ];
                                 $std_time += $time['duration'] - $b;
                                 break;
                             }
                             $s[] = [
-                                'file' => $time['file'],
+                                'type' => 1,
                                 'key' => $time['key'],
-                                'start' => (int)($b),
-                                'end' => (int)$a,
-                                'type' => 1
+                                'title' => $dataStandart['title'],
+                                'duration' => $dataStandart['duration'],
+                                'file' => $dataStandart['file'],
+                                'start' => (int)$b,
+                                'end' => (int)$a
                             ];
                             $s[] = $val;
                             $std_time += $a - $b;

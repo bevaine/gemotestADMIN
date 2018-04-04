@@ -4,6 +4,7 @@ namespace common\models;
 
 use app\modules\GMS\controllers\GmsSendersController;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "gms_playlist".
@@ -97,5 +98,32 @@ class GmsPlaylist extends \yii\db\ActiveRecord
     public function getSenderModel()
     {
         return $this->hasOne(GmsSenders::className(), ['id' => 'sender_id']);
+    }
+
+    /**
+     * @param $video_key
+     * @return bool
+     */
+    public function getVideoData($video_key)
+    {
+        /** @var GmsPlaylistOut $findModel */
+        if (!empty($this->jsonPlaylist)) {
+            $jsonPlaylist = json_decode($this->jsonPlaylist);
+            if (empty($jsonPlaylist->children)) return false;
+            $arrTitle = ArrayHelper::getColumn($jsonPlaylist->children, 'title');
+            $arrTypes = ArrayHelper::getColumn($jsonPlaylist->children, 'data');
+            $arrKeys = ArrayHelper::getColumn($jsonPlaylist->children, 'key');
+            $arr_comb1 = array_combine($arrKeys , $arrTitle);
+            $arr_comb2 = array_combine($arrKeys , $arrTypes);
+
+            if (array_key_exists($video_key, $arr_comb1) &&
+                array_key_exists($video_key, $arr_comb2)
+            ) {
+                $d = $arr_comb2[$video_key];
+                $d->title = $arr_comb1[$video_key];
+                return $d;
+            }
+        }
+        return false;
     }
 }

@@ -221,12 +221,13 @@ class PlaylistController extends Controller
         foreach ($findModel as $model) {
             /** @var $model GmsPlaylist */
             if (!isset($model->type)) continue;
-            $out["result"][$model->type][] = ArrayHelper::toArray(json_decode($model->jsonPlaylist));
+            $out["result"][$model->type]['pls'] = $model->id;
+            $out["result"][$model->type]['inf'][] = ArrayHelper::toArray(json_decode($model->jsonPlaylist));
         }
 
-        if (!empty($pls_out_id) && !empty($out["result"][2][0])) {
+        if (!empty($pls_out_id) && !empty($out["result"][2]['inf'][0])) {
 
-            $children = $out["result"][2][0]['children'];
+            $children = $out["result"][2]['inf'][0]['children'];
             $comDataJSON = $this->parseJSON($children);
 
             if ($findPlsModel = GmsPlaylistOut::findOne($pls_out_id)) {
@@ -240,9 +241,9 @@ class PlaylistController extends Controller
                 $diffArr = array_diff_key($comDataJSON, $plsDataJSON);
             }
 
-            unset($out["result"][2][0]['children']);
+            unset($out["result"][2]['inf'][0]['children']);
             if (!empty($diffArr)) {
-                $out["result"][2][0]['children'] = array_values($diffArr);
+                $out["result"][2]['inf'][0]['children'] = array_values($diffArr);
             }
         }
 

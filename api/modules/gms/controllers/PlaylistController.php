@@ -102,7 +102,7 @@ class PlaylistController extends ActiveController
                 $out['pls'] = [
                     'id' => $modelDevices->playListOutModel->id,
                     'files' => $modelDevices->playListOutModel->getVideos(),
-                    'm3u' => Json::decode($modelDevices->playListOutModel->jsonPlaylist)
+                    'm3u' => Json::decode($modelDevices->playListOutModel->jsonKodi)
                 ];
             } else {
 
