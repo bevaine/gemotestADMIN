@@ -141,13 +141,15 @@ class PlaylistController extends Controller
      * @param null $region
      * @param null $sender_id
      * @param null $type_list
-     * @return array|null
+     * @return array|string
      */
     public function actionAjaxPlaylistActive(
         $region = null,
         $sender_id = null,
         $type_list = null
     ) {
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
 
         if (empty($sender_id)) $sender_id = null;
         if (empty($region)) exit('null');
@@ -173,7 +175,7 @@ class PlaylistController extends Controller
 
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
-        return !empty($out) ? $out : null;
+        return !empty($out) ? $out : 'null';
     }
 
     /**
@@ -247,6 +249,6 @@ class PlaylistController extends Controller
             }
         }
 
-        return !empty($out) ? $out : null;
+        return !empty($out) ? $out : 'null';
     }
 }

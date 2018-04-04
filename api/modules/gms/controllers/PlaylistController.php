@@ -227,9 +227,6 @@ class PlaylistController extends ActiveController
     {
         if ($findPlaylist = self::getPlaylist()) {
             $model = $findPlaylist["model"];
-//            Yii::getLogger()->log([
-//                '$findPlaylist' => $findPlaylist
-//            ], 1, 'binary');
             return $model;
         } else return false;
     }
