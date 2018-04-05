@@ -61,7 +61,7 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             'query' => $query,
             'sort' => [
                 'defaultOrder' => [
-                    'created_at' => SORT_DESC
+                    'update_at' => SORT_DESC
                 ],
             ],
         ]);
@@ -112,6 +112,7 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             'gms_playlist_out.date_end' => $this->date_end,
             'gms_playlist_out.sender_id' => $this->sender_id,
             'gms_playlist_out.region_id' => $this->region_id,
+            'gms_playlist_out.update_at' => $this->update_at,
             'gms_playlist_out.created_at' => $this->created_at,
             'gms_playlist_out.active' => $this->active,
         ]);

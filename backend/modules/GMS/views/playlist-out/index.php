@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'id'
             ],
             'created_at:date',
+            'update_at:date',
             'name',
             [
                 'filter' =>  \common\models\GmsRegions::getRegionList(),

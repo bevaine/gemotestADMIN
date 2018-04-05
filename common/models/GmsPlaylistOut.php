@@ -28,6 +28,7 @@ use yii\helpers\Url;
  * @property integer $date_end
  * @property integer $active
  * @property integer $created_at
+ * @property integer $update_at
  * @property integer $is_monday
  * @property integer $is_tuesday
  * @property integer $is_wednesday
@@ -102,7 +103,10 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     {
         if ($this->isNewRecord) {
             $this->created_at = time();
+            $this->updated_at = time();
             $this->active = 1;
+        } else {
+            $this->updated_at = time();
         }
 
         $this->date_start = self::getDateWithoutTime($this->date_start);
@@ -133,6 +137,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             'jsonKodi' => 'Команды Kodi',
             'active' => 'Статус',
             'created_at' => 'Дата создания',
+            'update_at' => 'Дата обновления',
             'device_name' => 'Устройство',
             'sender_name' => 'Отделение',
             'date_start_val' => 'Дата старт',
