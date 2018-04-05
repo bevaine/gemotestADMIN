@@ -319,7 +319,7 @@ class ActiveSyncHelper
             $objectOperators->MedReg = ($this->department == 5) ? 1 : 0;
             $objectOperators->mto = in_array($this->department, [2,3,5,6]) ? 1 : 0;
             $objectOperators->OrderEdit = in_array($this->department, [3,4,6]) ? 1 : 0;
-            $objectOperators->ClientMen = in_array($this->department, [3,4,6]) ? 1 : 0;
+            $objectOperators->ClientMen = in_array($this->department, [3,4,5,6]) ? 1 : 0;
 
             if ($objectOperators->save()) {
                 Yii::getLogger()->log([
@@ -505,7 +505,7 @@ class ActiveSyncHelper
             $objectUsersLogins->OrderEdit = ($this->department == 8) ? 1 : 0;
             $objectUsersLogins->MedReg = ($this->department == 5) ? 1 : 0;
             $objectUsersLogins->mto = in_array($this->department, [2,3,5,6]) ? 1 : 0;
-            $objectUsersLogins->clientmen = in_array($this->department, [3,4,6]) ? 1 : 0;
+            $objectUsersLogins->clientmen = in_array($this->department, [3,4,5,6]) ? 1 : 0;
             $objectUsersLogins->show_preanalytic = in_array($this->department, [4,5]) ? 1 : 0;
 
             if ($objectUsersLogins->save()) {
