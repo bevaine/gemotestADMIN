@@ -103,10 +103,10 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     {
         if ($this->isNewRecord) {
             $this->created_at = time();
-            $this->updated_at = time();
+            $this->update_at = time();
             $this->active = 1;
         } else {
-            $this->updated_at = time();
+            $this->update_at = time();
         }
 
         $this->date_start = self::getDateWithoutTime($this->date_start);
