@@ -85,7 +85,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     {
         return [
             [['region_id', 'jsonPlaylist', 'jsonKodi', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
-            [['active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],
+            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],
             [['name', 'jsonPlaylist', 'jsonKodi'], 'string'],
             [['date_start', 'date_end', 'time_start', 'time_end', 'region_id'], 'required', 'on' => 'default'],
             [['date_start', 'date_end','time_start', 'time_end'], 'filter', 'filter' => function ($value) {
