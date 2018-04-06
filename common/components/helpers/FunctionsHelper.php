@@ -203,15 +203,31 @@ SCRIPT;
      * @param $file
      * @return bool|mixed
      */
-    static function getDurationVideo($file)
+    static function getInfoVideo($file)
     {
         try {
             $ffprobe = FFProbe::create(self::getBinFFmpeg());
 
             $duration = $ffprobe
-                ->format($file)
+                ->streams($file)
+                ->videos()
+                ->first()
                 ->get('duration');
-            return !empty($duration) ? $duration : false;
+
+            $all_frames = $ffprobe
+                ->streams($file)
+                ->videos()
+                ->first()
+                ->get('nb_frames');
+
+            if (!empty($duration) && !empty($all_frames)) {
+                $rate = (int)$all_frames / (int)$duration;
+                return [
+                    'duration' => $duration,
+                    'nb_frames' => $all_frames,
+                    'frame_rate' => $rate
+                ];
+            } else return false;
 
         } catch (\Exception $exception) {
             return false;

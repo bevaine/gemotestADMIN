@@ -212,8 +212,10 @@ class PlaylistOutController extends Controller
                     'key' => $commerce['key'],
                     'file' => $dataCommerce['file'],
                     'duration' => $dataCommerce['duration'],
+                    'frame_rate' => $dataCommerce['frame_rate'],
+                    'nb_frames' => $dataCommerce['nb_frames'],
                     'start' => 0,
-                    'end' => (int)$commerce['duration']
+                    'end' => (int)$commerce['duration ']
                 ]);
                 if (empty($f)) $f = $arr;
                 else $f = array_merge($f, $arr);
@@ -237,6 +239,8 @@ class PlaylistOutController extends Controller
                         'key' => $time['key'],
                         'title' => $dataStandart['title'],
                         'duration' => $dataStandart['duration'],
+                        'frame_rate' => $dataStandart['frame_rate'],
+                        'nb_frames' => $dataStandart['nb_frames'],
                         'file' => $dataStandart['file'],
                         'start' => 0,
                         'end' => (int)$time['duration']
@@ -260,6 +264,8 @@ class PlaylistOutController extends Controller
                                 'key' => $time['key'],
                                 'title' => $dataStandart['title'],
                                 'duration' => $dataStandart['duration'],
+                                'frame_rate' => $dataStandart['frame_rate'],
+                                'nb_frames' => $dataStandart['nb_frames'],
                                 'file' => $dataStandart['file'],
                                 'start' => (int)$b,
                                 'end' => (int)$time['duration']
@@ -277,6 +283,8 @@ class PlaylistOutController extends Controller
                                     'key' => $time['key'],
                                     'title' => $dataStandart['title'],
                                     'duration' => $dataStandart['duration'],
+                                    'frame_rate' => $dataStandart['frame_rate'],
+                                    'nb_frames' => $dataStandart['nb_frames'],
                                     'file' => $dataStandart['file'],
                                     'start' => (int)$b,
                                     'end' => (int)$time['duration']
@@ -289,6 +297,8 @@ class PlaylistOutController extends Controller
                                 'key' => $time['key'],
                                 'title' => $dataStandart['title'],
                                 'duration' => $dataStandart['duration'],
+                                'frame_rate' => $dataStandart['frame_rate'],
+                                'nb_frames' => $dataStandart['nb_frames'],
                                 'file' => $dataStandart['file'],
                                 'start' => (int)$b,
                                 'end' => (int)$a

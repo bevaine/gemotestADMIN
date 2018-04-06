@@ -15,7 +15,8 @@ use Yii;
  * @property integer $created_at
  * @property string $comment
  * @property string $thumbnail
- *
+ * @property float $frame_rate
+ * @property integer $nb_frames
  */
 class GmsVideos extends \yii\db\ActiveRecord
 {
@@ -34,7 +35,8 @@ class GmsVideos extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'file'], 'required'],
-            [['time', 'created_at'], 'integer'],
+            [['time', 'nb_frames', 'created_at'], 'integer'],
+            [['frame_rate'], 'safe'],
             [['name', 'file'], 'string', 'max' => 255],
             [['comment', 'thumbnail', 'type'], 'string']
         ];
@@ -53,7 +55,9 @@ class GmsVideos extends \yii\db\ActiveRecord
             'time' => 'Продолжительность',
             'created_at' => 'Дата добавления',
             'comment' => 'Коментарий',
-            'thumbnail' => 'thumbnail'
+            'thumbnail' => 'thumbnail',
+            'frame_rate' => 'Частота кадров',
+            'nb_frames' => 'Всего кадров'
         ];
     }
 
@@ -71,6 +75,8 @@ class GmsVideos extends \yii\db\ActiveRecord
                 'title' => $model->name,
                 'icon' => '../../img/video1.png',
                 'data' => [
+                    'frame_rate' => $model->frame_rate,
+                    'nb_frames' => $model->nb_frames,
                     'duration' => $model->time,
                     'file' => $file_name
                 ]

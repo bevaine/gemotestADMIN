@@ -1135,6 +1135,8 @@ $js1 = <<< JS
             arrChildrenPls.data.file = children.data.file;
             arrChildrenPls.data.views = children.data.views;
             arrChildrenPls.data.duration = children.data.duration;
+            arrChildrenPls.data.frame_rate = children.data.frame_rate;
+            arrChildrenPls.data.nb_frames = children.data.nb_frames;
             arrChildrenPls.data.total = children.data.total;                            
             arrChildrenOnePls.push(arrChildrenPls); 
 

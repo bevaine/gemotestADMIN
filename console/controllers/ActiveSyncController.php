@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use common\components\helpers\ActiveSyncHelper;
+use common\components\helpers\FunctionsHelper;
 use common\models\GmsPlaylistOut;
 use common\models\Logins;
 use common\models\NAdUsers;
@@ -251,6 +252,17 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        echo FunctionsHelper::getFrameRateVideo('C:\\Users\\evgeny.dymchenko\\www\\admin\\backend\\web\\upload\\video\\594pkt7o13t8fmtciviipcuueiieattp\\15229947695ac70e51809695.91105442.mp4');
+        echo "\r\n---------------------";
+        echo FunctionsHelper::getFrameRateVideo('C:\\Users\\evgeny.dymchenko\\www\\admin\\backend\\web\\upload\\video\\594pkt7o13t8fmtciviipcuueiieattp\\15229401305ac638e29ad3a3.69889154.mp4');
+        echo "\r\n---------------------";
+        echo FunctionsHelper::getFrameRateVideo('C:\\Users\\evgeny.dymchenko\\www\\admin\\backend\\web\\upload\\video\\941fl6u96d5dep2vmb202q8b3m1grojk\\15200602075a9a472fed4ad6.90728564.mp4');
+        echo "\r\n---------------------";
+        echo FunctionsHelper::getFrameRateVideo('C:\\Users\\evgeny.dymchenko\\www\\admin\\backend\\web\\upload\\video\\594pkt7o13t8fmtciviipcuueiieattp\\11.mp4');
+
+        exit;
+
+
         echo date("U", strtotime('1970-01-01 00:00:10') * 10000);
         exit;
         $date = date_create();

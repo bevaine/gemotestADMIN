@@ -88,8 +88,11 @@ class GmsVideosController extends Controller
                 $model->file = $path;
                 $model->type = FileHelper::getMimeType($filePath);
                 $model->thumbnail = $thumbnailUrl;
-                if ($duration = FunctionsHelper::getDurationVideo($filePath)) {
-                    $model->time = round($duration);
+
+                if ($infoVideo = FunctionsHelper::getInfoVideo($filePath)) {
+                    $model->time = round($infoVideo['duration']);
+                    $model->frame_rate = round($infoVideo['frame_rate'], 2);
+                    $model->nb_frames = round($infoVideo['nb_frames']);
                 }
                 $model->created_at = time();
 
