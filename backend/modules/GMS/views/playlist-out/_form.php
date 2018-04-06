@@ -1117,8 +1117,10 @@ $js1 = <<< JS
             
             if (views === undefined || views < 0) 
                 views = 0;
+            
             if (duration === undefined || duration < 0) 
                 duration = 0;
+            
             if (total === undefined || total < 0) 
                 total = 0;
             

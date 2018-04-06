@@ -215,7 +215,7 @@ class PlaylistOutController extends Controller
                     'frame_rate' => $dataCommerce['frame_rate'],
                     'nb_frames' => $dataCommerce['nb_frames'],
                     'start' => 0,
-                    'end' => (int)$commerce['duration ']
+                    'end' => (int)$commerce['duration']
                 ]);
                 if (empty($f)) $f = $arr;
                 else $f = array_merge($f, $arr);
