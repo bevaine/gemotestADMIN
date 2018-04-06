@@ -15,6 +15,7 @@ use yii\web\UploadedFile;
 use FFMpeg;
 use yii\helpers\Url;
 use yii\log\Logger;
+use yii\base\Exception;
 
 /**
  * GmsVideosController implements the CRUD actions for GmsVideos model.
@@ -56,94 +57,102 @@ class GmsVideosController extends Controller
      */
     public function actionVideoUpload()
     {
-        $model = new GmsVideos();
+        try {
+            $model = new GmsVideos();
 
-        $imageFile = UploadedFile::getInstance($model, 'file');
+            $imageFile = UploadedFile::getInstance($model, 'file');
 
-        if (!is_dir(self::getVideoDir())) {
-            FileHelper::createDirectory(self::getVideoDir(), 0777);
-        }
-        if (!is_dir(self::getThumbnailDir())) {
-            FileHelper::createDirectory(self::getThumbnailDir(), 0777);
-        }
+            if (!is_dir(self::getVideoDir())) {
+                FileHelper::createDirectory(self::getVideoDir(), 0777);
+            }
+            if (!is_dir(self::getThumbnailDir())) {
+                FileHelper::createDirectory(self::getThumbnailDir(), 0777);
+            }
 
-        if ($imageFile) {
+            if ($imageFile) {
 
-            $thumbnailUrl = '/img/video.png';
-            $uid = uniqid(time(), true);
+                $thumbnailUrl = '/img/video.png';
+                $uid = uniqid(time(), true);
 
-            $fileName = $uid . '.' . $imageFile->extension;
-            $thumbnailName = $uid . '.jpg';
+                $fileName = $uid . '.' . $imageFile->extension;
+                $thumbnailName = $uid . '.jpg';
 
-            $filePath = self::getVideoDir() . $fileName;
-            $thumbnailPath = self::getThumbnailDir() . $thumbnailName;
+                $filePath = self::getVideoDir() . $fileName;
+                $thumbnailPath = self::getThumbnailDir() . $thumbnailName;
 
-            if ($imageFile->saveAs($filePath)) {
-                if ($thumbnail = FunctionsHelper::createMovieThumb($filePath, $thumbnailPath)) {
-                    $thumbnailUrl = '/' . implode('/', ['upload', 'thumbnail', Yii::$app->session->id, $thumbnailName]);
-                } else {
-                    Yii::getLogger()->log([
-                        'FunctionsHelper::createMovieThumb' => [$filePath, $thumbnailPath]
-                    ], Logger::LEVEL_ERROR, 'binary');
-                }
-                $path = '/' . implode('/', ['upload', 'video', Yii::$app->session->id, $fileName]);
+                if ($imageFile->saveAs($filePath)) {
+                    if ($thumbnail = FunctionsHelper::createMovieThumb($filePath, $thumbnailPath)) {
+                        $thumbnailUrl = '/' . implode('/', ['upload', 'thumbnail', Yii::$app->session->id, $thumbnailName]);
+                    } else {
+                        Yii::getLogger()->log([
+                            'FunctionsHelper::createMovieThumb' => [$filePath, $thumbnailPath]
+                        ], Logger::LEVEL_ERROR, 'binary');
+                    }
+                    $path = '/' . implode('/', ['upload', 'video', Yii::$app->session->id, $fileName]);
 
-                $model->name = 'Без имени';
-                $model->file = $path;
-                $model->type = FileHelper::getMimeType($filePath);
-                $model->thumbnail = $thumbnailUrl;
+                    $model->name = 'Без имени';
+                    $model->file = $path;
+                    $model->type = FileHelper::getMimeType($filePath);
+                    $model->thumbnail = $thumbnailUrl;
 
-                if ($infoVideo = FunctionsHelper::getInfoVideo($filePath)) {
-                    $model->time = round($infoVideo['duration']);
-                    $model->frame_rate = round($infoVideo['frame_rate'], 2);
-                    $model->nb_frames = round($infoVideo['nb_frames']);
-                }
-                $model->created_at = time();
+                    if ($infoVideo = FunctionsHelper::getInfoVideo($filePath)) {
+                        $model->time = round($infoVideo['duration']);
+                        $model->frame_rate = round($infoVideo['frame_rate'], 2);
+                        $model->nb_frames = round($infoVideo['nb_frames']);
+                    }
+                    $model->created_at = time();
 
-                if (!empty(Yii::$app->request->post())) {
-                    $post = Yii::$app->request->post();
+                    if (!empty(Yii::$app->request->post())) {
+                        $post = Yii::$app->request->post();
 
-                    Yii::getLogger()->log([
-                        '$post' => $post
-                    ], Logger::LEVEL_ERROR, 'binary');
+                        Yii::getLogger()->log([
+                            '$post' => $post
+                        ], Logger::LEVEL_ERROR, 'binary');
 
-                    if (!empty($imageFile->size)) {
-                        $fileSize = $imageFile->size;
-                        if (!empty($post["GmsVideos"][$fileSize]['name'])) {
-                            $model->name = $post["GmsVideos"][$fileSize]['name'];
-                        }
-                        if (!empty($post["GmsVideos"][$fileSize]['comment'])) {
-                            $model->comment = $post["GmsVideos"][$fileSize]['comment'];
+                        if (!empty($imageFile->size)) {
+                            $fileSize = $imageFile->size;
+                            if (!empty($post["GmsVideos"][$fileSize]['name'])) {
+                                $model->name = $post["GmsVideos"][$fileSize]['name'];
+                            }
+                            if (!empty($post["GmsVideos"][$fileSize]['comment'])) {
+                                $model->comment = $post["GmsVideos"][$fileSize]['comment'];
+                            }
                         }
                     }
-                }
 
-                if ($model->save()) {
+                    if ($model->save()) {
 
-                    return Json::encode([
-                        'files' => [
-                            [
-                                'name' => $fileName,
-                                'size' => $imageFile->size,
-                                'url' => "../.." . $path,
-                                'thumbnailUrl' => "../.." . $thumbnailUrl,
-                                'deleteUrl' => 'video-delete?id=' . $model->id,
-                                'deleteType' => 'POST',
+                        return Json::encode([
+                            'files' => [
+                                [
+                                    'name' => $fileName,
+                                    'size' => $imageFile->size,
+                                    'url' => "../.." . $path,
+                                    'thumbnailUrl' => "../.." . $thumbnailUrl,
+                                    'deleteUrl' => 'video-delete?id=' . $model->id,
+                                    'deleteType' => 'POST',
+                                ]
                             ]
-                        ]
-                    ]);
+                        ]);
+                    } else {
+                        Yii::getLogger()->log([
+                            '$model->save()' => $model->getErrors()
+                        ], Logger::LEVEL_ERROR, 'binary');
+                    }
                 } else {
                     Yii::getLogger()->log([
-                        '$model->save()' => $model->getErrors()
+                        '$imageFile->saveAs($filePath)' => $filePath
                     ], Logger::LEVEL_ERROR, 'binary');
                 }
-            } else {
-                Yii::getLogger()->log([
-                    '$imageFile->saveAs($filePath)' => $filePath
-                ], Logger::LEVEL_ERROR, 'binary');
             }
+            return '';
+
+        } catch (Exception $e) {
+            Yii::getLogger()->log([
+                'e'=>$e->getMessage()
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
         }
-        return '';
     }
 
     /**
