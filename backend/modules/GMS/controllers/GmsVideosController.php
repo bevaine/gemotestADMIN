@@ -60,10 +60,6 @@ class GmsVideosController extends Controller
 
         $imageFile = UploadedFile::getInstance($model, 'file');
 
-        Yii::getLogger()->log([
-            '$imageFile'=>$imageFile
-        ], Logger::LEVEL_ERROR, 'binary');
-
         if (!is_dir(self::getVideoDir())) {
             FileHelper::createDirectory(self::getVideoDir(), 0777);
         }
@@ -71,7 +67,7 @@ class GmsVideosController extends Controller
             FileHelper::createDirectory(self::getThumbnailDir(), 0777);
         }
 
-        if ($imageFile) {
+        if (!empty($imageFile)) {
 
             $thumbnailUrl = '/img/video.png';
             $uid = uniqid(time(), true);
@@ -87,13 +83,11 @@ class GmsVideosController extends Controller
                     $thumbnailUrl = '/' . implode('/', ['upload', 'thumbnail', Yii::$app->session->id, $thumbnailName]);
                 } else {
                     Yii::getLogger()->log([
-                        'FunctionsHelper::createMovieThumb' => [$filePath, $thumbnailPath]
+                        'FunctionsHelper::createMovieThumb' => [
+                            $filePath, $thumbnailPath
+                        ]
                     ], Logger::LEVEL_ERROR, 'binary');
                 }
-                
-                Yii::getLogger()->log([
-                    '$thumbnail'=>$thumbnail
-                ], Logger::LEVEL_ERROR, 'binary');
 
                 $path = '/' . implode('/', ['upload', 'video', Yii::$app->session->id, $fileName]);
 
@@ -112,10 +106,6 @@ class GmsVideosController extends Controller
                 if (!empty(Yii::$app->request->post())) {
                     $post = Yii::$app->request->post();
 
-                    Yii::getLogger()->log([
-                        '$post' => $post
-                    ], Logger::LEVEL_ERROR, 'binary');
-
                     if (!empty($imageFile->size)) {
                         $fileSize = $imageFile->size;
                         if (!empty($post["GmsVideos"][$fileSize]['name'])) {
@@ -127,8 +117,8 @@ class GmsVideosController extends Controller
                     }
                 }
 
-                if ($model->save()) {
-
+                if ($model->save())
+                {
                     return Json::encode([
                         'files' => [
                             [
@@ -146,10 +136,6 @@ class GmsVideosController extends Controller
                         '$model->save()' => $model->getErrors()
                     ], Logger::LEVEL_ERROR, 'binary');
                 }
-            } else {
-                Yii::getLogger()->log([
-                    '$imageFile->saveAs($filePath)' => $filePath
-                ], Logger::LEVEL_ERROR, 'binary');
             }
         }
         return '';
