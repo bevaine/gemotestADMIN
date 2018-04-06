@@ -81,6 +81,10 @@ class GmsVideosController extends Controller
             if ($imageFile->saveAs($filePath)) {
                 if ($thumbnail = FunctionsHelper::createMovieThumb($filePath, $thumbnailPath)) {
                     $thumbnailUrl = '/' . implode('/', ['upload', 'thumbnail', Yii::$app->session->id, $thumbnailName]);
+                } else {
+                    Yii::getLogger()->log([
+                        'FunctionsHelper::createMovieThumb' => [$filePath, $thumbnailPath]
+                    ], Logger::LEVEL_ERROR, 'binary');
                 }
                 $path = '/' . implode('/', ['upload', 'video', Yii::$app->session->id, $fileName]);
 
@@ -98,6 +102,11 @@ class GmsVideosController extends Controller
 
                 if (!empty(Yii::$app->request->post())) {
                     $post = Yii::$app->request->post();
+
+                    Yii::getLogger()->log([
+                        '$post' => $post
+                    ], Logger::LEVEL_ERROR, 'binary');
+
                     if (!empty($imageFile->size)) {
                         $fileSize = $imageFile->size;
                         if (!empty($post["GmsVideos"][$fileSize]['name'])) {
@@ -128,6 +137,10 @@ class GmsVideosController extends Controller
                         '$model->save()' => $model->getErrors()
                     ], Logger::LEVEL_ERROR, 'binary');
                 }
+            } else {
+                Yii::getLogger()->log([
+                    '$imageFile->saveAs($filePath)' => $filePath
+                ], Logger::LEVEL_ERROR, 'binary');
             }
         }
         return '';
