@@ -72,17 +72,13 @@ class HistoryController extends ActiveController
                 '$post'=>$post
             ], Logger::LEVEL_ERROR, 'binary');
 
-//            if (empty($post->pls_id))
-//                return ['state' => 0];
-//
-$findModel = GmsPlaylistOut::findOne($post->pls_id);
+            if (empty($post["pls_id"]))
+                return ['state' => 0];
+
+            if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
+                return ['state' => 0];
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
-
-            Yii::getLogger()->log([
-                '$arrJsonKodi'=>$arrJsonKodi
-            ], Logger::LEVEL_ERROR, 'binary');
-
             $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi, 'pos_in_all');
 
             $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi, 'pos_in_list');
@@ -92,18 +88,20 @@ $findModel = GmsPlaylistOut::findOne($post->pls_id);
                 '$arr_merge_list'=>$arr_merge_list
             ], Logger::LEVEL_ERROR, 'binary');
 
-            foreach ($post->inf as $pos_in_list => $time_start_end) {
+            foreach ($post["inf"] as $pos_in_list => $time_start_end) {
 
                 Yii::getLogger()->log([
                     '$arr_merge_list[$pos_in_list]'=>$arr_merge_list[$pos_in_list]
                 ], Logger::LEVEL_ERROR, 'binary');
 
-                if (!array_key_exists($pos_in_list, $arr_merge_list)) continue;
+                if (!array_key_exists($pos_in_list, $arr_merge_list))
+                    continue;
+
                 $current_pos_all = $arr_merge_list[$pos_in_list];
 
                 $videoHistoryModel = GmsVideoHistory::findOne([
                     'pos_pls' => $current_pos_all,
-                    'pls_guid' => $post->pls_guid
+                    'pls_guid' => $post["pls_guid"]
                 ]);
 
                 if (!$videoHistoryModel) {
@@ -111,11 +109,11 @@ $findModel = GmsPlaylistOut::findOne($post->pls_id);
                 }
 
                 $videoHistoryModel->pls_pos = $current_pos_all;
-                $videoHistoryModel->pls_guid = $post->pls_guid;
-                $videoHistoryModel->device_id = $post->device_id;
-                $videoHistoryModel->pls_id = $post->pls_id;
+                $videoHistoryModel->pls_guid = $post["pls_guid"];
+                $videoHistoryModel->device_id = $post["device_id"];
+                $videoHistoryModel->pls_id = $post["pls_id"];
                 $videoHistoryModel->created_at = date('Y-m-d H:i:s P', $time_start_end['start']);
-                $videoHistoryModel->last_at = date('Y-m-d H:i:s P',$time_start_end['end']);
+                $videoHistoryModel->last_at = date('Y-m-d H:i:s P', $time_start_end['end']);
 
                 if ($videoHistoryModel->save()) {
                     return ['state' => 1];
