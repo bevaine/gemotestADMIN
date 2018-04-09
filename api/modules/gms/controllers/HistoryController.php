@@ -72,11 +72,10 @@ class HistoryController extends ActiveController
                 '$post'=>$post
             ], Logger::LEVEL_ERROR, 'binary');
 
-            if (empty($post->pls_id))
-                return ['state' => 0];
-
-            if (!$findModel = GmsPlaylistOut::findOne($post->pls_id))
-                return ['state' => 0];
+//            if (empty($post->pls_id))
+//                return ['state' => 0];
+//
+$findModel = GmsPlaylistOut::findOne($post->pls_id);
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
 
