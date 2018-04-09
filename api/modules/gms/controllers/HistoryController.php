@@ -79,6 +79,11 @@ class HistoryController extends ActiveController
                 return ['state' => 0];
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
+
+            Yii::getLogger()->log([
+                '$arrJsonKodi'=>$arrJsonKodi
+            ], Logger::LEVEL_ERROR, 'binary');
+
             $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi, 'pos_in_all');
 
             $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi, 'pos_in_list');
