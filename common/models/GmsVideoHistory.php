@@ -12,6 +12,8 @@ use Yii;
  * @property string $device_id
  * @property string $created_at
  * @property string $last_at
+ * @property integer pls_pos
+ * @property string pls_guid
  * @property integer $video_key
  * @property GmsDevices $deviceModel
  * @property GmsRegions $regionModel
@@ -35,8 +37,8 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pls_id', 'video_key'], 'integer'],
-            [['device_id', 'created_at', 'last_at'], 'string', 'max' => 255],
+            [['pls_id', 'video_key', 'pls_pos'], 'integer'],
+            [['device_id', 'created_at', 'last_at', 'pls_guid'], 'string', 'max' => 255],
         ];
     }
 
@@ -56,7 +58,9 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
             'pls_name' => 'Плейлист',
             'region_id' => 'Регион',
             'date_at' => 'Период воспр.',
-            'start_at' => 'Начало'
+            'start_at' => 'Начало',
+            'pls_pos' => 'Позиция в плейлисте',
+            'pls_guid' => 'GUID сгенерированного плейлиста'
         ];
     }
 

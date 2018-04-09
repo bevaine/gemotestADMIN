@@ -8,12 +8,14 @@
 
 namespace api\modules\gms\controllers;
 
+use common\models\GmsPlaylistOut;
 use common\models\GmsVideoHistory;
 use yii\rest\ActiveController;
 use yii;
 use common\models\GmsHistory;
 use yii\log\Logger;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 
 class HistoryController extends ActiveController
@@ -62,39 +64,50 @@ class HistoryController extends ActiveController
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
 
-        $model = new GmsVideoHistory();
-        if ($model->load(Yii::$app->request->post())) {
+        if (!empty($post = Yii::$app->request->post())) {
+            $post = Yii::$app->request->post();
+            if (empty($post->pls_id))
+                return ['state' => 0];
 
-            $model->last_at = $model->created_at;
-            /** @var GmsVideoHistory $findModel */
-            $findModel = GmsVideoHistory::find()
-                ->where([
-                    'device_id' => $model->device_id,
-                    'pls_id' => $model->pls_id,
-                ])->limit(1)->orderBy(['created_at' => SORT_DESC])->one();
+            if (!$findModel = GmsPlaylistOut::findOne($post->pls_id))
+                return ['state' => 0];
 
-            if ($findModel
-                && $findModel->video_key == $model->video_key
-                && $findModel->load(Yii::$app->request->post())
-            ) {
-                $findModel->last_at = $model->created_at;
-                $findModel->created_at = $findModel->oldAttributes['created_at'];
-                if ($findModel->save()) {
+            $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
+            $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi, 'pos_in_all');
+
+            $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi, 'pos_in_list');
+            $arr_merge_list = array_combine($arr_pos_list, $arr_pos_all);
+
+            foreach ($post->inf as $pos_in_list => $time_start_end) {
+
+                if (!array_key_exists($pos_in_list, $arr_merge_list)) continue;
+                $current_pos_all = $arr_merge_list[$pos_in_list];
+
+                $videoHistoryModel = GmsVideoHistory::findOne([
+                    'pos_pls' => $current_pos_all,
+                    'pls_guid' => $post->pls_guid
+                ]);
+
+                if (!$videoHistoryModel) {
+                    $videoHistoryModel = new GmsVideoHistory();
+                }
+
+                $videoHistoryModel->pls_pos = $current_pos_all;
+                $videoHistoryModel->pls_guid = $post->pls_guid;
+                $videoHistoryModel->device_id = $post->device_id;
+                $videoHistoryModel->pls_id = $post->pls_id;
+                $videoHistoryModel->created_at = $time_start_end['start'];
+                $videoHistoryModel->last_at = $time_start_end['end'];
+
+                if ($videoHistoryModel->save()) {
                     return ['state' => 1];
                 } else {
-                    Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
+                    Yii::getLogger()->log($videoHistoryModel->errors, Logger::LEVEL_ERROR, 'binary');
                     return ['state' => 0];
                 }
             }
-
-            if ($model->save()) {
-                return ['state' => 1];
-            } else {
-                Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
-                return ['state' => 0];
-            }
-
         }
+
         return ['state' => 0];
     }
 }

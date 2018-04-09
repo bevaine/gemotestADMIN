@@ -165,6 +165,7 @@ class PlaylistOutController extends Controller
         $std_time = 0;
         $com_time = 0;
         $minimal_std = 60;
+        $pos_in_all = 0;
 
         if ($post = Yii::$app->request->post()) {
             $all_time = $post['all_time'];
@@ -215,7 +216,8 @@ class PlaylistOutController extends Controller
                     'frame_rate' => $dataCommerce['frame_rate'],
                     'nb_frames' => $dataCommerce['nb_frames'],
                     'start' => 0,
-                    'end' => (int)$commerce['duration']
+                    'end' => (int)$commerce['duration'],
+                    'pos_in_all' => $pos_in_all + 1
                 ]);
                 if (empty($f)) $f = $arr;
                 else $f = array_merge($f, $arr);
@@ -226,6 +228,7 @@ class PlaylistOutController extends Controller
 
             while(list($key, $time) = each($arr_standart))
             {
+                $pos_in_all += 1;
                 if ($dataStandart = $findStandartModel->getVideoData($time['key'])) {
                     $dataStandart = ArrayHelper::toArray($dataStandart);
                 } else
@@ -243,7 +246,8 @@ class PlaylistOutController extends Controller
                         'nb_frames' => $dataStandart['nb_frames'],
                         'file' => $dataStandart['file'],
                         'start' => 0,
-                        'end' => (int)$time['duration']
+                        'end' => (int)$time['duration'],
+                        'pos_in_all' => $pos_in_all,
                     ];
 
                     $std_time += array_sum(ArrayHelper::getColumn($time, 'duration'));
@@ -268,7 +272,8 @@ class PlaylistOutController extends Controller
                                 'nb_frames' => $dataStandart['nb_frames'],
                                 'file' => $dataStandart['file'],
                                 'start' => (int)$b,
-                                'end' => (int)$time['duration']
+                                'end' => (int)$time['duration'],
+                                'pos_in_all' => $pos_in_all,
                             ];
                             $s[] = $val;
                             $std_time += $time['duration'] - $b;
@@ -287,7 +292,8 @@ class PlaylistOutController extends Controller
                                     'nb_frames' => $dataStandart['nb_frames'],
                                     'file' => $dataStandart['file'],
                                     'start' => (int)$b,
-                                    'end' => (int)$time['duration']
+                                    'end' => (int)$time['duration'],
+                                    'pos_in_all' => $pos_in_all,
                                 ];
                                 $std_time += $time['duration'] - $b;
                                 break;
@@ -301,7 +307,8 @@ class PlaylistOutController extends Controller
                                 'nb_frames' => $dataStandart['nb_frames'],
                                 'file' => $dataStandart['file'],
                                 'start' => (int)$b,
-                                'end' => (int)$a
+                                'end' => (int)$a,
+                                'pos_in_all' => $pos_in_all,
                             ];
                             $s[] = $val;
                             $std_time += $a - $b;
@@ -316,6 +323,9 @@ class PlaylistOutController extends Controller
             }
 
             if (!empty($s)) {
+                foreach ($s as $key => $val) {
+                    $s[$key]["pos_in_list"] = $key;
+                }
                 return [
                     'com_time' => $com_time,
                     'std_time' => $std_time,
