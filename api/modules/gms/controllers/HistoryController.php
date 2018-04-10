@@ -85,6 +85,10 @@ class HistoryController extends ActiveController
 
             $arr_merge_list = array_combine($arr_pos_list, $arr_pos_all);
 
+            Yii::getLogger()->log([
+                '$arr_merge_list'=>$arr_merge_list
+            ], Logger::LEVEL_ERROR, 'binary');
+
             foreach ($post["inf"] as $pos_in_list => $time_start_end) {
 
                 if (!array_key_exists($pos_in_list, $arr_merge_list)) {

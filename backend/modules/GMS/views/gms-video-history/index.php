@@ -191,26 +191,6 @@ $this->params['breadcrumbs'][] = $this->title;
                    return !empty($model->type) ? GmsPlaylist::getPlayListType($model->type) : null;
                 },
             ],
-
-//            [
-//                'headerOptions' => array('style' => 'width: 200px;'),
-//                'label' => 'Тип видео',
-//                'value' => function($model) {
-//                    /** @var $model \common\models\GmsVideoHistory */
-//                    if (!$findModel = GmsPlaylistOut::findOne($model['pls_id'])) return null;
-//                    if ($data = $findModel->getVideoData($model['video_key'])) {
-//                        if (empty($data->type)) return null;
-//                        if ($data->type == 1) {
-//                            return 'Стандартный';
-//                        } elseif ($data->type == 2) {
-//                            return 'Коммерческий';
-//                        }
-//                    }
-//                    return null;
-//                },
-//                'format' => 'html',
-//            ],
-
             [
                 'class' => 'yii\grid\ActionColumn',
                 'buttons' => [
