@@ -207,19 +207,22 @@ class PlaylistOutController extends Controller
                 } else
                     continue;
 
-                $pos_in_all += 1;
-                $arr = array_fill(0, $commerce['views'], [
-                    'title' => $dataCommerce['title'],
-                    'type' => 2,
-                    'key' => $commerce['key'],
-                    'file' => $dataCommerce['file'],
-                    'duration' => $dataCommerce['duration'],
-                    'frame_rate' => $dataCommerce['frame_rate'],
-                    'nb_frames' => $dataCommerce['nb_frames'],
-                    'start' => 0,
-                    'end' => (int)$commerce['duration'],
-                    'pos_in_all' => $pos_in_all
-                ]);
+                $arr = [];
+                for ($s = 1; $s < $commerce['views'] + 1; $s++) {
+                    $pos_in_all += $s;
+                    $arr[] = [
+                        'title' => $dataCommerce['title'],
+                        'type' => 2,
+                        'key' => $commerce['key'],
+                        'file' => $dataCommerce['file'],
+                        'duration' => $dataCommerce['duration'],
+                        'frame_rate' => $dataCommerce['frame_rate'],
+                        'nb_frames' => $dataCommerce['nb_frames'],
+                        'start' => 0,
+                        'end' => (int)$commerce['duration'],
+                        'pos_in_all' => $pos_in_all
+                    ];
+                }
 
                 if (empty($f)) $f = $arr;
                 else $f = array_merge($f, $arr);
