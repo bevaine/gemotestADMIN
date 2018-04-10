@@ -324,7 +324,7 @@ class PlaylistOutController extends Controller
 
             if (!empty($s)) {
                 foreach ($s as $key => $val) {
-                    $s[]["pos_in_list"] = $key;
+                    $s[$key]["pos_in_list"] = $key;
                 }
                 return [
                     'com_time' => $com_time,
