@@ -89,13 +89,17 @@ class HistoryController extends ActiveController
 
             foreach ($post["inf"] as $pos_in_list => $time_start_end) {
 
+                Yii::getLogger()->log([
+                    '$pos_in_list'=>$pos_in_list, '$arr_merge_list' => $arr_merge_list
+                ], Logger::LEVEL_ERROR, 'binary');
+
                 if (!array_key_exists($pos_in_list, $arr_merge_list))
                     continue;
 
                 $current_pos_all = $arr_merge_list[$pos_in_list];
 
                 Yii::getLogger()->log([
-                    '$current_pos_all'=>$current_pos_all
+                    '$arr_merge_list'=>$arr_merge_list, '$pos_in_list' => $pos_in_list
                 ], Logger::LEVEL_ERROR, 'binary');
 
                 $videoHistoryModel = GmsVideoHistory::findOne([
