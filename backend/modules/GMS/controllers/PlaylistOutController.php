@@ -208,8 +208,8 @@ class PlaylistOutController extends Controller
                     continue;
 
                 $arr = [];
-                for ($s = 1; $s < $commerce['views'] + 1; $s++) {
-                    $pos_in_all += $s;
+                for ($n = 1; $n < $commerce['views'] + 1; $n++) {
+                    $pos_in_all += $n;
                     $arr[] = [
                         'title' => $dataCommerce['title'],
                         'type' => 2,
