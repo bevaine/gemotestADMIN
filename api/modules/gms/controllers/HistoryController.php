@@ -72,7 +72,7 @@ class HistoryController extends ActiveController
                 '$post'=>$post
             ], Logger::LEVEL_ERROR, 'binary');
 
-            if (empty($post["pls_id"]))
+            if (!isset($post["pls_id"]) || empty($post["pls_guid"]) || empty($post["device_id"]))
                 return ['state' => 0];
 
             if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
@@ -86,6 +86,9 @@ class HistoryController extends ActiveController
                 return ['state' => 0];
 
             $arr_merge_list = array_combine($arr_pos_list, $arr_pos_all);
+
+            Yii::getLogger()->log(['count'=>count($post["inf"]),
+            ], Logger::LEVEL_ERROR, 'binary');
 
             foreach ($post["inf"] as $pos_in_list => $time_start_end) {
 
