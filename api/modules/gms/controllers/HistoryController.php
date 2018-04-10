@@ -88,7 +88,7 @@ class HistoryController extends ActiveController
                 $current_pos_all = $arr_merge_list[$pos_in_list];
 
                 $videoHistoryModel = GmsVideoHistory::findOne([
-                    'pos_pls' => $current_pos_all,
+                    'pls_pos' => $current_pos_all,
                     'pls_guid' => $post["pls_guid"]
                 ]);
 
