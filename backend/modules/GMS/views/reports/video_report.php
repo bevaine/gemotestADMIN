@@ -70,7 +70,7 @@ $gridColumns = [
     ],
     [
         'value' => function ($model) {
-            return !empty($model["duration"]) ? date("H:i:s", $model["duration"]) : null;
+            return !empty($model["duration"]) ? date("H:i:s", mktime(null,null, $model["duration"])) : null;
         },
         'label' => 'Продолжит.',
         'group'=> false,
