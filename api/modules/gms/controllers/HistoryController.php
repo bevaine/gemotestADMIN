@@ -68,10 +68,6 @@ class HistoryController extends ActiveController
         {
             $post = Yii::$app->request->post();
 
-            Yii::getLogger()->log([
-                '$post'=>$post
-            ], Logger::LEVEL_ERROR, 'binary');
-
             if (empty($post["pls_id"]))
                 return ['state' => 0];
 
@@ -79,20 +75,12 @@ class HistoryController extends ActiveController
                 return ['state' => 0];
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
-            $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi, 'pos_in_all');
+            $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_all');
 
-            $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi, 'pos_in_list');
+            $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_list');
             $arr_merge_list = array_combine($arr_pos_list, $arr_pos_all);
 
-            Yii::getLogger()->log([
-                '$arr_merge_list'=>$arr_merge_list
-            ], Logger::LEVEL_ERROR, 'binary');
-
             foreach ($post["inf"] as $pos_in_list => $time_start_end) {
-
-                Yii::getLogger()->log([
-                    '$arr_merge_list[$pos_in_list]'=>$arr_merge_list[$pos_in_list]
-                ], Logger::LEVEL_ERROR, 'binary');
 
                 if (!array_key_exists($pos_in_list, $arr_merge_list))
                     continue;
@@ -112,8 +100,8 @@ class HistoryController extends ActiveController
                 $videoHistoryModel->pls_guid = $post["pls_guid"];
                 $videoHistoryModel->device_id = $post["device_id"];
                 $videoHistoryModel->pls_id = $post["pls_id"];
-                $videoHistoryModel->created_at = date('Y-m-d H:i:s P', $time_start_end['start']);
-                $videoHistoryModel->last_at = date('Y-m-d H:i:s P', $time_start_end['end']);
+                $videoHistoryModel->created_at = $time_start_end['start'];
+                $videoHistoryModel->last_at = $time_start_end['end'];
 
                 if ($videoHistoryModel->save()) {
                     return ['state' => 1];

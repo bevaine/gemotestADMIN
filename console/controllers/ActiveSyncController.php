@@ -252,6 +252,25 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        $post["pls_id"] = 34;
+        if (empty($post["pls_id"]))
+            return ['state' => 0];
+
+        if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
+            return ['state' => 0];
+
+        $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
+        print_r($arrJsonKodi);
+        $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_all');
+        print_r($arr_pos_all);
+        $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_list');
+        $arr_merge_list = array_combine($arr_pos_list, $arr_pos_all);
+
+        print_r($arr_merge_list);
+        exit;
+
+
+
         echo FunctionsHelper::getFrameRateVideo('C:\\Users\\evgeny.dymchenko\\www\\admin\\backend\\web\\upload\\video\\594pkt7o13t8fmtciviipcuueiieattp\\15229947695ac70e51809695.91105442.mp4');
         echo "\r\n---------------------";
         echo FunctionsHelper::getFrameRateVideo('C:\\Users\\evgeny.dymchenko\\www\\admin\\backend\\web\\upload\\video\\594pkt7o13t8fmtciviipcuueiieattp\\15229401305ac638e29ad3a3.69889154.mp4');
