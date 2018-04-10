@@ -68,6 +68,10 @@ class HistoryController extends ActiveController
         {
             $post = Yii::$app->request->post();
 
+            Yii::getLogger()->log([
+                '$post'=>$post
+            ], Logger::LEVEL_ERROR, 'binary');
+
             if (empty($post["pls_id"]))
                 return ['state' => 0];
 
@@ -89,6 +93,10 @@ class HistoryController extends ActiveController
                     continue;
 
                 $current_pos_all = $arr_merge_list[$pos_in_list];
+
+                Yii::getLogger()->log([
+                    '$current_pos_all'=>$current_pos_all
+                ], Logger::LEVEL_ERROR, 'binary');
 
                 $videoHistoryModel = GmsVideoHistory::findOne([
                     'pls_pos' => $current_pos_all,
