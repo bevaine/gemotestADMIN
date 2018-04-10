@@ -15,6 +15,8 @@ use Yii;
  * @property integer pls_pos
  * @property string pls_guid
  * @property integer $video_key
+ * @property integer $type
+ * @property integer $duration
  * @property GmsDevices $deviceModel
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
@@ -37,7 +39,7 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pls_id', 'video_key', 'pls_pos'], 'integer'],
+            [['pls_id', 'video_key', 'pls_pos', 'type', 'duration'], 'integer'],
             [['device_id', 'created_at', 'last_at', 'pls_guid'], 'string', 'max' => 255],
         ];
     }
@@ -60,7 +62,9 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
             'date_at' => 'Период воспр.',
             'start_at' => 'Начало',
             'pls_pos' => 'Позиция в плейлисте',
-            'pls_guid' => 'GUID сгенерированного плейлиста'
+            'pls_guid' => 'GUID сгенерированного плейлиста',
+            'type' => 'Тип видео',
+            'duration' => 'Продолжительность'
         ];
     }
 
