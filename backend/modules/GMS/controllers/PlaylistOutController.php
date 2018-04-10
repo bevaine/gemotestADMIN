@@ -165,7 +165,7 @@ class PlaylistOutController extends Controller
         $std_time = 0;
         $com_time = 0;
         $minimal_std = 60;
-        $pos_in_all = 0;
+        $pos_in_all = -1;
 
         if ($post = Yii::$app->request->post()) {
             $all_time = $post['all_time'];
@@ -324,8 +324,7 @@ class PlaylistOutController extends Controller
 
             if (!empty($s)) {
                 foreach ($s as $key => $val) {
-                    $key = $key + 1;
-                    $s[$key]["pos_in_list"] = $key;
+                    $s[]["pos_in_list"] = $key;
                 }
                 return [
                     'com_time' => $com_time,
