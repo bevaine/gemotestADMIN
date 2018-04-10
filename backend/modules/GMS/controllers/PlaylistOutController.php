@@ -207,6 +207,7 @@ class PlaylistOutController extends Controller
                 } else
                     continue;
 
+                $pos_in_all += 1;
                 $arr = array_fill(0, $commerce['views'], [
                     'title' => $dataCommerce['title'],
                     'type' => 2,
@@ -217,8 +218,9 @@ class PlaylistOutController extends Controller
                     'nb_frames' => $dataCommerce['nb_frames'],
                     'start' => 0,
                     'end' => (int)$commerce['duration'],
-                    'pos_in_all' => $pos_in_all + 1
+                    'pos_in_all' => $pos_in_all
                 ]);
+
                 if (empty($f)) $f = $arr;
                 else $f = array_merge($f, $arr);
                 if (!empty($f)) shuffle($f);
@@ -229,6 +231,7 @@ class PlaylistOutController extends Controller
             while(list($key, $time) = each($arr_standart))
             {
                 $pos_in_all += 1;
+
                 if ($dataStandart = $findStandartModel->getVideoData($time['key'])) {
                     $dataStandart = ArrayHelper::toArray($dataStandart);
                 } else
