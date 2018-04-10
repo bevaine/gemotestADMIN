@@ -252,6 +252,14 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        $pos_in_list = 0;
+        $arr_merge_list = [1,2,3,1];
+        if (!array_key_exists($pos_in_list, $arr_merge_list)) {
+            echo "qweqweqwe";
+        }
+            exit;
+
+
         $post["pls_id"] = 34;
         if (empty($post["pls_id"]))
             return ['state' => 0];

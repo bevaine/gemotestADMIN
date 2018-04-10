@@ -95,8 +95,11 @@ class HistoryController extends ActiveController
                     '$pos_in_list' => $pos_in_list,
                 ], Logger::LEVEL_ERROR, 'binary');
 
-                if (!array_key_exists($pos_in_list, $arr_merge_list))
+                if (!array_key_exists($pos_in_list, $arr_merge_list)) {
+                    echo "qweqweqWEQweqweqweq";
                     continue;
+                }
+
 
                 $current_pos_all = $arr_merge_list[$pos_in_list];
 
