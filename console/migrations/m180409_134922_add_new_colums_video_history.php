@@ -15,6 +15,8 @@ class m180409_134922_add_new_colums_video_history extends Migration
     {
         $this->addColumn('{{%gms_video_history}}', 'pls_pos', Schema::TYPE_INTEGER);
         $this->addColumn('{{%gms_video_history}}', 'pls_guid', Schema::TYPE_STRING);
+        $this->addColumn('{{%gms_video_history}}', 'duration', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_video_history}}', 'type', Schema::TYPE_INTEGER);
     }
 
     /**
@@ -24,6 +26,8 @@ class m180409_134922_add_new_colums_video_history extends Migration
     {
         $this->dropColumn('{{%gms_video_history}}', 'pls_pos');
         $this->dropColumn('{{%gms_video_history}}', 'pls_guid');
+        $this->dropColumn('{{%gms_video_history}}', 'duration');
+        $this->dropColumn('{{%gms_video_history}}', 'type');
     }
 
     /*

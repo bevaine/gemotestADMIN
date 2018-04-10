@@ -103,6 +103,8 @@ class HistoryController extends ActiveController
                     $videoHistoryModel->created_at = $time_start_end['start'];
                 }
 
+                $videoHistoryModel->duration = $post["duration"];
+                $videoHistoryModel->type = $post["type"];
                 $videoHistoryModel->pls_pos = $current_pos_all;
                 $videoHistoryModel->pls_guid = $post["pls_guid"];
                 $videoHistoryModel->video_key = $time_start_end["key"];
