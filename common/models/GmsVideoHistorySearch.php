@@ -31,7 +31,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
     public function rules()
     {
         return [
-            [['id', 'pls_id', 'video_key', 'region_id'], 'integer'],
+            [['id', 'pls_id', 'video_key', 'region_id', 'type'], 'integer'],
             [['date_from', 'video_name', 'date_to', 'sender_name', 'pls_name', 'device_id', 'created_at'], 'safe'],
         ];
     }
@@ -63,7 +63,8 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             ->select("t.*, t.id hv_id, t.created_at start_at, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.*, t4.name video_name, t4.id video_key, t5.id dev_id");
 
         // grid filtering conditions
-        $query->andFilterWhere(['t.id' => $this->id]);
+        $query->andFilterWhere(['t.id' => $this->id])
+            ->andFilterWhere(['t.type' => $this->type]);
 
         $query->andFilterWhere(['like', 't.created_at', $this->created_at])
               ->andFilterWhere(['like', 't.device_id', $this->device_id]);
@@ -110,6 +111,10 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             'device_name' => [
                 'asc' => ['t3.device' => SORT_ASC],
                 'desc' => ['t3.device' => SORT_DESC]
+            ],
+            'type' => [
+                'asc' => ['type' => SORT_ASC],
+                'desc' => ['type' => SORT_DESC]
             ],
             'pls_name' => [
                 'asc' => ['pls_name' => SORT_ASC],
