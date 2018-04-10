@@ -62,7 +62,7 @@ $gridColumns = [
         'filter' => \common\models\GmsPlaylist::getPlayListType(),
         'value' => function ($model) {
             /** @var $model \common\models\GmsPlaylistOut */
-            return !empty($model["type"]) ? GmsPlaylist::getPlayListType($model["type"]) : null;
+            return !empty($model["type_pls"]) ? GmsPlaylist::getPlayListType($model["type_pls"]) : null;
         },
         'format' => 'html',
         'group'=> false,

@@ -60,7 +60,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             ->joinWith('playListOutModel t3')
             ->joinWith('videoModel t4')
             ->joinWith('deviceModel t5')
-            ->select("t.*, t.id hv_id, t.created_at start_at, t.id vh_id, t1.*, t2.*, t3.name pls_name, t4.*, t4.name video_name, t4.id video_key, t5.id dev_id");
+            ->select("t.*, t.id hv_id, t.created_at start_at, t.id vh_id, t.type type_pls, t1.*, t2.*, t3.name pls_name, t4.*, t4.name video_name, t4.id video_key, t5.id dev_id");
 
         // grid filtering conditions
         $query->andFilterWhere(['t.id' => $this->id])
@@ -113,8 +113,8 @@ class GmsVideoHistorySearch extends GmsVideoHistory
                 'desc' => ['t3.device' => SORT_DESC]
             ],
             'type' => [
-                'asc' => ['type' => SORT_ASC],
-                'desc' => ['type' => SORT_DESC]
+                'asc' => ['t.type' => SORT_ASC],
+                'desc' => ['t.type' => SORT_DESC]
             ],
             'pls_name' => [
                 'asc' => ['pls_name' => SORT_ASC],
