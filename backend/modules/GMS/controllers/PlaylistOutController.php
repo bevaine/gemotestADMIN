@@ -324,6 +324,7 @@ class PlaylistOutController extends Controller
 
             if (!empty($s)) {
                 foreach ($s as $key => $val) {
+                    $key = $key + 1;
                     $s[$key]["pos_in_list"] = $key;
                 }
                 return [

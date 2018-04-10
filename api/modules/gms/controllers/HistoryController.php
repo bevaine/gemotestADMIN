@@ -76,8 +76,11 @@ class HistoryController extends ActiveController
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
             $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_all');
-
             $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_list');
+
+            if (empty($arr_pos_list) || empty($arr_pos_all))
+                return ['state' => 0];
+
             $arr_merge_list = array_combine($arr_pos_list, $arr_pos_all);
 
             foreach ($post["inf"] as $pos_in_list => $time_start_end) {
@@ -94,13 +97,14 @@ class HistoryController extends ActiveController
 
                 if (!$videoHistoryModel) {
                     $videoHistoryModel = new GmsVideoHistory();
+                    $videoHistoryModel->created_at = $time_start_end['start'];
                 }
 
                 $videoHistoryModel->pls_pos = $current_pos_all;
                 $videoHistoryModel->pls_guid = $post["pls_guid"];
+                $videoHistoryModel->video_key = $post["key"];
                 $videoHistoryModel->device_id = $post["device_id"];
                 $videoHistoryModel->pls_id = $post["pls_id"];
-                $videoHistoryModel->created_at = $time_start_end['start'];
                 $videoHistoryModel->last_at = $time_start_end['end'];
 
                 if ($videoHistoryModel->save()) {
