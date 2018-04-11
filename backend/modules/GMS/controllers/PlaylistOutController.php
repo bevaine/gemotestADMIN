@@ -399,10 +399,6 @@ class PlaylistOutController extends Controller
             ];
         }
         if (!empty($s)) {
-            Yii::getLogger()->log([
-                '$s'=>$s
-            ], Logger::LEVEL_ERROR, 'binary');
-
             return [
                 'com_time' => 0,
                 'std_time' => $std_time,

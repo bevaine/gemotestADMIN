@@ -1049,7 +1049,6 @@ $js1 = <<< JS
                 pls_out_id: {$pls_id}
             },
             success: function (res) {
-                console.log(res);
                 if (res !== 'null') {
                     const pls_id = [];
                     if (res.result[1]['inf'] !== undefined) {
@@ -1102,8 +1101,6 @@ $js1 = <<< JS
             timeDay = getTimeDay();
 
         if (parentFolder.children === null) return false;
-        
-        console.log(parentFolder.children);
         
         parentFolder.children.forEach(function(children) 
         {
