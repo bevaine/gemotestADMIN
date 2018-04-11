@@ -226,9 +226,9 @@ class PlaylistOutController extends Controller
 
                 if (empty($f)) $f = $arr;
                 else $f = array_merge($f, $arr);
-                if (!empty($f)) shuffle($f);
             }
 
+            if (!empty($f)) shuffle($f);
             $findStandartModel = GmsPlaylist::findOne($pls_standart);
 
             while(list($key, $time) = each($arr_standart))
@@ -281,9 +281,11 @@ class PlaylistOutController extends Controller
                                 'end' => (int)$time['duration'],
                                 'pos_in_all' => $pos_in_all,
                             ];
-                            $s[] = $val;
                             $std_time += $time['duration'] - $b;
-                            $com_time += $val['end'];
+                            if (!empty($val)) {
+                                $s[] = $val;
+                                $com_time += $val['end'];
+                            }
                             break;
                         } elseif ($a > 0)
                         {
@@ -316,9 +318,11 @@ class PlaylistOutController extends Controller
                                 'end' => (int)$a,
                                 'pos_in_all' => $pos_in_all,
                             ];
-                            $s[] = $val;
                             $std_time += $a - $b;
-                            $com_time += $val['end'];
+                            if (!empty($val)) {
+                                $s[] = $val;
+                                $com_time += $val['end'];
+                            }
                         }
                     }
                 }
