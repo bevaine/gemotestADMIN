@@ -166,15 +166,21 @@ class PlaylistOutController extends Controller
         $com_time = 0;
         $minimal_std = 60;
         $pos_in_all = -1;
+        $all_time = '';
+        $arr_commerce = [];
+        $arr_standart = [];
+        $pls_commerce = '';
+        $pls_standart = '';
 
-        if ($post = Yii::$app->request->post()) {
-            $all_time = $post['all_time'];
-            $arr_commerce = $post['arr_commerce'];
-            $arr_standart = $post['arr_standart'];
-            $pls_commerce = $post['pls_commerce'];
-            $pls_standart = $post['pls_standart'];
-        } else
+        if (empty(Yii::$app->request->post()))
             return false;
+
+        $post = Yii::$app->request->post();
+        if (!empty($post['all_time'])) $all_time = $post['all_time'];
+        if (!empty($post['arr_commerce'])) $arr_commerce = $post['arr_commerce'];
+        if (!empty($post['arr_standart'])) $arr_standart = $post['arr_standart'];
+        if (!empty($post['pls_commerce'])) $pls_commerce = $post['pls_commerce'];
+        if (!empty($post['pls_standart'])) $pls_standart = $post['pls_standart'];
 
         if (empty($arr_standart) || empty($all_time)) {
             return [
