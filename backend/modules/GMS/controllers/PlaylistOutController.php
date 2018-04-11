@@ -190,7 +190,7 @@ class PlaylistOutController extends Controller
         }
 
         if (empty($arr_commerce)) {
-            return $this->getStandartPls($arr_standart);
+            return $this->getStandartPls($arr_standart, $pls_standart);
         }
 
         foreach ($arr_commerce as $input) {
@@ -369,16 +369,33 @@ class PlaylistOutController extends Controller
         }
     }
 
-    public function getStandartPls($arr_standart)
+    public function getStandartPls($arr_standart, $pls_standart)
     {
+        $pos_in_all = -1;
+
         $std_time = array_sum(ArrayHelper::getColumn($arr_standart, 'duration'));
+        $findStandartModel = GmsPlaylist::findOne($pls_standart);
 
         foreach ($arr_standart as $time) {
+
+            $pos_in_all += 1;
+
+            if ($dataStandart = $findStandartModel->getVideoData($time['key'])) {
+                $dataStandart = ArrayHelper::toArray($dataStandart);
+            } else
+                continue;
+
             $s[] = [
-                'file' => $time['file'],
+                'type' => 1,
                 'key' => $time['key'],
+                'title' => $dataStandart['title'],
+                'duration' => $dataStandart['duration'],
+                'frame_rate' => $dataStandart['frame_rate'],
+                'nb_frames' => $dataStandart['nb_frames'],
+                'file' => $dataStandart['file'],
                 'start' => 0,
-                'end' => (int)$time['duration']
+                'end' => (int)$time['duration'],
+                'pos_in_all' => $pos_in_all,
             ];
         }
         if (!empty($s)) {
