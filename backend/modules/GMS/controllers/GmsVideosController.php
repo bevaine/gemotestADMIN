@@ -3,6 +3,7 @@
 namespace app\modules\GMS\controllers;
 
 use common\components\helpers\FunctionsHelper;
+use common\models\GmsPlaylist;
 use Yii;
 use common\models\GmsVideos;
 use common\models\GmsVideosSearch;
@@ -226,6 +227,7 @@ class GmsVideosController extends Controller
                 Yii::getLogger()->log('Файл ' . $videoPath . ' - не найден!',
                     Logger::LEVEL_ERROR, 'binary');
             }
+            GmsPlaylist::removeVideoData($modelVideo->id);
         }
 
         if (!empty($modelVideo->thumbnail)) {

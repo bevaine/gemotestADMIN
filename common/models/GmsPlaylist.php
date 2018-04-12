@@ -3,8 +3,10 @@
 namespace common\models;
 
 use app\modules\GMS\controllers\GmsSendersController;
+use function MongoDB\BSON\toJSON;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\log\Logger;
 
 /**
  * This is the model class for table "gms_playlist".
@@ -125,5 +127,35 @@ class GmsPlaylist extends \yii\db\ActiveRecord
             }
         }
         return false;
+    }
+
+    /**
+     * @param $video_key
+     * @return bool
+     */
+    static function removeVideoData($video_key)
+    {
+        if ($findModel = self::find()->all()) {
+            /** @var GmsPlaylist $model */
+            foreach ($findModel as $model) {
+                $jsonPlaylist = ArrayHelper::toArray(json_decode($model->jsonPlaylist));
+                $arrChildren = $jsonPlaylist["children"];
+                $arrKeys = ArrayHelper::getColumn($arrChildren, 'key');
+                $arr_keys = array_keys($arrKeys, $video_key);
+                if (empty($arr_keys)) continue;
+                foreach ($arr_keys as $key) {
+                    unset($arrChildren[$key]);
+                }
+                $arrChildren = array_values($arrChildren);
+                $jsonPlaylist["children"] = $arrChildren;
+                $model->jsonPlaylist = json_encode($jsonPlaylist, JSON_UNESCAPED_UNICODE);
+                if (!$model->save()) {
+                    Yii::getLogger()->log([
+                        'removeVideoData->$model->save()'=>$model->errors
+                    ], Logger::LEVEL_ERROR, 'binary');
+                }
+            }
+            return true;
+        } else return false;
     }
 }

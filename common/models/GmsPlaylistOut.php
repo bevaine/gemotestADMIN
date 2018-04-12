@@ -357,6 +357,10 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         return false;
     }
 
+    /**
+     * @param $video_key
+     * @return bool
+     */
     public function getVideoData($video_key)
     {
         /** @var GmsPlaylistOut $findModel */

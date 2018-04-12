@@ -4,6 +4,7 @@ namespace console\controllers;
 
 use common\components\helpers\ActiveSyncHelper;
 use common\components\helpers\FunctionsHelper;
+use common\models\GmsPlaylist;
 use common\models\GmsPlaylistOut;
 use common\models\Logins;
 use common\models\NAdUsers;
@@ -252,6 +253,16 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        $string = 'April 15, 2003';
+        $pattern = '/(\w+) (\d+), (\d+)/i';
+        $replacement = '${1}1,$3';
+        echo preg_replace($pattern, $replacement, $string);
+
+
+
+        GmsPlaylist::checkVideoData(53);
+        exit;
+
         $pos_in_list = 0;
         $arr_merge_list = [1,2,3,1];
         if (!array_key_exists($pos_in_list, $arr_merge_list)) {

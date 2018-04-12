@@ -131,6 +131,9 @@ class PlaylistOutController extends Controller
      */
     public function actionAjaxTimeCheck()
     {
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+
         $out = [];
         $model = new GmsPlaylistOut();
         $model->scenario = 'findPlaylistOut';
@@ -142,12 +145,9 @@ class PlaylistOutController extends Controller
 
             $model->time_start = GmsPlaylistOut::getTimeDate(strtotime($model->time_start));
             $model->time_end = GmsPlaylistOut::getTimeDate(strtotime($model->time_end));
-
             $out = $model->checkPlaylist();
         }
 
-        $response = Yii::$app->response;
-        $response->format = yii\web\Response::FORMAT_JSON;
         return !empty($out) ? $out : 'null';
     }
 
@@ -409,6 +409,42 @@ class PlaylistOutController extends Controller
             return [
                 'state' => 0,
                 'message' => 'Ошибка формирования плейлиста дневного эфира!'
+            ];
+        }
+    }
+
+    /**
+     * @param $video_key
+     * @return array|string
+     */
+    public function actionAjaxCheckVideo($video_key)
+    {
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+
+        $keys = [];
+        if ($findModel = GmsPlaylistOut::find()->all()) {
+            /** @var GmsPlaylistOut $model */
+            foreach ($findModel as $model) {
+                $jsonPlaylist = ArrayHelper::toArray(json_decode($model->jsonPlaylist));
+                $arrChildren = $jsonPlaylist["children"];
+                $arrKeys = ArrayHelper::getColumn($arrChildren, 'key');
+                $arr_keys = array_keys($arrKeys, $video_key);
+                if (!empty($arr_keys)) {
+                    $keys[] = $model->id;
+                }
+            }
+        }
+        if (!empty($keys)) {
+            $str_html = "Данное видео удалить не возможно";
+            $str_html .= "<br>т.к., оно добавлено в плейлисты - ".implode(",", $keys);
+            return [
+                'state' => 0,
+                'message' => $str_html
+            ];
+        } else {
+            return [
+                'state' => 1,
             ];
         }
     }

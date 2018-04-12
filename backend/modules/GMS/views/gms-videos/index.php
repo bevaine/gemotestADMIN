@@ -14,6 +14,7 @@ use kartik\date\DatePicker;
 $this->title = 'Видео библиотека';
 $this->params['breadcrumbs'][] = $this->title;
 
+$urlAjaxCheckVideo = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-check-video']);
 ?>
     <style>
         .center {
@@ -26,6 +27,32 @@ $this->params['breadcrumbs'][] = $this->title;
             z-index: 2147483647;
         }
     </style>
+
+    <div class="modal bootstrap-dialog type-warning fade size-normal in" id="modal-dialog" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="bootstrap-dialog-header">
+                        <div class="bootstrap-dialog-close-button" style="display: none;">
+                            <button class="close" aria-label="close">×</button>
+                        </div>
+                        <div class="bootstrap-dialog-title" id="w1_title">Подтверждение</div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="bootstrap-dialog-body">
+                        <div class="bootstrap-dialog-message" id="bootstrap-dialog-message">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="bootstrap-dialog-footer">
+                        <div class="bootstrap-dialog-footer-buttons" id="bootstrap-dialog-footer-buttons"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
         <div class="center">
@@ -109,13 +136,26 @@ $this->params['breadcrumbs'][] = $this->title;
                     return date("H:i:s" , mktime(0, 0, $model->time));
                 },
             ],
-            ['class' => 'yii\grid\ActionColumn', 'template'=>'{view} {delete}'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template'=>'{view} {delete}',
+                'buttons' => [
+                    'delete' => function($url, $model){
+                        return Html::a('<span onclick="checkPlayList('.$model->id.')" class="glyphicon glyphicon-trash"></span>', "#");
+                    }
+                ]
+            ]
         ],
     ]); ?>
 </div>
 
 <?php
 $js1 = <<< JS
+
+    function deleteItem(video_key) {
+        $.post("../../GMS/gms-videos/delete?id=" + video_key, { id: video_key});
+    }
+    
     /**
     * 
     * @param str
@@ -131,6 +171,44 @@ $js1 = <<< JS
             '&#039;': "'"
         };
         return str.replace(/&amp;|&lt;|&gt;|&quot;|&#039;/g, function(m) {return map[m];});
+    }
+    
+    function checkPlayList(video_key) {
+        $.ajax({
+            type : 'GET',
+            url: '{$urlAjaxCheckVideo}',
+            data: {
+                video_key: video_key,
+            },
+            success: function (res) {
+                if (res !== 'null' && res.state !== undefined) {
+                    let message = '';
+                    let html_button = '';
+                    let style = '';
+                    let button_cancel = '<button class="btn btn-default" data-dismiss="modal">';
+                    button_cancel += '<span class="glyphicon glyphicon-ban-circle"></span> Отмена';
+                    button_cancel += '</button>';
+                    if (res.state === 0) {
+                        style = 'danger';
+                        message = res.message;
+                    } else {
+                        style = 'warning';
+                        message = "Вы уверены, что хотите удалить этот элемент?";
+                        html_button += '<button class="btn btn-' + style + '" id="delete-item"';
+                        html_button += ' onClick="deleteItem(' + video_key + ')">';
+                        html_button += '<span class="glyphicon glyphicon-ok"></span> Ok';
+                        html_button += '</button>';
+
+                    }                        
+                    $('#bootstrap-dialog-message').html(message);  
+                    $('#bootstrap-dialog-footer-buttons').html(button_cancel + html_button); 
+                    $('#modal-dialog')
+                        .removeClass()
+                        .toggleClass('modal bootstrap-dialog type-' + style + ' fade size-normal in')
+                        .modal('show');
+                }
+            }
+        });
     }
     
     /**
