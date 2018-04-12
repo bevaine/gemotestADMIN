@@ -2,6 +2,7 @@
 
 namespace app\modules\GMS\controllers;
 
+use yii\helpers\Html;
 use common\models\GmsPlaylist;
 use Yii;
 use common\models\GmsPlaylistOut;
@@ -12,6 +13,7 @@ use yii\filters\VerbFilter;
 use yii\log\Logger;
 use yii\helpers\Json;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
  * PlaylistOutController implements the CRUD actions for GmsPlaylistOut model.
@@ -436,17 +438,24 @@ class PlaylistOutController extends Controller
             }
         }
         if (!empty($keys)) {
-            $str_html = "Данное видео удалить не возможно";
-            $str_html .= "<br>т.к., оно добавлено в плейлисты - ".implode(",", $keys);
-            return [
-                'state' => 0,
-                'message' => $str_html
-            ];
-        } else {
-            return [
-                'state' => 1,
-            ];
+            $url = [];
+            foreach ($keys as $key) {
+                if ($findPls = GmsPlaylistOut::findOne($key)) {
+                    $url[] = Html::a($findPls->name, Url::to(["playlist-out/view", 'id' => $findPls->id]), ['target'=>'_blank']);
+                }
+            }
+            if (!empty($url)) {
+                $str_html = "Данное видео удалить не возможно";
+                $str_html .= "<br>т.к., оно добавлено в плейлисты - ".implode(",", $url);
+                return [
+                    'state' => 0,
+                    'message' => $str_html
+                ];
+            }
         }
+        return [
+            'state' => 1,
+        ];
     }
 
     /**
