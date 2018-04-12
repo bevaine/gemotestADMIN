@@ -29,6 +29,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'id',
             'device',
             [
+                'value' => !empty($model->name) ? $model->name : null,
+                'attribute' => 'name'
+            ],
+            [
                 'value' => !empty($model->regionModel) ? $model->regionModel->region_name : null,
                 'attribute' => 'region_id'
             ],

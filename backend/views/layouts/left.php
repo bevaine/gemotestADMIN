@@ -51,6 +51,7 @@
                                 'items' => [
                                     ['label' => 'Регионы', 'icon' => 'dashboard', 'url' => '/GMS/gms-regions'],
                                     ['label' => 'Отделения', 'icon' => 'dashboard', 'url' => '/GMS/gms-senders'],
+                                    ['label' => 'Группы устройств', 'icon' => 'dashboard', 'url' => '/GMS/gms-group-devices'],
                                 ]
                             ]
                         ]

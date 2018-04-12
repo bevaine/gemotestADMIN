@@ -32,7 +32,7 @@ class GmsDevicesSearch extends GmsDevices
     {
         return [
             [['id', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
-            [['sender_name', 'created_at', 'created_at_from', 'created_at_to', 'last_active_at', 'last_active_at_from', 'last_active_at_to', 'current_pls_name', 'sender_id', 'host_name', 'device', 'timezone'], 'safe'],
+            [['sender_name', 'created_at', 'created_at_from', 'created_at_to', 'last_active_at', 'last_active_at_from', 'last_active_at_to', 'current_pls_name', 'sender_id', 'name', 'device', 'timezone'], 'safe'],
         ];
     }
 
@@ -107,7 +107,7 @@ class GmsDevicesSearch extends GmsDevices
         }
 
         $query->andFilterWhere(['like', 'sender_id', $this->sender_id])
-            ->andFilterWhere(['like', 'host_name', $this->host_name])
+            ->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'device', $this->device])
             ->andFilterWhere(['like', 'gms_senders.sender_name', $this->sender_name])
             ->andFilterWhere(['like', 'gms_playlist_out.name', $this->current_pls_name]);

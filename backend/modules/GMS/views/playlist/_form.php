@@ -399,6 +399,7 @@ $js1 = <<< JS
                     if (data.otherNode) {
                         let sameTree = (data.otherNode.tree === data.tree);
                         const playlistNode = data.tree.getNodeByKey('playList[1]');
+                        console.log(sameTree);
                         if (!sameTree) {
                             if (data.otherNode.isFolder()) {
                                 playlistNode.addNode(data.otherNode.children, 'child');                           

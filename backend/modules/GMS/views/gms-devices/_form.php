@@ -18,6 +18,10 @@ use common\models\GmsPlaylistOut;
     <?= $form->field($model, 'device')->textInput(['maxlength' => true, 'disabled' => !$model->isNewRecord]) ?>
     <?= Html::hiddenInput('GmsDevices[device]', $model['device']) ?>
 
+    <div class="form-group name">
+        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+    </div>
+
     <div class="form-group region_id">
         <?= $form->field($model, 'region_id')->dropDownList(GmsRegions::getRegionList(), ['prompt' => '---']); ?>
     </div>
