@@ -675,7 +675,6 @@ class LoginsController extends Controller
             $findModel = DirectorFloSender::findOne([
                 'sender_key' => $key
             ]);
-            print_r($findModel);
             if (isset($findModel->directorFlo)) {
                 $fullName = $findModel->directorFlo->last_name
                     ." ".$findModel->directorFlo->first_name
