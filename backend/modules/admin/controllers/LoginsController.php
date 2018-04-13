@@ -648,7 +648,8 @@ class LoginsController extends Controller
             $arrAccountAD['gs'] = ArrayHelper::toArray($objectUsersLogins);
         }
 
-        //todo проверяем существует ли пользователь с ФИО в GS
+        //todo проверяем существует ли пользователь с ФИО в GD
+
         if (!empty($gd_id)) {
             if ($checkGD = self::checkGD($gd_id)) {
                 $arrAccountAD = array_merge($arrAccountAD, $checkGD);
@@ -674,7 +675,7 @@ class LoginsController extends Controller
             $findModel = DirectorFloSender::findOne([
                 'sender_key' => $key
             ]);
-
+            print_r($findModel);
             if (isset($findModel->directorFlo)) {
                 $fullName = $findModel->directorFlo->last_name
                     ." ".$findModel->directorFlo->first_name
@@ -682,7 +683,7 @@ class LoginsController extends Controller
                 $out['gd'] = $fullName;
             }
         }
-        return !empty($out) ? $out : 'null';
+        return !empty($out) ? $out : false;
     }
 
     /**
