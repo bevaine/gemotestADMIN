@@ -22,78 +22,29 @@ use wbraganca\fancytree\FancytreeWidget;
                         <h3 class="box-title">Новая группа</h3>
                     </div>
                     <div class="box-body">
-                        <?php
-                        echo FancytreeWidget::widget([
-                            'id' => 'devices_group',
-                            'options' =>[
-                                'disabled' => false,
-                                'source' => [
-                                    [
-                                        'title' => 'Новая группа',
-                                        'key' => 'group',
-                                        'folder' => true,
-                                    ]
-                                ],
-                                'extensions' => ['dnd'],
-                                'dblclick' => new JsExpression('function(node, data) {
-                                    if (!data.node.isFolder()) {
-                                        const playlistNode = $("#treetable")
-                                            .fancytree("getTree")
-                                            .getNodeByKey("playlist"),
-                                            addChild = [];
-                                        addChild.push(data.node);
-                                        playlistNode.addNode(addChild, "child");
-                                    }
-                                }'),
-                                'dnd' => [
-                                    'preventVoidMoves' => true,
-                                    'preventRecursiveMoves' => true,
-                                    'autoExpandMS' => 400,
-                                    'dragStart' => new JsExpression('function(node, data) {
-                                        return false;
-                                    }'),
-                                    'dragEnter' => new JsExpression('function(node, data) {
-                                        return true;
-                                    }'),
-                                    'dragDrop' => new JsExpression('function(node, data) {
-                                        if (data.otherNode) {                                        
-                                            let sameTree = (data.otherNode.tree === data.tree);
-                                            const playlistNode = data.tree.getNodeByKey(\'group\');
-
-                                            if (!sameTree) {
-                                                if (data.otherNode.isFolder()) {
-                                                    $.each(data.otherNode.children, function(index, children1) {
-                                                        if (children1.isFolder()) {
-                                                            $.each(children1.children, function(index, children2) {
-                                                                children2.moveTo(playlistNode, \'child\'); 
-                                                            });    
-                                                        } else {
-                                                            children1.moveTo(playlistNode, \'child\'); 
-                                                        }
-                                                    });
-                                                } else if (data.otherNode.isFolder() === false) {
-                                                    data.otherNode.moveTo(playlistNode, \'child\'); 
-                                                }
-                                            } else {
-                                                data.otherNode.moveTo(node, data.hitMode); 
-                                                if (!data.otherNode.isChildOf(playlistNode)) {
-                                                    data.otherNode.moveTo(playlistNode, "child");
-                                                }
-                                                data.otherNode.render(true);
-                                            }
-                                        } else if (data.otherNodeData) {
-                                            node.addChild(data.otherNodeData, data.hitMode);
-                                        } else {
-                                            node.addNode({
-                                              title: transfer.getData("text")
-                                            }, data.hitMode);
-                                        }
-                                        node.setExpanded();
-                                    }'),
-                                ],
-                            ]
-                        ]);
-                        ?>
+                        <div class="box-body">
+                            <table id="devices_group">
+                                <colgroup>
+                                    <col width="50px">
+                                    <col width="600px">
+                                    <col width="30px">
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Название</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align: center;"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -115,12 +66,12 @@ use wbraganca\fancytree\FancytreeWidget;
                                 'extensions' => ['dnd'],
                                 'dblclick' => new JsExpression('function(node, data) {
                                     if (!data.node.isFolder()) {
-                                        const playlistNode = $("#treetable")
+                                        const playlistNode = $("#devices_group")
                                             .fancytree("getTree")
-                                            .getNodeByKey("playlist"),
+                                            .getNodeByKey("group"),
                                             addChild = [];
-                                        addChild.push(data.node);
-                                        playlistNode.addNode(addChild, "child");
+                                        data.node.moveTo(playlistNode, "child");
+                                        playlistNode.setExpanded();
                                     }
                                 }'),
                                 'dnd' => [
@@ -128,10 +79,7 @@ use wbraganca\fancytree\FancytreeWidget;
                                     'preventRecursiveMoves' => true,
                                     'autoExpandMS' => 400,
                                     'dragStart' => new JsExpression('function(node, data) {
-                                        if (!data.tree.options.disabled) {
-                                            return true;
-                                            return !node.isFolder();
-                                        } else return false;
+                                        return !node.isFolder();
                                     }'),
                                     'dragEnter' => new JsExpression('function(node, data) {
                                         return true;
@@ -156,3 +104,128 @@ use wbraganca\fancytree\FancytreeWidget;
     <?php ActiveForm::end(); ?>
 
 </div>
+
+<?php
+$standartf = [
+    [
+        'title' => 'Новая группа',
+        'key' => 'group',
+        'folder' => true,
+    ]
+];
+$standartf = json_encode($standartf);
+
+$js1 = <<< JS
+    
+    const tree1 = $("#devices_group");
+        
+    $(function()
+    {
+        tree1.fancytree({
+            extensions: ["table", "dnd", "edit"],
+            table: {
+                indentation: 20,
+                nodeColumnIdx: 1,
+                checkboxColumnIdx: 0
+            },                
+            source: {$standartf},
+            dblclick: function(event, data) {
+
+            },
+            beforeActivate: function(event, data) {
+            },
+            renderColumns: function(event, data) {
+                const node = data.node, tdList = $(node.tr).find(">td");
+                tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
+                if (!node.isFolder()) {
+                    tdList.eq(2).html('<span id="trash-node" style="cursor:pointer;" class="glyphicon glyphicon-trash"></span>');
+                }
+            },
+            edit: {
+                triggerStart: ["clickActive", "dblclick"],
+                beforeEdit : function(event, data){
+                    return data.node.isFolder()
+                },
+                edit : function(event, data){
+                },
+                beforeClose : function(event, data){
+                },
+                save : function(event, data){
+                    setTimeout(function(){
+                        $(data.node.span).removeClass("pending");
+                        data.node.setTitle(data.node.title);
+                    }, 2000);
+                    return true;
+                },
+                close : function(event, data){
+                    if(data.save) {
+                        $(data.node.span).addClass("pending");
+                    }
+                }
+            },
+            dnd: {
+                preventVoidMoves : true,
+                preventRecursiveMoves : true,
+                autoExpandMS :400,
+                dragStart : function(node, data) {
+                    return false;
+                },
+                dragEnter : function(node, data) {
+                    return true;
+                },
+                dragOver : function(node, data) {
+                },
+                dragDrop : function(node, data) {
+                    console.log(data);
+                    if (data.otherNode) 
+                    {                                        
+                        let sameTree = (data.otherNode.tree === data.tree);
+                        const playlistNode = data.tree.getNodeByKey('group');
+
+                        if (!sameTree) {
+                            if (data.otherNode.isFolder()) {
+                                $.each(data.otherNode.children, function(index, children1) {
+                                    if (children1.isFolder()) {
+                                        $.each(children1.children, function(index, children2) {
+                                            children2.moveTo(playlistNode, 'child'); 
+                                        });    
+                                    } else {
+                                        children1.moveTo(playlistNode, 'child'); 
+                                    }
+                                });
+                            } else if (data.otherNode.isFolder() === false) {
+                                data.otherNode.moveTo(playlistNode, 'child'); 
+                            }
+                        } else {
+                            data.otherNode.moveTo(node, data.hitMode); 
+                            if (!data.otherNode.isChildOf(playlistNode)) {
+                                data.otherNode.moveTo(playlistNode, "child");
+                            }
+                            data.otherNode.render(true);
+                        }
+                    } else if (data.otherNodeData) {
+                        node.addChild(data.otherNodeData, data.hitMode);
+                    } else {
+                        node.addNode({
+                          title: transfer.getData("text")
+                        }, data.hitMode);
+                    }
+                    node.setExpanded();
+                }
+            }
+        });
+        
+        tree1.delegate("span[id=trash-node]", "click", function(e){
+            const node = $.ui.fancytree.getNode(e), tdList = $(node.tr);
+            const tree2 = $("#fancyree_devices_all").fancytree("getTree");
+            const playlistNode = tree2.getNodeByKey(node.data.key_parent);
+            node.moveTo(playlistNode, "child");
+            playlistNode.setExpanded();
+            tdList.remove();
+            e.stopPropagation();
+            node.render(true);
+        });
+    });
+JS;
+
+$this->registerJs($js1);

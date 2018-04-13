@@ -129,50 +129,57 @@ class GmsDevices extends \yii\db\ActiveRecord
     static function getTreeDevices()
     {
         $out = [];
-        $out3 = [];
+        $out2 = [];
         $findModel = self::find()->all();
 
         /** @var GmsDevices $model */
         foreach ($findModel as $model) {
-            if (empty($model->name || empty($model->regionModel->region_name))) continue;
-            if (!empty($model->senderModel->sender_name)) {
-                $out[$model->regionModel->region_name][$model->senderModel->sender_name][$model->device] = $model->name;
-            } else {
-                $out[$model->regionModel->region_name][$model->device] = $model->name;
-            }
+            if (empty($model->name || empty($model->region_id))) continue;
+            $out[$model->region_id][$model->sender_id][$model->device] = $model->name;
         }
 
         foreach ($out as $key => $region) {
-            $out1 = [
-                'title' => $key,
-                'key' => 1,
+            $findRegion = GmsRegions::findOne($key);
+            if (!$findRegion) continue;
+            $out = [
+                'title' => $findRegion->region_name,
+                'key' => (string)$key,
                 'folder' => true,
                 'expanded' => true
             ];
             if (is_array($region)) {
                 foreach ($region as $key1 => $sender) {
-                    $out4 = [
-                        'title' => is_array($sender) ? $key1 : $sender,
-                        'key' => is_array($sender) ? 1 : $key1,
-                        'folder' => is_array($sender) ? true : false,
-                        'expanded' => true
-                    ];
+                    $children_device = [];
                     if (is_array($sender)) {
                         foreach ($sender as $key2 => $device) {
-                            $children = [
+                            $children_device[] = [
                                 'title' => $device,
-                                'key' => $key2,
-                                'folder' => false
+                                'key' => (string)$key2,
+                                'folder' => false,
+                                'expanded' => true,
+                                'data' => [
+                                    'key_parent' => !empty($key1) ? (string)$key.".".$key1 : (string)$key
+                                ]
                             ];
-                            $out4['children'][] = $children;
                         }
                     }
-                    $out1['children'][] = $out4;
+                    if (!empty($key1)) {
+                        $findSender = GmsSenders::findOne($key1);
+                        $children_sender = [
+                            'title' => $findSender->sender_name,
+                            'key' => (string)$key.".".$key1,
+                            'folder' => true,
+                            'expanded' => true
+                        ];
+                        $children_sender['children'] = $children_device;
+                        $out['children'][] = $children_sender;
+                    } else {
+                        $out['children'] = $children_device;
+                    }
                 }
             }
-            $out3[] = $out1;
-            unset($out1);
+            $out2[] = $out;
         }
-        return $out3;
+        return $out2;
     }
 }

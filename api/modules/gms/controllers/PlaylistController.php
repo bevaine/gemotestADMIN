@@ -79,6 +79,7 @@ class PlaylistController extends ActiveController
             $modelDevices = new GmsDevices();
             $modelDevices->scenario = 'addDevice';
             $modelDevices->device = $dev;
+            $modelDevices->name = $dev;
             $modelDevices->auth_status = 0;
             $modelDevices->created_at = $date_db;
             $modelDevices->last_active_at = $date_db;
