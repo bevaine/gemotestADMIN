@@ -174,17 +174,21 @@ class Logins extends \yii\db\ActiveRecord
             }
         }
         if ($modelLpASs = $this->lpASs) {
-            if($this->Login !== $this->oldAttributes['Login']) {
-                $modelLpASs->login = $this->Login;
-            }
-            if($this->Pass !== $this->oldAttributes['Pass']) {
-                $modelLpASs->pass = $this->Pass;
-            }
-            if (!$modelLpASs->save()) {
-                Yii::getLogger()->log([
-                    'modelLpASs->save()'=>$modelLpASs->errors
-                ], Logger::LEVEL_ERROR, 'binary');
-                return false;
+            if (!empty($this->oldAttributes['Login']) &&
+                !empty($this->oldAttributes['Pass'])) {
+
+                if ($this->Login !== $this->oldAttributes['Login']) {
+                    $modelLpASs->login = $this->Login;
+                }
+                if ($this->Pass !== $this->oldAttributes['Pass']) {
+                    $modelLpASs->pass = $this->Pass;
+                }
+                if (!$modelLpASs->save()) {
+                    Yii::getLogger()->log([
+                        'modelLpASs->save()'=>$modelLpASs->errors
+                    ], Logger::LEVEL_ERROR, 'binary');
+                    return false;
+                }
             }
         }
         return true;
