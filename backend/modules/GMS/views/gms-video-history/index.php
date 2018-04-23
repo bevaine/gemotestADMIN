@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 id="my-player"
                 class="video-js"
                 preload="auto"
-                poster="../../img/logo.jpg"
+                poster="/img/logo.jpg"
                 width="783"
                 controls
                 data-setup='{ "inactivityTimeout": 0 }'>

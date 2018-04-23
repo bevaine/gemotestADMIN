@@ -2,18 +2,37 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use wbraganca\fancytree\FancytreeWidget;
 use yii\web\JsExpression;
 use common\models\GmsVideos;
-use common\components\helpers\FunctionsHelper;
-use mihaildev\ckeditor\Assets;
+use yii\helpers\Url;
 
 \backend\assets\GmsAsset::register($this);
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylist */
 /* @var $form yii\widgets\ActiveForm */
+
+if (!$model->isNewRecord) {
+    if (!empty($model->group_id)) {
+        $action = 'group';
+        $class_tab1 = "disabled";
+        $class_tab2 = "active";
+    } else {
+        $action = '';
+        $class_tab1 = "active";
+        $class_tab2 = "disabled";
+    }
+} else {
+    if ($action == "group") {
+        $class_tab1 = "";
+        $class_tab2 = "active";
+    } else {
+        $class_tab1 = "active";
+        $class_tab2 = "";
+    }
+}
 ?>
+
 <style type="text/css">
     span.fancytree-title {
         font-size: small;
@@ -41,31 +60,62 @@ use mihaildev\ckeditor\Assets;
 
     <div class="row">
         <div class="col-xs-7">
+            <div class="nav-tabs-custom">
+
+                <ul class="nav nav-tabs">
+                    <li class="<?= $class_tab1 ?>">
+                        <?= Html::a("Привязка к регион./отдел.",!$model->isNewRecord ? "#" : Url::to(["playlist/create"])) ?>
+                    </li>
+                    <li class="<?= $class_tab2 ?>">
+                        <?= Html::a("Привязка к группе", !$model->isNewRecord ? "#" : Url::to(["playlist/create/group"])) ?>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+                    <?php if ($action != 'group') { ?>
+                        <div class="tab-pane active" id="tab_1">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group region">
+                                        <?= $form->field($model, 'region')->dropDownList(\common\models\GmsRegions::getRegionList(), [
+                                            'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                        ]);
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group sender_id">
+                                        <?= $form->field($model, 'sender_id')->dropDownList([], [
+                                            'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                        ]);
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } else { ?>
+                        <div class="tab-pane active" id="tab_2">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group region">
+                                        <?= $form->field($model, 'group_id')->dropDownList(\common\models\GmsGroupDevices::getGroupList(), [
+                                            'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                        ]);
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
             <div class="box box-solid box-success">
                 <div class="box-header with-border">
                     <h3 class="box-title">Перетащите видо-ролики для шаблона плейлиста</h3>
                 </div>
                 <div class="box-body">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group region">
-                                <?= $form->field($model, 'region')->dropDownList(\common\models\GmsRegions::getRegionList(), [
-                                    'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                ]);
-                                ?>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group sender_id">
-                                <?= $form->field($model, 'sender_id')->dropDownList([], [
-                                    'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                ]);
-                                ?>
-                            </div>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="form-group type">
@@ -164,7 +214,6 @@ use mihaildev\ckeditor\Assets;
                 </div>
             </div>
         </div>
-
         <div class="col-xs-5">
             <div class="form-group">
                 <div class="box box-solid box-primary">
@@ -177,7 +226,7 @@ use mihaildev\ckeditor\Assets;
                                 class="video-js"
                                 controls
                                 preload="auto"
-                                poster="../../img/logo.jpg"
+                                poster="/img/logo.jpg"
                                 width="645"
                                 data-setup='{}'>
                             <p class="vjs-no-js">
@@ -216,7 +265,7 @@ $videof = [
         'key' => 'playList[all]',
         'folder' => true,
         'expanded' => true,
-        'icon' => '../../img/playlist.png',
+        'icon' => '/img/playlist.png',
         'children' => GmsVideos::getVideosTree()
     ]
 ];
@@ -227,7 +276,7 @@ $standartf =  [
         'key' => 'playList[1]',
         'folder' => true,
         'expanded' => true,
-        'icon' => '../../img/gemotest.jpg'
+        'icon' => '/img/gemotest.jpg'
     ]
 ];
 
@@ -237,7 +286,7 @@ $commercef =  [
         'key' => 'playList[1]',
         'folder' => true,
         'expanded' => true,
-        'icon' => '../../img/dollar.png'
+        'icon' => '/img/dollar.png'
     ]
 ];
 
@@ -265,6 +314,9 @@ $js1 = <<< JS
             },                
             source: {$videof},
             dblclick: function(event, data) {
+                if (data.node.isFolder()) {
+                    return false;
+                }
                 const playlistNode = tree2
                     .fancytree("getTree")
                     .getNodeByKey('playList[1]');
@@ -673,7 +725,7 @@ $js1 = <<< JS
             htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
         }
         myPlayer.reset();
-        myPlayer.poster("../../img/logo.jpg");
+        myPlayer.poster("/img/logo.jpg");
         myPlayer.width("645");
         
         $('#video-info')

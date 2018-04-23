@@ -19,7 +19,7 @@ $htmlPlayer = <<<HTML
             class="video-js"
             controls
             preload="auto"
-            poster="../../img/logo.jpg"
+            poster="/img/logo.jpg"
             width="783"
             data-setup='{}'>
             <source src="$model->file" type="$model->type"></source>

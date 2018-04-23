@@ -55,27 +55,38 @@ class PlaylistController extends Controller
     public function actionView($id)
     {
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $this->findModel($id)
         ]);
     }
 
     /**
-     * Creates a new GmsPlaylist model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param $param
+     * @return string|\yii\web\Response
      */
-    public function actionCreate()
+    public function actionCreate($param = null)
     {
         $model = new GmsPlaylist();
+        $model->scenario = 'addRegion';
+        if ($param == 'group') {
+            $model->scenario = 'addGroup';
+        }
 
         if ($model->load(Yii::$app->request->post())) {
-            //$model->created_at = time();
+            //print_r(Yii::$app->request->post());
             if ($model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect([
+                    'view',
+                    'id' => $model->id
+                ]);
+            } else {
+                Yii::getLogger()->log([
+                    '$model->save()'=>$model->errors
+                ], 1, 'binary');
             }
         }
         return $this->render('create', [
             'model' => $model,
+            'action' => $param
         ]);
     }
 
@@ -88,6 +99,11 @@ class PlaylistController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
+        $model->scenario = 'addRegion';
+        if (!empty($model->group_id)) {
+            $model->scenario = 'addGroup';
+        }
 
         if ($model->load(Yii::$app->request->post())) {
             //$model->updated_at = time();

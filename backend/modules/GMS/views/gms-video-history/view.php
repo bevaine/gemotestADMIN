@@ -21,7 +21,7 @@ $htmlPlayer = <<<HTML
         class="video-js"
         controls
         preload="auto"
-        poster="../../img/logo.jpg"
+        poster="/img/logo.jpg"
         width="783"
         data-setup='{}'>
     <source src="$videoFile" type="$videoType"></source>

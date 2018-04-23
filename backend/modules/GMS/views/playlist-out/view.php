@@ -155,7 +155,7 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                         class="video-js"
                         controls
                         preload="auto"
-                        poster="../../img/logo.jpg"
+                        poster="/img/logo.jpg"
                         width="660"
                         data-setup='{}'>
                     <p class="vjs-no-js">

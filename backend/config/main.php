@@ -145,6 +145,8 @@ return [
                 'POST /admin/logins/roles/<department>' => '/admin/logins/roles',
                 'GET /GMS/gms-devices/index/<param>' => '/GMS/gms-devices/index',
                 'POST /GMS/gms-devices/index/<param>' => '/GMS/gms-devices/index',
+                'GET /GMS/playlist/create/<param>' => '/GMS/playlist/create',
+                'POST /GMS/playlist/create/<param>' => '/GMS/playlist/create',
                 'GET /GMS/gms-devices/activate/<id:[\w\-]+>' => '/GMS/gms-devices/activate',
                 'GET /GMS/gms-devices/deactivate/<id:[\w\-]+>' => '/GMS/gms-devices/deactivate',
             ],

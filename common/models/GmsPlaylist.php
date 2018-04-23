@@ -18,6 +18,7 @@ use yii\log\Logger;
  * @property integer $region
  * @property integer $created_at
  * @property integer $updated_at
+ * @property integer $group_id
  * @property string $sender_id
  * @property string $jsonPlaylist
  * @property GmsRegions $regionModel
@@ -27,6 +28,21 @@ use yii\log\Logger;
 
 class GmsPlaylist extends \yii\db\ActiveRecord
 {
+    CONST SCENARIO_ADD_REGION = 'addRegion';
+    CONST SCENARIO_ADD_GROUP = 'addGroup';
+    //CONST SCENARIO_DEFAULT = 'default';
+
+    /**
+     * @return array
+     */
+    public function scenarios()
+    {
+        return [
+            self::SCENARIO_ADD_REGION => ['name', 'type', 'region', 'jsonPlaylist', 'sender_id', 'created_at', 'updated_at'],
+            self::SCENARIO_ADD_GROUP => ['name', 'type', 'group_id', 'jsonPlaylist', 'created_at', 'updated_at'],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -41,8 +57,10 @@ class GmsPlaylist extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['name', 'type', 'region', 'jsonPlaylist'], 'required', 'on' => 'addRegion'],
+            [['name', 'type', 'group_id', 'jsonPlaylist'], 'required', 'on' => 'addGroup'],
             [['region', 'type'], 'required'],
-            [['type', 'region', 'created_at', 'updated_at', 'sender_id'], 'integer'],
+            [['type', 'region', 'created_at', 'updated_at', 'sender_id', 'group_id'], 'integer'],
             [['name', 'file'], 'string', 'max' => 255],
             [['jsonPlaylist'], 'string'],
         ];
@@ -73,7 +91,8 @@ class GmsPlaylist extends \yii\db\ActiveRecord
             'updated_at' => 'Дата редактирования',
             'jsonPlaylist' => 'Плейлист',
             'sender_id' => 'Код отделения',
-            'sender_name' => 'Отделение'
+            'sender_name' => 'Отделение',
+            'group_id' => 'Номер группы'
         ];
     }
 
@@ -100,6 +119,14 @@ class GmsPlaylist extends \yii\db\ActiveRecord
     public function getSenderModel()
     {
         return $this->hasOne(GmsSenders::className(), ['id' => 'sender_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupDevicesModel()
+    {
+        return $this->hasMany(GmsGroupDevices::className(), ['id' => 'group_id']);
     }
 
     /**

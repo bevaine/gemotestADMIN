@@ -422,7 +422,7 @@ $this->registerCss($css);
                                 class="video-js"
                                 controls
                                 preload="auto"
-                                poster="../../img/logo.jpg"
+                                poster="/img/logo.jpg"
                                 width="783"
                                 data-setup='{}'>
                             <p class="vjs-no-js">
@@ -490,7 +490,7 @@ if ($model->isNewRecord) {
             'key' => 'playlist',
             'folder' => true,
             'expanded' => true,
-            'icon' => '../../img/video1.png'
+            'icon' => '/img/video1.png'
         ]
     ];
     $source = json_encode($source);
@@ -509,7 +509,7 @@ $js1 = <<< JS
             "key" : "playlist", 
             "folder" : true, 
             "expanded" : true, 
-            "icon" : "../../img/video1.png"
+            "icon" : "/img/video1.png"
         }
     ];
 
@@ -523,7 +523,7 @@ $js1 = <<< JS
             htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
         }
         myPlayer.reset();
-        myPlayer.poster("../../img/logo.jpg");
+        myPlayer.poster("/img/logo.jpg");
         myPlayer.width("783");
         
         $('#video-info')
@@ -653,7 +653,7 @@ $js1 = <<< JS
                     if (icon !== '') {
                         const span = $(node.span);
                         span.find("> span.fancytree-icon").css({
-                            backgroundImage: "url(../../img/" + icon + ")",
+                            backgroundImage: "url(/img/" + icon + ")",
                             backgroundPosition: "0 0"
                         });
                     }
@@ -860,7 +860,7 @@ $js1 = <<< JS
                     tdList.eq(0).text(++i).addClass("alignRight");
                 } else if (this.data.type === '2') {
                     tdList.eq(0).append().css({
-                        backgroundImage: "url(../../img/rand.png)",
+                        backgroundImage: "url(/img/rand.png)",
                         backgroundPosition: "0 0",
                         backgroundRepeat: "no-repeat"
                     });
