@@ -1156,7 +1156,10 @@ $js1 = <<< JS
         arrOutPls["folder"] = "true";
         arrOutPls["expanded"] = "true"; 
         arrOutPls["children"] = arrChildrenOnePls;
+        
+        let d = tree.toDict(true);
         const jsonStrPls = JSON.stringify(arrOutPls);
+        //const jsonStrPls = JSON.stringify(d.children);
         
         if (inputVar.is("#gmsplaylistout-jsonplaylist")) {
             $("#gmsplaylistout-jsonplaylist").remove();

@@ -22,11 +22,42 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
+            'group_id',
             'group_name',
-            'device_id',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        /** @var \common\models\GmsGroupDevices $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'GMS/gms-group-devices/view',
+                            'group_id' => $model['group_id']
+                        ]);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                    },
+                    'update' => function ($url, $model) {
+                        /** @var \common\models\GmsGroupDevices $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'GMS/gms-group-devices/update',
+                            'group_id' => $model['group_id']
+                        ]);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                    },
+                    'delete' => function ($url, $model) {
+                        /** @var \common\models\GmsGroupDevices $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'GMS/gms-group-devices/delete',
+                            'group_id' => $model['group_id']
+                        ]);
+                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-trash"></span>', $customurl,
+                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                    },
+
+                ],
+            ],
         ],
     ]); ?>
 </div>

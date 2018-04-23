@@ -10,9 +10,15 @@ use Yii;
  * @property int $id
  * @property string $group_name
  * @property int $device_id
+ * @property string $group_json
+ * @property string $group_id
+ * @property string $parent_key
+ * @property GmsDevices $device
  */
 class GmsGroupDevices extends \yii\db\ActiveRecord
 {
+    public $group_json;
+
     /**
      * @inheritdoc
      */
@@ -29,8 +35,8 @@ class GmsGroupDevices extends \yii\db\ActiveRecord
         return [
             [['group_name', 'device_id'], 'required'],
             [['device_id'], 'default', 'value' => null],
-            [['device_id'], 'integer'],
-            [['group_name'], 'string', 'max' => 255],
+            [['device_id', 'group_id'], 'integer'],
+            [['group_name', 'group_json', 'parent_key'], 'string', 'max' => 255],
         ];
     }
 
@@ -41,8 +47,18 @@ class GmsGroupDevices extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'group_id' => 'Номер группы',
             'group_name' => 'Название',
             'device_id' => 'Устройство',
+            'parent_key' => 'Родитель'
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDevice()
+    {
+        return $this->hasOne(GmsDevices::className(), ['device' => 'device_id']);
     }
 }

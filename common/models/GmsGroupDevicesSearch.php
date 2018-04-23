@@ -18,7 +18,7 @@ class GmsGroupDevicesSearch extends GmsGroupDevices
     public function rules()
     {
         return [
-            [['id', 'device_id'], 'integer'],
+            [['id', 'device_id', 'group_id'], 'integer'],
             [['group_name'], 'safe'],
         ];
     }
@@ -41,7 +41,9 @@ class GmsGroupDevicesSearch extends GmsGroupDevices
      */
     public function search($params)
     {
-        $query = GmsGroupDevices::find();
+        $query = GmsGroupDevices::find()
+            ->select(['group_name', 'group_id'])
+            ->distinct();
 
         // add conditions that should always apply here
 
@@ -61,6 +63,7 @@ class GmsGroupDevicesSearch extends GmsGroupDevices
         $query->andFilterWhere([
             'id' => $this->id,
             'device_id' => $this->device_id,
+            'group_id' => $this->group_id,
         ]);
 
         $query->andFilterWhere(['ilike', 'group_name', $this->group_name]);

@@ -8,6 +8,8 @@ use common\models\GmsGroupDevicesSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\db\Exception;
+use yii\log\Logger;
 
 /**
  * GmsGroupDevicesController implements the CRUD actions for GmsGroupDevices model.
@@ -65,60 +67,126 @@ class GmsGroupDevicesController extends Controller
     public function actionCreate()
     {
         $model = new GmsGroupDevices();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        $rowInsert = [];
+        if ($model->load(Yii::$app->request->post())) {
+            $json = json_decode($model->group_json);
+            $max = (int)GmsGroupDevices::find()->max('group_id');
+            $max += 1;
+            foreach ($json[0]->children as $children) {
+                $rowInsert[] = [
+                    'group_name' => $json[0]->title,
+                    'group_id' => $max,
+                    'device_id' => $children->key,
+                    'parent_key' => $children->data->key_parent,
+                ];
+            }
+            if (!empty($rowInsert)) {
+                try {
+                    Yii::$app->db->createCommand()->batchInsert(
+                        GmsGroupDevices::tableName(),
+                        array_keys($rowInsert[0]),
+                        $rowInsert
+                    )->execute();
+                } catch (Exception $e) {
+                    Yii::getLogger()->log([
+                        'GmsGroupDevices->batchInsert'=>$e->getMessage()
+                    ], Logger::LEVEL_ERROR, 'binary');
+                }
+                return $this->redirect(['view', 'group_id' => $max]);
+            }
         }
-
         return $this->render('create', [
             'model' => $model,
         ]);
     }
 
     /**
-     * Updates an existing GmsGroupDevices model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $group_id
+     * @return string|\yii\web\Response
      */
-    public function actionUpdate($id)
+    public function actionUpdate($group_id)
     {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (!$findModel = $this->findModel($group_id)) {
+            return $this->redirect(['index']);
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        if ($dataArr = $this->addJson($findModel)) {
+            return $this->render('update', [
+                'dataArr' => $dataArr,
+            ]);
+        } else {
+            return $this->redirect(['index']);
+        }
     }
 
     /**
-     * Deletes an existing GmsGroupDevices model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $findModel
+     * @return array
      */
-    public function actionDelete($id)
+    public function addJson($findModel)
     {
-        $this->findModel($id)->delete();
+        $group_id = '';
+        $group_name = '';
+        $row_json = [];
+
+        /** @var GmsGroupDevices $model */
+        foreach ($findModel as $model) {
+            $group_name = $model->group_name;
+            $group_id = $model->group_id;
+            $row_json[] = [
+                'title' => $model->device->name,
+                'folder' => false,
+                'key' => (string)$model->device_id,
+                'data' => [
+                    'parent_key' => $model->parent_key
+                ]
+            ];
+        }
+        $json = [
+            'title' => $group_name,
+            'folder' => true,
+            'key' => 'group',
+            'children' => $row_json,
+            'expanded' => true
+        ];
+        return [
+            'group_id' => $group_id,
+            'group_name' => $group_name,
+            'json' => json_encode(array($json), JSON_UNESCAPED_UNICODE)
+        ];
+    }
+
+    /**
+     * @param $group_id
+     * @return bool
+     */
+    static function deleteGroup($group_id)
+    {
+        if (!empty($group_id))
+            GmsGroupDevices::deleteAll(['group_id' => $group_id]);
+
+        return true;
+    }
+
+    /**
+     * @param $group_id
+     * @return \yii\web\Response
+     */
+    public function actionDelete($group_id)
+    {
+        $this->deleteGroup($group_id);
 
         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the GmsGroupDevices model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return GmsGroupDevices the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $group_id
+     * @return static[]
+     * @throws NotFoundHttpException
      */
-    protected function findModel($id)
+    protected function findModel($group_id)
     {
-        if (($model = GmsGroupDevices::findOne($id)) !== null) {
+        if (($model = GmsGroupDevices::findAll(['group_id' => $group_id])) !== null) {
             return $model;
         }
 

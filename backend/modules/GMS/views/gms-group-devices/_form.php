@@ -6,13 +6,12 @@ use yii\web\JsExpression;
 use wbraganca\fancytree\FancytreeWidget;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\GmsGroupDevices */
+/* @var $dataArr array */
 /* @var $form yii\widgets\ActiveForm */
 ?>
-
 <div class="gms-group-devices-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id' => 'form']); ?>
 
     <div class="row">
         <div class="col-lg-5">
@@ -79,7 +78,7 @@ use wbraganca\fancytree\FancytreeWidget;
                                     'preventRecursiveMoves' => true,
                                     'autoExpandMS' => 400,
                                     'dragStart' => new JsExpression('function(node, data) {
-                                        return !node.isFolder();
+                                        return true;
                                     }'),
                                     'dragEnter' => new JsExpression('function(node, data) {
                                         return true;
@@ -98,7 +97,7 @@ use wbraganca\fancytree\FancytreeWidget;
     </div>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::Button('Сохранить', ['class' => 'btn btn-success']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>
@@ -106,19 +105,48 @@ use wbraganca\fancytree\FancytreeWidget;
 </div>
 
 <?php
-$standartf = [
-    [
-        'title' => 'Новая группа',
-        'key' => 'group',
-        'folder' => true,
-    ]
-];
-$standartf = json_encode($standartf);
+$standartf = '';
+if ($model->isNewRecord) {
+    $standartf = [
+        [
+            'title' => 'Новая группа',
+            'key' => 'group',
+            'folder' => true,
+            "autoCollapse" => true,
+        ]
+    ];
+    $standartf = json_encode($standartf);
+} elseif (!empty($dataArr['json']))
+{
+    $standartf = new JsExpression($dataArr['json']);
+}
 
 $js1 = <<< JS
     
     const tree1 = $("#devices_group");
+    const childrenJson = {$standartf};
+    
+    $(".btn-success").click(function() { 
+        const tree = $("#devices_group")
+            .fancytree("getTree"),
+            inputVar = $("input");
         
+        let nodeJSON = tree.toDict(true);
+        if (nodeJSON.children !== null) {
+            const jsonStrDev = JSON.stringify(nodeJSON.children);
+            if (inputVar.is("#gmsgroupdevices-groupjson")) {
+                $("#gmsgroupdevices-groupjson").remove();
+            }
+            $("<input>").attr({
+                type: "hidden",
+                id: "gmsgroupdevices-groupjson",
+                name: "GmsGroupDevices[group_json]",
+                value: jsonStrDev
+            }).appendTo("form");  
+            $("#form").submit();
+        }
+    });  
+    
     $(function()
     {
         tree1.fancytree({
@@ -128,9 +156,8 @@ $js1 = <<< JS
                 nodeColumnIdx: 1,
                 checkboxColumnIdx: 0
             },                
-            source: {$standartf},
+            source: childrenJson,
             dblclick: function(event, data) {
-
             },
             beforeActivate: function(event, data) {
             },
@@ -176,9 +203,8 @@ $js1 = <<< JS
                 dragOver : function(node, data) {
                 },
                 dragDrop : function(node, data) {
-                    console.log(data);
                     if (data.otherNode) 
-                    {                                        
+                    {       
                         let sameTree = (data.otherNode.tree === data.tree);
                         const playlistNode = data.tree.getNodeByKey('group');
 
@@ -218,14 +244,25 @@ $js1 = <<< JS
         tree1.delegate("span[id=trash-node]", "click", function(e){
             const node = $.ui.fancytree.getNode(e), tdList = $(node.tr);
             const tree2 = $("#fancyree_devices_all").fancytree("getTree");
-            const playlistNode = tree2.getNodeByKey(node.data.key_parent);
-            node.moveTo(playlistNode, "child");
-            playlistNode.setExpanded();
-            tdList.remove();
-            e.stopPropagation();
-            node.render(true);
+            if (node.data.key_parent !== undefined) {
+                const playlistNode = tree2.getNodeByKey(node.data.key_parent);
+                node.moveTo(playlistNode, "child");
+                playlistNode.setExpanded();
+                tdList.remove();
+                e.stopPropagation();
+                node.render(true);                
+            }
         });
     });
+    
+    $(document).ready(function()
+    {
+        const tree2 = $("#fancyree_devices_all").fancytree("getTree");
+        $.each(childrenJson[0].children, function(index, children1) {
+            const node = tree2.getNodeByKey(children1.key);
+            if (node !== null) node.remove();
+        });  
+    });  
 JS;
 
 $this->registerJs($js1);
