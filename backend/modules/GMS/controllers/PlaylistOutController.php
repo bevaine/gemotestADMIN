@@ -79,11 +79,10 @@ class PlaylistOutController extends Controller
     }
 
     /**
-     * Creates a new GmsPlaylistOut model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @param null $param
+     * @return string|\yii\web\Response
      */
-    public function actionCreate()
+    public function actionCreate($param = null)
     {
         $model = new GmsPlaylistOut();
 
@@ -92,6 +91,7 @@ class PlaylistOutController extends Controller
         } else {
             return $this->render('create', [
                 'model' => $model,
+                'action' => $param
             ]);
         }
     }

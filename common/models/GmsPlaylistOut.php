@@ -36,6 +36,7 @@ use yii\helpers\Url;
  * @property integer $is_friday
  * @property integer $is_saturday
  * @property integer $is_sunday
+ * @property integer $group_id
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsDevices $deviceModel
@@ -85,7 +86,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     {
         return [
             [['region_id', 'jsonPlaylist', 'jsonKodi', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
-            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],
+            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday', 'group_id'], 'integer'],
             [['name', 'jsonPlaylist', 'jsonKodi'], 'string'],
             [['date_start', 'date_end', 'time_start', 'time_end', 'region_id'], 'required', 'on' => 'default'],
             [['date_start', 'date_end','time_start', 'time_end'], 'filter', 'filter' => function ($value) {
@@ -142,6 +143,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             'sender_name' => 'Отделение',
             'date_start_val' => 'Дата старт',
             'date_end_val' => 'Дата стоп',
+            'group_id' => 'Номер группы'
         ];
     }
 

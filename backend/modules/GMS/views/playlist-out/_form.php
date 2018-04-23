@@ -2,20 +2,37 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
-use common\models\Doctors;
-use kartik\select2;
 use kartik\date\DatePicker;
-use kartik\time\TimePicker;
 use kartik\form\ActiveForm;
 use yii\web\JsExpression;
 use wbraganca\fancytree\FancytreeWidget;
-use mihaildev\ckeditor\Assets;
 
 \backend\assets\GmsAsset::register($this);
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylistOut */
+/* @var $action string
 /* @var $form yii\widgets\ActiveForm */
+
+if (!$model->isNewRecord) {
+    if (!empty($model->group_id)) {
+        $action = 'group';
+        $class_tab1 = "disabled";
+        $class_tab2 = "active";
+    } else {
+        $action = '';
+        $class_tab1 = "active";
+        $class_tab2 = "disabled";
+    }
+} else {
+    if ($action == "group") {
+        $class_tab1 = "";
+        $class_tab2 = "active";
+    } else {
+        $class_tab1 = "active";
+        $class_tab2 = "";
+    }
+}
 
 $layout = <<< HTML
     {input1}
@@ -80,10 +97,179 @@ $css = <<<CSS
 CSS;
 $this->registerCss($css);
 
-?>
-<style type="text/css">
+$html = <<<HTML
+<div class="row">
+    <div class="col-lg-6">
+        <div class="form-group">
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Стандартный шаблон плейлиста</h3>
+                </div>
+                <div class="box-body">
+HTML;
+                $html .= FancytreeWidget::widget([
+                    'id' => 'template_region',
+                    'options' =>[
+                        'disabled' => true,
+                        'source' => [
+                            [
+                                'title' => 'уточните параметры для отображения',
+                                'folder' => false,
+                            ]
+                        ],
+                        'extensions' => ['dnd'],
+                        'dblclick' => new JsExpression('function(node, data) {
+                            if (!data.node.isFolder()) {
+                                const playlistNode = $("#treetable")
+                                    .fancytree("getTree")
+                                    .getNodeByKey("playlist"),
+                                    addChild = [];
+                                addChild.push(data.node);
+                                playlistNode.addNode(addChild, "child");
+                            }
+                        }'),
+                        'dnd' => [
+                            'preventVoidMoves' => true,
+                            'preventRecursiveMoves' => true,
+                            'autoExpandMS' => 400,
+                            'dragStart' => new JsExpression('function(node, data) {
+                                if (!data.tree.options.disabled) {
+                                    return true;
+                                    return !node.isFolder();
+                                } else return false;
+                            }'),
+                            'dragEnter' => new JsExpression('function(node, data) {
+                                return true;
+                            }'),
+                            'dragDrop' => new JsExpression('function(node, data) {
+                                return false;
+                            }'),
+                        ],
+                    ]
+                ]);
+$html .= <<<HTML
+                </div>
+            </div>
+        </div>
+    </div>
 
-</style>
+    <div class="col-lg-6">
+        <div class="form-group">
+            <div class="box box-warning">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Коммерческий шаблон плейлиста</h3>
+                </div>
+                <div class="box-body">
+HTML;
+                $html .= FancytreeWidget::widget([
+                    'id' => 'template_commercial',
+                    'options' =>[
+                        'disabled' => true,
+                        'source' => [
+                            [
+                                'title' => 'уточните параметры для отображения',
+                                'folder' => false,
+                            ]
+                        ],
+                        'extensions' => ['dnd'],
+                        'dblclick' => new JsExpression('function(node, data) {
+                            if (!data.node.isFolder()) {
+                                const playlistNode = $("#treetable")
+                                    .fancytree("getTree")
+                                    .getNodeByKey("playlist"),
+                                    addChild = [];
+                                data.node.moveTo(playlistNode, "child");
+                            }
+                        }'),
+                        'dnd' => [
+                            'preventVoidMoves' => true,
+                            'preventRecursiveMoves' => true,
+                            'autoExpandMS' => 400,
+                            'dragStart' => new JsExpression('function(node, data) {
+                                if (!data.tree.options.disabled) {
+                                    return !node.isFolder();
+                                } else return false;
+                            }'),
+                            'dragEnter' => new JsExpression('function(node, data) {
+                                return true;
+                            }'),
+                            'dragDrop' => new JsExpression('function(node, data) {
+                                return false;
+                            }'),
+                            'dragEnd' => new JsExpression('function(node, data) {
+                            }'),
+                        ],
+                    ]
+                ]);
+$html .= <<<HTML
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="form-group">
+            <div class="box box-success">
+                <div class="box-header with-border">
+                    <h3 class="box-title">Окончательный плейлист</h3>
+                </div>
+                <div class="box-body">
+                    <table id="treetable">
+                        <colgroup>
+                            <col width="50px">
+                            <col width="500px">
+                            <col width="150px">
+                            <col width="100px">
+                            <col width="70px">
+                            <col width="70px">
+                            <col width="30px">
+                        </colgroup>
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Плейлист</th>
+                            <th>Тип ролика</th>
+                            <th>Продолжител.</th>
+                            <th>Кол-во показ.</th>
+                            <th>Общая продолж.</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td style="text-align: center;"></td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr>
+                                <th style="font-size: smaller">Итого:</th>
+                                <th style="font-size: smaller" colspan="1">
+                                    <span class="day-summ" id="day-summ"></span>
+                                </th>
+                                <th style="text-align: right;" colspan="3">
+                                    <span style="padding: 4px" class="error_span" id="error_span"></span>
+                                </th>
+                                <th>
+                                    <div class="duration-summ" id="duration-summ"></div>
+                                </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+HTML;
+?>
 
 <div class="gms-playlist-out-form">
 
@@ -203,196 +389,55 @@ $this->registerCss($css);
 
                 </div>
             </div>
-            <div class="box box-solid box-success">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Выберите регион (отделение) для отображения доступных шаблонов</h3>
-                </div>
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group region">
-                                <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), ['prompt' => '---']); ?>
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <div class="form-group sender_id">
-                                <?= $form->field($model, 'sender_id')->dropDownList([], ['prompt' => '---']); ?>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <div class="box box-primary">
-                                    <div class="box-header with-border">
-                                        <h3 class="box-title">Стандартный шаблон плейлиста</h3>
+            <div class="nav-tabs-custom">
+
+                <ul class="nav nav-tabs">
+                    <li class="<?= $class_tab1 ?>">
+                        <?= Html::a("Привязка к регион./отдел.",!$model->isNewRecord ? "#" : Url::to(["playlist-out/create"])) ?>
+                    </li>
+                    <li class="<?= $class_tab2 ?>">
+                        <?= Html::a("Привязка к группе", !$model->isNewRecord ? "#" : Url::to(["playlist-out/create/group"])) ?>
+                    </li>
+                </ul>
+
+                <div class="tab-content">
+
+                    <?php if ($action != 'group') { ?>
+                        <div class="tab-pane active" id="tab_1">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group region">
+                                        <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), ['prompt' => '---']); ?>
                                     </div>
-                                    <div class="box-body">
-                                        <?php
-                                        echo FancytreeWidget::widget([
-                                            'id' => 'template_region',
-                                            'options' =>[
-                                                'disabled' => true,
-                                                'source' => [
-                                                    [
-                                                        'title' => 'уточните параметры для отображения',
-                                                        'folder' => false,
-                                                    ]
-                                                ],
-                                                'extensions' => ['dnd'],
-                                                'dblclick' => new JsExpression('function(node, data) {
-                                                    if (!data.node.isFolder()) {
-                                                        const playlistNode = $("#treetable")
-                                                            .fancytree("getTree")
-                                                            .getNodeByKey("playlist"),
-                                                            addChild = [];
-                                                        addChild.push(data.node);
-                                                        playlistNode.addNode(addChild, "child");
-                                                    }
-                                                }'),
-                                                'dnd' => [
-                                                    'preventVoidMoves' => true,
-                                                    'preventRecursiveMoves' => true,
-                                                    'autoExpandMS' => 400,
-                                                    'dragStart' => new JsExpression('function(node, data) {
-                                                        if (!data.tree.options.disabled) {
-                                                            return true;
-                                                            return !node.isFolder();
-                                                        } else return false;
-                                                    }'),
-                                                    'dragEnter' => new JsExpression('function(node, data) {
-                                                        return true;
-                                                    }'),
-                                                    'dragDrop' => new JsExpression('function(node, data) {
-                                                        return false;
-                                                    }'),
-                                                ],
-                                            ]
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group sender_id">
+                                        <?= $form->field($model, 'sender_id')->dropDownList([], ['prompt' => '---']); ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <?= $html ?>
+                        </div>
+                    <?php } else { ?>
+                        <div class="tab-pane active" id="tab_2">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group group_id">
+                                        <?= $form->field($model, 'group_id')->dropDownList(\common\models\GmsGroupDevices::getGroupList(), [
+                                            'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
                                         ]);
                                         ?>
                                     </div>
                                 </div>
                             </div>
+                            <?= $html ?>
                         </div>
+                    <?php } ?>
 
-                        <div class="col-lg-6">
-                            <div class="form-group">
-                                <div class="box box-warning">
-                                    <div class="box-header with-border">
-                                        <h3 class="box-title">Коммерческий шаблон плейлиста</h3>
-                                    </div>
-                                    <div class="box-body">
-                                        <?php
-                                        echo FancytreeWidget::widget([
-                                            'id' => 'template_commercial',
-                                            'options' =>[
-                                                'disabled' => true,
-                                                'source' => [
-                                                    [
-                                                        'title' => 'уточните параметры для отображения',
-                                                        'folder' => false,
-                                                    ]
-                                                ],
-                                                'extensions' => ['dnd'],
-                                                'dblclick' => new JsExpression('function(node, data) {
-                                                    if (!data.node.isFolder()) {
-                                                        const playlistNode = $("#treetable")
-                                                            .fancytree("getTree")
-                                                            .getNodeByKey("playlist"),
-                                                            addChild = [];
-                                                        data.node.moveTo(playlistNode, "child");
-                                                    }
-                                                }'),
-                                                'dnd' => [
-                                                    'preventVoidMoves' => true,
-                                                    'preventRecursiveMoves' => true,
-                                                    'autoExpandMS' => 400,
-                                                    'dragStart' => new JsExpression('function(node, data) {
-                                                        if (!data.tree.options.disabled) {
-                                                            return !node.isFolder();
-                                                        } else return false;
-                                                    }'),
-                                                    'dragEnter' => new JsExpression('function(node, data) {
-                                                        return true;
-                                                    }'),
-                                                    'dragDrop' => new JsExpression('function(node, data) {
-                                                        return false;
-                                                    }'),
-                                                    'dragEnd' => new JsExpression('function(node, data) {
-                                                    }'),
-                                                ],
-                                            ]
-                                        ]);
-                                        ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="form-group">
-                                <div class="box box-success">
-                                    <div class="box-header with-border">
-                                        <h3 class="box-title">Окончательный плейлист</h3>
-                                    </div>
-                                    <div class="box-body">
-                                        <table id="treetable">
-                                            <colgroup>
-                                                <col width="50px">
-                                                <col width="500px">
-                                                <col width="150px">
-                                                <col width="100px">
-                                                <col width="70px">
-                                                <col width="70px">
-                                                <col width="30px">
-                                            </colgroup>
-                                            <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Плейлист</th>
-                                                <th>Тип ролика</th>
-                                                <th>Продолжител.</th>
-                                                <th>Кол-во показ.</th>
-                                                <th>Общая продолж.</th>
-                                                <th></th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td style="text-align: center;"></td>
-                                                </tr>
-                                            </tbody>
-                                            <thead>
-                                                <tr>
-                                                    <th style="font-size: smaller">Итого:</th>
-                                                    <th style="font-size: smaller" colspan="1">
-                                                        <span class="day-summ" id="day-summ"></span>
-                                                    </th>
-                                                    <th style="text-align: right;" colspan="3">
-                                                        <span style="padding: 4px" class="error_span" id="error_span"></span>
-                                                    </th>
-                                                    <th>
-                                                        <div class="duration-summ" id="duration-summ"></div>
-                                                    </th>
-                                                    <th></th>
-                                                </tr>
-                                            </thead>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
+
             <div class="box box-solid box-default">
                 <div class="box-header with-border">
                     <h3 class="box-title">Привязка устройства</h3>
@@ -439,31 +484,8 @@ $this->registerCss($css);
                     </div>
                 </div>
             </div>
-
-
         </div>
     </div>
-
-    <?php
-//    edofre\fullcalendar\Fullcalendar::widget([
-//        'options'       => [
-//            'id'       => 'calendar',
-//            'language' => 'ru',
-//        ],
-//        'clientOptions' => [
-//            'weekNumbers' => true,
-//            'selectable'  => true,
-//            'defaultView' => 'agendaWeek',
-//            'eventResize' => new JsExpression("
-//                function(event, delta, revertFunc, jsEvent, ui, view) {
-//                    console.log(event);
-//                }
-//            "),
-//
-//        ],
-//        'events' => Url::to(['calendar/events', 'id' => 1]),
-//    ]);
-    ?>
 
     <div class="form-group">
         <?= Html::Button($model->isNewRecord ? 'Создать' : 'Сохранить', ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
@@ -1029,7 +1051,7 @@ $js1 = <<< JS
         outTree.reload(newPlayList);      
     }
     
-    function setTreeData (region = null, sender = null) 
+    function setTreeData (region = null, sender = null, group = null) 
     {
         const regionObject = $("#fancyree_template_region");
         const regionTree = regionObject.fancytree("getTree");
@@ -1046,7 +1068,8 @@ $js1 = <<< JS
             data: {
                 region: region,
                 sender_id: sender,
-                pls_out_id: {$pls_id}
+                pls_out_id: {$pls_id},
+                group_id: group
             },
             success: function (res) {
                 if (res !== 'null') {
@@ -1348,6 +1371,11 @@ $js1 = <<< JS
             disableTree();
             setDevice ($('#gmsplaylistout-region_id').val(), $(this).val());
             setTreeData ($('#gmsplaylistout-region_id').val(), $(this).val());
+        });
+        
+        $(".group_id select").change(function() {
+            disableTree();
+            setTreeData (null, null, $(this).val());
         });
     
         $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker({ 

@@ -99,7 +99,7 @@ if (!$model->isNewRecord) {
                         <div class="tab-pane active" id="tab_2">
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <div class="form-group region">
+                                    <div class="form-group group_id">
                                         <?= $form->field($model, 'group_id')->dropDownList(\common\models\GmsGroupDevices::getGroupList(), [
                                             'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
                                         ]);
