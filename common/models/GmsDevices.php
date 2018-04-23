@@ -158,7 +158,7 @@ class GmsDevices extends \yii\db\ActiveRecord
                                 'folder' => false,
                                 'expanded' => true,
                                 'data' => [
-                                    'key_parent' => !empty($key1) ? (string)$key.".".$key1 : (string)$key
+                                    'parent_key' => !empty($key1) ? (string)$key.".".$key1 : (string)$key
                                 ]
                             ];
                         }

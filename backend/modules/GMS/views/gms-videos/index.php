@@ -198,7 +198,6 @@ $js1 = <<< JS
                         html_button += ' onClick="deleteItem(' + video_key + ')">';
                         html_button += '<span class="glyphicon glyphicon-ok"></span> Ok';
                         html_button += '</button>';
-
                     }                        
                     $('#bootstrap-dialog-message').html(message);  
                     $('#bootstrap-dialog-footer-buttons').html(button_cancel + html_button); 

@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             'group_id' => $model['group_id']
                         ]);
                         return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $customurl,
-                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                            ['title' => Yii::t('yii', 'Update'), 'data-pjax' => '0']);
                     },
                     'delete' => function ($url, $model) {
                         /** @var \common\models\GmsGroupDevices $model */
@@ -53,9 +53,14 @@ $this->params['breadcrumbs'][] = $this->title;
                             'group_id' => $model['group_id']
                         ]);
                         return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-trash"></span>', $customurl,
-                            ['title' => Yii::t('yii', 'View'), 'data-pjax' => '0']);
+                            [
+                                'title' => Yii::t('yii', 'Delete'),
+                                'data-pjax' => '0',
+                                'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                                'data-method' => 'post',
+                            ]
+                        );
                     },
-
                 ],
             ],
         ],

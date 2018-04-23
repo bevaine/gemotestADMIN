@@ -2,36 +2,65 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use wbraganca\fancytree\FancytreeWidget;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
-/* @var $model common\models\GmsGroupDevices */
+/* @var $dataArr array */
 
-$this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Gms Group Devices', 'url' => ['index']];
+$this->title = $dataArr['group_name'];
+$this->params['breadcrumbs'][] = ['label' => 'Группы устройств', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <div class="gms-group-devices-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Редактировать', ['update', 'group_id' => $dataArr['group_id']], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'group_id' => $dataArr['group_id']], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
                 'method' => 'post',
             ],
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'group_name',
-            'device_id',
-        ],
-    ]) ?>
-
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="form-group">
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Группа устройств</h3>
+                    </div>
+                    <div class="box-body">
+                        <?php
+                        echo FancytreeWidget::widget([
+                            'id' => 'devices_group',
+                            'options' =>[
+                                'disabled' => false,
+                                'source' => !empty($dataArr['json']) ? json_decode($dataArr['json']) : [],
+                                'extensions' => ['dnd'],
+                                'dnd' => [
+                                    'preventVoidMoves' => true,
+                                    'preventRecursiveMoves' => true,
+                                    'autoExpandMS' => 400,
+                                    'dragStart' => new JsExpression('function(node, data) {
+                                        return false;
+                                    }'),
+                                    'dragEnter' => new JsExpression('function(node, data) {
+                                        return true;
+                                    }'),
+                                    'dragDrop' => new JsExpression('function(node, data) {
+                                        return false;
+                                    }'),
+                                ],
+                            ]
+                        ]);
+                        ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

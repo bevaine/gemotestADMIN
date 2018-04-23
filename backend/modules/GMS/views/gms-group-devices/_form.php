@@ -9,6 +9,32 @@ use wbraganca\fancytree\FancytreeWidget;
 /* @var $dataArr array */
 /* @var $form yii\widgets\ActiveForm */
 ?>
+<div class="modal bootstrap-dialog type-warning fade size-normal in" id="modal-dialog" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="bootstrap-dialog-header">
+                    <div class="bootstrap-dialog-close-button" style="display: none;">
+                        <button class="close" aria-label="close">×</button>
+                    </div>
+                    <div class="bootstrap-dialog-title" id="w1_title">Подтверждение</div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="bootstrap-dialog-body">
+                    <div class="bootstrap-dialog-message" id="bootstrap-dialog-message">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="bootstrap-dialog-footer">
+                    <div class="bootstrap-dialog-footer-buttons" id="bootstrap-dialog-footer-buttons"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="gms-group-devices-form">
 
     <?php $form = ActiveForm::begin(['id' => 'form']); ?>
@@ -18,7 +44,7 @@ use wbraganca\fancytree\FancytreeWidget;
             <div class="form-group">
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Новая группа</h3>
+                        <h3 class="box-title">Группа устройств</h3>
                     </div>
                     <div class="box-body">
                         <div class="box-body">
@@ -105,8 +131,9 @@ use wbraganca\fancytree\FancytreeWidget;
 </div>
 
 <?php
-$standartf = '';
-if ($model->isNewRecord) {
+if (!empty($dataArr['json'])){
+    $standartf = new JsExpression($dataArr['json']);
+} else {
     $standartf = [
         [
             'title' => 'Новая группа',
@@ -116,9 +143,6 @@ if ($model->isNewRecord) {
         ]
     ];
     $standartf = json_encode($standartf);
-} elseif (!empty($dataArr['json']))
-{
-    $standartf = new JsExpression($dataArr['json']);
 }
 
 $js1 = <<< JS
@@ -127,12 +151,16 @@ $js1 = <<< JS
     const childrenJson = {$standartf};
     
     $(".btn-success").click(function() { 
-        const tree = $("#devices_group")
-            .fancytree("getTree"),
+        const tree = tree1.fancytree("getTree"),
             inputVar = $("input");
-        
         let nodeJSON = tree.toDict(true);
-        if (nodeJSON.children !== null) {
+    
+        if (nodeJSON.children[0] === undefined 
+            || nodeJSON.children[0].title === '') {
+            return false;            
+        }
+
+        if (nodeJSON.children[0].children !== undefined) {
             const jsonStrDev = JSON.stringify(nodeJSON.children);
             if (inputVar.is("#gmsgroupdevices-groupjson")) {
                 $("#gmsgroupdevices-groupjson").remove();
@@ -144,6 +172,14 @@ $js1 = <<< JS
                 value: jsonStrDev
             }).appendTo("form");  
             $("#form").submit();
+        } else {
+            const message = 'В группу <b>"' + nodeJSON.children[0].title + '"</b> не добавлено ни одного устройства!';
+            let button_cancel = '<button class="btn btn-default" data-dismiss="modal">';
+            button_cancel += '<span class="glyphicon glyphicon-ban-circle"></span> Отмена';
+            button_cancel += '</button>';
+            $('#bootstrap-dialog-message').html(message);  
+            $('#bootstrap-dialog-footer-buttons').html(button_cancel); 
+            $('#modal-dialog').modal('show');
         }
     });  
     
@@ -244,8 +280,8 @@ $js1 = <<< JS
         tree1.delegate("span[id=trash-node]", "click", function(e){
             const node = $.ui.fancytree.getNode(e), tdList = $(node.tr);
             const tree2 = $("#fancyree_devices_all").fancytree("getTree");
-            if (node.data.key_parent !== undefined) {
-                const playlistNode = tree2.getNodeByKey(node.data.key_parent);
+            if (node.data.parent_key !== undefined) {
+                const playlistNode = tree2.getNodeByKey(node.data.parent_key);
                 node.moveTo(playlistNode, "child");
                 playlistNode.setExpanded();
                 tdList.remove();
@@ -264,5 +300,4 @@ $js1 = <<< JS
         });  
     });  
 JS;
-
 $this->registerJs($js1);

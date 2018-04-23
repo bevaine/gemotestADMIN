@@ -8,7 +8,7 @@ use yii\helpers\Html;
 $this->title = 'Редактирование группы: '.$dataArr['group_name'];
 $this->params['breadcrumbs'][] = ['label' => 'Группы устройств', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $dataArr['group_name'], 'url' => ['view', 'group_id' => $dataArr['group_id']]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->params['breadcrumbs'][] = 'Редактирование';
 ?>
 <div class="gms-group-devices-update">
 

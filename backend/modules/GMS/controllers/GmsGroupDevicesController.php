@@ -47,16 +47,22 @@ class GmsGroupDevicesController extends Controller
     }
 
     /**
-     * Displays a single GmsGroupDevices model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
+     * @param $group_id
+     * @return string|\yii\web\Response
      */
-    public function actionView($id)
+    public function actionView($group_id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if (!$findModel = $this->findModel($group_id)) {
+            return $this->redirect(['index']);
+        }
+
+        if ($dataArr = $this->addJson($findModel)) {
+            return $this->render('view', [
+                'dataArr' => $dataArr,
+            ]);
+        } else {
+            return $this->redirect(['index']);
+        }
     }
 
     /**
@@ -77,7 +83,7 @@ class GmsGroupDevicesController extends Controller
                     'group_name' => $json[0]->title,
                     'group_id' => $max,
                     'device_id' => $children->key,
-                    'parent_key' => $children->data->key_parent,
+                    'parent_key' => $children->data->parent_key,
                 ];
             }
             if (!empty($rowInsert)) {
@@ -106,6 +112,37 @@ class GmsGroupDevicesController extends Controller
      */
     public function actionUpdate($group_id)
     {
+        $model = new GmsGroupDevices();
+        $rowInsert = [];
+        if ($model->load(Yii::$app->request->post())) {
+            $json = json_decode($model->group_json);
+            if (!self::deleteGroup($group_id)) {
+                return $this->redirect(['update', 'group_id' => $group_id]);
+            }
+            foreach ($json[0]->children as $children) {
+                $rowInsert[] = [
+                    'group_name' => $json[0]->title,
+                    'group_id' => $group_id,
+                    'device_id' => $children->key,
+                    'parent_key' => $children->data->parent_key,
+                ];
+            }
+            if (!empty($rowInsert)) {
+                try {
+                    Yii::$app->db->createCommand()->batchInsert(
+                        GmsGroupDevices::tableName(),
+                        array_keys($rowInsert[0]),
+                        $rowInsert
+                    )->execute();
+                } catch (Exception $e) {
+                    Yii::getLogger()->log([
+                        'GmsGroupDevices->batchInsert'=>$e->getMessage()
+                    ], Logger::LEVEL_ERROR, 'binary');
+                }
+                return $this->redirect(['view', 'group_id' => $group_id]);
+            }
+        }
+
         if (!$findModel = $this->findModel($group_id)) {
             return $this->redirect(['index']);
         }
