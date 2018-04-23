@@ -59,6 +59,6 @@ class GmsGroupDevices extends \yii\db\ActiveRecord
      */
     public function getDevice()
     {
-        return $this->hasOne(GmsDevices::className(), ['device' => 'device_id']);
+        return $this->hasOne(GmsDevices::className(), ['id' => 'device_id']);
     }
 }

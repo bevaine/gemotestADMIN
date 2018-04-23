@@ -135,7 +135,7 @@ class GmsDevices extends \yii\db\ActiveRecord
         /** @var GmsDevices $model */
         foreach ($findModel as $model) {
             if (empty($model->name || empty($model->region_id))) continue;
-            $out[$model->region_id][$model->sender_id][$model->device] = $model->name;
+            $out[$model->region_id][$model->sender_id][$model->id] = $model->name;
         }
 
         foreach ($out as $key => $region) {

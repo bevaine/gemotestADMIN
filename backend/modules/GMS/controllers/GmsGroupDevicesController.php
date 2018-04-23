@@ -173,7 +173,7 @@ class GmsGroupDevicesController extends Controller
             $row_json[] = [
                 'title' => $model->device->name,
                 'folder' => false,
-                'key' => (string)$model->device_id,
+                'key' => (string)$model->device->id,
                 'data' => [
                     'parent_key' => $model->parent_key
                 ]
