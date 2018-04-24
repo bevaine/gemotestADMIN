@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "gms_devices".
@@ -181,5 +182,18 @@ class GmsDevices extends \yii\db\ActiveRecord
             $out2[] = $out;
         }
         return $out2;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getDeviceList()
+    {
+        $arr = self::find()
+            ->orderBy(['name' => 'asc'])
+            ->asArray()
+            ->all();
+
+        return ArrayHelper::map($arr,'id','name');
     }
 }

@@ -12,24 +12,38 @@ use yii\helpers\Url;
 /* @var $model common\models\GmsPlaylist */
 /* @var $form yii\widgets\ActiveForm */
 
+$class_tab1 = "";
+$class_tab2 = "";
+$class_tab3 = "";
+$class_active1 = "";
+$class_active2 = "";
+$class_active3 = "";
 if (!$model->isNewRecord) {
-    if (!empty($model->group_id)) {
-        $action = 'group';
-        $class_tab1 = "disabled";
-        $class_tab2 = "active";
-    } else {
-        $action = '';
+    $data_tab1 = "";
+    $data_tab2 = "";
+    $data_tab3 = "";
+    $class_tab1 = "disabled";
+    $class_tab2 = "disabled";
+    $class_tab3 = "disabled";
+    if (!empty($model->region)) {
         $class_tab1 = "active";
-        $class_tab2 = "disabled";
+        $class_active1 = " in active";
+        $data_tab1 = "tab";
+    }elseif (!empty($model->group_id)) {
+        $class_tab2 = "active";
+        $class_active2 = " in active";
+        $data_tab2 = "tab";
+    }elseif (!empty($model->device_id)) {
+        $class_tab3 = "active";
+        $class_active3 = " in active";
+        $data_tab3 = "tab";
     }
 } else {
-    if ($action == "group") {
-        $class_tab1 = "";
-        $class_tab2 = "active";
-    } else {
-        $class_tab1 = "active";
-        $class_tab2 = "";
-    }
+    $data_tab1 = "tab";
+    $data_tab2 = "tab";
+    $data_tab3 = "tab";
+    $class_tab1 = "active";
+    $class_active1 = " in active";
 }
 ?>
 
@@ -43,16 +57,31 @@ if (!$model->isNewRecord) {
 
     <?php $form = ActiveForm::begin(['id' => 'form']); ?>
 
-    <div class="modal fade" id="deactivate-user" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+    <div class="modal bootstrap-dialog type-warning fade size-normal in" id="modal-dialog" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-
-                <div class="modal-header" id="modal-header"></div>
-                <div class="modal-body" id="modal-body">
-
+                <div class="modal-header">
+                    <div class="bootstrap-dialog-header">
+                        <div class="bootstrap-dialog-close-button" style="display: none;">
+                            <button class="close" aria-label="close">×</button>
+                        </div>
+                        <div class="bootstrap-dialog-title" id="bootstrap-dialog-title">Подтверждение</div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="bootstrap-dialog-body">
+                        <div class="bootstrap-dialog-message" id="bootstrap-dialog-message">
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    <div class="bootstrap-dialog-footer">
+                        <div class="bootstrap-dialog-footer-buttons" id="bootstrap-dialog-footer-buttons">
+                            <button class="btn btn-default" data-dismiss="modal">
+                                <span class="glyphicon glyphicon-ban-circle"></span> Отмена
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -64,58 +93,65 @@ if (!$model->isNewRecord) {
 
                 <ul class="nav nav-tabs">
                     <li class="<?= $class_tab1 ?>">
-                        <?= Html::a("Привязка к регион./отдел.",!$model->isNewRecord ? "#" : Url::to(["playlist/create"])) ?>
+                        <a data-toggle="<?= $data_tab1 ?>" href="#tab_1">Привязка к региону/отдел.</a>
                     </li>
                     <li class="<?= $class_tab2 ?>">
-                        <?= Html::a("Привязка к группе", !$model->isNewRecord ? "#" : Url::to(["playlist/create/group"])) ?>
+                        <a data-toggle="<?= $data_tab2 ?>" href="#tab_2">Привязка к группе уст-в</a>
+                    </li>
+                    <li class="<?= $class_tab3 ?>">
+                        <a data-toggle="<?= $data_tab3 ?>" href="#tab_3">Привязка к устройству</a>
                     </li>
                 </ul>
 
                 <div class="tab-content">
-                    <?php if ($action != 'group') { ?>
-                        <div class="tab-pane active" id="tab_1">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="form-group region">
-                                        <?= $form->field($model, 'region')->dropDownList(\common\models\GmsRegions::getRegionList(), [
-                                            'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                        ]);
-                                        ?>
-                                    </div>
+
+                    <div id="tab_1" class="tab-pane fade<?= $class_active1 ?>">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group region">
+                                    <?= $form->field($model, 'region')->dropDownList(\common\models\GmsRegions::getRegionList(), [
+                                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                    ]);
+                                    ?>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="form-group sender_id">
-                                        <?= $form->field($model, 'sender_id')->dropDownList([], [
-                                            'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                        ]);
-                                        ?>
-                                    </div>
+                            <div class="col-lg-6">
+                                <div class="form-group sender_id">
+                                    <?= $form->field($model, 'sender_id')->dropDownList([], [
+                                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                    ]);
+                                    ?>
                                 </div>
                             </div>
                         </div>
-                    <?php } else { ?>
-                        <div class="tab-pane active" id="tab_2">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="form-group group_id">
-                                        <?= $form->field($model, 'group_id')->dropDownList(\common\models\GmsGroupDevices::getGroupList(), [
-                                            'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                        ]);
-                                        ?>
-                                    </div>
+                    </div>
+
+                    <div id="tab_2" class="tab-pane fade<?= $class_active2 ?>">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group group_id">
+                                    <?= $form->field($model, 'group_id')->dropDownList(\common\models\GmsGroupDevices::getGroupList(), [
+                                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                    ]);
+                                    ?>
                                 </div>
                             </div>
                         </div>
-                    <?php } ?>
-                </div>
-            </div>
-            <div class="box box-solid box-success">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Перетащите видо-ролики для шаблона плейлиста</h3>
-                </div>
-                <div class="box-body">
+                    </div>
+
+                    <div id="tab_3" class="tab-pane fade<?= $class_active3 ?>">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group device_id">
+                                    <?= $form->field($model, 'device_id')->dropDownList(\common\models\GmsDevices::getDeviceList(), [
+                                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                    ]);
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="form-group type">
@@ -126,8 +162,9 @@ if (!$model->isNewRecord) {
                             </div>
                         </div>
                     </div>
+
                     <div class="row">
-                        <div class="col-lg-5">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <div class="box box-primary">
                                     <div class="box-header with-border">
@@ -166,7 +203,7 @@ if (!$model->isNewRecord) {
                             </div>
                         </div>
 
-                        <div class="col-lg-7">
+                        <div class="col-lg-6">
                             <div class="form-group">
                                 <div class="box box-warning">
                                     <div class="box-header with-border">
@@ -214,6 +251,7 @@ if (!$model->isNewRecord) {
                 </div>
             </div>
         </div>
+
         <div class="col-xs-5">
             <div class="form-group">
                 <div class="box box-solid box-primary">
@@ -255,7 +293,7 @@ if (!$model->isNewRecord) {
 </div>
 
 <?php
-
+$isNew = 'false';
 $urlAjaxSender = \yii\helpers\Url::to(['/GMS/gms-senders/ajax-senders-list']);
 $urlAjaxVideo = \yii\helpers\Url::to(['/GMS/gms-videos/ajax-video-active']);
 
@@ -294,17 +332,41 @@ $videof = json_encode($videof);
 $standartf = json_encode($standartf);
 $commercef = json_encode($commercef);
 
-if (!$model->isNewRecord && !empty($model->jsonPlaylist)) {
-    $standartf = new JsExpression('['.$model->jsonPlaylist.']');
+if ($model->isNewRecord) {
+    $isNew = 'true';
+} else {
+    if (!empty($model->jsonPlaylist)) {
+        $standartf = new JsExpression('['.$model->jsonPlaylist.']');
+    }
 }
 
 $js1 = <<< JS
     
-    const tree1 = $("#treetable1");
-    const tree2 = $("#treetable2"); 
+    const tree1 = $("#treetable1"),
+        tree2 = $("#treetable2"),
+        regionSelectConst = $('#gmsplaylist-region'),
+        typeSelectConst = $('#gmsplaylist-type'),
+        senderSelectConst = $('#gmsplaylist-sender_id'),
+        deviceSelectConst = $('#gmsplaylist-device_id'),
+        groupSelectConst = $('#gmsplaylist-group_id'),
+        input = $("input"),
+        isNew = {$isNew}; 
         
     $(function()
     {
+        if (isNew !== false) {
+            setSender(regionSelectConst.val());
+        }
+        
+        $("a[href='#tab_1'], a[href='#tab_2'], a[href='#tab_3']").click(function() {
+            if (isNew !== false) {
+                regionSelectConst.prop('selectedIndex', 0);
+                setSender(regionSelectConst.val());
+                groupSelectConst.prop('selectedIndex', 0);
+                deviceSelectConst.prop('selectedIndex', 0);               
+            }
+        });
+                
         tree1.fancytree({
             extensions: ["table", "dnd"],
             table: {
@@ -320,11 +382,11 @@ $js1 = <<< JS
                 const playlistNode = tree2
                     .fancytree("getTree")
                     .getNodeByKey('playList[1]');
-                if ($('#gmsplaylist-type').val() === '1') {
+                if (typeSelectConst.val() === '1') {
                     const addChild = [];
                     addChild.push(data.node);
                     playlistNode.addNode(addChild, 'child');
-                } else if ($('#gmsplaylist-type').val() === '2') {
+                } else if (typeSelectConst.val() === '2') {
                     data.node.moveTo(playlistNode, "child");
                 }
             },
@@ -394,9 +456,9 @@ $js1 = <<< JS
                 tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
 
                 let typePlaylist = ''; 
-                if ( $('#gmsplaylist-type').val() === '1') {
+                if ( typeSelectConst.val() === '1') {
                     typePlaylist = 'Стандартный';                     
-                } else if ( $('#gmsplaylist-type').val() === '2') {
+                } else if ( typeSelectConst.val() === '2') {
                     typePlaylist = 'Коммерческий';
                 }
                 if (typePlaylist !== '' && !node.isFolder()) {
@@ -451,7 +513,6 @@ $js1 = <<< JS
                     if (data.otherNode) {
                         let sameTree = (data.otherNode.tree === data.tree);
                         const playlistNode = data.tree.getNodeByKey('playList[1]');
-                        console.log(sameTree);
                         if (!sameTree) {
                             if (data.otherNode.isFolder()) {
                                 playlistNode.addNode(data.otherNode.children, 'child');                           
@@ -544,11 +605,11 @@ $js1 = <<< JS
         const rootTitle = parentFolder.title;
         const rootIcon = parentFolder.icon;
         
-        if ($("input").is("#gmsplaylist-jsonplaylist")) {
+        if (input.is("#gmsplaylist-jsonplaylist")) {
             $("#gmsplaylist-jsonplaylist").remove();
         }                    
         
-        if ($("input").is("#gmsplaylist-name")) {
+        if (input.is("#gmsplaylist-name")) {
             $("#gmsplaylist-name").remove();
         }
 
@@ -567,12 +628,11 @@ $js1 = <<< JS
         
         if (parentFolder.children !== null) {
             parentFolder.children.forEach(function(children) {
-                console.log(children);
                 const arrChildren = {};
                 const arrData = {};
                 const key = children.key;
                 const name = children.title;
-                const typePlaylist = $('#gmsplaylist-type').val();
+                const typePlaylist = typeSelectConst.val();
                 arrData["duration"] = children.data.duration;
                 arrData["frame_rate"] = children.data.frame_rate;
                 arrData["nb_frames"] = children.data.nb_frames;
@@ -613,9 +673,10 @@ $js1 = <<< JS
             return true;
         } else {
             html_body = 'Необходимо добавить хотя бы одно видео в шаблон плейлиста'; 
-            $('#modal-header').html(htm_header);
-            $('#modal-body').html(html_body);
-            $('#deactivate-user').modal('show');
+            
+            $('#bootstrap-dialog-title').html(htm_header);  
+            $('#bootstrap-dialog-message').html(html_body);  
+            $('#modal-dialog').modal('show');
             return false;
         }
     }
@@ -625,12 +686,16 @@ $js1 = <<< JS
     * @param region
     * @param sender_id
     * @param type_list
+    * @param group_id
+    * @param device_id
     */
     function checkList 
     (
         region = null, 
         sender_id = null, 
-        type_list = null
+        type_list = null,
+        group_id = null,
+        device_id = null
     ) {
         let html_body = '';
         const htm_header = 'Ошибка сохранения плейлиста';       
@@ -639,33 +704,44 @@ $js1 = <<< JS
             data: {
                 region: region,
                 sender_id: sender_id,
-                type_list: type_list
+                type_list: type_list,
+                group_id: group_id,
+                device_id: device_id
             },
             success: function (res) {
                 if (res === 'null') {
                     if (checkJSON()) $("#form").submit();
                 } else {
                     let html_body = "";
-                    const region = res.region;
-                    const sender = res.sender;
-                    const type = res.type;
-                    const name = res.name;
-                    const playlist_Id = res.id;
+                    const region = res.region,
+                        sender = res.sender,
+                        type = res.type,
+                        name = res.name,
+                        group = res.group,
+                        device = res.device,
+                        playlist_Id = res.id;
                     
-                    if (region !== undefined) {
-                        if (sender !== undefined) {
-                            html_body += 'В отделении <b>' + sender + '</b> уже есть шаблон прикрепленного <b>"' + type + '"</b> плейлиста';
-                        } else {
-                            html_body += 'В регионе <b>' + region + '</b> уже есть шаблон прикрепленного <b>"' + type + '"</b> плейлиста';
-                        }
-                        html_body += ' <b><a target="_blank" href="/GMS/playlist/view?id=' + playlist_Id + '">';
-                        html_body += name;
-                        html_body += '</a></b>';
+                    if (region !== null) {
+                        html_body += 'Для региона <b>' + region + '</b>';
+                        if (sender !== null) {
+                            html_body += ' и отделения <b>' + sender + '</b>';
+                        } 
+                    } else if (group !== null) {
+                        html_body += 'Для группы устройств <b>' + group + '</b>';     
+                    } else if (device !== null) {
+                        html_body += 'Для устройства <b>' + device + '</b>'; 
                     }
+                    
+                    if (html_body !== '') {
+                        html_body += ' уже есть шаблон с типом <b>"' + type + '"</b> и названием ';
+                        html_body += ' <b><a target="_blank" href="/GMS/playlist/view?id=' + playlist_Id + '">';
+                        html_body += '"' + name + '"';
+                        html_body += '</a></b>';
+                    }    
 
-                    $('#modal-header').html(htm_header);
-                    $('#modal-body').html(html_body);
-                    $('#deactivate-user').modal('show');
+                    $('#bootstrap-dialog-title').html(htm_header);  
+                    $('#bootstrap-dialog-message').html(html_body);  
+                    $('#modal-dialog').modal('show');
                     return false;
                 }
             }
@@ -677,7 +753,6 @@ $js1 = <<< JS
     */
     function setSender(region) 
     {
-        console.log(region);
         const senderSelect = $('.sender_id select');
         const senderDisable = senderSelect.prop('disabled'); 
         senderSelect.attr('disabled', true); 
@@ -735,9 +810,11 @@ $js1 = <<< JS
     
     $(".btn-success").click(function() {
         checkList(
-            $('#gmsplaylist-region').val(),
-            $('#gmsplaylist-sender_id').val(),
-            $('#gmsplaylist-type').val()
+            regionSelectConst.val(),
+            senderSelectConst.val(),
+            typeSelectConst.val(),
+            groupSelectConst.val(),
+            deviceSelectConst.val()
         );
     });
 
@@ -754,13 +831,4 @@ $js1 = <<< JS
     });
 JS;
 $this->registerJs($js1);
-
-$js_ready = <<<JS
-    $(document).ready(function(){  
-        setSender($(".region select").val());
-    }); 
-JS;
-if (!$model->isNewRecord) {
-    $this->registerJs($js_ready);
-}
 ?>

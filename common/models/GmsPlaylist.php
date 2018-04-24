@@ -2,8 +2,6 @@
 
 namespace common\models;
 
-use app\modules\GMS\controllers\GmsSendersController;
-use function MongoDB\BSON\toJSON;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\log\Logger;
@@ -19,30 +17,17 @@ use yii\log\Logger;
  * @property integer $created_at
  * @property integer $updated_at
  * @property integer $group_id
+ * @property integer $device_id
  * @property string $sender_id
  * @property string $jsonPlaylist
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsDevices $deviceModel
+ * @property GmsGroupDevices $groupDevicesModel
  */
 
 class GmsPlaylist extends \yii\db\ActiveRecord
 {
-    CONST SCENARIO_ADD_REGION = 'addRegion';
-    CONST SCENARIO_ADD_GROUP = 'addGroup';
-    //CONST SCENARIO_DEFAULT = 'default';
-
-    /**
-     * @return array
-     */
-    public function scenarios()
-    {
-        return [
-            self::SCENARIO_ADD_REGION => ['name', 'type', 'region', 'jsonPlaylist', 'sender_id', 'created_at', 'updated_at'],
-            self::SCENARIO_ADD_GROUP => ['name', 'type', 'group_id', 'jsonPlaylist', 'created_at', 'updated_at'],
-        ];
-    }
-
     /**
      * @inheritdoc
      */
@@ -57,10 +42,8 @@ class GmsPlaylist extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'type', 'region', 'jsonPlaylist'], 'required', 'on' => 'addRegion'],
-            [['name', 'type', 'group_id', 'jsonPlaylist'], 'required', 'on' => 'addGroup'],
-            [['region', 'type'], 'required'],
-            [['type', 'region', 'created_at', 'updated_at', 'sender_id', 'group_id'], 'integer'],
+            [['jsonPlaylist', 'type'], 'required'],
+            [['type', 'region', 'created_at', 'updated_at', 'sender_id', 'group_id', 'device_id'], 'integer'],
             [['name', 'file'], 'string', 'max' => 255],
             [['jsonPlaylist'], 'string'],
         ];
@@ -92,7 +75,8 @@ class GmsPlaylist extends \yii\db\ActiveRecord
             'jsonPlaylist' => 'Плейлист',
             'sender_id' => 'Код отделения',
             'sender_name' => 'Отделение',
-            'group_id' => 'Номер группы'
+            'group_id' => 'Группа устр-в',
+            'device_id' => 'Устройство'
         ];
     }
 
@@ -126,7 +110,15 @@ class GmsPlaylist extends \yii\db\ActiveRecord
      */
     public function getGroupDevicesModel()
     {
-        return $this->hasMany(GmsGroupDevices::className(), ['id' => 'group_id']);
+        return $this->hasOne(GmsGroupDevices::className(), ['id' => 'group_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeviceModel()
+    {
+        return $this->hasOne(GmsDevices::className(), ['id' => 'device_id']);
     }
 
     /**

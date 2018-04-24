@@ -66,10 +66,6 @@ class PlaylistController extends Controller
     public function actionCreate($param = null)
     {
         $model = new GmsPlaylist();
-        $model->scenario = 'addRegion';
-        if ($param == 'group') {
-            $model->scenario = 'addGroup';
-        }
 
         if ($model->load(Yii::$app->request->post())) {
             //print_r(Yii::$app->request->post());
@@ -100,13 +96,7 @@ class PlaylistController extends Controller
     {
         $model = $this->findModel($id);
 
-        $model->scenario = 'addRegion';
-        if (!empty($model->group_id)) {
-            $model->scenario = 'addGroup';
-        }
-
         if ($model->load(Yii::$app->request->post())) {
-            //$model->updated_at = time();
             if ($model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
@@ -157,40 +147,59 @@ class PlaylistController extends Controller
      * @param null $region
      * @param null $sender_id
      * @param null $type_list
+     * @param null $group_id
+     * @param null $device_id
      * @return array|string
      */
     public function actionAjaxPlaylistActive(
         $region = null,
         $sender_id = null,
-        $type_list = null
+        $type_list = null,
+        $group_id = null,
+        $device_id = null
     ) {
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
 
         if (empty($sender_id)) $sender_id = null;
-        if (empty($region)) exit('null');
+        if (empty($region)) $region = null;
+        if (empty($group_id)) $group_id = null;
+        if (empty($device_id)) $device_id = null;
 
-        $findModel = GmsPlaylist::findOne([
-            'region' => $region,
-            'sender_id' => $sender_id,
-            'type' => $type_list
-        ]);
-
-        if ($findModel) {
-            $out = $findModel->toArray();
-            if (isset($findModel->regionModel)) {
-                $out['region'] = $findModel->regionModel->region_name;
-            }
-            if (isset($findModel->senderModel)) {
-                $out['sender'] = $findModel->senderModel->sender_name;
-            }
-            if (isset($findModel->type)) {
-                $out['type'] =  \common\models\GmsPlaylist::getPlayListType($findModel->type);
-            }
+        $findModel = GmsPlaylist::find();
+        $findModel->where(['type' => $type_list]);
+        if (!empty($region)) {
+            $findModel->andWhere([
+                'region' => $region,
+                'sender_id' => $sender_id
+            ]);
+        } elseif (!empty($group_id)) {
+            $findModel->andWhere(['group_id' => $group_id]);
+        } elseif (!empty($device_id)) {
+            $findModel->andWhere(['device_id' => $device_id]);
         }
 
-        $response = Yii::$app->response;
-        $response->format = yii\web\Response::FORMAT_JSON;
+        /* @var GmsPlaylist $playlistModel */
+        $playlistModel = $findModel->one();
+
+        if ($playlistModel) {
+            $out = $playlistModel->toArray();
+            if (isset($playlistModel->regionModel)) {
+                $out['region'] = $playlistModel->regionModel->region_name;
+            }
+            if (isset($playlistModel->senderModel)) {
+                $out['sender'] = $playlistModel->senderModel->sender_name;
+            }
+            if (isset($playlistModel->type)) {
+                $out['type'] =  GmsPlaylist::getPlayListType($playlistModel->type);
+            }
+            if (isset($playlistModel->groupDevicesModel)) {
+                $out['group'] =  $playlistModel->groupDevicesModel->group_name;
+            }
+            if (isset($playlistModel->deviceModel)) {
+                $out['device'] =  $playlistModel->deviceModel->name;
+            }
+        }
         return !empty($out) ? $out : 'null';
     }
 
