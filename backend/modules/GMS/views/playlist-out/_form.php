@@ -14,15 +14,19 @@ use wbraganca\fancytree\FancytreeWidget;
 /* @var $action string
 /* @var $form yii\widgets\ActiveForm */
 
+$data_tab1 = "tab";
+$data_tab2 = "tab";
 if (!$model->isNewRecord) {
     if (!empty($model->group_id)) {
         $action = 'group';
         $class_tab1 = "disabled";
         $class_tab2 = "active";
+        $data_tab1 = "";
     } else {
         $action = '';
         $class_tab1 = "active";
         $class_tab2 = "disabled";
+        $data_tab2 = "";
     }
 } else {
     if ($action == "group") {
@@ -394,46 +398,48 @@ HTML;
 
                 <ul class="nav nav-tabs">
                     <li class="<?= $class_tab1 ?>">
-                        <?= Html::a("Привязка к регион./отдел.",!$model->isNewRecord ? "#" : Url::to(["playlist-out/create"])) ?>
+                        <a data-toggle="<?= $data_tab1 ?>" href="#tab_1">Привязка к регион./отдел.</a>
                     </li>
                     <li class="<?= $class_tab2 ?>">
-                        <?= Html::a("Привязка к группе", !$model->isNewRecord ? "#" : Url::to(["playlist-out/create/group"])) ?>
+                        <a data-toggle="<?= $data_tab2 ?>" href="#tab_2">Привязка к группе</a>
                     </li>
                 </ul>
 
                 <div class="tab-content">
 
-                    <?php if ($action != 'group') { ?>
-                        <div class="tab-pane active" id="tab_1">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <div class="form-group region">
-                                        <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), ['prompt' => '---']); ?>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6">
-                                    <div class="form-group sender_id">
-                                        <?= $form->field($model, 'sender_id')->dropDownList([], ['prompt' => '---']); ?>
-                                    </div>
+                    <div id="tab_1" class="tab-pane fade in active">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group region">
+                                    <?= $form->field($model, 'region_id')->dropDownList(\common\models\GmsRegions::getRegionList(), [
+                                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                    ]); ?>
                                 </div>
                             </div>
-                            <?= $html ?>
-                        </div>
-                    <?php } else { ?>
-                        <div class="tab-pane active" id="tab_2">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <div class="form-group group_id">
-                                        <?= $form->field($model, 'group_id')->dropDownList(\common\models\GmsGroupDevices::getGroupList(), [
-                                            'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
-                                        ]);
-                                        ?>
-                                    </div>
+                            <div class="col-lg-6">
+                                <div class="form-group sender_id">
+                                    <?= $form->field($model, 'sender_id')->dropDownList([], [
+                                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                    ]); ?>
                                 </div>
                             </div>
-                            <?= $html ?>
                         </div>
-                    <?php } ?>
+                    </div>
+
+                    <div id="tab_2" class="tab-pane fade">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group group_id">
+                                    <?= $form->field($model, 'group_id')->dropDownList(\common\models\GmsGroupDevices::getGroupList(), [
+                                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                    ]);
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <?= $html ?>
 
                 </div>
             </div>
@@ -503,9 +509,11 @@ $urlAjaxTime = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-time-check']);
 $urlAjaxPlaylistTemplate = \yii\helpers\Url::to(['/GMS/playlist/ajax-playlist-template']);
 $urlAjaxCheckPlaylist = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-check-playlist']);
 
+$isNew = 'false';
 $pls_id = 'null';
 $source = [];
 if ($model->isNewRecord) {
+    $isNew = 'true';
     $source =  [
         [
             'title' => 'Новый плейлист',
@@ -533,7 +541,13 @@ $js1 = <<< JS
             "expanded" : true, 
             "icon" : "/img/video1.png"
         }
-    ];
+    ],
+    regionSelectConst = $('#gmsplaylistout-region_id'),
+    senderSelectConst = $('#gmsplaylistout-sender_id'),
+    groupSelectConst = $('#gmsplaylistout-group_id'),
+    timeStartConst = $('#gmsplaylistout-time_start'),
+    timeEndConst = $('#gmsplaylistout-time_end'),
+    isNew = {$isNew};
 
     /**
     * 
@@ -832,8 +846,8 @@ $js1 = <<< JS
     * @returns {*}
     */
     function getTimeDay() {
-        const datePicker1 = $('#gmsplaylistout-time_start').val(),
-            datePicker2 = $('#gmsplaylistout-time_end').val(),
+        const datePicker1 = timeStartConst.val(),
+            datePicker2 = timeEndConst.val(),
             date1 = new Date('1976-01-01 ' + datePicker1),
             date2 = new Date('1976-01-01 ' + datePicker2);
         if (datePicker2 > datePicker1) {
@@ -1356,6 +1370,15 @@ $js1 = <<< JS
     
     $(document).ready(function()
     {  
+        $("a[href='#tab_1'], a[href='#tab_2']").click(function() {
+            if (isNew !== false) {
+                regionSelectConst.prop('selectedIndex', 0);
+                setSender(regionSelectConst.val());
+                groupSelectConst.prop('selectedIndex', 0);
+                disableTree();                
+            }
+        });
+            
         $(".btn-primary, .btn-success").click(function() { 
             checkTime();
         });
@@ -1363,14 +1386,14 @@ $js1 = <<< JS
         $(".region select").change(function() {
             disableTree();
             setSender ($(this).val());
-            setDevice ($(this).val(), $('#gmsplaylistout-sender_id').val());
-            setTreeData ($(this).val(), $('#gmsplaylistout-sender_id').val());
+            setDevice ($(this).val(), senderSelectConst.val());
+            setTreeData ($(this).val(), senderSelectConst.val());
         });
         
         $(".sender_id select").change(function() {
             disableTree();
-            setDevice ($('#gmsplaylistout-region_id').val(), $(this).val());
-            setTreeData ($('#gmsplaylistout-region_id').val(), $(this).val());
+            setDevice (regionSelectConst.val(), $(this).val());
+            setTreeData (regionSelectConst.val(), $(this).val());
         });
         
         $(".group_id select").change(function() {
@@ -1378,7 +1401,7 @@ $js1 = <<< JS
             setTreeData (null, null, $(this).val());
         });
     
-        $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker({ 
+        timeEndConst.bootstrapMaterialDatePicker({ 
             date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
         }).on('change', function(e, date) 
         {
@@ -1386,27 +1409,25 @@ $js1 = <<< JS
             sumDuration();
         });
 
-        $('#gmsplaylistout-time_start').bootstrapMaterialDatePicker({
+        timeStartConst.bootstrapMaterialDatePicker({
             date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
         }).on('change', function(e, date) 
         {
-            $('#gmsplaylistout-time_end').bootstrapMaterialDatePicker('setMinDate', date);
+            timeEndConst.bootstrapMaterialDatePicker('setMinDate', date);
             setDayTime();
             sumDuration();
         });
 
         setDayTime();
 		            
-        setSender ($('#gmsplaylistout-region_id').val());
+        setSender (regionSelectConst.val());
         
         setTimeout(function(){
-            setDevice ($('#gmsplaylistout-region_id').val()
-                , $('#gmsplaylistout-sender_id').val());
+            setDevice (regionSelectConst.val(), senderSelectConst.val());
         }, 1000);
         
         setTimeout(function(){
-            setTreeData ($('#gmsplaylistout-region_id').val()
-                ,$('#gmsplaylistout-sender_id').val());
+            setTreeData (regionSelectConst.val(), senderSelectConst.val());
         }, 1000);        
     }); 
 JS;
