@@ -40,6 +40,22 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'sender_name'
             ],
             [
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsPlaylist */
+                    return !empty($model->groupDevicesModel) ? $model->groupDevicesModel->group_name : null;
+
+                },
+                'attribute' => 'group_id'
+            ],
+            [
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsPlaylist */
+                    return !empty($model->deviceModel) ? $model->deviceModel->name : null;
+
+                },
+                'attribute' => 'device_id'
+            ],
+            [
                 'filter' => \common\models\GmsPlaylist::getPlayListType(),
                 'attribute' => 'type',
                 'value' => function ($model) {

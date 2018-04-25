@@ -49,6 +49,22 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylist */
+                    return !empty($model->groupDevicesModel) ? $model->groupDevicesModel->group_name : null;
+
+                },
+                'attribute' => 'group_id'
+            ],
+            [
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsPlaylist */
+                    return !empty($model->deviceModel) ? $model->deviceModel->name : null;
+
+                },
+                'attribute' => 'device_id'
+            ],
+            [
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsPlaylist */
                     return \common\models\GmsPlaylist::getPlayListType($model->type);
                 },
                 'attribute' => 'type'
@@ -140,8 +156,8 @@ if (!empty($model->jsonPlaylist)) {
 
 $js1 = <<< JS
     
-    var tree1 = $("#treetable1");
-    var tree2 = $("#treetable2"); 
+    const tree1 = $("#treetable1"),
+        tree2 = $("#treetable2"); 
         
     $(function()
     {
@@ -154,7 +170,10 @@ $js1 = <<< JS
             },                
             source: {$standartf},
             dblclick: function(event, data) {
-                var videoKey = data.node.key;
+                if (data.node.isFolder() === true) {
+                    return false;
+                }
+                const videoKey = data.node.key;
                 $.ajax({
                     url: '{$urlAjaxVideo}',
                     data: {video: videoKey},

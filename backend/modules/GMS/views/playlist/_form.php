@@ -276,7 +276,7 @@ if (!$model->isNewRecord) {
                             </p>
                         </video>
                         <div class="video-info" id="video-info">
-                            Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.
+                            Добавьте ролик в шаблон плейлиста. Просмотр видео и информации по двойному клику мыши.
                         </div>
                     </div>
                 </div>
@@ -578,6 +578,7 @@ $js1 = <<< JS
             node.remove();
             node.render(true);
             sumDuration(parent, '#duration-summ2');
+            resetPlayer();
         });
     });
     
@@ -845,7 +846,7 @@ $js1 = <<< JS
     function resetPlayer(htm_table = null) {
         const myPlayer = videojs('my-player');
         if (htm_table === null) {
-            htm_table = 'Добавьте ролик в окончательный плейлист. Просмотр видео и информации по двойному клику мыши.';
+            htm_table = 'Добавьте ролик в шаблон плейлиста. Просмотр видео и информации по двойному клику мыши.';
         }
         myPlayer.reset();
         myPlayer.poster("/img/logo.jpg");
