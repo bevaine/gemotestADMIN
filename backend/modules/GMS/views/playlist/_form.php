@@ -93,10 +93,10 @@ if (!$model->isNewRecord) {
 
                 <ul class="nav nav-tabs">
                     <li class="<?= $class_tab1 ?>">
-                        <a data-toggle="<?= $data_tab1 ?>" href="#tab_1">Привязка к региону/отдел.</a>
+                        <a data-toggle="<?= $data_tab1 ?>" href="#tab_1">Привязка к региону/отделению</a>
                     </li>
                     <li class="<?= $class_tab2 ?>">
-                        <a data-toggle="<?= $data_tab2 ?>" href="#tab_2">Привязка к группе уст-в</a>
+                        <a data-toggle="<?= $data_tab2 ?>" href="#tab_2">Привязка к группе устройств</a>
                     </li>
                     <li class="<?= $class_tab3 ?>">
                         <a data-toggle="<?= $data_tab3 ?>" href="#tab_3">Привязка к устройству</a>
@@ -164,7 +164,7 @@ if (!$model->isNewRecord) {
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-6">
+                        <div class="col-lg-5">
                             <div class="form-group">
                                 <div class="box box-primary">
                                     <div class="box-header with-border">
@@ -203,7 +203,7 @@ if (!$model->isNewRecord) {
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
+                        <div class="col-lg-7">
                             <div class="form-group">
                                 <div class="box box-warning">
                                     <div class="box-header with-border">
@@ -238,8 +238,8 @@ if (!$model->isNewRecord) {
                                             </tbody>
                                             <thead>
                                             <tr>
-                                                <th style="font-size: smaller" colspan="2">Итого</th>
-                                                <th colspan="3"><div class="duration-summ2" id="duration-summ2"></div></th>
+                                                <th style="font-size: smaller" colspan="3">Итого</th>
+                                                <th colspan="2"><div class="duration-summ2" id="duration-summ2"></div></th>
                                             </tr>
                                             </thead>
                                         </table>
@@ -366,6 +366,28 @@ $js1 = <<< JS
                 deviceSelectConst.prop('selectedIndex', 0);               
             }
         });
+           
+        $(".btn-success").click(function() {
+             checkList(
+                 regionSelectConst.val(),
+                 senderSelectConst.val(),
+                 typeSelectConst.val(),
+                 groupSelectConst.val(),
+                 deviceSelectConst.val()
+             );
+        });
+    
+        $(".btn-primary").click(function() { 
+            if (checkJSON()) $("#form").submit();
+        });
+        
+        $(".region select").change(function() {
+            setSender($(this).val());  
+        });    
+        
+        $(".type select").change(function() {
+            disableTree($(this).val());
+        });
                 
         tree1.fancytree({
             extensions: ["table", "dnd"],
@@ -379,16 +401,18 @@ $js1 = <<< JS
                 if (data.node.isFolder()) {
                     return false;
                 }
+                if (typeSelectConst.val() === '2') {
+                    const findKey = tree2
+                        .fancytree("getTree")
+                        .getNodeByKey(data.node.key);
+                    if (findKey !== null) return false;
+                }
                 const playlistNode = tree2
                     .fancytree("getTree")
-                    .getNodeByKey('playList[1]');
-                if (typeSelectConst.val() === '1') {
-                    const addChild = [];
-                    addChild.push(data.node);
-                    playlistNode.addNode(addChild, 'child');
-                } else if (typeSelectConst.val() === '2') {
-                    data.node.moveTo(playlistNode, "child");
-                }
+                    .getNodeByKey('playList[1]'),
+                    addChild = [];
+                addChild.push(data.node);
+                playlistNode.addNode(addChild, 'child');                        
             },
             beforeActivate: function(event, data) {
             },
@@ -454,14 +478,15 @@ $js1 = <<< JS
             renderColumns: function(event, data) {
                 const node = data.node, tdList = $(node.tr).find(">td");
                 tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
-
+                
                 let typePlaylist = ''; 
-                if ( typeSelectConst.val() === '1') {
+                if (typeSelectConst.val() === '1') {
                     typePlaylist = 'Стандартный';                     
-                } else if ( typeSelectConst.val() === '2') {
+                } else if (typeSelectConst.val() === '2') {
                     typePlaylist = 'Коммерческий';
                 }
-                if (typePlaylist !== '' && !node.isFolder()) {
+                
+                if (typePlaylist !== '' && node.isFolder() === false) {
                     tdList.eq(2).text(typePlaylist);
                 }                
                 
@@ -511,6 +536,12 @@ $js1 = <<< JS
                 },
                 dragDrop : function(node, data) {
                     if (data.otherNode) {
+                        if (typeSelectConst.val() === '2') {
+                            const findKey = tree2
+                                .fancytree("getTree")
+                                .getNodeByKey(data.otherNode.key);
+                            if (findKey !== null) return false;
+                        }                        
                         let sameTree = (data.otherNode.tree === data.tree);
                         const playlistNode = data.tree.getNodeByKey('playList[1]');
                         if (!sameTree) {
@@ -663,8 +694,8 @@ $js1 = <<< JS
     function checkJSON () 
     {
         let html_body = '';
-        const htm_header = 'Ошибка сохранения плейлиста';
-        const parentFolder = tree2
+        const htm_header = 'Ошибка сохранения плейлиста',
+            parentFolder = tree2
             .fancytree("getTree")
             .getNodeByKey("playList[1]"); 
         
@@ -698,7 +729,24 @@ $js1 = <<< JS
         device_id = null
     ) {
         let html_body = '';
-        const htm_header = 'Ошибка сохранения плейлиста';       
+        const htm_header = 'Ошибка сохранения плейлиста',
+            activeTab = $('.nav-tabs .active a')[0].hash;
+            
+        if (activeTab === '#tab_1' && region === '') {
+            html_body += 'Не указано обязательное поле - <b>"Регион прогрывания"</b>'; 
+        }
+        if (activeTab === '#tab_2' && group_id === '') {
+            html_body += 'Не указано обязательное поле - <b>"Группа устройств"</b>'; 
+        }
+        if (activeTab === '#tab_3' && device_id === '') {
+            html_body += 'Не указано обязательное поле - <b>"Устройство"</b>'; 
+        }
+        if (html_body !== '') {
+            $('#bootstrap-dialog-title').html(htm_header);  
+            $('#bootstrap-dialog-message').html(html_body);  
+            $('#modal-dialog').modal('show');
+            return false;
+        }
         $.ajax({
             url: '/GMS/playlist/ajax-playlist-active',
             data: {
@@ -807,28 +855,6 @@ $js1 = <<< JS
             .addClass('video-info-normal')
             .html(htm_table);        
     }
-    
-    $(".btn-success").click(function() {
-        checkList(
-            regionSelectConst.val(),
-            senderSelectConst.val(),
-            typeSelectConst.val(),
-            groupSelectConst.val(),
-            deviceSelectConst.val()
-        );
-    });
-
-    $(".btn-primary").click(function() { 
-        if (checkJSON()) $("#form").submit();
-    });
-    
-    $(".region select").change(function() {
-        setSender($(this).val());  
-    });    
-    
-    $(".type select").change(function() {
-        disableTree($(this).val());
-    });
 JS;
 $this->registerJs($js1);
 ?>

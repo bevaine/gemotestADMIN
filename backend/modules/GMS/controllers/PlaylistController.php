@@ -174,31 +174,35 @@ class PlaylistController extends Controller
                 'sender_id' => $sender_id
             ]);
         } elseif (!empty($group_id)) {
-            $findModel->andWhere(['group_id' => $group_id]);
+            $findModel->andWhere([
+                'group_id' => $group_id
+            ]);
         } elseif (!empty($device_id)) {
-            $findModel->andWhere(['device_id' => $device_id]);
-        }
+            $findModel->andWhere([
+                'device_id' => $device_id
+            ]);
+        } else return 'null';
 
         /* @var GmsPlaylist $playlistModel */
         $playlistModel = $findModel->one();
 
         if ($playlistModel) {
             $out = $playlistModel->toArray();
-            if (isset($playlistModel->regionModel)) {
-                $out['region'] = $playlistModel->regionModel->region_name;
-            }
-            if (isset($playlistModel->senderModel)) {
-                $out['sender'] = $playlistModel->senderModel->sender_name;
-            }
-            if (isset($playlistModel->type)) {
-                $out['type'] =  GmsPlaylist::getPlayListType($playlistModel->type);
-            }
-            if (isset($playlistModel->groupDevicesModel)) {
-                $out['group'] =  $playlistModel->groupDevicesModel->group_name;
-            }
-            if (isset($playlistModel->deviceModel)) {
-                $out['device'] =  $playlistModel->deviceModel->name;
-            }
+
+            $out['region'] = isset($playlistModel->regionModel)
+                ? $playlistModel->regionModel->region_name : null;
+
+            $out['sender'] = isset($playlistModel->senderModel)
+                ? $playlistModel->senderModel->sender_name : null;
+
+            $out['type'] = isset($playlistModel->type)
+                ? GmsPlaylist::getPlayListType($playlistModel->type) : null;
+
+            $out['group'] = isset($playlistModel->groupDevicesModel)
+                ? $playlistModel->groupDevicesModel->group_name : null;
+
+            $out['device'] = isset($playlistModel->deviceModel)
+                ? $playlistModel->deviceModel->name : null;
         }
         return !empty($out) ? $out : 'null';
     }
