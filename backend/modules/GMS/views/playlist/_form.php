@@ -11,40 +11,6 @@ use yii\helpers\Url;
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylist */
 /* @var $form yii\widgets\ActiveForm */
-
-$class_tab1 = "";
-$class_tab2 = "";
-$class_tab3 = "";
-$class_active1 = "";
-$class_active2 = "";
-$class_active3 = "";
-if (!$model->isNewRecord) {
-    $data_tab1 = "";
-    $data_tab2 = "";
-    $data_tab3 = "";
-    $class_tab1 = "disabled";
-    $class_tab2 = "disabled";
-    $class_tab3 = "disabled";
-    if (!empty($model->region)) {
-        $class_tab1 = "active";
-        $class_active1 = " in active";
-        $data_tab1 = "tab";
-    }elseif (!empty($model->group_id)) {
-        $class_tab2 = "active";
-        $class_active2 = " in active";
-        $data_tab2 = "tab";
-    }elseif (!empty($model->device_id)) {
-        $class_tab3 = "active";
-        $class_active3 = " in active";
-        $data_tab3 = "tab";
-    }
-} else {
-    $data_tab1 = "tab";
-    $data_tab2 = "tab";
-    $data_tab3 = "tab";
-    $class_tab1 = "active";
-    $class_active1 = " in active";
-}
 ?>
 
 <style type="text/css">
@@ -92,20 +58,20 @@ if (!$model->isNewRecord) {
             <div class="nav-tabs-custom">
 
                 <ul class="nav nav-tabs">
-                    <li class="<?= $class_tab1 ?>">
-                        <a data-toggle="<?= $data_tab1 ?>" href="#tab_1">Привязка к региону/отделению</a>
+                    <li class="">
+                        <a data-toggle="" href="#tab_1">Привязка к региону/отделению</a>
                     </li>
-                    <li class="<?= $class_tab2 ?>">
-                        <a data-toggle="<?= $data_tab2 ?>" href="#tab_2">Привязка к группе устройств</a>
+                    <li class="">
+                        <a data-toggle="" href="#tab_2">Привязка к группе устройств</a>
                     </li>
-                    <li class="<?= $class_tab3 ?>">
-                        <a data-toggle="<?= $data_tab3 ?>" href="#tab_3">Привязка к устройству</a>
+                    <li class="">
+                        <a data-toggle="" href="#tab_3">Привязка к устройству</a>
                     </li>
                 </ul>
 
                 <div class="tab-content">
 
-                    <div id="tab_1" class="tab-pane fade<?= $class_active1 ?>">
+                    <div id="tab_1" class="tab-pane fade">
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group region">
@@ -126,7 +92,7 @@ if (!$model->isNewRecord) {
                         </div>
                     </div>
 
-                    <div id="tab_2" class="tab-pane fade<?= $class_active2 ?>">
+                    <div id="tab_2" class="tab-pane fade">
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group group_id">
@@ -139,7 +105,7 @@ if (!$model->isNewRecord) {
                         </div>
                     </div>
 
-                    <div id="tab_3" class="tab-pane fade<?= $class_active3 ?>">
+                    <div id="tab_3" class="tab-pane fade">
                         <div class="row">
                             <div class="col-lg-12">
                                 <div class="form-group device_id">
@@ -353,7 +319,9 @@ $js1 = <<< JS
         isNew = {$isNew}; 
         
     $(function()
-    {
+    {  
+        setTabs();
+        
         if (isNew !== false) {
             setSender(regionSelectConst.val());
         }
@@ -581,6 +549,91 @@ $js1 = <<< JS
             resetPlayer();
         });
     });
+    
+    /**
+    * 
+    */
+    function setTabs() {
+        let liTab1 = '',
+            liTab2 = '',
+            liTab3 = '',
+            pineTab1 = '',
+            pineTab2 = '',
+            pineTab3 = '';
+
+        const customTabs = $('.nav-tabs-custom'),
+            navTabs = customTabs.find('.nav-tabs'),
+            contentTabs = customTabs.find('.tab-content'),
+            liTabs = navTabs.find('li'),
+            pineTabs = contentTabs.find('.tab-pane');
+        
+        if (liTabs.length > 0) {
+            liTab1 = liTabs.eq(0);
+            liTab2 = liTabs.eq(1);
+            liTab3 = liTabs.eq(2);                
+        }
+        
+        if (pineTabs.length > 0) {
+            pineTab1 = pineTabs.eq(0);
+            pineTab2 = pineTabs.eq(1);
+            pineTab3 = pineTabs.eq(2);
+        }
+
+        if (isNew !== false) {
+            if (liTab1 !== '' && pineTab1 !== '') {
+                liTab1.addClass('active');
+                liTab1.find('a').attr('data-toggle', 'tab');
+                pineTab1.removeClass('tab-pane fade').addClass('tab-pane fade in active');
+            }
+            if (liTab2 !== '') {
+                liTab2.find('a').attr('data-toggle', 'tab');
+                
+            }
+            if (liTab3 !== '') {
+                liTab3.find('a').attr('data-toggle', 'tab');
+            }
+        } else {
+            let data_tab1 = "",
+                data_tab2 = "",
+                data_tab3 = "",
+                class_tab1 = "disabled",
+                class_tab2 = "disabled",
+                class_tab3 = "disabled",
+                class_active1 = 'tab-pane fade',
+                class_active2 = 'tab-pane fade',
+                class_active3 = 'tab-pane fade';
+
+            if (liTab1 !== '' && pineTab1 !== '' && '{$model->region}' !== '') {
+                data_tab1 = 'tab';
+                class_tab1 = 'active';
+                class_active1 = 'tab-pane fade in active';
+            }
+            
+            if (liTab2 !== '' && pineTab2 !== '' && '{$model->group_id}' !== '') {
+                data_tab2 = 'tab';
+                class_tab2 = 'active';
+                class_active2 = 'tab-pane fade in active';
+            }
+            
+            if (liTab3 !== '' && pineTab3 !== '' && '{$model->device_id}' !== '') {
+                data_tab3 = 'tab';
+                class_tab3 = 'active';
+                class_active3 = 'tab-pane fade in active';
+            }
+
+            liTab1.addClass(class_tab1);
+            liTab1.find('a').attr('data-toggle', data_tab1);
+            pineTab1.removeClass('tab-pane fade').addClass(class_active1);
+            
+            liTab2.addClass(class_tab2);
+            liTab2.find('a').attr('data-toggle', data_tab2);
+            pineTab2.removeClass('tab-pane fade').addClass(class_active2);
+            
+            liTab3.addClass(class_tab3);
+            liTab3.find('a').attr('data-toggle', data_tab3);
+            pineTab3.removeClass('tab-pane fade').addClass(class_active3);
+        }
+    }
     
     /**
     * 

@@ -14,30 +14,6 @@ use wbraganca\fancytree\FancytreeWidget;
 /* @var $action string
 /* @var $form yii\widgets\ActiveForm */
 
-$data_tab1 = "tab";
-$data_tab2 = "tab";
-if (!$model->isNewRecord) {
-    if (!empty($model->group_id)) {
-        $action = 'group';
-        $class_tab1 = "disabled";
-        $class_tab2 = "active";
-        $data_tab1 = "";
-    } else {
-        $action = '';
-        $class_tab1 = "active";
-        $class_tab2 = "disabled";
-        $data_tab2 = "";
-    }
-} else {
-    if ($action == "group") {
-        $class_tab1 = "";
-        $class_tab2 = "active";
-    } else {
-        $class_tab1 = "active";
-        $class_tab2 = "";
-    }
-}
-
 $layout = <<< HTML
     {input1}
     {separator}
@@ -281,19 +257,31 @@ HTML;
 
     <?= Html::hiddenInput('GmsPlaylistOut[id]', $model->id) ?>
 
-    <div class="modal fade" id="check-playlist" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+    <div class="modal bootstrap-dialog type-warning fade size-normal in" id="modal-dialog" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-body" id="modal-body">
-                    <div class="box box-solid box-danger">
-                        <div class="box-header with-border">
-                            <h3 class="box-title" id="box-title"></h3>
+                <div class="modal-header">
+                    <div class="bootstrap-dialog-header">
+                        <div class="bootstrap-dialog-close-button" style="display: none;">
+                            <button class="close" aria-label="close">×</button>
                         </div>
-                        <div class="box-body" id="box-body"></div>
+                        <div class="bootstrap-dialog-title" id="bootstrap-dialog-title">Подтверждение</div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="bootstrap-dialog-body">
+                        <div class="bootstrap-dialog-message" id="bootstrap-dialog-message">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                    <div class="bootstrap-dialog-footer">
+                        <div class="bootstrap-dialog-footer-buttons" id="bootstrap-dialog-footer-buttons">
+                            <button class="btn btn-default" data-dismiss="modal">
+                                <span class="glyphicon glyphicon-ban-circle"></span> Отмена
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -397,17 +385,20 @@ HTML;
             <div class="nav-tabs-custom">
 
                 <ul class="nav nav-tabs">
-                    <li class="<?= $class_tab1 ?>">
-                        <a data-toggle="<?= $data_tab1 ?>" href="#tab_1">Привязка к регион./отдел.</a>
+                    <li class="">
+                        <a data-toggle="" href="#tab_1">Привязка к региону/отделению</a>
                     </li>
-                    <li class="<?= $class_tab2 ?>">
-                        <a data-toggle="<?= $data_tab2 ?>" href="#tab_2">Привязка к группе</a>
+                    <li class="">
+                        <a data-toggle="" href="#tab_2">Привязка к группе устройств</a>
+                    </li>
+                    <li class="">
+                        <a data-toggle="" href="#tab_3">Привязка к устройству</a>
                     </li>
                 </ul>
 
                 <div class="tab-content">
 
-                    <div id="tab_1" class="tab-pane fade in active">
+                    <div id="tab_1" class="tab-pane fade">
                         <div class="row">
                             <div class="col-lg-6">
                                 <div class="form-group region">
@@ -439,26 +430,24 @@ HTML;
                         </div>
                     </div>
 
+                    <div id="tab_3" class="tab-pane fade">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group device_id">
+                                    <?= $form->field($model, 'device_id')->dropDownList(\common\models\GmsDevices::getDeviceList(), [
+                                        'prompt' => '---', 'disabled' => (!$model->isNewRecord) ? 'disabled' : false
+                                    ]);
+                                    ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <?= $html ?>
 
                 </div>
             </div>
 
-            <div class="box box-solid box-default">
-                <div class="box-header with-border">
-                    <h3 class="box-title">Привязка устройства</h3>
-                </div>
-                <div class="box-body">
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="form-group device_id">
-                                <?= $form->field($model, 'device_id')->dropDownList([], ['prompt' => '---']);
-                                ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="col-xs-6">
@@ -534,20 +523,22 @@ if ($model->isNewRecord) {
 $js1 = <<< JS
 
     const newPlayList = [
-        {
-            "title" : "Новый плейлист", 
-            "key" : "playlist", 
-            "folder" : true, 
-            "expanded" : true, 
-            "icon" : "/img/video1.png"
-        }
-    ],
-    regionSelectConst = $('#gmsplaylistout-region_id'),
-    senderSelectConst = $('#gmsplaylistout-sender_id'),
-    groupSelectConst = $('#gmsplaylistout-group_id'),
-    timeStartConst = $('#gmsplaylistout-time_start'),
-    timeEndConst = $('#gmsplaylistout-time_end'),
-    isNew = {$isNew};
+            {
+                "title" : "Новый плейлист", 
+                "key" : "playlist", 
+                "folder" : true, 
+                "expanded" : true, 
+                "icon" : "/img/video1.png"
+            }
+        ],
+        inputVar = $("input"),
+        regionSelectConst = $('#gmsplaylistout-region_id'),
+        senderSelectConst = $('#gmsplaylistout-sender_id'),
+        groupSelectConst = $('#gmsplaylistout-group_id'),
+        deviceSelectConst = $('#gmsplaylistout-device_id'),
+        timeStartConst = $('#gmsplaylistout-time_start'),
+        timeEndConst = $('#gmsplaylistout-time_end'),
+        isNew = {$isNew};
 
     /**
     * 
@@ -573,6 +564,61 @@ $js1 = <<< JS
     $(function()
     {
         const tree = $("#treetable");
+        
+        setTabs();
+        
+        $(".btn-primary, .btn-success").click(function() { 
+            checkTime();
+        });
+        
+        $(".region select").change(function() {
+            disableTree();
+            resetPlayer();
+            sumDuration();
+            setSender ($(this).val());
+            setTreeData (
+                $(this).val(), 
+                senderSelectConst.val(),
+                null,
+                null,
+            );
+        });
+        
+        $(".sender_id select").change(function() {
+            disableTree();
+            resetPlayer();
+            sumDuration();            
+            setTreeData (
+                regionSelectConst.val(), 
+                $(this).val(),
+                null,
+                null
+            );
+        });
+        
+        $(".group_id select").change(function() {
+            disableTree();
+            resetPlayer();
+            sumDuration(); 
+            setTreeData (
+                null, 
+                null, 
+                $(this).val(),
+                null
+            );
+        });
+        
+        $(".device_id select").change(function() {
+            disableTree();            
+            resetPlayer();
+            sumDuration(); 
+            setTreeData (
+                null, 
+                null, 
+                null,
+                $(this).val()
+            );
+        });
         
         tree.fancytree({
             extensions: ["table", "dnd", "edit"],
@@ -839,7 +885,130 @@ $js1 = <<< JS
             });
             e.stopPropagation(); 
         });
+        
+        $("a[href='#tab_1'], a[href='#tab_2'], a[href='#tab_3']").click(function() {
+            if (isNew !== false) {
+                regionSelectConst.prop('selectedIndex', 0);
+                setSender(regionSelectConst.val());
+                groupSelectConst.prop('selectedIndex', 0);
+                deviceSelectConst.prop('selectedIndex', 0); 
+                disableTree();
+                resetPlayer();
+                sumDuration();
+            }
+        });
+    
+        timeEndConst.bootstrapMaterialDatePicker({ 
+            date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
+        }).on('change', function(e, date) 
+        {
+            setDayTime();
+            sumDuration();
+        });
+
+        timeStartConst.bootstrapMaterialDatePicker({
+            date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
+        }).on('change', function(e, date) 
+        {
+            timeEndConst.bootstrapMaterialDatePicker('setMinDate', date);
+            setDayTime();
+            sumDuration();
+        });
+
+        setDayTime();
+		            
+        setSender (regionSelectConst.val());
+        
+        setTimeout(function(){
+            setTreeData (regionSelectConst.val(), senderSelectConst.val());
+        }, 1000); 
+        
     });
+    
+    /**
+    * 
+    */
+    function setTabs() {
+        let liTab1 = '',
+            liTab2 = '',
+            liTab3 = '',
+            pineTab1 = '',
+            pineTab2 = '',
+            pineTab3 = '';
+
+        const customTabs = $('.nav-tabs-custom'),
+            navTabs = customTabs.find('.nav-tabs'),
+            contentTabs = customTabs.find('.tab-content'),
+            liTabs = navTabs.find('li'),
+            pineTabs = contentTabs.find('.tab-pane');
+        
+        if (liTabs.length > 0) {
+            liTab1 = liTabs.eq(0);
+            liTab2 = liTabs.eq(1);
+            liTab3 = liTabs.eq(2);                
+        }
+        
+        if (pineTabs.length > 0) {
+            pineTab1 = pineTabs.eq(0);
+            pineTab2 = pineTabs.eq(1);
+            pineTab3 = pineTabs.eq(2);
+        }
+
+        if (isNew !== false) {
+            if (liTab1 !== '' && pineTab1 !== '') {
+                liTab1.addClass('active');
+                liTab1.find('a').attr('data-toggle', 'tab');
+                pineTab1.removeClass('tab-pane fade').addClass('tab-pane fade in active');
+            }
+            if (liTab2 !== '') {
+                liTab2.find('a').attr('data-toggle', 'tab');
+                
+            }
+            if (liTab3 !== '') {
+                liTab3.find('a').attr('data-toggle', 'tab');
+            }
+        } else {
+            let data_tab1 = "",
+                data_tab2 = "",
+                data_tab3 = "",
+                class_tab1 = "disabled",
+                class_tab2 = "disabled",
+                class_tab3 = "disabled",
+                class_active1 = 'tab-pane fade',
+                class_active2 = 'tab-pane fade',
+                class_active3 = 'tab-pane fade';
+
+            if (liTab1 !== '' && pineTab1 !== '' && '{$model->region_id}' !== '') {
+                data_tab1 = 'tab';
+                class_tab1 = 'active';
+                class_active1 = 'tab-pane fade in active';
+            }
+            
+            if (liTab2 !== '' && pineTab2 !== '' && '{$model->group_id}' !== '') {
+                data_tab2 = 'tab';
+                class_tab2 = 'active';
+                class_active2 = 'tab-pane fade in active';
+            }
+            
+            if (liTab3 !== '' && pineTab3 !== '' && '{$model->device_id}' !== '') {
+                data_tab3 = 'tab';
+                class_tab3 = 'active';
+                class_active3 = 'tab-pane fade in active';
+            }
+
+            liTab1.addClass(class_tab1);
+            liTab1.find('a').attr('data-toggle', data_tab1);
+            pineTab1.removeClass('tab-pane fade').addClass(class_active1);
+            
+            liTab2.addClass(class_tab2);
+            liTab2.find('a').attr('data-toggle', data_tab2);
+            pineTab2.removeClass('tab-pane fade').addClass(class_active2);
+            
+            liTab3.addClass(class_tab3);
+            liTab3.find('a').attr('data-toggle', data_tab3);
+            pineTab3.removeClass('tab-pane fade').addClass(class_active3);
+        }
+    }
     
     /**
     * 
@@ -883,42 +1052,44 @@ $js1 = <<< JS
         const treeObject = $("#treetable"), 
             tree = treeObject.fancytree("getTree"),
             parent = tree.getNodeByKey("playlist");
+        let color = 'black', error = '';
         
-        if (parent === undefined 
-            || parent.getChildren() === null) 
-            return false;
-
-        $.each(parent.getChildren(), function() 
-        {
-            if (this.data.type !== undefined) {
-                tdList = $(this.tr).find(">td");
-                if (this.data.type === '1') {
-                    tdList.eq(0).text(++i).addClass("alignRight");
-                } else if (this.data.type === '2') {
-                    tdList.eq(0).append().css({
-                        backgroundImage: "url(/img/rand.png)",
-                        backgroundPosition: "0 0",
-                        backgroundRepeat: "no-repeat"
-                    });
+        if (parent !== undefined && parent.getChildren() !== null) 
+        { 
+            $.each(parent.getChildren(), function() 
+            {
+                if (this.data.type !== undefined) {
+                    tdList = $(this.tr).find(">td");
+                    if (this.data.type === '1') {
+                        tdList.eq(0).text(++i).addClass("alignRight");
+                    } else if (this.data.type === '2') {
+                        tdList.eq(0).append().css({
+                            backgroundImage: "url(/img/rand.png)",
+                            backgroundPosition: "0 0",
+                            backgroundRepeat: "no-repeat"
+                        });
+                    }
+                }
+                
+                if (this.data.total !== undefined) {
+                    total += parseInt(this.data.total, 10);                
+                }
+            });
+            
+            if (total > 0) {
+                totalStr = moment.unix(total).utc().format("HH:mm:ss");
+                let timeDay = getTimeDay();
+                if (timeDay && total > timeDay) {
+                    color = "red";
+                    error = 'Превышен лимит за указанное время:';
                 }
             }
-            
-            if (this.data.total !== undefined) {
-                total += parseInt(this.data.total, 10);                
-            }
-        });
-        let color = 'black', error = '';
-        if (total > 0) {
-            totalStr = moment.unix(total).utc().format("HH:mm:ss");
-            let timeDay = getTimeDay();
-            if (timeDay && total > timeDay) {
-                color = "red";
-                error = 'Превышен лимит за указанное время:';
-            }
         }
+        
         $('#duration-summ').html(totalStr).css({
             color : color
         });
+    
         $('#error_span').html(error).css({
             color : color
         });
@@ -1065,7 +1236,14 @@ $js1 = <<< JS
         outTree.reload(newPlayList);      
     }
     
-    function setTreeData (region = null, sender = null, group = null) 
+    /**
+    * 
+    * @param region
+    * @param sender
+    * @param group
+    * @param device
+    */
+    function setTreeData (region = null, sender = null, group = null, device = null) 
     {
         const regionObject = $("#fancyree_template_region");
         const regionTree = regionObject.fancytree("getTree");
@@ -1083,21 +1261,22 @@ $js1 = <<< JS
                 region: region,
                 sender_id: sender,
                 pls_out_id: {$pls_id},
-                group_id: group
+                group_id: group,
+                device_id: device
             },
             success: function (res) {
                 if (res !== 'null') {
                     const pls_id = [];
-                    if (res.result[1]['inf'] !== undefined) {
-                        document.cookie = 'pls_std_id =' + res.result[1]['pls'] + ';';
+                    if (res.result[1] !== undefined) {
+                        setFormVal("pls_std_id", res.result[1]['pls']);
                         regionObject.fancytree("enable");
                         regionTree.reload(res.result[1]['inf']);
-                    }                  
-                    if (res.result[2]['inf'] !== undefined) {
-                        document.cookie = 'pls_com_id =' + res.result[2]['pls'] + ';';
+                    }  
+                    if (res.result[2] !== undefined) {
+                        setFormVal("pls_com_id", res.result[2]['pls']);
                         commercialObject.fancytree("enable");
                         commercialTree.reload(res.result[2]['inf']);
-                    } 
+                    }                        
                 }
             }
         });
@@ -1105,16 +1284,25 @@ $js1 = <<< JS
     
     /**
     * 
-    * @param cookie_name
-    * @returns {*}
+    * @param name
+    * @param val
     */
-    function get_cookie (cookie_name)
+    function setFormVal(name, val) 
     {
-        let results = document.cookie.match ( '(^|;) ?' + cookie_name + '=([^;]*)(;|$)' );
-        if (results)
-            return decodeURI(results[2]);
-        else
-            return null;
+        if ($("input").is("#" + name)) {
+            $("#" + name).remove();
+        }
+        $("<input>").attr({
+            type: "hidden",
+            id: name,
+            name: name,
+            value: val
+        }).appendTo("form");
+    }
+    
+    function getFormVal(name) 
+    {
+        return $('#' + name).val();
     }
     
     /**
@@ -1129,8 +1317,7 @@ $js1 = <<< JS
             arrCommercialChildren = [],
             htm_header = 'Ошибка сохранения плейлиста';
         
-        const inputVar = $("input"), 
-            treeObject = $("#treetable"), 
+        const treeObject = $("#treetable"), 
             tree = treeObject.fancytree("getTree"),
             parentFolder = tree.getNodeByKey("playlist"),
             rootTitle = parentFolder.title,
@@ -1229,8 +1416,8 @@ $js1 = <<< JS
             url: '{$urlAjaxCheckPlaylist}',
             data: {
                 all_time: timeDay,
-                pls_commerce: get_cookie('pls_com_id'),
-                pls_standart: get_cookie('pls_std_id'),
+                pls_commerce: getFormVal('pls_com_id'),
+                pls_standart: getFormVal('pls_std_id'),
                 arr_commerce: arrCommercialChildren,
                 arr_standart: arrStandartChildren
             },
@@ -1239,9 +1426,9 @@ $js1 = <<< JS
                 if (res !== 'null') {
                     if (res.state === 0) {
                         const html_body = res.message; 
-                        $('#modal-header').html(htm_header);        
-                        $('#modal-body').html(html_body);
-                        $('#check-playlist').modal('show');
+                        $('#bootstrap-dialog-title').html(htm_header);  
+                        $('#bootstrap-dialog-message').html(html_body);  
+                        $('#modal-dialog').modal('show');
                         return false;
                     } else {
                         arrOut["key"] = playListKey;
@@ -1302,9 +1489,9 @@ $js1 = <<< JS
              parentFolder === null || 
              parentFolder.children === null
          ) {
-            $('#modal-header').html(htm_header);        
-            $('#modal-body').html(html_body);
-            $('#check-playlist').modal('show');
+            $('#bootstrap-dialog-title').html(htm_header);  
+            $('#bootstrap-dialog-message').html(html_body);  
+            $('#modal-dialog').modal('show');
             return false;
         }
         
@@ -1316,6 +1503,26 @@ $js1 = <<< JS
     */
     function checkTime() {
         const m_data = $('#form').serialize();
+        let html_body = '';
+
+        const htm_header = 'Ошибка сохранения плейлиста',
+            activeTab = $('.nav-tabs .active a')[0].hash;
+            
+        if (activeTab === '#tab_1' && regionSelectConst.val() === '') {
+            html_body += 'Не указано обязательное поле - <b>"Регион прогрывания"</b>'; 
+        }
+        if (activeTab === '#tab_2' && groupSelectConst.val() === '') {
+            html_body += 'Не указано обязательное поле - <b>"Группа устройств"</b>'; 
+        }
+        if (activeTab === '#tab_3' && deviceSelectConst.val() === '') {
+            html_body += 'Не указано обязательное поле - <b>"Устройство"</b>'; 
+        }
+        if (html_body !== '') {
+            $('#bootstrap-dialog-title').html(htm_header);  
+            $('#bootstrap-dialog-message').html(html_body);  
+            $('#modal-dialog').modal('show');
+            return false;
+        }
         $.ajax({
             type: 'GET',
             url: '{$urlAjaxTime}',
@@ -1324,15 +1531,22 @@ $js1 = <<< JS
                 let html_body = '';
                 const htm_header = 'Ошибка добавления, временное пересечение с другим плейлистом!';
                 if (res !== 'null') {
-                    if (res.id !== undefined && res.name !== undefined) {
-                        let html  = 'Регион: <b>' + $('.region select option:selected').text() + '</b>'; 
-                        if ($('.sender_id select option:selected').text() !== '---') {
-                            html += '<br>Отделение: <b>' + $('.sender_id select option:selected').text() + '</b>'; 
-                        } 
-                        if ($('.device_id select option:selected').text() !== '---') {
-                            html += '<br>Устройство: <b>' +  + $('.device_id select option:selected').text() + '</b>'; 
-                        } 
-                        //html += 'Действует с' + res.date_start + ' по '.res.date_end;
+                    if (res.cross !== undefined && res.id !== undefined && res.name !== undefined) {
+                        let html = "";
+                        if (res.cross === 'region') {
+                            html  = 'Регион: <b>' + $('.region select option:selected').text() + '</b>'; 
+                            if (res.region !== undefined) {
+                                html += '<br>Отделение: <b>' + res.region + '</b>'; 
+                            } 
+                        } else if (res.cross === 'group') {
+                            if (res.group !== undefined) {
+                                html += 'Группа устройств: <b>' + res.group + '</b>'; 
+                            }   
+                        } else if (res.cross === 'device') {
+                            if (res.device !== undefined) {
+                                html += 'Устройство: <b>' + res.device + '</b>'; 
+                            }                              
+                        }
                         html_body += 'Для параметров: <p style="margin-left:30px;">' + html + '</span>';
                         html_body += '<p>Уже есть привязанный плейлист: ';
                         html_body += '<b><a target="_blank" href="/GMS/playlist-out/view?id=' + res.id + '">' + res.name + '</a></b>';
@@ -1350,9 +1564,10 @@ $js1 = <<< JS
                     }
                     html_body += '<p>Измените параметры и попробуйте ещё!</p>';
 
-                    $('#box-title').html(htm_header);
-                    $('#box-body').html(html_body);
-                    $('#check-playlist').modal('show');
+                    $('#bootstrap-dialog-title').html(htm_header);  
+                    $('#bootstrap-dialog-message').html(html_body);  
+                    $('#modal-dialog').modal('show');
+                    return false;
                 } else {
                     checkJSON();
                 }
@@ -1367,69 +1582,6 @@ $js1 = <<< JS
         }
         $('#day-summ').html(timeDuration);        
     }
-    
-    $(document).ready(function()
-    {  
-        $("a[href='#tab_1'], a[href='#tab_2']").click(function() {
-            if (isNew !== false) {
-                regionSelectConst.prop('selectedIndex', 0);
-                setSender(regionSelectConst.val());
-                groupSelectConst.prop('selectedIndex', 0);
-                disableTree();                
-            }
-        });
-            
-        $(".btn-primary, .btn-success").click(function() { 
-            checkTime();
-        });
-        
-        $(".region select").change(function() {
-            disableTree();
-            setSender ($(this).val());
-            setDevice ($(this).val(), senderSelectConst.val());
-            setTreeData ($(this).val(), senderSelectConst.val());
-        });
-        
-        $(".sender_id select").change(function() {
-            disableTree();
-            setDevice (regionSelectConst.val(), $(this).val());
-            setTreeData (regionSelectConst.val(), $(this).val());
-        });
-        
-        $(".group_id select").change(function() {
-            disableTree();
-            setTreeData (null, null, $(this).val());
-        });
-    
-        timeEndConst.bootstrapMaterialDatePicker({ 
-            date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
-        }).on('change', function(e, date) 
-        {
-            setDayTime();
-            sumDuration();
-        });
-
-        timeStartConst.bootstrapMaterialDatePicker({
-            date: false, shortTime: false, format: 'HH:mm', lang : 'ru'
-        }).on('change', function(e, date) 
-        {
-            timeEndConst.bootstrapMaterialDatePicker('setMinDate', date);
-            setDayTime();
-            sumDuration();
-        });
-
-        setDayTime();
-		            
-        setSender (regionSelectConst.val());
-        
-        setTimeout(function(){
-            setDevice (regionSelectConst.val(), senderSelectConst.val());
-        }, 1000);
-        
-        setTimeout(function(){
-            setTreeData (regionSelectConst.val(), senderSelectConst.val());
-        }, 1000);        
-    }); 
 JS;
 $this->registerJs($js1);
 ?>

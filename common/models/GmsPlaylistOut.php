@@ -5,11 +5,6 @@ namespace common\models;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\behaviors\TimestampBehavior;
-use yii\db\Expression;
-use yii\db\ActiveRecord;
-use yii\log\Logger;
-use yii\helpers\Url;
 
 /**
  * This is the model class for table "gms_playlist_out".
@@ -40,6 +35,7 @@ use yii\helpers\Url;
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsDevices $deviceModel
+ * @property GmsGroupDevices $groupDevicesModel
  * @property integer $videoType
  * @property array $videos
  *
@@ -47,20 +43,6 @@ use yii\helpers\Url;
 
 class GmsPlaylistOut extends \yii\db\ActiveRecord
 {
-    CONST SCENARIO_DEFAULT_PLAYLIST = 'default';
-    CONST SCENARIO_FIND_PLAYLIST = 'findPlaylistOut';
-
-    /**
-     * @return array
-     */
-    public function scenarios()
-    {
-        return [
-            self::SCENARIO_DEFAULT_PLAYLIST => ['active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday','name', 'jsonPlaylist', 'jsonKodi', 'date_start', 'date_end','time_start', 'time_end'],
-            self::SCENARIO_FIND_PLAYLIST => ['id', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday','name', 'jsonPlaylist', 'jsonKodi', 'date_start', 'date_end','time_start', 'time_end'],
-        ];
-    }
-
     CONST WEEK = [
         "is_monday" => "Понедельник",
         "is_tuesday" => "Вторник",
@@ -85,11 +67,10 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['region_id', 'jsonPlaylist', 'jsonKodi', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
-            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday', 'group_id'], 'integer'],
+            [['jsonPlaylist', 'jsonKodi', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
+            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'group_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],
             [['name', 'jsonPlaylist', 'jsonKodi'], 'string'],
-            [['date_start', 'date_end', 'time_start', 'time_end', 'region_id'], 'required', 'on' => 'default'],
-            [['date_start', 'date_end','time_start', 'time_end'], 'filter', 'filter' => function ($value) {
+            [['date_start', 'date_end', 'time_start', 'time_end'], 'filter', 'filter' => function ($value) {
                 if (!preg_match("/^[\d\+]+$/", $value) && !empty($value)) return strtotime($value);
                 else return $value;
             }],
@@ -185,6 +166,14 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupDevicesModel()
+    {
+        return $this->hasOne(GmsGroupDevices::className(), ['id' => 'group_id']);
+    }
+
+    /**
      * @param null $auth
      * @return array|mixed
      */
@@ -239,19 +228,35 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
      */
     public function checkPlaylist()
     {
-        if (empty($this->region_id)) return false;
+        $cross = '';
+        if (empty($this->region_id)) $this->region_id = null;
         if (empty($this->sender_id)) $this->sender_id = null;
+        if (empty($this->group_id)) $this->group_id = null;
         if (empty($this->device_id)) $this->device_id = null;
 
-        $findModel = self::find()
-            ->where([
+        $findModel = GmsPlaylistOut::find();
+        if (!empty($this->region_id)) {
+            $cross = 'region';
+            $findModel->andWhere([
                 'region_id' => $this->region_id,
-                'sender_id' => $this->sender_id,
-                'device_id' => $this->device_id])
-            ->andFilterWhere(['!=', 'id', $this->id])
-            ->all();
+                'sender_id' => $this->sender_id
+            ]);
+        } elseif (!empty($this->group_id)) {
+            $cross = 'group';
+            $findModel->andWhere([
+                'group_id' => $this->group_id
+            ]);
+        } elseif (!empty($this->device_id)) {
+            $cross = 'device';
+            $findModel->andWhere([
+                'device_id' => $this->device_id
+            ]);
+        }
 
-        if ($findModel) {
+        $findModel->andFilterWhere(['!=', 'id', $this->id]);
+        $findModel1 = $findModel->all();
+
+        if ($findModel1) {
 
             $arrDaysModel = [];
 
@@ -259,7 +264,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                 if (!empty($this->$day)) $arrDaysModel[$day] = $name;
             }
 
-            foreach ($findModel as $model) {
+            foreach ($findModel1 as $model) {
 
                 /** @var $model GmsPlaylistOut */
                 $dateCross = ($this->date_start <= $model->date_end  && $this->date_end >= $model->date_start);
@@ -271,6 +276,11 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                     $out = [
                         "id" => $model->id,
                         "name" => $model->name,
+                        "cross" => $cross,
+                        "region" => $model->regionModel->region_name,
+                        "sender" => $model->senderModel->sender_name,
+                        "group" => $model->groupDevicesModel->group_name,
+                        "device" => $model->deviceModel->name,
                         "date" => [
                             "start" => date("d-m-Y", $model->date_start),
                             "end" => date("d-m-Y", $model->date_end),
@@ -340,7 +350,6 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             date("Y", 0)
         );
     }
-
 
     /**
      * @return array|bool

@@ -85,7 +85,6 @@ class PlaylistOutController extends Controller
     public function actionCreate($param = null)
     {
         $model = new GmsPlaylistOut();
-
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
         } else {
@@ -138,7 +137,6 @@ class PlaylistOutController extends Controller
 
         $out = [];
         $model = new GmsPlaylistOut();
-        $model->scenario = 'findPlaylistOut';
 
         if ($model->load(Yii::$app->request->queryParams)) {
 

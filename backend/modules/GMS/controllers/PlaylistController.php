@@ -228,13 +228,15 @@ class PlaylistController extends Controller
      * @param null $sender_id
      * @param null $pls_out_id
      * @param null $group_id
+     * @param null $device_id
      * @return array|string
      */
     public function actionAjaxPlaylistTemplate(
         $region = null,
         $sender_id = null,
         $pls_out_id = null,
-        $group_id = null
+        $group_id = null,
+        $device_id = null
     ) {
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
@@ -244,18 +246,25 @@ class PlaylistController extends Controller
         $plsDataJSON = false;
 
         if (empty($sender_id)) $sender_id = null;
-        if (empty($region) && empty($group_id))
-            return 'null';
+        if (empty($region)) $region = null;
+        if (empty($group_id)) $group_id = null;
+        if (empty($device_id)) $device_id = null;
 
         $findModel = GmsPlaylist::find();
-        if (!empty($group_id)) {
-            $findModel
-                ->andWhere(['group_id' => $group_id]);
-        } else {
-            $findModel
-                ->andWhere(['region' => $region])
-                ->andWhere(['sender_id' => $sender_id]);
-        }
+        if (!empty($region)) {
+            $findModel->andWhere([
+                'region' => $region,
+                'sender_id' => $sender_id
+            ]);
+        } elseif (!empty($group_id)) {
+            $findModel->andWhere([
+                'group_id' => $group_id
+            ]);
+        } elseif (!empty($device_id)) {
+            $findModel->andWhere([
+                'device_id' => $device_id
+            ]);
+        } else return 'null';
 
         foreach ($findModel->all() as $model) {
             /** @var $model GmsPlaylist */
