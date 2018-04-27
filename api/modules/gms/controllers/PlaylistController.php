@@ -4,6 +4,7 @@ namespace api\modules\gms\controllers;
 
 use common\components\helpers\FunctionsHelper;
 use common\models\GmsDevices;
+use common\models\GmsGroupDevices;
 use common\models\GmsPlaylistOut;
 use yii\web\ForbiddenHttpException;
 use yii\rest\ActiveController;
@@ -13,6 +14,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 use DateTime;
 use DateTimeZone;
+use yii\db\Query;
 
 /**
  * @property GmsDevices $modelDevice
@@ -142,28 +144,66 @@ class PlaylistController extends ActiveController
     }
 
     /**
-     * @return array|bool
+     * @return array|bool|yii\db\ActiveRecord[]
      */
-    private function getPlaylist()
+    function getModelPlaylist()
     {
         $this->currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
         $this->currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
 
-        $findPlaylist = GmsPlaylistOut::find()
-            ->andFilterWhere(['region_id' => $this->modelDevice->region_id])
-            ->andFilterWhere(['sender_id' => $this->modelDevice->sender_id])
-            ->andWhere([
-                'OR',
-                ['device_id' => $this->modelDevice->id],
-                ['is', 'device_id' , null]
-            ])
-            ->andWhere(['<=', 'date_start', $this->currentDate])
-            ->andWhere(['>=', 'date_end', $this->currentDate])
-            ->andWhere(['<=', 'time_start', $this->currentTime])
-            ->andWhere(['>=', 'time_end', $this->currentTime])
-            ->andWhere(['=', 'active', 1])->asArray()->all();
+        $deviceId = $this->modelDevice->id;
+        $groupId = $this->modelDevice->groupDevices->group_id;
+        $region_id = $this->modelDevice->region_id;
+        $sender_id = $this->modelDevice->sender_id;
 
-        //Yii::getLogger()->log(['$findPlaylist'=>$findPlaylist], 1, 'binary');
+        $where = [
+            'and',
+            ['<=', 'date_start', $this->currentDate],
+            ['>=', 'date_end', $this->currentDate],
+            ['<=', 'time_start', $this->currentTime],
+            ['>=', 'time_end', $this->currentTime],
+            ['=', 'active', 1]
+        ];
+
+        if (!empty($deviceId)) {
+            $query = GmsPlaylistOut::find()
+                ->where(array_merge(
+                    $where,
+                    array(['=', 'device_id', $deviceId]))
+                )
+                ->one();
+            if ($query) return $query->toArray();
+        }
+
+        if (!empty($groupId)) {
+            $query = GmsPlaylistOut::find()
+                ->where(array_merge(
+                    $where,
+                    array(['=', 'group_id', $groupId]))
+                )
+                ->one();
+            if ($query) return $query->toArray();
+        }
+
+        if (!empty($region_id)) {
+            $query = GmsPlaylistOut::find()
+                ->where(array_merge(
+                    $where,
+                    array(['=', 'region_id', $region_id]))
+                )
+                ->andFilterWhere(['=', 'sender_id', $sender_id])
+                ->one();
+            if ($query) return $query->toArray();
+        }
+        return false;
+    }
+
+    /**
+     * @return array|bool
+     */
+    private function getPlaylist()
+    {
+        $findPlaylist = self::getModelPlaylist();
         if (!$findPlaylist) return false;
 
         $weekKeys = array_combine(

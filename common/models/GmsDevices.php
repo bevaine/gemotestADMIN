@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsPlaylistOut $playListOutModel
+ * @property GmsGroupDevices $groupDevices
  * @property array $treeDevices
  *
  */
@@ -122,6 +123,14 @@ class GmsDevices extends \yii\db\ActiveRecord
     public function getPlayListOutModel()
     {
         return $this->hasOne(GmsPlaylistOut::className(), ['id' => 'current_pls_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGroupDevices()
+    {
+        return $this->hasOne(GmsGroupDevices::className(), ['device_id' => 'id']);
     }
 
     /**
