@@ -277,16 +277,20 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                         "id" => $model->id,
                         "name" => $model->name,
                         "cross" => $cross,
-                        "region" => $model->regionModel->region_name,
-                        "sender" => $model->senderModel->sender_name,
-                        "group" => $model->groupDevicesModel->group_name,
-                        "device" => $model->deviceModel->name,
                         "date" => [
                             "start" => date("d-m-Y", $model->date_start),
                             "end" => date("d-m-Y", $model->date_end),
                         ],
                     ];
-
+                    if ($model->regionModel) {
+                        $out["region"] = $model->regionModel->region_name;
+                    }
+                    if ($model->senderModel) {
+                        $out["sender"] = $model->senderModel->sender_name;
+                    }
+                    if ($model->deviceModel) {
+                        $out["device"] = $model->deviceModel->name;
+                    }
                     if (!empty($arrDaysModel)) {
 
                         $weekCross = array_intersect_key(ArrayHelper::toArray($model), $arrDaysModel);
