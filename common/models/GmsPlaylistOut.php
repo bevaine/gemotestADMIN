@@ -32,6 +32,7 @@ use yii\helpers\Html;
  * @property integer $is_saturday
  * @property integer $is_sunday
  * @property integer $group_id
+ * @property integer $pls_id
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsDevices $deviceModel
@@ -43,6 +44,8 @@ use yii\helpers\Html;
 
 class GmsPlaylistOut extends \yii\db\ActiveRecord
 {
+    public $pls_id;
+
     CONST WEEK = [
         "is_monday" => "Понедельник",
         "is_tuesday" => "Вторник",
@@ -68,7 +71,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     {
         return [
             [['jsonPlaylist', 'jsonKodi', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
-            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'group_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday'], 'integer'],
+            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'group_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday', 'pls_id'], 'integer'],
             [['name', 'jsonPlaylist', 'jsonKodi'], 'string'],
             [['date_start', 'date_end', 'time_start', 'time_end'], 'filter', 'filter' => function ($value) {
                 if (!preg_match("/^[\d\+]+$/", $value) && !empty($value)) return strtotime($value);
@@ -253,7 +256,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             ]);
         }
 
-        $findModel->andFilterWhere(['!=', 'id', $this->id]);
+        $findModel->andFilterWhere(['!=', 'id', $this->pls_id]);
         $findModel1 = $findModel->all();
 
         if ($findModel1) {

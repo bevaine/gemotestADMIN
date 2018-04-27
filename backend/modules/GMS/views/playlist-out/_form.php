@@ -255,7 +255,7 @@ HTML;
 
     <?php $form = ActiveForm::begin(['id' => 'form']); ?>
 
-    <?= Html::hiddenInput('GmsPlaylistOut[id]', $model->id) ?>
+    <?= Html::hiddenInput('GmsPlaylistOut[pls_id]', $model->id) ?>
 
     <div class="modal bootstrap-dialog type-warning fade size-normal in" id="modal-dialog" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
         <div class="modal-dialog">
