@@ -148,13 +148,22 @@ class PlaylistController extends ActiveController
      */
     function getModelPlaylist()
     {
+        $deviceId = '';
+        $groupId = '';
+        $region_id = '';
+        $sender_id = '';
+
         $this->currentDate = GmsPlaylistOut::getDateWithoutTime($this->timeForTimeZone);
         $this->currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
 
-        $deviceId = $this->modelDevice->id;
-        $groupId = $this->modelDevice->groupDevices->group_id;
-        $region_id = $this->modelDevice->region_id;
-        $sender_id = $this->modelDevice->sender_id;
+        if ($this->modelDevice) {
+            $deviceId = $this->modelDevice->id;
+            $region_id = $this->modelDevice->region_id;
+            $sender_id = $this->modelDevice->sender_id;
+            if ($this->modelDevice->groupDevices) {
+                $groupId = $this->modelDevice->groupDevices->group_id;
+            }
+        }
 
         $where = [
             'and',
