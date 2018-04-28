@@ -110,7 +110,7 @@ class GmsPlaylist extends \yii\db\ActiveRecord
      */
     public function getGroupDevicesModel()
     {
-        return $this->hasOne(GmsGroupDevices::className(), ['id' => 'group_id']);
+        return $this->hasOne(GmsGroupDevices::className(), ['group_id' => 'group_id']);
     }
 
     /**

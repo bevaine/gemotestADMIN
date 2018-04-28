@@ -920,9 +920,13 @@ $js1 = <<< JS
         setSender (regionSelectConst.val());
         
         setTimeout(function(){
-            setTreeData (regionSelectConst.val(), senderSelectConst.val());
+            setTreeData (
+                regionSelectConst.val(), 
+                senderSelectConst.val(),
+                groupSelectConst.val(),
+                deviceSelectConst.val()
+            );
         }, 1000); 
-        
     });
     
     /**

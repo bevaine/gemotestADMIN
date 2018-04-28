@@ -69,10 +69,12 @@ class GmsGroupDevices extends \yii\db\ActiveRecord
     public static function getGroupList()
     {
         $arr = self::find()
+            ->distinct()
+            ->select(['group_id', 'group_name'])
             ->orderBy(['group_name' => 'asc'])
             ->asArray()
             ->all();
 
-        return ArrayHelper::map($arr,'id','group_name');
+        return ArrayHelper::map($arr,'group_id','group_name');
     }
 }

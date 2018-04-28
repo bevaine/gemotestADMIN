@@ -182,6 +182,8 @@ class PlaylistOutController extends Controller
         if (!empty($post['pls_commerce'])) $pls_commerce = $post['pls_commerce'];
         if (!empty($post['pls_standart'])) $pls_standart = $post['pls_standart'];
 
+        Yii::getLogger()->log(['$post'=>$post], 1, 'binary');
+
         if (empty($arr_standart) || empty($all_time)) {
             return [
                 'state' => 0,
