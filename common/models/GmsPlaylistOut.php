@@ -257,7 +257,6 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         }
 
         $findModel->andFilterWhere(['!=', 'id', $this->pls_id]);
-
         $findModel1 = $findModel->all();
 
         if ($findModel1) {

@@ -136,9 +136,19 @@ class PlaylistOutController extends Controller
         $response->format = yii\web\Response::FORMAT_JSON;
 
         $out = [];
-        $model = new GmsPlaylistOut();
+        if (empty(Yii::$app->request->queryParams)) {
+            return 'null';
+        }
 
-        if ($model->load(Yii::$app->request->queryParams)) {
+        $post = Yii::$app->request->queryParams;
+        if (!empty($post['GmsPlaylistOut']['pls_id'])) {
+            $pls_id = $post['GmsPlaylistOut']['pls_id'];
+            $model = GmsPlaylistOut::findOne($pls_id);
+        } else {
+            $model = new GmsPlaylistOut();
+        }
+
+        if ($model->load($post)) {
 
             $model->date_start = strtotime($model->date_start);
             $model->date_end = strtotime($model->date_end);
