@@ -121,6 +121,31 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
             [
+                'headerOptions' => array('style' => 'text-align: center;'),
+                'contentOptions' => function ($model, $key, $index, $column){
+                    return ['style' => 'text-align: center;'];
+                },
+                'format' => 'raw',
+                'value' => function ($model) {
+                    /** @var \common\models\GmsPlaylistOut $model */
+                    $value = $model['last_update_at'];
+                    $img_name = 'stop.png';
+                    if (time() < mktime(
+                            date('H', $value),
+                            date('i', $value) + 1,
+                            date('s', $value),
+                            date('m', $value),
+                            date('d', $value),
+                            date('Y', $value))) {
+                        $img_name = 'play.jpg';
+                    }
+                    return Html::img('/img/'.$img_name, [
+                        "alt" => 'Последняя активность была '.$value,
+                        "title" => 'Последняя активность была '.$value
+                    ]);
+                }
+            ],
+            [
                 'label' => 'Дни воспр.',
                 'headerOptions' => array('style' => 'width: 100px; text-align: center;'),
                 'format' => 'raw',
