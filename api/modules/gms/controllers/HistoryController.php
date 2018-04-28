@@ -49,10 +49,6 @@ class HistoryController extends ActiveController
 
         //todo если плейлист не изменился или нет подходящего плейлиста то историю не сохраняем
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            if (!empty($model->pls_id)) {
-                $findModel = GmsPlaylistOut::findOne($model->pls_id);
-                $findModel->last_update_at = time();
-            }
             return ['state' => 1];
         } else {
             Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
@@ -79,6 +75,11 @@ class HistoryController extends ActiveController
 
             if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
                 return ['state' => 0];
+
+            if (!empty($post["pls_id"])) {
+                $findModel = GmsPlaylistOut::findOne($post["pls_id"]);
+                $findModel->last_update_at = time();
+            }
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
             $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_all');
