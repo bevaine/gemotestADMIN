@@ -42,18 +42,14 @@ $this->params['breadcrumbs'][] = $this->title;
                     $value = $model['update_json'];
                     if (!empty($value)) {
                         $update_json = json_decode($value);
-                        $device = ArrayHelper::getColumn($update_json, 'device');
-                        $datetime = ArrayHelper::getColumn($update_json, 'datetime');
-                        $arr_merge_dev = array_combine($device, $datetime);
                         Yii::getLogger()->log([
-                          '$arr_merge_dev'=>$arr_merge_dev
+                          '$update_json'=>$update_json
                         ], 1, 'binary');
-
-                        $max_datetime = max($arr_merge_dev);
+                        $max_datetime = max($update_json);
                         if ($play_time = GmsPlaylistOut::checkTime($max_datetime)) {
                             $img_name =  'play.jpg';
                         }
-                        foreach ($arr_merge_dev as $key_dev => $val_dev) {
+                        foreach ($update_json as $key_dev => $val_dev) {
                             if (GmsPlaylistOut::checkTime($val_dev)) {
                                 $arr_dev[] = Html::tag(
                                     'span',
