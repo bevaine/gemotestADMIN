@@ -5,6 +5,7 @@ use yii\grid\GridView;
 use kartik\date\DatePicker;
 use yii\helpers\ArrayHelper;
 use common\models\GmsPlaylistOut;
+use common\models\GmsDevices;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsPlaylistOutSearch */
@@ -33,27 +34,24 @@ $this->params['breadcrumbs'][] = $this->title;
                 'contentOptions' => function ($model, $key, $index, $column){
                     return ['style' => 'text-align: center;'];
                 },
+                'label' => 'Воспр. на устр.',
                 'format' => 'raw',
                 'value' => function ($model) {
                     /** @var \common\models\GmsPlaylistOut $model */
                     $arr_dev = [];
-                    $html_dev = '';
-                    $img_name = 'stop.png';
+                    $html_dev = Html::img('/img/stop.png');
                     $value = $model['update_json'];
                     if (!empty($value)) {
                         $update_json = json_decode($value);
-                        Yii::getLogger()->log([
-                          '$update_json'=>$update_json
-                        ], 1, 'binary');
-                        $max_datetime = max(ArrayHelper::toArray($update_json));
-                        if ($play_time = GmsPlaylistOut::checkTime($max_datetime)) {
-                            $img_name = 'play.jpg';
-                        }
                         foreach ($update_json as $key_dev => $val_dev) {
+                            if ($findModel = GmsDevices::findOne($key_dev)) {
+                                continue;
+                            }
+                            $name_dev = $findModel->name;
                             if (GmsPlaylistOut::checkTime($val_dev)) {
                                 $arr_dev[] = Html::tag(
                                     'span',
-                                    $key_dev,
+                                    $name_dev,
                                     ['class' => 'label label-success']
                                 );
                             }
@@ -62,7 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             $html_dev = implode('<br>', $arr_dev);
                         }
                     }
-                    return Html::img('/img/'.$img_name).$html_dev;
+                    return $html_dev;
                 }
             ],
             'created_at:date',

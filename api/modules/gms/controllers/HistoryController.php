@@ -8,6 +8,7 @@
 
 namespace api\modules\gms\controllers;
 
+use common\models\GmsDevices;
 use common\models\GmsPlaylistOut;
 use common\models\GmsVideoHistory;
 use yii\rest\ActiveController;
@@ -63,6 +64,7 @@ class HistoryController extends ActiveController
     {
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
+        $arr_merge_dev = [];
 
         if (!empty(Yii::$app->request->post()))
         {
@@ -76,11 +78,19 @@ class HistoryController extends ActiveController
             if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
                 return ['state' => 0];
 
-            $arr_merge_dev = [];
+            if (!$findModelDevice = GmsDevices::findOne([
+                'device' => $post["device_id"]
+            ])) return ['state' => 0];
+
+            $device_key = $findModelDevice->id;
+
             if (!empty($findModel->update_json)) {
-                $arr_merge_dev = ArrayHelper::toArray(json_decode($findModel->update_json));
+                $arr_merge_dev = ArrayHelper::toArray(
+                    json_decode($findModel->update_json)
+                );
             }
-            $arr_merge_dev[$post["device_id"]] = time();
+
+            $arr_merge_dev[$device_key] = time();
             $findModel->update_json = json_encode($arr_merge_dev);
             $findModel->save();
 
