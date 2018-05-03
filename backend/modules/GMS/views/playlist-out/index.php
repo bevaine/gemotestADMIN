@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         ], 1, 'binary');
                         $max_datetime = max(ArrayHelper::toArray($update_json));
                         if ($play_time = GmsPlaylistOut::checkTime($max_datetime)) {
-                            $img_name =  'play.jpg';
+                            $img_name = 'play.jpg';
                         }
                         foreach ($update_json as $key_dev => $val_dev) {
                             if (GmsPlaylistOut::checkTime($val_dev)) {

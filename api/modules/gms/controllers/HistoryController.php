@@ -78,7 +78,7 @@ class HistoryController extends ActiveController
 
             $arr_merge_dev = [];
             if (!empty($findModel->update_json)) {
-                $arr_merge_dev = json_decode($findModel->update_json);
+                $arr_merge_dev = ArrayHelper::toArray(json_decode($findModel->update_json));
             }
             $arr_merge_dev[$post["device_id"]] = time();
             $findModel->update_json = json_encode($arr_merge_dev);
