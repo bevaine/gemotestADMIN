@@ -24,7 +24,7 @@ use yii\helpers\Html;
  * @property integer $active
  * @property integer $created_at
  * @property integer $update_at
- * @property integer $last_update_at
+ * @property integer $update_json
  * @property integer $is_monday
  * @property integer $is_tuesday
  * @property integer $is_wednesday
@@ -65,15 +65,28 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         return 'gms_playlist_out';
     }
 
-    /**
+    public static function checkTime($time) {
+        if (time() < mktime(
+            date('H', $time),
+            date('i', $time) + 1,
+            date('s', $time),
+            date('m', $time),
+            date('d', $time),
+            date('Y', $time))) {
+            return true;
+        }
+        return false;
+    }
+
+        /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
             [['jsonPlaylist', 'jsonKodi', 'date_start', 'date_end', 'time_start', 'time_end'], 'required'],
-            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'group_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday', 'pls_id', 'last_update_at'], 'integer'],
-            [['name', 'jsonPlaylist', 'jsonKodi'], 'string'],
+            [['created_at', 'update_at', 'active', 'region_id', 'sender_id', 'group_id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday', 'pls_id'], 'integer'],
+            [['name', 'jsonPlaylist', 'jsonKodi', 'update_json'], 'string'],
             [['date_start', 'date_end', 'time_start', 'time_end'], 'filter', 'filter' => function ($value) {
                 if (!preg_match("/^[\d\+]+$/", $value) && !empty($value)) return strtotime($value);
                 else return $value;
@@ -129,7 +142,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             'date_start_val' => 'Дата старт',
             'date_end_val' => 'Дата стоп',
             'group_id' => 'Номер группы',
-            'last_update_at' => 'Дата последнего испол.'
+            'update_json' => 'Обновление'
         ];
     }
 

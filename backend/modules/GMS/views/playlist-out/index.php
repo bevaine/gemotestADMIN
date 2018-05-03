@@ -3,6 +3,8 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use kartik\date\DatePicker;
+use yii\helpers\ArrayHelper;
+use common\models\GmsPlaylistOut;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsPlaylistOutSearch */
@@ -34,21 +36,34 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function ($model) {
                     /** @var \common\models\GmsPlaylistOut $model */
-                    $value = $model['last_update_at'];
+                    $arr_dev = [];
+                    $html_dev = '';
                     $img_name = 'stop.png';
-                    if (time() < mktime(
-                            date('H', $value),
-                            date('i', $value) + 1,
-                            date('s', $value),
-                            date('m', $value),
-                            date('d', $value),
-                            date('Y', $value))) {
-                        $img_name = 'play.jpg';
+                    $value = $model['update_json'];
+                      if (!empty($value)) {
+                        $update_json = json_decode($value);
+                        $device = ArrayHelper::getColumn($update_json, 'device');
+                        $datetime = ArrayHelper::getColumn($update_json, 'datetime');
+                        $arr_merge_dev = array_combine($device, $datetime);
+                        $max_datetime = max($arr_merge_dev);
+                        if ($play_time = GmsPlaylistOut::checkTime($max_datetime)) {
+                            $img_name =  'play.jpg';
+                        }
+                        foreach ($arr_merge_dev as $key_dev => $val_dev) {
+                            if (GmsPlaylistOut::checkTime($val_dev)) {
+                                $arr_dev[] = Html::tag(
+                                    'span',
+                                    $key_dev,
+                                    ['class' => 'label label-success']
+                                );
+                            }
+                        }
+                        if (!empty($arr_dev)) {
+                            $html_dev = implode('<br>', $arr_dev);
+                        }
+
                     }
-                    return Html::img('/img/'.$img_name, [
-                        "alt" => 'Последняя активность в '.date("Y-m-d H:i:s", $value),
-                        "title" => 'Последняя активность в '.date("Y-m-d H:i:s", $value)
-                    ]);
+                    return Html::img('/img/'.$img_name).$html_dev;
                 }
             ],
             'created_at:date',

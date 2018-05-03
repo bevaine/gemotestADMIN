@@ -13,7 +13,7 @@ class m180428_142039_add_new_column_play_list_out extends Migration
      */
     public function safeUp()
     {
-        $this->addColumn('{{%gms_playlist_out}}', 'last_update_at', Schema::TYPE_INTEGER);
+        $this->addColumn('{{%gms_playlist_out}}', 'update_json', Schema::TYPE_STRING);
     }
 
     /**
@@ -21,7 +21,7 @@ class m180428_142039_add_new_column_play_list_out extends Migration
      */
     public function safeDown()
     {
-        $this->dropColumn('{{%gms_playlist_out}}', 'last_update_at');
+        $this->dropColumn('{{%gms_playlist_out}}', 'update_json');
     }
 
     /*
