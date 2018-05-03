@@ -65,10 +65,14 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         return 'gms_playlist_out';
     }
 
+    /**
+     * @param $time
+     * @return bool
+     */
     public static function checkTime($time) {
         if (time() < mktime(
             date('H', $time),
-            date('i', $time) + 2,
+            date('i', $time) + 1,
             date('s', $time),
             date('m', $time),
             date('d', $time),
@@ -141,7 +145,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             'sender_name' => 'Отделение',
             'date_start_val' => 'Дата старт',
             'date_end_val' => 'Дата стоп',
-            'group_id' => 'Номер группы',
+            'group_id' => 'Группа устр-в',
             'update_json' => 'Обновление'
         ];
     }
@@ -188,7 +192,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
      */
     public function getGroupDevicesModel()
     {
-        return $this->hasOne(GmsGroupDevices::className(), ['id' => 'group_id']);
+        return $this->hasOne(GmsGroupDevices::className(), ['group_id' => 'group_id']);
     }
 
     /**
@@ -219,6 +223,36 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             ['class' => 'label label-' . $class]
         );
         return $html;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdateDev() {
+        /** @var \common\models\GmsPlaylistOut $model */
+        $arr_dev = [];
+        $html_dev = Html::img('/img/stop.png');
+        $value = $model->update_json;
+        if (!empty($value)) {
+            $update_json = json_decode($value);
+            foreach ($update_json as $key_dev => $val_dev) {
+                if (!$findModel = GmsDevices::findOne($key_dev)) {
+                    continue;
+                }
+                $name_dev = $findModel->name;
+                if (GmsPlaylistOut::checkTime($val_dev)) {
+                    $arr_dev[] = Html::tag(
+                        'span',
+                        $name_dev,
+                        ['class' => 'label label-success']
+                    );
+                }
+            }
+            if (!empty($arr_dev)) {
+                $html_dev = implode('<br>', $arr_dev);
+            }
+        }
+        return $html_dev;
     }
 
     /**

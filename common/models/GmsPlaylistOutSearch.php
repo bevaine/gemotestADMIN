@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\components\helpers\FunctionsHelper;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -28,8 +29,8 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
     public function rules()
     {
         return [
-            [['id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday', 'date_start', 'date_end', 'sender_id', 'region_id', 'active'], 'integer'],
-            [['date_start_val', 'date_end_val', 'device_name', 'sender_name', 'name', 'jsonPlaylist'], 'safe'],
+            [['id', 'device_id', 'is_monday', 'is_tuesday', 'is_wednesday', 'is_thursday', 'is_friday', 'is_saturday', 'is_sunday', 'date_start', 'date_end', 'sender_id', 'region_id', 'active', 'group_id'], 'integer'],
+            [['date_start_val', 'date_end_val', 'device_name', 'sender_name', 'name', 'jsonPlaylist', 'time_start', 'time_end'], 'safe'],
         ];
     }
 
@@ -98,29 +99,14 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
         // grid filtering conditions
         $query->andFilterWhere([
             'gms_playlist_out.id' => $this->id,
-            'gms_playlist_out.device_id' => $this->device_id,
-            'gms_playlist_out.is_monday' => $this->is_monday,
-            'gms_playlist_out.is_tuesday' => $this->is_tuesday,
-            'gms_playlist_out.is_wednesday' => $this->is_wednesday,
-            'gms_playlist_out.is_thursday' => $this->is_thursday,
-            'gms_playlist_out.is_friday' => $this->is_friday,
-            'gms_playlist_out.is_saturday' => $this->is_saturday,
-            'gms_playlist_out.is_sunday' => $this->is_sunday,
-            'gms_playlist_out.time_start' => $this->time_start,
-            'gms_playlist_out.time_end' => $this->time_end,
-            'gms_playlist_out.date_start' => $this->date_start,
-            'gms_playlist_out.date_end' => $this->date_end,
-            'gms_playlist_out.sender_id' => $this->sender_id,
             'gms_playlist_out.region_id' => $this->region_id,
-            'gms_playlist_out.update_at' => $this->update_at,
-            'gms_playlist_out.created_at' => $this->created_at,
             'gms_playlist_out.active' => $this->active,
+            'gms_playlist_out.group_id' => $this->group_id,
         ]);
 
-        $query->andFilterWhere(['like', 'jsonPlaylist', $this->jsonPlaylist])
-            ->andFilterWhere(['like', 'gms_devices.device', $this->device_name])
-            ->andFilterWhere(['like', 'gms_senders.sender_name', $this->sender_name]);
-
+        $query->andFilterWhere(['like', 'LOWER(gms_playlist_out.name)', strtolower($this->name)])
+            ->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->device_name)])
+            ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)]);
 
         $end_date = mktime(
             date("H", 23),
@@ -130,6 +116,13 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             date("d", strtotime($this->date_end_val)),
             date("Y", strtotime($this->date_end_val))
         );
+        if (!empty($this->time_start)) {
+            $query->andFilterWhere(['>=', 'time_start', GmsPlaylistOut::getTimeDate(strtotime($this->time_start))]);
+        }
+
+        if (!empty($this->time_end)) {
+            $query->andFilterWhere(['<=', 'time_end', GmsPlaylistOut::getTimeDate(strtotime($this->time_end))]);
+        }
 
         if ($this->date_start_val) {
             $query->andFilterWhere(['>=', 'date_start', strtotime($this->date_start_val)]);

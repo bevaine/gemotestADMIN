@@ -6,6 +6,7 @@ use kartik\date\DatePicker;
 use yii\helpers\ArrayHelper;
 use common\models\GmsPlaylistOut;
 use common\models\GmsDevices;
+use kartik\time\TimePicker;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsPlaylistOutSearch */
@@ -22,6 +23,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'options' => ['style' => 'font-size:12px;'],
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
@@ -38,29 +40,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'raw',
                 'value' => function ($model) {
                     /** @var \common\models\GmsPlaylistOut $model */
-                    $arr_dev = [];
-                    $html_dev = Html::img('/img/stop.png');
-                    $value = $model['update_json'];
-                    if (!empty($value)) {
-                        $update_json = json_decode($value);
-                        foreach ($update_json as $key_dev => $val_dev) {
-                            if (!$findModel = GmsDevices::findOne($key_dev)) {
-                                continue;
-                            }
-                            $name_dev = $findModel->name;
-                            if (GmsPlaylistOut::checkTime($val_dev)) {
-                                $arr_dev[] = Html::tag(
-                                    'span',
-                                    $name_dev,
-                                    ['class' => 'label label-success']
-                                );
-                            }
-                        }
-                        if (!empty($arr_dev)) {
-                            $html_dev = implode('<br>', $arr_dev);
-                        }
-                    }
-                    return $html_dev;
+                    return $model->getUpdateDev();
                 }
             ],
             'created_at:date',
@@ -69,7 +49,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'filter' =>  \common\models\GmsRegions::getRegionList(),
                 'value' => function ($model) {
-                    /** @var $model \common\models\GmsPlaylist */
+                    /** @var $model \common\models\GmsPlaylistOut */
                     return !empty($model->regionModel) ? $model->regionModel->region_name : null;
                 },
                 'attribute' => 'region_id'
@@ -83,25 +63,37 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'sender_name'
             ],
             [
+                'options' => ['style' => 'font-size:12px;'],
+                'filter' =>  \common\models\GmsGroupDevices::getGroupList(),
+                'value' => function ($model) {
+                    /** @var $model \common\models\GmsPlaylistOut */
+                    return !empty($model->groupDevicesModel) ? $model->groupDevicesModel->group_name : null;
+                },
+                'attribute' => 'group_id'
+            ],
+            [
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylist */
-                    return !empty($model->deviceModel) ? $model->deviceModel->device : null;
+                    return !empty($model->deviceModel) ? $model->deviceModel->name : null;
 
                 },
                 'attribute' => 'device_name'
             ],
             [
-                'headerOptions' => array('style' => 'width: 195px; text-align: center;'),
+                'headerOptions' => [
+                    'style' => 'width: 105px; text-align: center;'
+                ],
                 'attribute' => 'date_start_val',
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylist */
                     return isset($model->date_start) ? date('d-m-Y', $model->date_start) : null;
                 },
                 'filter' => \kartik\date\DatePicker::widget([
-                        'model' => $searchModel,
-                        'name' => 'date_start_val',
-                        'attribute' => 'date_start_val',
-                        'type' => DatePicker::TYPE_COMPONENT_PREPEND,
+                    'model' => $searchModel,
+                    'name' => 'date_start_val',
+                    'attribute' => 'date_start_val',
+                    'options' => ['style' => 'font-size:12px;'],
+                        'type' => DatePicker::TYPE_INPUT,
                         'pluginOptions' => [
                             'autoclose' => true,
                             'format' => 'dd-mm-yyyy'
@@ -110,17 +102,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'html', // datetime
             ],
             [
-                'headerOptions' => array('style' => 'width: 195px; text-align: center;'),
+                'headerOptions' => [
+                    'style' => 'width: 105px; text-align: center;'
+                ],
                 'attribute' => 'date_end_val',
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylist */
                     return isset($model->date_end) ? date('d-m-Y', $model->date_end) : null;
                 },
                 'filter' => \kartik\date\DatePicker::widget([
+                    'options' => ['style' => 'font-size:12px;'],
                     'model' => $searchModel,
                     'name' => 'date_end_val',
                     'attribute' => 'date_end_val',
-                    'type' => DatePicker::TYPE_COMPONENT_PREPEND,
+                    'type' => DatePicker::TYPE_INPUT,
                     'pluginOptions' => [
                         'autoclose' => true,
                         'format' => 'dd-mm-yyyy'
@@ -128,9 +123,26 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                 'format' => 'html', // datetime
             ],
-            //'date_start:date',
-            //'date_end:date',
             [
+                'filter' => \kartik\time\TimePicker::widget([
+                    'model' => $searchModel,
+                    'name' => 'time_start',
+                    'attribute' => 'time_start',
+                    'options' => ['style' => 'width: 60px; text-align: center; font-size:12px;'],
+                    'pluginOptions' => [
+                        'showSeconds' => false,
+                        'showMeridian' => false,
+                        'minuteStep' => 5,
+                        'hourStep' => 1,
+                        'showInputs' => false,
+                        'defaultTime' => '00:00',
+                        'template' => false
+                    ],
+                    'addonOptions' => [
+                        'asButton' => false,
+                    ],
+                    'addon' => ''
+                ]),
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylistOut */
                     return !empty($model->time_start) ? date('H:i', $model->time_start) : null;
@@ -139,6 +151,25 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'time_start'
             ],
             [
+                'filter' => \kartik\time\TimePicker::widget([
+                    'model' => $searchModel,
+                    'name' => 'time_end',
+                    'attribute' => 'time_end',
+                    'options' => ['style' => 'width: 60px; text-align: center; font-size:12px;'],
+                    'pluginOptions' => [
+                        'showSeconds' => false,
+                        'showMeridian' => false,
+                        'minuteStep' => 5,
+                        'hourStep' => 1,
+                        'showInputs' => false,
+                        'defaultTime' => '23:59',
+                        'template' => false
+                    ],
+                    'addonOptions' => [
+                        'asButton' => false,
+                    ],
+                    'addon' => ''
+                ]),
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylistOut */
                     return !empty($model->time_end) ? date('H:i', $model->time_end) : null;
@@ -159,7 +190,9 @@ $this->params['breadcrumbs'][] = $this->title;
             ],
             [
                 'label' => 'Дни воспр.',
-                'headerOptions' => array('style' => 'width: 100px; text-align: center;'),
+                'headerOptions' => [
+                        'style' => 'width: 100px; text-align: center;'
+                ],
                 'format' => 'raw',
                 'value' => function ($model) {
                     /** @var \common\models\GmsPlaylistOut $model */
@@ -167,7 +200,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
             ],
 
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'headerOptions' => [
+                    'style' => 'width: 60px; text-align: center;'
+                ],
+            ],
         ],
     ]); ?>
 </div>

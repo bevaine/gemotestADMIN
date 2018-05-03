@@ -368,10 +368,10 @@ HTML;
                                     <?php
                                     foreach ($model::WEEK as $key => $value) {
                                         echo "<span style='padding-left: 10px'>".Html::Activecheckbox($model, $key, [
-                                                'value' => "1",
-                                                'label' => $value,
-                                                'data-url' => 'is_monday'
-                                            ])."</span>";
+                                            'value' => "1",
+                                            'label' => $value,
+                                            'data-url' => 'is_monday'
+                                        ])."</span>";
                                     }
                                     ?>
                                 </p>
