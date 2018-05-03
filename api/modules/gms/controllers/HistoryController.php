@@ -76,19 +76,15 @@ class HistoryController extends ActiveController
             if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
                 return ['state' => 0];
 
+            $arr_merge_dev = [];
             if (!empty($findModel->update_json)) {
                 $json_dev = json_decode($findModel->update_json);
                 $device = ArrayHelper::getColumn($json_dev, 'device');
                 $datetime = ArrayHelper::getColumn($json_dev, 'datetime');
                 $arr_merge_dev = array_combine($device, $datetime);
-                $arr_merge_dev[$post["device_id"]] = time();
-                $findModel->update_json = json_encode($arr_merge_dev);
-            } else {
-                $findModel->update_json = json_encode([
-                    'device' => $post["device_id"],
-                    'datetime' => time(),
-                ]);
             }
+            $arr_merge_dev[$post["device_id"]] = time();
+            $findModel->update_json = json_encode($arr_merge_dev);
             $findModel->save();
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
