@@ -40,11 +40,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     $html_dev = '';
                     $img_name = 'stop.png';
                     $value = $model['update_json'];
-                      if (!empty($value)) {
+                    if (!empty($value)) {
                         $update_json = json_decode($value);
                         $device = ArrayHelper::getColumn($update_json, 'device');
                         $datetime = ArrayHelper::getColumn($update_json, 'datetime');
                         $arr_merge_dev = array_combine($device, $datetime);
+                        Yii::getLogger()->log([
+                          '$arr_merge_dev'=>$arr_merge_dev
+                        ], 1, 'binary');
+
                         $max_datetime = max($arr_merge_dev);
                         if ($play_time = GmsPlaylistOut::checkTime($max_datetime)) {
                             $img_name =  'play.jpg';
@@ -61,7 +65,6 @@ $this->params['breadcrumbs'][] = $this->title;
                         if (!empty($arr_dev)) {
                             $html_dev = implode('<br>', $arr_dev);
                         }
-
                     }
                     return Html::img('/img/'.$img_name).$html_dev;
                 }
