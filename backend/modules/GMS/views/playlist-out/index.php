@@ -44,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if (!empty($value)) {
                         $update_json = json_decode($value);
                         foreach ($update_json as $key_dev => $val_dev) {
-                            if ($findModel = GmsDevices::findOne($key_dev)) {
+                            if (!$findModel = GmsDevices::findOne($key_dev)) {
                                 continue;
                             }
                             $name_dev = $findModel->name;

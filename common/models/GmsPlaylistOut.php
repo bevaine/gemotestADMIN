@@ -68,7 +68,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     public static function checkTime($time) {
         if (time() < mktime(
             date('H', $time),
-            date('i', $time) + 1,
+            date('i', $time) + 2,
             date('s', $time),
             date('m', $time),
             date('d', $time),
