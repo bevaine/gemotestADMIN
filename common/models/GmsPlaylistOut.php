@@ -229,10 +229,9 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
      * @return string
      */
     public function getUpdateDev() {
-        /** @var \common\models\GmsPlaylistOut $model */
         $arr_dev = [];
         $html_dev = Html::img('/img/stop.png');
-        $value = $model->update_json;
+        $value = $this->update_json;
         if (!empty($value)) {
             $update_json = json_decode($value);
             foreach ($update_json as $key_dev => $val_dev) {
