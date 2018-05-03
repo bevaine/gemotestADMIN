@@ -45,7 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         Yii::getLogger()->log([
                           '$update_json'=>$update_json
                         ], 1, 'binary');
-                        $max_datetime = max($update_json);
+                        $max_datetime = max(ArrayHelper::toArray($update_json));
                         if ($play_time = GmsPlaylistOut::checkTime($max_datetime)) {
                             $img_name =  'play.jpg';
                         }
