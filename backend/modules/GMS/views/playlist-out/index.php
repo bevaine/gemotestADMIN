@@ -31,18 +31,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'headerOptions' => array('style' => 'width: 30px; text-align: center;'),
                 'attribute' => 'id'
             ],
-            [
-                'headerOptions' => array('style' => 'text-align: center;'),
-                'contentOptions' => function ($model, $key, $index, $column){
-                    return ['style' => 'text-align: center;'];
-                },
-                'label' => 'Воспр. на устр.',
-                'format' => 'raw',
-                'value' => function ($model) {
-                    /** @var \common\models\GmsPlaylistOut $model */
-                    return $model->getUpdateDev();
-                }
-            ],
             'created_at:date',
             'update_at:date',
             'name',
@@ -199,7 +187,20 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->getDaysPlaylist();
                 }
             ],
-
+            [
+                'headerOptions' => array('style' => 'text-align: center;'),
+                'contentOptions' => function ($model, $key, $index, $column){
+                    return [
+                        'style' => 'text-align: center;'
+                    ];
+                },
+                'label' => 'Воспр. на устр.',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    /** @var \common\models\GmsPlaylistOut $model */
+                    return $model->getUpdateDev();
+                }
+            ],
             [
                 'class' => 'yii\grid\ActionColumn',
                 'headerOptions' => [

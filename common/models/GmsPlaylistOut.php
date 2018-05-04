@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "gms_playlist_out".
@@ -228,7 +229,8 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     /**
      * @return string
      */
-    public function getUpdateDev() {
+    public function getUpdateDev()
+    {
         $arr_dev = [];
         $html_dev = Html::img('/img/stop.png');
         $value = $this->update_json;
@@ -240,10 +242,22 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                 }
                 $name_dev = $findModel->name;
                 if (GmsPlaylistOut::checkTime($val_dev)) {
-                    $arr_dev[] = Html::tag(
-                        'span',
-                        $name_dev,
-                        ['class' => 'label label-success']
+                    $arr_dev[] = Html::a(
+                        Html::tag(
+                            'span',
+                            $name_dev,
+                            [
+                                'class' => 'label label-success'
+                            ]
+                        ),
+                        Url::to(['GMS/gms-devices/view', 'id' => $key_dev]),
+                        [
+                            'style' => [
+                                'cursor' => 'pointer'
+                            ],
+                            'title' => $name_dev,
+                            'target' => '_blank'
+                        ]
                     );
                 }
             }
