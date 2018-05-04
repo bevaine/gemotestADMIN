@@ -1337,6 +1337,10 @@ class ActiveSyncHelper
             }
         }
 
+        if (strlen($this->accountName) > 20) {
+            $this->accountName = substr($this->accountName, 0, 20);
+        }
+
         //todo создаем нового пользователя в AD
         $arrAccountAD = $this->addNewUserAd();
 

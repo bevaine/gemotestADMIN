@@ -166,6 +166,20 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'time_end'
             ],
             [
+                'headerOptions' => array('style' => 'text-align: center;'),
+                'contentOptions' => function ($model, $key, $index, $column){
+                    return [
+                        'style' => 'text-align: center;'
+                    ];
+                },
+                'label' => 'Воспр. на устр.',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    /** @var \common\models\GmsPlaylistOut $model */
+                    return $model->getUpdateDev();
+                }
+            ],
+            [
                 'label' => 'Статус',
                 'headerOptions' => array('style' => 'width: 100px; text-align: center;'),
                 'filter' => \common\models\GmsPlaylistOut::getAuthStatusArray(),
@@ -185,20 +199,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function ($model) {
                     /** @var \common\models\GmsPlaylistOut $model */
                     return $model->getDaysPlaylist();
-                }
-            ],
-            [
-                'headerOptions' => array('style' => 'text-align: center;'),
-                'contentOptions' => function ($model, $key, $index, $column){
-                    return [
-                        'style' => 'text-align: center;'
-                    ];
-                },
-                'label' => 'Воспр. на устр.',
-                'format' => 'raw',
-                'value' => function ($model) {
-                    /** @var \common\models\GmsPlaylistOut $model */
-                    return $model->getUpdateDev();
                 }
             ],
             [

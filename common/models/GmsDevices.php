@@ -4,6 +4,13 @@ namespace common\models;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
+use yii\helpers\Html;
+use common\components\helpers\FunctionsHelper;
+use DateTime;
+use DateTimeZone;
+use yii\base\Exception;
+use DateInterval;
 
 /**
  * This is the model class for table "gms_devices".
@@ -73,7 +80,7 @@ class GmsDevices extends \yii\db\ActiveRecord
             'id' => 'ID',
             'sender_id' => 'Отделение',
             'name' => 'Название',
-            'device' => 'Устройство',
+            'device' => 'ID устройства',
             'created_at' => 'Создан',
             'last_active_at' => 'Активность',
             'region_id' => 'Регион',
@@ -92,6 +99,93 @@ class GmsDevices extends \yii\db\ActiveRecord
     public static function getAuthStatus($auth = null) {
         if ($auth == null || $auth != 1) $auth = 0;
         return self::getAuthStatusArray()[$auth];
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getAuthGrid()
+    {
+        if (empty($this->region_id)
+            || empty($this->timezone)
+            || empty($this->device))
+            return null;
+
+        $value = $this->auth_status;
+        if (!empty($value)) {
+            $img_name = 'on.jpg';
+            $title = "Заблокировать";
+            $action = "deactivate";
+        } else {
+            $img_name = 'off.jpg';
+            $title = "Авторизировать";
+            $action = "activate";
+        }
+        return Html::a(
+            Html::img('/img/'.$img_name),
+            Url::to(["/GMS/gms-devices/".$action."/".$this->id]),
+            ['title' => $title]
+        );
+    }
+
+    /**
+     * @return null
+     */
+    public function getTimeZoneGrid()
+    {
+        if (array_key_exists($this->timezone, FunctionsHelper::getTimeZonesList())) {
+            return FunctionsHelper::getTimeZonesList()[$this->timezone];
+        } else return null;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getLastActiveGrid()
+    {
+        if (empty($this->last_active_at))
+            return null;
+
+        $value = $this->last_active_at;
+        $img_name = 'icon-time3.jpg';
+
+        try {
+            $dt2 = new DateTime($value);
+            $dt3 = new DateTime($value);
+            $tz = $dt2->getTimezone();
+            $dt1 = new DateTime('now', new DateTimeZone($tz->getName()));
+            $dt2->add(new DateInterval('P1D')); // +1 день
+            $dt3->add(new DateInterval('P2D')); // +2 дня
+            if ($dt2 >= $dt1) {
+                $img_name = 'icon-time1.jpg';
+            } elseif ($dt3 >= $dt1) {
+                $img_name = 'icon-time2.jpg';
+            }
+        } catch (Exception $e) {
+            return null;
+        }
+
+        $html = date("Y-m-d H:i:s T", strtotime($this->last_active_at));
+        $html .= "&#9;".Html::img('/img/'.$img_name, [
+            "alt" => 'Последняя активность была '.$value,
+            "title" => 'Последняя активность была '.$value
+        ]);
+        return $html;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getStateGrid()
+    {
+        if (empty($this->auth_status))
+            return null;
+
+        $value = $this->auth_status;
+        $name = GmsDevices::getAuthStatus($value);
+        $value == 1 ? $class = 'success' : $class = 'danger';
+        $html = Html::tag('span', Html::encode($name), ['class' => 'label label-' . $class]);
+        return $html;
     }
 
     /**
