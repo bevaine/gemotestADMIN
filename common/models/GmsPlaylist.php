@@ -69,13 +69,13 @@ class GmsPlaylist extends \yii\db\ActiveRecord
             'name' => 'Название',
             'file' => 'Имя файла',
             'type' => 'Тип шаблона',
-            'region' => 'Регион прогрывания',
-            'created_at' => 'Дата создания',
-            'updated_at' => 'Дата редактирования',
+            'region' => 'Регион проигр.',
+            'created_at' => 'Создан',
+            'updated_at' => 'Обновлен',
             'jsonPlaylist' => 'Плейлист',
             'sender_id' => 'Код отделения',
             'sender_name' => 'Отделение',
-            'group_id' => 'Группа устройств',
+            'group_id' => 'Группа устр.',
             'device_name' => 'Устройство'
         ];
     }
