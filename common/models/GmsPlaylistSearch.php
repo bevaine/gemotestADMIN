@@ -10,7 +10,7 @@ use common\models\GmsPlaylist;
 /**
  * GmsPlaylistSearch represents the model behind the search form about `common\models\GmsPlaylist`.
  * @property string $sender_name
- * @property string $group_name
+ * @property string $group_id
  * @property string $device_name
  * @property string $created_at_from
  * @property string $created_at_to
@@ -18,7 +18,7 @@ use common\models\GmsPlaylist;
 class GmsPlaylistSearch extends GmsPlaylist
 {
     public $sender_name;
-    public $group_name;
+    public $group_id;
     public $device_name;
     public $created_at_from;
     public $created_at_to;
@@ -31,7 +31,7 @@ class GmsPlaylistSearch extends GmsPlaylist
     {
         return [
             [['id', 'type', 'region', 'sender_id'], 'integer'],
-            [['name', 'file', 'sender_name', 'group_name', 'device_name', 'created_at_from', 'created_at_to'], 'safe'],
+            [['name', 'file', 'sender_name', 'group_id', 'device_name', 'created_at_from', 'created_at_to'], 'safe'],
         ];
     }
 
@@ -68,7 +68,7 @@ class GmsPlaylistSearch extends GmsPlaylist
                 'asc' => ['gms_senders.sender_name' => SORT_ASC],
                 'desc' => ['gms_senders.sender_name' => SORT_DESC]
             ],
-            'group_name' => [
+            'group_id' => [
                 'asc' => ['gms_group_devices.group_name' => SORT_ASC],
                 'desc' => ['gms_group_devices.group_name' => SORT_DESC]
             ],
@@ -89,15 +89,15 @@ class GmsPlaylistSearch extends GmsPlaylist
 
         // grid filtering conditions
         $query->andFilterWhere([
-            'id' => $this->id,
-            'type' => $this->type,
-            'region' => $this->region,
+            'gms_playlist.id' => $this->id,
+            'gms_playlist.type' => $this->type,
+            'gms_playlist.region' => $this->region,
+            'gms_playlist.group_id'=> $this->group_id,
         ]);
 
         $query->andFilterWhere(['like', 'LOWER(gms_playlist.name)', strtolower($this->name)])
             ->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->device_name)])
-            ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)])
-            ->andFilterWhere(['like', 'LOWER(gms_group_devices.group_name)', strtolower($this->group_name)]);
+            ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)]);
 
         if ($this->created_at_from) {
             $query->andFilterWhere([

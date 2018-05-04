@@ -75,12 +75,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'sender_name'
             ],
             [
+                'filter' =>  \common\models\GmsGroupDevices::getGroupList(),
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylist */
                     return !empty($model->groupDevicesModel) ? $model->groupDevicesModel->group_name : null;
 
                 },
-                'attribute' => 'group_name'
+                'attribute' => 'group_id'
             ],
             [
                 'value' => function ($model) {

@@ -403,7 +403,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
 
     /**
      * @param $datetime
-     * @return false|intmktime
+     * @return false|int
      */
     public static function getTimeEnd($datetime) {
         return mktime(

@@ -108,28 +108,36 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             ->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->device_name)])
             ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)]);
 
-        $end_date = mktime(
-            date("H", 23),
-            date("i", 59),
-            date("s", 59),
-            date("m", strtotime($this->date_end_val)),
-            date("d", strtotime($this->date_end_val)),
-            date("Y", strtotime($this->date_end_val))
-        );
         if (!empty($this->time_start)) {
-            $query->andFilterWhere(['>=', 'time_start', GmsPlaylistOut::getTimeDate(strtotime($this->time_start))]);
+            $query->andFilterWhere([
+                '>=',
+                'gms_playlist_out.time_start',
+                GmsPlaylistOut::getTimeDate(strtotime($this->time_start))
+            ]);
         }
 
         if (!empty($this->time_end)) {
-            $query->andFilterWhere(['<=', 'time_end', GmsPlaylistOut::getTimeDate(strtotime($this->time_end))]);
+            $query->andFilterWhere([
+                '<=',
+                'gms_playlist_out.time_end',
+                GmsPlaylistOut::getTimeDate(strtotime($this->time_end))
+            ]);
         }
 
         if ($this->date_start_val) {
-            $query->andFilterWhere(['>=', 'date_start', strtotime($this->date_start_val)]);
+            $query->andFilterWhere([
+                '>=',
+                'gms_playlist_out.date_start',
+                GmsPlaylistOut::getTimeStart(strtotime($this->date_start_val))
+            ]);
         }
 
         if ($this->date_end_val) {
-            $query->andFilterWhere(['<=', 'date_end', $end_date]);
+            $query->andFilterWhere([
+                '<=',
+                'gms_playlist_out.date_end',
+                GmsPlaylistOut::getTimeEnd(strtotime($this->date_end_val))
+            ]);
         }
 
         return $dataProvider;
