@@ -10,10 +10,19 @@ use common\models\GmsPlaylist;
 /**
  * GmsPlaylistSearch represents the model behind the search form about `common\models\GmsPlaylist`.
  * @property string $sender_name
+ * @property string $group_name
+ * @property string $device_name
+ * @property string $created_at_from
+ * @property string $created_at_to
  */
 class GmsPlaylistSearch extends GmsPlaylist
 {
     public $sender_name;
+    public $group_name;
+    public $device_name;
+    public $created_at_from;
+    public $created_at_to;
+
 
     /**
      * @inheritdoc
@@ -21,8 +30,8 @@ class GmsPlaylistSearch extends GmsPlaylist
     public function rules()
     {
         return [
-            [['id', 'type', 'region', 'created_at', 'updated_at', 'sender_id'], 'integer'],
-            [['name', 'file', 'sender_name'], 'safe'],
+            [['id', 'type', 'region', 'sender_id'], 'integer'],
+            [['name', 'file', 'sender_name', 'group_name', 'device_name', 'created_at_from', 'created_at_to'], 'safe'],
         ];
     }
 
@@ -44,12 +53,31 @@ class GmsPlaylistSearch extends GmsPlaylist
      */
     public function search($params)
     {
-        $query = GmsPlaylist::find();
-        $query->joinWith('senderModel');
+        $query = GmsPlaylist::find()
+            ->joinWith('senderModel')
+            ->joinWith('groupDevicesModel')
+            ->joinWith('deviceModel');
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
+
+        $sort = $dataProvider->getSort();
+        $sort->attributes = array_merge($sort->attributes, [
+            'sender_name' => [
+                'asc' => ['gms_senders.sender_name' => SORT_ASC],
+                'desc' => ['gms_senders.sender_name' => SORT_DESC]
+            ],
+            'group_name' => [
+                'asc' => ['gms_group_devices.group_name' => SORT_ASC],
+                'desc' => ['gms_group_devices.group_name' => SORT_DESC]
+            ],
+            'device_name' => [
+                'asc' => ['gms_devices.device' => SORT_ASC],
+                'desc' => ['gms_devices.device' => SORT_DESC]
+            ],
+        ]);
+        $dataProvider->setSort($sort);
 
         $this->load($params);
 
@@ -64,13 +92,28 @@ class GmsPlaylistSearch extends GmsPlaylist
             'id' => $this->id,
             'type' => $this->type,
             'region' => $this->region,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ]);
 
-        $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'file', $this->file])
-            ->andFilterWhere(['like', 'sender_name', $this->sender_name]);
+        $query->andFilterWhere(['like', 'LOWER(gms_playlist.name)', strtolower($this->name)])
+            ->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->device_name)])
+            ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)])
+            ->andFilterWhere(['like', 'LOWER(gms_group_devices.group_name)', strtolower($this->group_name)]);
+
+        if ($this->created_at_from) {
+            $query->andFilterWhere([
+                '>=',
+                'gms_playlist.created_at',
+                GmsPlaylistOut::getTimeStart(strtotime($this->created_at_from))
+            ]);
+        }
+
+        if ($this->created_at_to) {
+            $query->andFilterWhere([
+                '<=',
+                'gms_playlist.created_at',
+                GmsPlaylistOut::getTimeEnd(strtotime($this->created_at_to))
+            ]);
+        }
 
         //print_r($query);
         return $dataProvider;

@@ -166,10 +166,10 @@ class GmsDevices extends \yii\db\ActiveRecord
         }
 
         $html = date("Y-m-d H:i:s T", strtotime($this->last_active_at));
-        $html .= "&#9;".Html::img('/img/'.$img_name, [
+        $html .= '<span style="padding-left: 8px">'.Html::img('/img/'.$img_name, [
             "alt" => 'Последняя активность была '.$value,
             "title" => 'Последняя активность была '.$value
-        ]);
+        ]).'</span>';
         return $html;
     }
 

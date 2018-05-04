@@ -113,8 +113,8 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             $this->update_at = time();
         }
 
-        $this->date_start = self::getDateWithoutTime($this->date_start);
-        $this->date_end = self::getDateWithoutTime($this->date_end);
+        $this->date_start = self::getTimeStart($this->date_start);
+        $this->date_end = self::getTimeStart($this->date_end);
 
         $this->time_start = self::getTimeDate($this->time_start);
         $this->time_end = self::getTimeDate($this->time_end);
@@ -135,8 +135,8 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             'device_id' => 'Устройство',
             'date_start' => 'Дата старта',
             'date_end' => 'Дата окончания',
-            'time_start' => 'Время старт',
-            'time_end' => 'Время стоп',
+            'time_start' => 'Время старт, от',
+            'time_end' => 'Время стоп, до',
             'jsonPlaylist' => 'Плейлист',
             'jsonKodi' => 'Команды Kodi',
             'active' => 'Статус',
@@ -390,11 +390,26 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
      * @param $datetime
      * @return false|int
      */
-    public static function getDateWithoutTime($datetime) {
+    public static function getTimeStart($datetime) {
         return mktime(
             0,
             0,
             0,
+            date("m", $datetime),
+            date("d", $datetime),
+            date("Y", $datetime)
+        );
+    }
+
+    /**
+     * @param $datetime
+     * @return false|intmktime
+     */
+    public static function getTimeEnd($datetime) {
+        return mktime(
+            23,
+            59,
+            59,
             date("m", $datetime),
             date("d", $datetime),
             date("Y", $datetime)
