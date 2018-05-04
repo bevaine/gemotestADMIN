@@ -60,6 +60,11 @@ class GmsPlaylistSearch extends GmsPlaylist
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC
+                ],
+            ],
         ]);
 
         $sort = $dataProvider->getSort();

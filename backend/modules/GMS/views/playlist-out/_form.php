@@ -1437,9 +1437,11 @@ $js1 = <<< JS
                     } else {
                         arrOut["key"] = playListKey;
                         arrOut["title"] = rootTitle;
+                        arrOut["folder"] = 'true';
+                        arrOut["expanded"] = 'true';
                         arrOut["children"] = res.info;
                         const jsonStr = JSON.stringify(arrOut);
-                        
+
                         $("<input>").attr({
                             type: "hidden",
                             id: "gmsplaylistout-jsonkodi",
