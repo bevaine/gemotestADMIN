@@ -73,7 +73,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
     public static function checkTime($time) {
         if (time() < mktime(
             date('H', $time),
-            date('i', $time) + 1,
+            date('i', $time) + 2,
             date('s', $time),
             date('m', $time),
             date('d', $time),
@@ -246,16 +246,12 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
                         Html::tag(
                             'span',
                             $name_dev,
-                            [
-                                'class' => 'label label-success'
-                            ]
+                            ['class' => 'label label-success']
                         ),
-                        Url::to(['GMS/gms-devices/view', 'id' => $key_dev]),
+                        Url::to(['gms-devices/view', 'id' => $key_dev]),
                         [
-                            'style' => [
-                                'cursor' => 'pointer'
-                            ],
-                            'title' => $name_dev,
+                            'style' => ['cursor' => 'pointer'],
+                            'title' => "Последняя активность в ".date("Y-m-d h:i:s", $val_dev),
                             'target' => '_blank'
                         ]
                     );
