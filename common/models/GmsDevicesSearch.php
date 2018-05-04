@@ -109,7 +109,7 @@ class GmsDevicesSearch extends GmsDevices
             ]);
         }
 
-        $query->andFilterWhere(['like', 'LOWER(name)', strtolower($this->name)])
+        $query->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->name)])
             ->andFilterWhere(['like', 'LOWER(device)', strtolower($this->device)])
             ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)])
             ->andFilterWhere(['like', 'LOWER(gms_playlist_out.name)', strtolower($this->current_pls_name)]);

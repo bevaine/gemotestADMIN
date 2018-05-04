@@ -13,6 +13,7 @@ use common\components\helpers\FunctionsHelper;
 
 $this->title = 'Устройства';
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
 <div class="gms-devices-index">
 
@@ -23,8 +24,22 @@ $this->params['breadcrumbs'][] = $this->title;
     <div class="nav-tabs-custom">
 
         <ul class="nav nav-tabs">
-            <li class="<?= ($action == 'auth') ? "active" : '' ?>"><a href="<?php echo Url::to(["gms-devices/index/auth"]) ?>">Авторизованные</a></li>
-            <li class="<?= ($action != 'auth') ? "active" : '' ?>"><a href="<?php echo Url::to(["gms-devices/index"]) ?>">Не авторизованные</a></li>
+            <li class="<?= ($action == 'auth') ? "active" : '' ?>">
+                <a href="<?php echo Url::to(["gms-devices/index/auth"]) ?>">
+                    <span style="padding-right: 5px">Авторизованные</span>
+                    <span class="label label-success">
+                        <?= GmsDevices::find()->where(['auth_status' => 1])->count() ?>
+                    </span>
+                </a>
+            </li>
+            <li class="<?= ($action != 'auth') ? "active" : '' ?>">
+                <a href="<?php echo Url::to(["gms-devices/index"]) ?>">
+                    <span style="padding-right: 5px">Не авторизованные</span>
+                    <span class="label label-warning">
+                        <?= GmsDevices::find()->where(['auth_status' => 0])->count() ?>
+                    </span>
+                </a>
+            </li>
         </ul>
 
         <div class="tab-content">
