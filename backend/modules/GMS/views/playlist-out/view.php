@@ -231,7 +231,6 @@ $js1 = <<< JS
                 const node = data.node, tdList = $(node.tr).find(">td");
                 tdList.eq(0).text(node.getIndexHier()).addClass("alignRight");
                 let typePlaylist = ''; 
-                console.log(node.data.type);
                 if (node.data.type === '1') {
                     typePlaylist = 'Стандартный';
                 } else if (node.data.type === '2') {

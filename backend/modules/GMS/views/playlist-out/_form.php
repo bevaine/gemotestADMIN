@@ -74,6 +74,9 @@ $css = <<<CSS
         -webkit-font-feature-settings: 'liga';
         -webkit-font-smoothing: antialiased;
     }
+    table {
+      border-collapse: collapse;
+    }  
 CSS;
 $this->registerCss($css);
 
@@ -106,6 +109,7 @@ HTML;
                                     addChild = [];
                                 addChild.push(data.node);
                                 playlistNode.addNode(addChild, "child");
+                                sortNode();
                             }
                         }'),
                         'dnd' => [
@@ -159,6 +163,7 @@ HTML;
                                     .getNodeByKey("playlist"),
                                     addChild = [];
                                 data.node.moveTo(playlistNode, "child");
+                                sortNode();
                             }
                         }'),
                         'dnd' => [
@@ -636,8 +641,10 @@ $js1 = <<< JS
             renderColumns: function(event, data) 
             {
                 let time = 0;
-                const node = data.node, tdList = $(node.tr).find(">td");
-            
+                const 
+                    node = data.node, 
+                    tdList = $(node.tr).find(">td");
+
                 tdList.eq(1).addClass('dblclick');
                 
                 if (node.data.duration !== undefined) {
@@ -652,6 +659,7 @@ $js1 = <<< JS
                     let views_str = '';
                     
                     if (node.data.type === '1') {
+                        
                         icon = 'gemotest.jpg';
                         typePlaylist = 'Стандартный';
                         
@@ -663,6 +671,7 @@ $js1 = <<< JS
                             tdList.eq(5).text(time);
                         } 
                     } else if (node.data.type === '2') {
+                                                
                         icon = 'dollar.png';
                         typePlaylist = 'Коммерческий';
                         
@@ -817,6 +826,7 @@ $js1 = <<< JS
                           title: transfer.getData("text")
                         }, data.hitMode);
                     }
+                    sortNode();
                     node.setExpanded();
                 }
             }
@@ -928,6 +938,29 @@ $js1 = <<< JS
             );
         }, 1000); 
     });
+    
+    /**
+    * 
+    */
+    function sortNode() {
+        const treeObject = $("#treetable"), 
+            tree = treeObject.fancytree("getTree"),
+            d = tree.toDict(true),
+            children = d.children[0].children;
+            
+        let g = [], k = [];
+        children.forEach(function(node) 
+        {
+            if (node.data.type === '1') {
+                g.push(node);        
+            } else if (node.data.type === '2') {
+                k.push(node);
+            }
+        });
+
+        d.children[0].children = $.merge(g, k);
+        tree.reload(d);
+    }
     
     /**
     * 
