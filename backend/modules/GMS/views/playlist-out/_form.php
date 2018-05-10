@@ -1103,7 +1103,7 @@ $js1 = <<< JS
         const treeObject = $("#treetable"), 
             tree = treeObject.fancytree("getTree"),
             parent = tree.getNodeByKey("playlist");
-        let color = 'black', error = '';
+        let color = 'green', error = '';
         
         if (parent !== undefined && parent.getChildren() !== null) 
         { 
@@ -1145,6 +1145,20 @@ $js1 = <<< JS
             color : color
         });
         return color!=='red';
+    }
+    
+    /**
+    * 
+    * @param unix_timestamp
+    * @returns {string}
+    */
+    function stampToString(unix_timestamp) 
+    {
+        let date = new Date(Date.UTC(1970, 1, 1, -3, 0, unix_timestamp));
+        let hours = date.getHours();
+        let minutes = "0" + date.getMinutes();
+        let seconds = "0" + date.getSeconds();
+        return hours + ':' + minutes.substr(-2) + ':' + seconds.substr(-2);
     }
     
     /**
@@ -1577,7 +1591,7 @@ $js1 = <<< JS
             return false;
         }
         $.ajax({
-            type: 'GET',
+            type: 'POST',
             url: '{$urlAjaxTime}',
             data: m_data,
             success: function (res){

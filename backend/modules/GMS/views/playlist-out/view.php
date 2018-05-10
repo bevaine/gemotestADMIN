@@ -38,7 +38,7 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
 
     <div class="gms-playlist-form">
         <div class="row">
-            <div class="col-lg-10">
+            <div class="col-lg-12">
                 <div class="form-group">
                     <div class="box box-solid box-warning">
                         <div class="box-header with-border">
@@ -111,7 +111,7 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
 
         <?php if (!empty($model->jsonPlaylist)) : ?>
         <div class="row">
-            <div class="col-lg-5">
+            <div class="col-lg-6">
                 <div class="form-group">
                     <div class="box box-solid box-primary">
                         <div class="box-header with-border">
@@ -125,6 +125,7 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                     <col width="120px">
                                     <col width="70px">
                                     <col width="70px">
+                                    <col width="80px">
                                 </colgroup>
                                 <thead>
                                 <tr>
@@ -133,6 +134,7 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                     <th>Тип</th>
                                     <th>Старт</th>
                                     <th>Стоп</th>
+                                    <th>Продолж.</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -142,21 +144,37 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                     <td></td>
                                     <td></td>
                                     <td></td>
+                                    <td></td>
                                 </tr>
                                 </tbody>
+                                <thead>
+                                <tr>
+                                    <th style="font-size: medium">Итого:</th>
+                                    <th style="font-size: medium" colspan="1">
+                                        <span class="day-summ" id="day-summ"></span>
+                                    </th>
+                                    <th style="text-align: right;" colspan="3">
+                                        <span style="padding: 4px" class="error_span" id="error_span"></span>
+                                    </th>
+                                    <th>
+                                        <div class="duration-summ" id="duration-summ"></div>
+                                    </th>
+                                    <th></th>
+                                </tr>
+                                </thead>
                             </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-5">
+            <div class="col-lg-6">
                 <video
                         id="my-player"
                         class="video-js"
                         controls
                         preload="auto"
                         poster="/img/logo.jpg"
-                        width="660"
+                        width="800"
                         data-setup='{}'>
                     <p class="vjs-no-js">
                         To view this video please enable JavaScript, and consider upgrading to a
@@ -245,6 +263,11 @@ $js1 = <<< JS
                     const time_end = moment.unix(node.data.end).utc().format("HH:mm:ss");
                     tdList.eq(4).text(time_end);
                 }
+                let time = getTime(node);
+                if (time !== false) {
+                    time = moment.unix(time).utc().format("HH:mm:ss");
+                    tdList.eq(5).text(time);
+                }
             },
             dnd: {
                 preventVoidMoves : true,
@@ -263,6 +286,57 @@ $js1 = <<< JS
                 }
             }
         });
+        
+        sumDuration();
     });
+    
+    /**
+    * 
+    * @param node
+    * @returns {*}
+    */
+    function getTime(node) 
+    {
+        if (node.data.start !== undefined && node.data.end !== undefined){
+            return parseInt(node.data.end, 10) - parseInt(node.data.start, 10);
+        } else return false; 
+    }
+    
+    /**
+    * 
+    * @returns {boolean}
+    */
+    function sumDuration() 
+    {
+        let i = 0;
+        let total = 0;
+        let tdList = '';
+        let totalStr = '00:00:00';
+        
+        const 
+            treeObject = $("#treetable1"), 
+            tree = treeObject.fancytree("getTree"),
+            parent = tree.getNodeByKey("playlist");
+        
+        if (parent !== undefined && parent.getChildren() !== null) 
+        { 
+            $.each(parent.getChildren(), function() 
+            {
+                tdList = $(this.tr).find(">td");
+                tdList.eq(0).text(++i).addClass("alignRight");
+                let time = getTime(this);
+                if (time !== false) {
+                    total += time; 
+                }
+            });
+            
+            if (total > 0) {
+                totalStr = moment.unix(total).utc().format("HH:mm:ss");
+                $('#duration-summ').html(totalStr).css({
+                    color : "black"
+                });
+            }
+        }
+    }
 JS;
 $this->registerJs($js1);

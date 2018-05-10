@@ -345,6 +345,11 @@ class PlaylistOutController extends Controller
                     }
                 }
 
+                if (($std_time + $com_time) > $all_time) {
+                    array_pop($s);
+                    break;
+                }
+
                 if (!empty($val) && $key == count($arr_standart) - 1) {
                     reset($arr_standart);
                 }

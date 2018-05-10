@@ -253,7 +253,14 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
-        $string = 'April 15, 2003';
+        $string = '1970-01-01 00:03:48';
+        date_default_timezone_set('Europe/Moscow');
+        $d = mktime(0,3,48,0, 0, 0);
+        echo $d;
+        //$h = ;
+        echo "\r\n".date("H:i:s", $d);
+        exit;
+
         $pattern = '/(\w+) (\d+), (\d+)/i';
         $replacement = '${1}1,$3';
         echo preg_replace($pattern, $replacement, $string);
