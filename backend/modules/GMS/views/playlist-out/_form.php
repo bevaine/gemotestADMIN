@@ -861,6 +861,7 @@ $js1 = <<< JS
             e.stopPropagation();  
             sumDuration();
             resetPlayer();
+            sortNode();
         });
         
         tree.delegate(".dblclick", "dblclick", function(e)
@@ -948,7 +949,7 @@ $js1 = <<< JS
             d = tree.toDict(true),
             children = d.children[0].children;
             
-        let g = [], k = [];
+        let g = [], k = [], comPos = null;
         children.forEach(function(node) 
         {
             if (node.data.type === '1') {
@@ -957,9 +958,20 @@ $js1 = <<< JS
                 k.push(node);
             }
         });
-
+        
+        if (k.length > 0 && g.length > 0) {
+            comPos = g.length;        
+        }       
+        
         d.children[0].children = $.merge(g, k);
-        tree.reload(d);
+        tree.reload(d);        
+
+        if (comPos !== null) {
+            $( "#treetable tr").eq(comPos + 2).find(">td").css({
+                "border-top-style" : "double",
+                "border-top-width" : "10px",
+            });        
+        }
     }
     
     /**
