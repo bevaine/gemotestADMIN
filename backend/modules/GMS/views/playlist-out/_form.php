@@ -938,6 +938,8 @@ $js1 = <<< JS
                 deviceSelectConst.val()
             );
         }, 1000); 
+        
+        sortNode();
     });
     
     /**
