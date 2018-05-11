@@ -946,12 +946,18 @@ $js1 = <<< JS
     * 
     */
     function sortNode() {
-        const treeObject = $("#treetable"), 
+        const 
+            treeObject = $("#treetable"), 
             tree = treeObject.fancytree("getTree"),
             d = tree.toDict(true),
             children = d.children[0].children;
             
         let g = [], k = [], comPos = null;
+        
+        if (children === undefined) {
+            return false;
+        }
+        
         children.forEach(function(node) 
         {
             if (node.data.type === '1') {
@@ -963,10 +969,9 @@ $js1 = <<< JS
         
         if (k.length > 0 && g.length > 0) {
             comPos = g.length;        
+            d.children[0].children = $.merge(g, k);
+            tree.reload(d);          
         }       
-        
-        d.children[0].children = $.merge(g, k);
-        tree.reload(d);        
 
         if (comPos !== null) {
             $( "#treetable tr").eq(comPos + 2).find(">td").css({
@@ -1442,8 +1447,8 @@ $js1 = <<< JS
         
         arrOutPls["key"] = playListKey;
         arrOutPls["title"] = rootTitle;
-        arrOutPls["folder"] = "true";
-        arrOutPls["expanded"] = "true"; 
+        arrOutPls["folder"] = true;
+        arrOutPls["expanded"] = true; 
         arrOutPls["children"] = arrChildrenOnePls;
         
         let d = tree.toDict(true);
@@ -1498,8 +1503,8 @@ $js1 = <<< JS
                     } else {
                         arrOut["key"] = playListKey;
                         arrOut["title"] = rootTitle;
-                        arrOut["folder"] = 'true';
-                        arrOut["expanded"] = 'true';
+                        arrOut["folder"] = true;
+                        arrOut["expanded"] = false;
                         arrOut["children"] = res.info;
                         const jsonStr = JSON.stringify(arrOut);
 

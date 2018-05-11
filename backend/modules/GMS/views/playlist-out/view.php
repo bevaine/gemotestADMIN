@@ -222,7 +222,6 @@ if (!empty($model->jsonKodi)) {
 }
 
 $js1 = <<< JS
-    
     const tree1 = $("#treetable1");
         
     $(function()
