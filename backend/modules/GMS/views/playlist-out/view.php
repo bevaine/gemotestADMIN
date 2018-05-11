@@ -149,22 +149,22 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                 </tbody>
                                 <thead>
                                     <tr>
-                                        <td style="font-size: medium" rowspan="3" colspan="2">Итого:</td>
-                                        <th style="font-size: medium;text-align: right;">Стандартное:</th>
+                                        <td style="font-size: medium" rowspan="3">Итого:</td>
+                                        <th style="font-size: medium;text-align: right;" colspan="2">Стандартное время:</th>
                                         <th colspan="2"></th>
                                         <th style="font-size: medium;text-align: left;" colspan="3">
                                             <div class="standart-summ" id="standart-summ"></div>
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th style="font-size: medium;text-align: right;">Коммерческое:</th>
+                                        <th style="font-size: medium;text-align: right;" colspan="2">Коммерческое время:</th>
                                         <th colspan="2"></th>
                                         <th style="font-size: medium;text-align: left;" colspan="3">
                                             <div class="commerce-summ" id="commerce-summ"></div>
                                         </th>
                                     </tr>
                                     <tr>
-                                        <th style="font-size: medium;text-align: right;">Общее:</th>
+                                        <th style="font-size: medium;text-align: right;" colspan="2">Общее время:</th>
                                         <th colspan="2"></th>
                                         <th style="font-size: medium;text-align: left;" colspan="3">
                                             <div class="duration-summ" id="duration-summ"></div>
