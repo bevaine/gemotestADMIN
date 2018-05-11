@@ -148,19 +148,28 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                 </tr>
                                 </tbody>
                                 <thead>
-                                <tr>
-                                    <th style="font-size: medium">Итого:</th>
-                                    <th style="font-size: medium" colspan="1">
-                                        <span class="day-summ" id="day-summ"></span>
-                                    </th>
-                                    <th style="text-align: right;" colspan="3">
-                                        <span style="padding: 4px" class="error_span" id="error_span"></span>
-                                    </th>
-                                    <th>
-                                        <div class="duration-summ" id="duration-summ"></div>
-                                    </th>
-                                    <th></th>
-                                </tr>
+                                    <tr>
+                                        <td style="font-size: medium" rowspan="3" colspan="2">Итого:</td>
+                                        <th style="font-size: medium;text-align: right;">Стандартное:</th>
+                                        <th colspan="2"></th>
+                                        <th style="font-size: medium;text-align: left;" colspan="3">
+                                            <div class="standart-summ" id="standart-summ"></div>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: medium;text-align: right;">Коммерческое:</th>
+                                        <th colspan="2"></th>
+                                        <th style="font-size: medium;text-align: left;" colspan="3">
+                                            <div class="commerce-summ" id="commerce-summ"></div>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="font-size: medium;text-align: right;">Общее:</th>
+                                        <th colspan="2"></th>
+                                        <th style="font-size: medium;text-align: left;" colspan="3">
+                                            <div class="duration-summ" id="duration-summ"></div>
+                                        </th>
+                                    </tr>
                                 </thead>
                             </table>
                         </div>
@@ -265,7 +274,7 @@ $js1 = <<< JS
                 }
                 let time = getTime(node);
                 if (time !== false) {
-                    time = moment.unix(time).utc().format("HH:mm:ss");
+                    time = moment.unix(time['val']).utc().format("HH:mm:ss");
                     tdList.eq(5).text(time);
                 }
             },
@@ -297,8 +306,12 @@ $js1 = <<< JS
     */
     function getTime(node) 
     {
+        let val = '', arr = [];
         if (node.data.start !== undefined && node.data.end !== undefined){
-            return parseInt(node.data.end, 10) - parseInt(node.data.start, 10);
+            val = parseInt(node.data.end, 10) - parseInt(node.data.start, 10);
+            arr['type'] = node.data.type;
+            arr['val'] = val;
+            return arr;
         } else return false; 
     }
     
@@ -308,10 +321,15 @@ $js1 = <<< JS
     */
     function sumDuration() 
     {
-        let i = 0;
-        let total = 0;
-        let tdList = '';
-        let totalStr = '00:00:00';
+        let 
+            i = 0,
+            total = 0,
+            std_sum = 0,
+            com_sum = 0,
+            tdList = '',
+            stdStr = '00:00:00',
+            comStr = '00:00:00',
+            totalStr = '00:00:00';
         
         const 
             treeObject = $("#treetable1"), 
@@ -326,13 +344,33 @@ $js1 = <<< JS
                 tdList.eq(0).text(++i).addClass("alignRight");
                 let time = getTime(this);
                 if (time !== false) {
-                    total += time; 
+                    if (time['type'] === '1') {
+                        std_sum += time['val']; 
+                    } else if (time['type'] === '2') {
+                        com_sum += time['val'];  
+                    }
+                    total += time['val']; 
                 }
             });
+            console.log(com_sum);
             
             if (total > 0) {
                 totalStr = moment.unix(total).utc().format("HH:mm:ss");
                 $('#duration-summ').html(totalStr).css({
+                    color : "black"
+                });
+            }
+            
+            if (std_sum > 0) {
+                stdStr = moment.unix(std_sum).utc().format("HH:mm:ss");
+                $('#standart-summ').html(stdStr).css({
+                    color : "black"
+                });
+            }
+            
+            if (com_sum > 0) {
+                comStr = moment.unix(com_sum).utc().format("HH:mm:ss");
+                $('#commerce-summ').html(comStr).css({
                     color : "black"
                 });
             }
