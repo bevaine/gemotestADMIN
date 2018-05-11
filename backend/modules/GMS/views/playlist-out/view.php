@@ -352,28 +352,25 @@ $js1 = <<< JS
                     total += time['val']; 
                 }
             });
-            console.log(com_sum);
             
             if (total > 0) {
                 totalStr = moment.unix(total).utc().format("HH:mm:ss");
-                $('#duration-summ').html(totalStr).css({
-                    color : "black"
-                });
             }
-            
             if (std_sum > 0) {
-                stdStr = moment.unix(std_sum).utc().format("HH:mm:ss");
-                $('#standart-summ').html(stdStr).css({
-                    color : "black"
-                });
-            }
-            
+                stdStr = moment.unix(std_sum).utc().format("HH:mm:ss");            
+            }  
             if (com_sum > 0) {
-                comStr = moment.unix(com_sum).utc().format("HH:mm:ss");
-                $('#commerce-summ').html(comStr).css({
-                    color : "black"
-                });
+                comStr = moment.unix(com_sum).utc().format("HH:mm:ss");            
             }
+            $('#duration-summ').html(totalStr).css({
+                color : "black"
+            });
+            $('#standart-summ').html(stdStr).css({
+                color : "black"
+            });
+            $('#commerce-summ').html(comStr).css({
+                color : "black"
+            });
         }
     }
 JS;
