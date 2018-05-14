@@ -1648,7 +1648,8 @@ class ActiveSyncHelper
 
         try {
 
-            $ADgroup = "CN=".$ldaprecord["CN"].",OU=".$this->typeLO." Users,OU=SSO,OU=gUsers,DC=lab,DC=gemotest,DC=ru";
+            $ADgroup = "CN=".$ldaprecord["CN"].",OU=SSO ".$this->typeLO." Users,OU=Departments,OU=Gemotest,DC=lab,DC=gemotest,DC=ru";
+
             $ldapconn = ldap_connect(self::LDAP_URL, self::LDAP_PORT);
             if (!$ldapconn) return false;
 

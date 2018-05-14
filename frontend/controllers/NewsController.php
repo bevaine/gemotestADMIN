@@ -2,6 +2,8 @@
 
 namespace frontend\controllers;
 
+use common\models\Logins;
+use common\models\Patients;
 use Yii;
 use common\models\NewsBlog;
 use yii\data\ActiveDataProvider;
@@ -35,13 +37,45 @@ class NewsController extends Controller
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => NewsBlog::find(),
-        ]);
+        self::parseCSV("./files/export.csv");
+    }
 
-        return $this->render('index', [
-            'dataProvider' => $dataProvider,
-        ]);
+
+    public static function parseCSV($file_name)
+    {
+        $row = 1;
+        if (($handle = fopen($file_name, "r")) !== FALSE) {
+            while (($data = fgetcsv($handle, 1000, ";")) !== FALSE) {
+                $date = trim($data[0]);
+                $sum = trim($data[1]);
+                $fio = iconv('Windows-1251', 'UTF-8', trim($data[2]));
+                $email = trim($data[3]);
+                $phone = trim($data[4]);
+                $city = iconv('Windows-1251', 'UTF-8',trim($data[5]));
+                $older = iconv('Windows-1251', 'UTF-8',trim($data[6]));
+                /** @var Patients $findModel */
+                $findModel = Patients::find()
+                    ->where(['email' => $email])
+                    ->one();
+
+                //print_r($findModel);
+                if ($findModel) {
+                    echo $findModel->LastName." ".$findModel->Name." -> ".$fio;
+                    //break;
+                }
+
+
+//
+//                $num = count($data);
+//                //echo "<p> $num полей в строке $row: <br /></p>\n";
+//                $row++;
+//                for ($c=0; $c < $num; $c++) {
+//                    $result = iconv('Windows-1251', 'UTF-8', $data[$c]);
+//                    echo $result . "<br />\n";
+//                }
+            }
+            fclose($handle);
+        }
     }
 
     /**

@@ -14,6 +14,7 @@ use yii\data\SqlDataProvider;
  * @property integer $region_id
  * @property string $sender_name
  * @property string $video_name
+ * @property string $device_name
  */
 class GmsVideoHistorySearch extends GmsVideoHistory
 {
@@ -27,12 +28,13 @@ class GmsVideoHistorySearch extends GmsVideoHistory
     public $date_to;
     public $sender_id;
     public $video_name;
+    public $device_name;
 
     public function rules()
     {
         return [
             [['id', 'pls_id', 'video_key', 'region_id', 'type'], 'integer'],
-            [['date_from', 'video_name', 'date_to', 'sender_name', 'pls_name', 'device_id', 'created_at'], 'safe'],
+            [['date_from', 'video_name', 'device_name', 'date_to', 'sender_name', 'pls_name', 'device_id', 'created_at'], 'safe'],
         ];
     }
 
@@ -60,14 +62,14 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             ->joinWith('playListOutModel t3')
             ->joinWith('videoModel t4')
             ->joinWith('deviceModel t5')
-            ->select("t.*, t.id hv_id, t.created_at start_at, t.id vh_id, t.type type_pls, t1.*, t2.*, t3.name pls_name, t4.*, t4.name video_name, t4.id video_key, t5.id dev_id");
+            ->select("t.*, t.id hv_id, t.created_at start_at, t.id vh_id, t.type type_pls, t1.*, t2.*, t3.name pls_name, t4.*, t4.name video_name, t4.id video_key, t5.id dev_id, t5.name dev_name");
 
         // grid filtering conditions
         $query->andFilterWhere(['t.id' => $this->id])
             ->andFilterWhere(['t.type' => $this->type]);
 
         $query->andFilterWhere(['like', 't.created_at', $this->created_at])
-              ->andFilterWhere(['like', 't.device_id', $this->device_id]);
+              ->andFilterWhere(['like', 't5.name', $this->device_name]);
 
 
         $query->andFilterWhere(['t1.id' => $this->region_id])
@@ -89,7 +91,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             'sql' => $query->createCommand()->rawSql,
             'sort' => [
                 'defaultOrder' => [
-                    'start_at' => SORT_DESC
+                    'last_at' => SORT_DESC
                 ]
             ],
         ]);
@@ -99,6 +101,10 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             'id' => [
                 'asc' => ['vh_id' => SORT_ASC],
                 'desc' => ['vh_id' => SORT_DESC],
+            ],
+            'duration' => [
+                'asc' => ['t.duration' => SORT_ASC],
+                'desc' => ['t.duration' => SORT_DESC]
             ],
             'region_id' => [
                 'asc' => ['t1.region_name' => SORT_ASC],

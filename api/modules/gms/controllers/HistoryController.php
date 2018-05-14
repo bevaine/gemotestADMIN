@@ -126,7 +126,7 @@ class HistoryController extends ActiveController
                 $videoHistoryModel->pls_pos = $current_pos_all;
                 $videoHistoryModel->pls_guid = $post["pls_guid"];
                 $videoHistoryModel->video_key = $time_start_end["key"];
-                $videoHistoryModel->device_id = $post["device_id"];
+                $videoHistoryModel->device_id = $device_key;
                 $videoHistoryModel->pls_id = $post["pls_id"];
                 $videoHistoryModel->last_at = $time_start_end['end'];
 

@@ -52,7 +52,7 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'pls_id' => 'Плейлист',
-            'device_id' => 'Устройство',
+            'device_name' => 'Устройство',
             'created_at' => 'Начало',
             'last_at' => 'Окончание',
             'video_key' => 'Видео',
@@ -73,7 +73,7 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
      */
     public function getDeviceModel()
     {
-        return $this->hasOne(GmsDevices::className(), ['device' => 'device_id']);
+        return $this->hasOne(GmsDevices::className(), ['id' => 'device_id']);
     }
 
     /**

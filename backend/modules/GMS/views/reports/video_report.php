@@ -7,6 +7,7 @@ use kartik\form\ActiveForm;
 use common\models\GmsPlaylistOut;
 use kartik\export\ExportMenu;
 use common\models\GmsPlaylist;
+use common\models\GmsDevices;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsVideoHistorySearch */
@@ -52,7 +53,7 @@ $gridColumns = [
             } else return null;
         },
         'format' => 'html',
-        'group'=> false,
+        'group'=> true,
         'attribute' => 'video_name',
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
@@ -65,7 +66,7 @@ $gridColumns = [
             return !empty($model["type_pls"]) ? GmsPlaylist::getPlayListType($model["type_pls"]) : null;
         },
         'format' => 'html',
-        'group'=> false,
+        'group'=> true,
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
     [
@@ -73,7 +74,7 @@ $gridColumns = [
             return !empty($model["duration"]) ? date("H:i:s", mktime(null,null, $model["duration"])) : null;
         },
         'label' => 'Продолжит.',
-        'group'=> false,
+        'group'=> true,
         'attribute' => 'duration',
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
@@ -82,15 +83,21 @@ $gridColumns = [
         'width'=>'120px',
         'label' => 'Плейлист',
         'value' => function($model) {
-            /** @var \common\models\LoginsSearch $model */
-            return Html::a(
-                $model['pls_name'],
-                Url::to(["/GMS/playlist-out/view?id=".$model['pls_id']]),
-                [
-                    'title' => $model['pls_name'],
-                    'target' => '_blank'
-                ]
-            );
+
+            Yii::getLogger()->log([
+                '$model[\'pls_name\']'=>$model['pls_name']
+            ], 1, 'binary');
+
+            if (!empty($model["pls_id"]) && !empty($model["pls_name"])) {
+                return Html::a(
+                    $model['pls_name'],
+                    Url::to(["/GMS/playlist-out/view?id=" . $model['pls_id']]),
+                    [
+                        'title' => $model['pls_name'],
+                        'target' => '_blank'
+                    ]
+                );
+            } else return null;
         },
         'format' => 'raw',
         'group'=> true,
@@ -98,34 +105,34 @@ $gridColumns = [
     ],
     [
         'filter' =>  \common\models\GmsRegions::getRegionList(),
+        'label' => 'Регион',
         'value' => function ($model) {
             return !empty($model["region_name"]) ? $model["region_name"] : null;
         },
-        'label' => 'Регион',
         'group'=> true,
         'attribute' => 'region_id',
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
     [
+        'label' => 'Отделение',
         'value' => function ($model) {
             return !empty($model["sender_name"]) ? $model["sender_name"] : null;
         },
-        'label' => 'Отделение',
         'group'=> true,
         'attribute' => 'sender_name',
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
     [
-        'attribute' => 'device_id',
+        'attribute' => 'device_name',
         'label' => 'Устройство',
         'width'=>'120px',
         'value' => function($model) {
-            if (!empty($model["sender_name"])) {
+            if (!empty($model["dev_id"]) && !empty($model["dev_name"])) {
                 return Html::a(
-                    $model['device_id'],
+                    $model['dev_name'],
                     Url::to(["/GMS/gms-devices/view?id=".$model['dev_id']]),
                     [
-                        'title' => $model['device_id'],
+                        'title' => $model['dev_name'],
                         'target' => '_blank'
                     ]
                 );
