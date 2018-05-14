@@ -39,8 +39,8 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pls_id', 'video_key', 'pls_pos', 'type', 'duration'], 'integer'],
-            [['device_id', 'created_at', 'last_at', 'pls_guid'], 'string', 'max' => 255],
+            [['pls_id', 'video_key', 'pls_pos', 'type', 'duration', 'device_id'], 'integer'],
+            [['created_at', 'last_at', 'pls_guid'], 'string', 'max' => 255],
         ];
     }
 
@@ -53,6 +53,7 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
             'id' => 'ID',
             'pls_id' => 'Плейлист',
             'device_name' => 'Устройство',
+            'device_id' => 'ID устройства',
             'created_at' => 'Начало',
             'last_at' => 'Окончание',
             'video_key' => 'Видео',
