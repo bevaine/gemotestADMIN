@@ -83,11 +83,6 @@ $gridColumns = [
         'width'=>'120px',
         'label' => 'Плейлист',
         'value' => function($model) {
-
-            Yii::getLogger()->log([
-                '$model[\'pls_name\']'=>$model['pls_name']
-            ], 1, 'binary');
-
             if (!empty($model["pls_id"]) && !empty($model["pls_name"])) {
                 return Html::a(
                     $model['pls_name'],
