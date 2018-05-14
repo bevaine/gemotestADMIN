@@ -45,7 +45,7 @@ $gridColumns = [
             if (empty($model["start_at"]) || empty($model["last_at"])) {
                 return null;
             }
-            $duration = $model["last_at"] - $model["start_at"];
+            $duration = strtotime($model["last_at"]) - strtotime($model["start_at"]);
             return !empty($duration) ? date("H:i:s", mktime(null,null, $duration)) : null;
         },
         'label' => 'Продолжит.',
