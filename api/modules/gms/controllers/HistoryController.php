@@ -70,10 +70,6 @@ class HistoryController extends ActiveController
         {
             $post = Yii::$app->request->post();
 
-            Yii::getLogger()->log([
-                '$post'=>$post
-            ], Logger::LEVEL_WARNING, 'binary');
-
             if (!isset($post["pls_id"])
                 || empty($post["pls_guid"])
                 || empty($post["device_id"]))
@@ -101,6 +97,16 @@ class HistoryController extends ActiveController
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
             $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_all');
             $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_list');
+
+            Yii::getLogger()->log([
+                '$arr_pos_list'=>$arr_pos_list
+            ], Logger::LEVEL_WARNING, 'binary');
+
+
+            Yii::getLogger()->log([
+                '$arr_pos_all'=>$arr_pos_all
+            ], Logger::LEVEL_WARNING, 'binary');
+
 
             if (empty($arr_pos_list) || empty($arr_pos_all))
                 return ['state' => 0];
