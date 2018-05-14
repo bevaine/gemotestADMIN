@@ -14,7 +14,7 @@ class m180514_062604_change_type_video_history extends Migration
     public function safeUp()
     {
         //$this->alterColumn('{{%gms_video_history}}', 'device_id', Schema::TYPE_INTEGER);
-        $this->execute("ALTER TABLE gms_video_history ALTER COLUMN device_id TYPE integer USING (trim(device_id)::integer)");
+        $this->execute("ALTER TABLE gms_video_history ALTER COLUMN device_id TYPE integer USING NULL");
     }
 
     /**
