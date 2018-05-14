@@ -46,7 +46,7 @@ $gridColumns = [
                 return null;
             }
             $duration = strtotime($model["last_at"]) - strtotime($model["start_at"]);
-            return !empty($duration) ? date("H:i:s", mktime(null,null, $duration)) : null;
+            return !empty($duration) && $duration > 0 ? date("H:i:s", mktime(null,null, $duration)) : null;
         },
         'label' => 'Продолжит.',
         'group'=> true,
