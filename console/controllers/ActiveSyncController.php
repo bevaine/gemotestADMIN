@@ -253,6 +253,18 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        $name = "GUID";
+        $value = "123456";
+        $file_txt = "#EXTM3U
+                    #ID:24
+                    #DATE:1526295181
+                    #GUID:
+                    #PLAYLIST:новый";
+        $replace = preg_replace("/\s*#".$name.":(.*?)\r\n\s*/is", "\r\n#".$name.":".$value."\r\n", $file_txt);
+        print_r($replace);
+        exit;
+
+
         $string = '1970-01-01 00:03:48';
         date_default_timezone_set('Europe/Moscow');
         $d = mktime(0,3,48,0, 0, 0);

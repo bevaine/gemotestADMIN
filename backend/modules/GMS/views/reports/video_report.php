@@ -20,6 +20,7 @@ $gridColumns = [
     ['class' => 'kartik\grid\SerialColumn'],
 
     [
+        'headerOptions' => array('style' => 'width: 160px;'),
         'value' => function ($model) {
             return !empty($model["start_at"]) ? date("Y-m-d H:i:s T", strtotime($model["start_at"])) : null;
         },
@@ -29,12 +30,27 @@ $gridColumns = [
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
     [
+        'headerOptions' => array('style' => 'width: 160px;'),
         'value' => function ($model) {
             return !empty($model["last_at"]) ? date("Y-m-d H:i:s T", strtotime($model["last_at"])) : null;
         },
         'label' => 'Конец',
         'attribute' => 'last_at',
         'group'=> false,
+        'pageSummaryOptions'=>['class'=>'text-right']
+    ],
+    [
+        'headerOptions' => array('style' => 'width: 100px;'),
+        'value' => function ($model) {
+            if (empty($model["start_at"]) || empty($model["last_at"])) {
+                return null;
+            }
+            $duration = $model["last_at"] - $model["start_at"];
+            return !empty($duration) ? date("H:i:s", mktime(null,null, $duration)) : null;
+        },
+        'label' => 'Продолжит.',
+        'group'=> true,
+        'attribute' => 'duration',
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
     [
@@ -58,7 +74,7 @@ $gridColumns = [
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
     [
-        'headerOptions' => array('style' => 'width: 200px;'),
+        'headerOptions' => array('style' => 'width: 100px;'),
         'attribute' => 'type',
         'filter' => \common\models\GmsPlaylist::getPlayListType(),
         'value' => function ($model) {
@@ -67,15 +83,6 @@ $gridColumns = [
         },
         'format' => 'html',
         'group'=> true,
-        'pageSummaryOptions'=>['class'=>'text-right']
-    ],
-    [
-        'value' => function ($model) {
-            return !empty($model["duration"]) ? date("H:i:s", mktime(null,null, $model["duration"])) : null;
-        },
-        'label' => 'Продолжит.',
-        'group'=> true,
-        'attribute' => 'duration',
         'pageSummaryOptions'=>['class'=>'text-right']
     ],
     [
@@ -153,6 +160,7 @@ $gridColumns = [
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
+        'options' => ['style' => 'font-size:12px;'],
         //'showPageSummary' => true,
         'striped' => false,
         'export' => false,

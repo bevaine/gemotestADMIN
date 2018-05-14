@@ -98,16 +98,6 @@ class HistoryController extends ActiveController
             $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_all');
             $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_list');
 
-            Yii::getLogger()->log([
-                '$arr_pos_list'=>$arr_pos_list
-            ], Logger::LEVEL_WARNING, 'binary');
-
-
-            Yii::getLogger()->log([
-                '$arr_pos_all'=>$arr_pos_all
-            ], Logger::LEVEL_WARNING, 'binary');
-
-
             if (empty($arr_pos_list) || empty($arr_pos_all))
                 return ['state' => 0];
 
