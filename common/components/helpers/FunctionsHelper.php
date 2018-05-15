@@ -17,32 +17,18 @@ use yii\helpers\ArrayHelper;
 
 class FunctionsHelper
 {
-//    static $timezone = [
-//        '2' => 'Europe/Kaliningrad',
-//        '3' => 'Europe/Moscow',
-//        '4' => 'Europe/Samara',
-//        '5' => 'Asia/Yekaterinburg',
-//        '6' => 'Asia/Novosibirsk',
-//        '7' => 'Asia/Novokuznetsk',
-//        '8' => 'Asia/Irkutsk',
-//        '9' => 'Asia/Yakutsk',
-//        '10' => 'Asia/Magadan',
-//        '11' => 'Asia/Sakhalin',
-//        '12' => 'Asia/Kamchatka',
-//    ];
-
     static $timezones = [
-        'Europe/Kaliningrad',
-        'Europe/Moscow',
-        'Europe/Samara',
-        'Asia/Yekaterinburg',
-        'Asia/Novosibirsk',
-        'Asia/Novokuznetsk',
-        'Asia/Irkutsk',
-        'Asia/Yakutsk',
-        'Asia/Magadan',
-        'Asia/Sakhalin',
-        'Asia/Kamchatka',
+        'Europe/Kaliningrad',   //+2
+        'Europe/Moscow',        //+3
+        'Europe/Samara',        //+4
+        'Asia/Yekaterinburg',   //+5
+        'Asia/Novosibirsk',     //+6
+        'Asia/Novokuznetsk',    //+7
+        'Asia/Irkutsk',         //+8
+        'Asia/Yakutsk',         //+9
+        'Asia/Magadan',         //+10
+        'Asia/Sakhalin',        //+11
+        'Asia/Kamchatka',       //+12
     ];
 
     /**
@@ -205,6 +191,10 @@ SCRIPT;
      */
     static function getInfoVideo($file)
     {
+        $duration = 0;
+        $rate = 0;
+        $all_frames = 0;
+
         try {
             $ffprobe = FFProbe::create(self::getBinFFmpeg());
 
@@ -214,20 +204,35 @@ SCRIPT;
                 ->first()
                 ->get('duration');
 
+            if (empty($duration)) return false;
+
             $all_frames = $ffprobe
                 ->streams($file)
                 ->videos()
                 ->first()
                 ->get('nb_frames');
 
-            if (!empty($duration) && !empty($all_frames)) {
+            if (empty($all_frames)) {
+                $avg_frame_rate = $ffprobe
+                    ->streams($file)
+                    ->videos()
+                    ->first()
+                    ->get('avg_frame_rate');
+                    $avg_frame_rate_exp = explode("/", $avg_frame_rate);
+                    if (!empty($avg_frame_rate_exp[0])
+                        && !empty($avg_frame_rate_exp[1])) {
+                        $rate = round($avg_frame_rate_exp[0] / $avg_frame_rate_exp[1]);
+                        $all_frames = (int)$rate * (int)$duration;
+                    }
+            } else {
                 $rate = (int)$all_frames / (int)$duration;
-                return [
-                    'duration' => $duration,
-                    'nb_frames' => $all_frames,
-                    'frame_rate' => $rate
-                ];
-            } else return false;
+            }
+
+            return [
+                'duration' => $duration,
+                'nb_frames' => $all_frames,
+                'frame_rate' => $rate
+            ];
 
         } catch (\Exception $exception) {
             return false;
