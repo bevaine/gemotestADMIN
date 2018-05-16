@@ -92,6 +92,11 @@ class HistoryController extends ActiveController
 
             $arr_merge_dev[$device_key] = time();
             $findModel->update_json = json_encode($arr_merge_dev);
+
+            Yii::getLogger()->log([
+                '$findModel'=>$findModel
+            ], Logger::LEVEL_WARNING, 'binary');
+
             $findModel->save();
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
