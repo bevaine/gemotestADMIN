@@ -1629,6 +1629,8 @@ class ActiveSyncHelper
             $name .= " ".$this->middleName;
 
         $ldaprecord = [
+            //"memberOf" => 'CN=LO - ДУОЛО - Лабораторные отд',
+            //"memberOf" => 'CN=LO - ДУОЛО - Лабораторные отд',
             "CN" => $this->cnName,
             "name" => $this->cnName,
             "sn" => $this->lastName, //фамилия

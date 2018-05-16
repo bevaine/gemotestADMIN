@@ -70,6 +70,10 @@ class HistoryController extends ActiveController
         {
             $post = Yii::$app->request->post();
 
+            Yii::getLogger()->log([
+                '$post'=>$post
+            ], Logger::LEVEL_WARNING, 'binary');
+
             if (!isset($post["pls_id"])
                 || empty($post["pls_guid"])
                 || empty($post["device_id"]))
