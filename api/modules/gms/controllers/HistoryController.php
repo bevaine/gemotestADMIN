@@ -70,10 +70,6 @@ class HistoryController extends ActiveController
         {
             $post = Yii::$app->request->post();
 
-            Yii::getLogger()->log([
-                '$post'=>$post
-            ], Logger::LEVEL_WARNING, 'binary');
-
             if (!isset($post["pls_id"])
                 || empty($post["pls_guid"])
                 || empty($post["device_id"]))
@@ -133,6 +129,11 @@ class HistoryController extends ActiveController
                 $videoHistoryModel->device_id = $device_key;
                 $videoHistoryModel->pls_id = $post["pls_id"];
                 $videoHistoryModel->last_at = $time_start_end['end'];
+
+
+                Yii::getLogger()->log([
+                    '$videoHistoryModel'=>$videoHistoryModel
+                ], Logger::LEVEL_WARNING, 'binary');
 
                 if (!$videoHistoryModel->save()) {
                     Yii::getLogger()->log(
