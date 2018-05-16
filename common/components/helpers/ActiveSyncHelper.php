@@ -1351,6 +1351,9 @@ class ActiveSyncHelper
             return false;
         }
         else {
+            if (!$infGroup = self::addGroupLdap()) {
+                return false;
+            }
             Yii::getLogger()->log([
                 'addUserAD=>arrAccountAD'=>$arrAccountAD
             ], Logger::LEVEL_WARNING, 'binary');
@@ -1629,8 +1632,6 @@ class ActiveSyncHelper
             $name .= " ".$this->middleName;
 
         $ldaprecord = [
-            //"memberOf" => 'CN=LO - ДУОЛО - Лабораторные отд',
-            //"memberOf" => 'CN=LO - ДУОЛО - Лабораторные отд',
             "CN" => $this->cnName,
             "name" => $this->cnName,
             "sn" => $this->lastName, //фамилия
@@ -1697,6 +1698,37 @@ class ActiveSyncHelper
     }
 
     /**
+     * @return bool
+     */
+    function addGroupLdap()
+    {
+        try {
+            $ldapconn = ldap_connect(self::LDAP_SERVER);
+            ldap_set_option($ldapconn, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ldapconn, LDAP_OPT_REFERRALS, 0);
+
+            if (!$ldapconn) return false;
+
+            $ldapbind = ldap_bind($ldapconn, self::LDAP_LOGIN, self::LDAP_PASSW);
+
+            if (!$ldapbind) return false;
+
+            $strPath = $this->typeLO." Users,OU=Departments,OU=Gemotest,DC=lab,DC=gemotest,DC=ru";
+            $ADgroup = "CN=".$this->cnName.",OU=SSO ".$strPath;
+            $ADmember = 'CN=SSO '.$this->typeLO.' USERS,OU=SSO '.$strPath;
+
+            $userdata['member'] = $ADgroup;
+            return ldap_modify($ldapconn, $ADmember, $userdata);
+
+        } catch (Exception $e) {
+            Yii::getLogger()->log([
+                'addGroupLdap'=>$e->getMessage()
+            ], Logger::LEVEL_ERROR, 'binary');
+            return false;
+        }
+    }
+
+    /**
      * @return mixed
      */
     public function checkUserNameAd()
@@ -1704,7 +1736,7 @@ class ActiveSyncHelper
         //todo проверяем на полное совпадение имени пользователя
         $arrAccounts = [];
         $ADcheckUser = "(name=*".$this->fullName."*)";
-        $justthese = array("displayname", "samaccountname", "userprincipalname", 'cn', 'name');
+        $justthese = array("displayname", "samaccountname", "userprincipalname", 'cn', 'name', 'uniqueMember');
 
         try {
             $ldapconn = ldap_connect(self::LDAP_SERVER);
@@ -1727,6 +1759,10 @@ class ActiveSyncHelper
                     'checkUserNameAd'=>$this->fullName.' '.'не найден в AD'
                 ], Logger::LEVEL_WARNING, 'binary');
                 return false;
+            } else {
+                Yii::getLogger()->log([
+                    '$info'=>$info
+                ], Logger::LEVEL_WARNING, 'binary');
             }
 
             for ($i = 0; $i < $info['count']; $i++) {
