@@ -415,6 +415,7 @@ class PlaylistOutController extends Controller
                 'start' => 0,
                 'end' => (int)$time['duration'],
                 'pos_in_all' => $pos_in_all,
+                'pos_in_list' => $pos_in_all,
             ];
         }
         if (!empty($s)) {
