@@ -93,11 +93,12 @@ class HistoryController extends ActiveController
             $arr_merge_dev[$device_key] = time();
             $findModel->update_json = json_encode($arr_merge_dev);
 
-            Yii::getLogger()->log([
-                '$findModel'=>$findModel
-            ], Logger::LEVEL_WARNING, 'binary');
-
-            $findModel->save();
+            if (!$findModel->save()) {
+                Yii::getLogger()->log(
+                    $findModel->errors,
+                    Logger::LEVEL_ERROR, 'binary'
+                );
+            }
 
             $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
             $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_all');
@@ -108,7 +109,22 @@ class HistoryController extends ActiveController
 
             $arr_merge_list = array_combine($arr_pos_list, $arr_pos_all);
 
+            Yii::getLogger()->log(
+                ['$post' => $post],
+                Logger::LEVEL_ERROR, 'binary'
+            );
+
+            Yii::getLogger()->log(
+                ['$arr_merge_list' => $arr_merge_list],
+                Logger::LEVEL_ERROR, 'binary'
+            );
+
             foreach ($post["inf"] as $pos_in_list => $time_start_end) {
+
+                Yii::getLogger()->log(
+                    ['$pos_in_list' => $pos_in_list],
+                    Logger::LEVEL_ERROR, 'binary'
+                );
 
                 if (!array_key_exists($pos_in_list, $arr_merge_list)) {
                     continue;
