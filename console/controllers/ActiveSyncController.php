@@ -253,6 +253,19 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+        date_default_timezone_set('Europe/Moscow');
+        $timeNowTrack = mktime(
+            1,
+            52,
+            0
+        );
+        $date_time_array = getdate($timeNowTrack);
+        print_r($date_time_array);
+//        $timeNowTrackSeconds = idate('U', $timeNowTrack);
+//        echo $timeNowTrackSeconds;
+        exit;
+
+
         $name = "GUID";
         $value = "123456";
         $file_txt = "#EXTM3U
