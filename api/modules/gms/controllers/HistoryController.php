@@ -124,7 +124,7 @@ class HistoryController extends ActiveController
 
                     $videoHistoryModel = GmsVideoHistory::findOne([
                         'pls_pos' => $current_pos_all,
-                        'pls_guid' => $post["pls_guid"]
+                        'pls_guid' => $guid_pls
                     ]);
 
                     if (!$videoHistoryModel) {
