@@ -253,6 +253,7 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+
         date_default_timezone_set('Europe/Moscow');
         $timeNowTrack = mktime(
             1,
