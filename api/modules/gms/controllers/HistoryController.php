@@ -67,7 +67,7 @@ class HistoryController extends ActiveController
         $arr_merge_dev = [];
 
         Yii::getLogger()->log([
-            'Yii::$app->request'=>json_decode(Yii::$app->request)
+            'Yii::$app->request'=>ArrayHelper::toArray(Yii::$app->request)
         ], Logger::LEVEL_ERROR, 'binary');
 
         if (!empty(Yii::$app->request->post()))
