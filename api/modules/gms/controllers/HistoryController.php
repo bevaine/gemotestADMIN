@@ -66,14 +66,10 @@ class HistoryController extends ActiveController
         $response->format = yii\web\Response::FORMAT_JSON;
         $arr_merge_dev = [];
 
-        $body = json_decode(Yii::$app->getRequest()->getRawBody(), true);
-        Yii::getLogger()->log([
-            '$body'=>$body
-        ], Logger::LEVEL_ERROR, 'binary');
-
         if (!empty(Yii::$app->request->post()))
         {
             $post = Yii::$app->request->post();
+            $post = ArrayHelper::toArray(json_decode($post));
 
             Yii::getLogger()->log([
                 '$post'=>$post
