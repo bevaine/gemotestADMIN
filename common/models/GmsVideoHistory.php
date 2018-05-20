@@ -39,8 +39,8 @@ class GmsVideoHistory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pls_id', 'video_key', 'pls_pos', 'type', 'duration', 'device_id'], 'integer'],
-            [['created_at', 'last_at', 'pls_guid'], 'string', 'max' => 255],
+            [['created_at', 'last_at', 'pls_id', 'video_key', 'pls_pos', 'type', 'duration', 'device_id'], 'integer'],
+            [['pls_guid'], 'string', 'max' => 255],
         ];
     }
 
