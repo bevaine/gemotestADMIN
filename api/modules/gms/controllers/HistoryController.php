@@ -66,17 +66,13 @@ class HistoryController extends ActiveController
         $response->format = yii\web\Response::FORMAT_JSON;
         $arr_merge_dev = [];
 
-        if (!empty(Yii::$app->request->post()))
-        {
+        if (!empty(Yii::$app->request->post())) {
             $post = Yii::$app->request->post();
             $post = ArrayHelper::toArray(json_decode($post));
 
-            Yii::getLogger()->log([
-                '$post'=>$post
-            ], Logger::LEVEL_ERROR, 'binary');
-
             if (!isset($post["pls_id"])
-                || empty($post["device_id"]))
+                || empty($post["device_id"])
+            )
                 return ['state' => 0];
 
             if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
@@ -84,7 +80,8 @@ class HistoryController extends ActiveController
 
             if (!$findModelDevice = GmsDevices::findOne([
                 'device' => $post["device_id"]
-            ])) return ['state' => 0];
+            ])
+            ) return ['state' => 0];
 
             $device_key = $findModelDevice->id;
 
@@ -104,55 +101,38 @@ class HistoryController extends ActiveController
                 );
             }
 
-            $arrJsonKodi = ArrayHelper::toArray(json_decode($findModel->jsonKodi));
-            $arr_pos_all = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_all');
-            $arr_pos_list = ArrayHelper::getColumn($arrJsonKodi["children"], 'pos_in_list');
+            $videoHistoryModel = GmsVideoHistory::findOne([
+                'pls_pos' => $post["inf"]["pls_pos"],
+                'pls_guid' => $post["guid"]
+            ]);
 
-            if (empty($arr_pos_list) || empty($arr_pos_all))
-                return ['state' => 0];
+            if (!$videoHistoryModel) {
+                $videoHistoryModel = new GmsVideoHistory();
+            }
 
-            $arr_merge_list = array_combine($arr_pos_list, $arr_pos_all);
+            if ($post["type_action"] == 'start') {
+                $videoHistoryModel->created_at = round($post["datetime"]);
+            } elseif ($post["type_action"] == 'end') {
+                $videoHistoryModel->last_at = round($post["datetime"]);
+            }
 
-            foreach ($post["inf"] as $guid_pls => $track)
-            {
-                foreach ($track as $pos_in_list => $time_start_end)
-                {
-                    if (!array_key_exists($pos_in_list, $arr_merge_list)) {
-                        continue;
-                    }
+            $videoHistoryModel->duration = $post["inf"]["duration"];
+            $videoHistoryModel->type = $post["inf"]["type"];
+            $videoHistoryModel->pls_pos = $post["inf"]["pls_pos"];
+            $videoHistoryModel->pls_guid = $post["guid"];
+            $videoHistoryModel->video_key = $post["inf"]["key"];
+            $videoHistoryModel->device_id = $device_key;
+            $videoHistoryModel->pls_id = $post["pls_id"];
 
-                    $current_pos_all = $arr_merge_list[$pos_in_list];
-
-                    $videoHistoryModel = GmsVideoHistory::findOne([
-                        'pls_pos' => $current_pos_all,
-                        'pls_guid' => $guid_pls
-                    ]);
-
-                    if (!$videoHistoryModel) {
-                        $videoHistoryModel = new GmsVideoHistory();
-                        $videoHistoryModel->created_at = $time_start_end['start'];
-                    }
-
-                    $videoHistoryModel->duration = $time_start_end["duration"];
-                    $videoHistoryModel->type = $time_start_end["type"];
-                    $videoHistoryModel->pls_pos = $current_pos_all;
-                    $videoHistoryModel->pls_guid = $guid_pls;
-                    $videoHistoryModel->video_key = $time_start_end["key"];
-                    $videoHistoryModel->device_id = $device_key;
-                    $videoHistoryModel->pls_id = $post["pls_id"];
-                    $videoHistoryModel->last_at = $time_start_end['end'];
-
-                    if (!$videoHistoryModel->save()) {
-                        Yii::getLogger()->log(
-                            $videoHistoryModel->errors,
-                            Logger::LEVEL_ERROR, 'binary'
-                        );
-                        return ['state' => 0];
-                    }
-                }
+            if ($videoHistoryModel->save()) {
+                return ['state' => 1];
+            } else {
+                Yii::getLogger()->log(
+                    $videoHistoryModel->errors,
+                    Logger::LEVEL_ERROR, 'binary'
+                );
             }
         }
-
-        return ['state' => 1];
+        return ['state' => 0];
     }
 }
