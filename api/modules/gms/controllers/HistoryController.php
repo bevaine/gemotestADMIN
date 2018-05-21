@@ -69,20 +69,23 @@ class HistoryController extends ActiveController
         if (!empty(Yii::$app->request->post())) {
 
             $post = Yii::$app->request->post();
-            //$post = ArrayHelper::toArray(json_decode($post));
 
             if (!isset($post["pls_id"])
                 || empty($post["device_id"])
-            )
+                || empty($post["guid"])
+                || empty($post["type_action"]))
+                return ['state' => 0];
+
+            if ($post["type_action"] == 'start' &&
+                !isset($post["inf"]["pls_pos"]))
                 return ['state' => 0];
 
             if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
                 return ['state' => 0];
 
             if (!$findModelDevice = GmsDevices::findOne([
-                'device' => $post["device_id"]
-            ])
-            ) return ['state' => 0];
+                'device' => $post["device_id"]]))
+                return ['state' => 0];
 
             $device_key = $findModelDevice->id;
 
@@ -102,28 +105,31 @@ class HistoryController extends ActiveController
                 );
             }
 
-            $videoHistoryModel = GmsVideoHistory::findOne([
-                'pls_pos' => $post["inf"]["pls_pos"],
-                'pls_guid' => $post["guid"]
-            ]);
+            if ($post["type_action"] == 'stop')
+            {
+                $pls_pos = GmsVideoHistory::find()
+                    ->where(['pls_guid' => $post["guid"]])
+                    ->max('pls_pos');
 
-            if (!$videoHistoryModel) {
-                $videoHistoryModel = new GmsVideoHistory();
-            }
+                if (!$videoHistoryModel = GmsVideoHistory::findOne([
+                    'pls_pos' => $pls_pos,
+                    'pls_guid' => $post["guid"]
+                ])) return ['state' => 0];
 
-            if ($post["type_action"] == 'start') {
-                $videoHistoryModel->created_at = round($post["datetime"]);
-            } elseif ($post["type_action"] == 'stop') {
                 $videoHistoryModel->last_at = round($post["datetime"]);
-            }
 
-            $videoHistoryModel->duration = $post["inf"]["duration"];
-            $videoHistoryModel->type = $post["inf"]["type"];
-            $videoHistoryModel->pls_pos = $post["inf"]["pls_pos"];
-            $videoHistoryModel->pls_guid = $post["guid"];
-            $videoHistoryModel->video_key = $post["inf"]["key"];
-            $videoHistoryModel->device_id = $device_key;
-            $videoHistoryModel->pls_id = $post["pls_id"];
+            } else {
+                $pls_pos = $post["inf"]["pls_pos"];
+                $videoHistoryModel = new GmsVideoHistory();
+                $videoHistoryModel->created_at = round($post["datetime"]);
+                $videoHistoryModel->duration = $post["inf"]["duration"];
+                $videoHistoryModel->type = $post["inf"]["type"];
+                $videoHistoryModel->pls_pos = $pls_pos;
+                $videoHistoryModel->pls_guid = $post["guid"];
+                $videoHistoryModel->video_key = $post["inf"]["key"];
+                $videoHistoryModel->device_id = $device_key;
+                $videoHistoryModel->pls_id = $post["pls_id"];
+            }
 
             if ($videoHistoryModel->save()) {
                 return ['state' => 1];
