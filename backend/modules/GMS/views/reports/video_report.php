@@ -22,7 +22,7 @@ $gridColumns = [
     [
         'headerOptions' => array('style' => 'width: 160px;'),
         'value' => function ($model) {
-            return !empty($model["start_at"]) ? date("Y-m-d H:i:s T", strtotime($model["start_at"])) : null;
+            return !empty($model["start_at"]) ? date("Y-m-d H:i:s T", $model["start_at"]) : null;
         },
         'label' => 'Начало',
         'attribute' => 'start_at',
@@ -32,7 +32,7 @@ $gridColumns = [
     [
         'headerOptions' => array('style' => 'width: 160px;'),
         'value' => function ($model) {
-            return !empty($model["last_at"]) ? date("Y-m-d H:i:s T", strtotime($model["last_at"])) : null;
+            return !empty($model["last_at"]) ? date("Y-m-d H:i:s T", $model["last_at"]) : null;
         },
         'label' => 'Конец',
         'attribute' => 'last_at',
@@ -45,7 +45,7 @@ $gridColumns = [
             if (empty($model["start_at"]) || empty($model["last_at"])) {
                 return null;
             }
-            $duration = strtotime($model["last_at"]) - strtotime($model["start_at"]);
+            $duration = $model["last_at"] - $model["start_at"];
             return !empty($duration) && $duration > 0 ? date("H:i:s", mktime(null,null, $duration)) : null;
         },
         'label' => 'Продолжит.',
