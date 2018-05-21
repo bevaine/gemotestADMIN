@@ -68,6 +68,8 @@ class HistoryController extends ActiveController
 
         if (!empty(Yii::$app->request->post()))
         {
+            $post = Yii::$app->request->post();
+
             if (!isset($post["pls_id"])
                 || empty($post["device_id"])
                 || empty($post["guid"])
