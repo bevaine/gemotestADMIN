@@ -66,13 +66,8 @@ class HistoryController extends ActiveController
         $response->format = yii\web\Response::FORMAT_JSON;
         $arr_merge_dev = [];
 
-        if (!empty(Yii::$app->request->post())) {
-
-            $post = Yii::$app->request->post();
-            Yii::getLogger()->log([
-                '$post'=>$post
-            ], Logger::LEVEL_ERROR, 'binary');
-
+        if (!empty(Yii::$app->request->post()))
+        {
             if (!isset($post["pls_id"])
                 || empty($post["device_id"])
                 || empty($post["guid"])
@@ -119,7 +114,7 @@ class HistoryController extends ActiveController
                     'pls_guid' => $post["guid"]
                 ])) return ['state' => 0];
 
-                $videoHistoryModel->last_at = round($post["datetime"]);
+                $videoHistoryModel->last_at = $post["datetime"];
 
             } else {
                 $pls_pos = $post["inf"]["pls_pos"];
