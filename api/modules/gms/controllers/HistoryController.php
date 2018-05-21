@@ -113,7 +113,7 @@ class HistoryController extends ActiveController
 
             if ($post["type_action"] == 'start') {
                 $videoHistoryModel->created_at = round($post["datetime"]);
-            } elseif ($post["type_action"] == 'end') {
+            } elseif ($post["type_action"] == 'stop') {
                 $videoHistoryModel->last_at = round($post["datetime"]);
             }
 
