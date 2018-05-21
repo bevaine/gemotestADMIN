@@ -67,8 +67,9 @@ class HistoryController extends ActiveController
         $arr_merge_dev = [];
 
         if (!empty(Yii::$app->request->post())) {
+
             $post = Yii::$app->request->post();
-            $post = ArrayHelper::toArray(json_decode($post));
+            //$post = ArrayHelper::toArray(json_decode($post));
 
             if (!isset($post["pls_id"])
                 || empty($post["device_id"])
