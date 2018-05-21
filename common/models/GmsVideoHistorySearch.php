@@ -91,7 +91,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
             'sql' => $query->createCommand()->rawSql,
             'sort' => [
                 'defaultOrder' => [
-                    'created_at' => SORT_DESC
+                    'start_at' => SORT_DESC
                 ]
             ],
         ]);
