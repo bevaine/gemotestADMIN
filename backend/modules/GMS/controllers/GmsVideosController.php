@@ -79,7 +79,8 @@ class GmsVideosController extends Controller
             $filePath = self::getVideoDir() . $fileName;
             $thumbnailPath = self::getThumbnailDir() . $thumbnailName;
 
-            if ($imageFile->saveAs($filePath)) {
+            if ($imageFile->saveAs($filePath))
+            {
                 if ($thumbnail = FunctionsHelper::createMovieThumb($filePath, $thumbnailPath)) {
                     $thumbnailUrl = '/' . implode('/', ['upload', 'thumbnail', Yii::$app->session->id, $thumbnailName]);
                 } else {
@@ -97,7 +98,19 @@ class GmsVideosController extends Controller
                 $model->type = FileHelper::getMimeType($filePath);
                 $model->thumbnail = $thumbnailUrl;
 
-                if ($infoVideo = FunctionsHelper::getInfoVideo($filePath)) {
+                if ($infoVideo = FunctionsHelper::getInfoVideo($filePath))
+                {
+                    if ($infoVideo['width'] > 1280 || $infoVideo['height'] > 720) {
+
+                        if (is_file($thumbnailPath)) unlink($thumbnailPath);
+                        if (is_file($filePath)) unlink($filePath);
+
+                        $message = '<p>Загружаемое видео ('.$infoVideo['width'].'x'.$infoVideo['height'].'px) не должно превышать разрешение в 1208x720px';
+                        $message .= '<br>Файл "'.$fileName.'" был удален!</p>';
+                        Yii::$app->session->setFlash('error', $message);
+                        return $this->redirect(Url::toRoute('create'));
+                    }
+
                     $model->time = round($infoVideo['duration']);
                     $model->frame_rate = round($infoVideo['frame_rate'], 2);
                     $model->nb_frames = round($infoVideo['nb_frames']);

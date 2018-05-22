@@ -191,26 +191,23 @@ SCRIPT;
      */
     static function getInfoVideo($file)
     {
-        $duration = 0;
         $rate = 0;
-        $all_frames = 0;
 
         try {
             $ffprobe = FFProbe::create(self::getBinFFmpeg());
 
-            $duration = $ffprobe
+            /** @var FFProbe\DataMapping\Stream $test */
+            $stream = $ffprobe
                 ->streams($file)
                 ->videos()
-                ->first()
-                ->get('duration');
+                ->first();
+
+            $duration = (int)$stream->get('duration');
+            $all_frames = (int)$stream->get('nb_frames');
+            $height = (int)$stream->getDimensions()->getHeight();
+            $width = (int)$stream->getDimensions()->getWidth();
 
             if (empty($duration)) return false;
-
-            $all_frames = $ffprobe
-                ->streams($file)
-                ->videos()
-                ->first()
-                ->get('nb_frames');
 
             if (empty($all_frames)) {
                 $avg_frame_rate = $ffprobe
@@ -229,6 +226,8 @@ SCRIPT;
             }
 
             return [
+                'width' => $width,
+                'height' => $height,
                 'duration' => $duration,
                 'nb_frames' => $all_frames,
                 'frame_rate' => $rate
