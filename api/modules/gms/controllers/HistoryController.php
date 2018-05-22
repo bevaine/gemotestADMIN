@@ -116,6 +116,10 @@ class HistoryController extends ActiveController
                     'pls_guid' => $post["guid"]
                 ])) return ['state' => 0];
 
+                if ($videoHistoryModel->created_at == $post["datetime"]) {
+                    $videoHistoryModel->delete();
+                    return ['state' => 0];
+                }
                 $videoHistoryModel->last_at = $post["datetime"];
 
             } else {
