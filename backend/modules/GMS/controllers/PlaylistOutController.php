@@ -193,8 +193,8 @@ class PlaylistOutController extends Controller
         if (!empty($post['arr_standart'])) $arr_standart = $post['arr_standart'];
         if (!empty($post['pls_commerce'])) $pls_commerce = $post['pls_commerce'];
         if (!empty($post['pls_standart'])) $pls_standart = $post['pls_standart'];
-
-        Yii::getLogger()->log(['$post'=>$post], 1, 'binary');
+//
+//        Yii::getLogger()->log(['$post'=>$post], 1, 'binary');
 
         if (empty($arr_standart) || empty($all_time)) {
             return [
@@ -215,6 +215,10 @@ class PlaylistOutController extends Controller
             / array_sum(ArrayHelper::getColumn($arr_commerce, 'views'));
 
         $play_standart = ceil($play_standart);
+
+        Yii::getLogger()->log([
+            '$play_standart'=>$play_standart
+        ], Logger::LEVEL_ERROR, 'binary');
 
         if ($play_standart >= $minimal_std) {
 
@@ -352,7 +356,7 @@ class PlaylistOutController extends Controller
                     break;
                 }
 
-                if (!empty($val) && $key == count($arr_standart) - 1) {
+                if (current($f) !== false) {
                     reset($arr_standart);
                 }
             }
