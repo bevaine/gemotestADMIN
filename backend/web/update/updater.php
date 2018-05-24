@@ -1,5 +1,5 @@
 <?php
-const version = 2;
+const version = 1;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
@@ -105,10 +105,9 @@ class SyncUpdate
 
         if ($this->version_remote > version)
         {
-
             return $this->backup();
         } else {
-            Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось получить версию скрипта на удаленном сервере', true);
+            Playlist::my_log(__CLASS__, __FUNCTION__, ': Версия скрипта является актуальной, обновление не требуется', true);
             return false;
         }
     }
