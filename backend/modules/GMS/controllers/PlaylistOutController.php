@@ -188,13 +188,12 @@ class PlaylistOutController extends Controller
             return false;
 
         $post = Yii::$app->request->post();
+
         if (!empty($post['all_time'])) $all_time = $post['all_time'];
         if (!empty($post['arr_commerce'])) $arr_commerce = $post['arr_commerce'];
         if (!empty($post['arr_standart'])) $arr_standart = $post['arr_standart'];
         if (!empty($post['pls_commerce'])) $pls_commerce = $post['pls_commerce'];
         if (!empty($post['pls_standart'])) $pls_standart = $post['pls_standart'];
-//
-//        Yii::getLogger()->log(['$post'=>$post], 1, 'binary');
 
         if (empty($arr_standart) || empty($all_time)) {
             return [
@@ -215,10 +214,6 @@ class PlaylistOutController extends Controller
             / array_sum(ArrayHelper::getColumn($arr_commerce, 'views'));
 
         $play_standart = ceil($play_standart);
-
-        Yii::getLogger()->log([
-            '$play_standart'=>$play_standart
-        ], Logger::LEVEL_ERROR, 'binary');
 
         if ($play_standart >= $minimal_std) {
 
@@ -255,8 +250,13 @@ class PlaylistOutController extends Controller
             if (!empty($f)) shuffle($f);
             $findStandartModel = GmsPlaylist::findOne($pls_standart);
 
-            while(list($key, $time) = each($arr_standart))
+            while(list(, $time) = each($arr_standart))
             {
+                if (current($f) === false
+                    && current($arr_standart) == false) {
+                    break;
+                }
+
                 $pos_in_all += 1;
 
                 if ($dataStandart = $findStandartModel->getVideoData($time['key'])) {
@@ -356,7 +356,8 @@ class PlaylistOutController extends Controller
                     break;
                 }
 
-                if (current($f) !== false) {
+                if (current($f) !== false
+                    && current($arr_standart) == false) {
                     reset($arr_standart);
                 }
             }
