@@ -1,558 +1,211 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: evgeny.dymchenko
- * Date: 09.03.2018
- * Time: 9:49
- * @var integer time_start
- */
 const version = 1;
+const timezone = 'Europe/Moscow';
+
+const logo_img = 'logo.jpg';
+const edl_log = 'edl_log.txt';
+const m3uPlaylist = 'playlist.m3u';
+const jsonInfPlaylist = 'playlist_inf.json';
+
+const backend_path = 'https://corptv.gemotest.ru/';
+const path = backend_path . 'api';
+const jsonrpc = "http://127.0.0.1:8080/jsonrpc";
+
+const current = '/storage/videos';
+const temp = '/storage/downloads';
 const path_updater = '/storage/.kodi/userdata/updater/';
+#-------------------------------------------------------
 
-/**
- *
- * selfUpdate
- *
- * Класс для обновления одного файла файлом из удаленного источника.
- * Адрес источника передается в конструктор. Скрипт загружает файл во временную папку
- *
- */
-class selfUpdate
+if ($argv[1] == 'sync')
 {
-    const TIMEOUT_SOCKET = 15;
+    $Playlist = new Playlist();
+    $Playlist->sync();
+}
+elseif ($argv[1] == 'start' || $argv[1] == 'stop') {
+    $SyncHistory = new SyncHistory();
+    $SyncHistory->type_action = $argv[1];
+    $SyncHistory->sync();
+}
+elseif ($argv[1] == 'update')
+{
+    header("Content-type: text/html; charset=utf-8");
+    $SyncUpdate = new SyncUpdate();
+    if ($SyncUpdate->update()) {
+        Playlist::my_log('', '', ' Успешно было выполнено обновление с версии '.$SyncUpdate->version_local.' на '.$SyncUpdate->version_remote, false);
+    } else {
+        Playlist::my_log('', '', ' Не удалось выполнить обновление версии с '.$SyncUpdate->version_local.' на '.$SyncUpdate->version_remote, true);
+    }
+}
+
+try {
+    $action = isset($_GET['action']) ? $_GET['action'] : false;
+    switch ($action) {
+        //todo запрос версии
+        case 'version':
+            header("Content-type: application/json; charset=utf-8");
+            echo json_encode(['version' => version]);
+            break;
+        //todo скачивание файла
+        case 'update':
+            header('Content-Description: File Transfer');
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename='.basename($_SERVER['SCRIPT_NAME']));
+            header('Content-Transfer-Encoding: binary');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            header('Content-Length: ' . filesize(basename($_SERVER['SCRIPT_NAME'])));
+            readfile(basename($_SERVER['SCRIPT_NAME']));
+            break;
+    }
+} catch(Exception $ex){
+    Playlist::my_log(__CLASS__, __FUNCTION__, 'Возникла ошибка при обновлении скрипта: '.$ex->getCode().' - '.$ex->getMessage(), true);
+}
+
+class SyncUpdate
+{
+    public $script_name;
+    public $version_local;
+    public $version_remote;
+    public $source_path;
+    public $file_to_path;
+    public $backup_path;
 
     /**
-     *
-     * @var string директория на сервере, куда загружается обновление, чтобы потом заменить работающий скрипт index.php
+     * SyncUpdate constructor.
      */
-    const PATH_UPDATE	 = 'updates/download/';
-    /**
-     *
-     * @var string директория для хранения прошлой версии скрипта
-     */
-    const PATH_BACKUP	 = 'updates/backup/';
-
-    /**
-     *
-     * @var string корневая директория установки
-     */
-    private $root_path;
-
-    /**
-     *
-     * @var int размер загружаемого файла
-     */
-    private $content_length = 0;
-
-    /**
-     *
-     * @var string хеш загружаемого файла
-     */
-    private $content_md5 = null;
-
-    /**
-     *
-     * @var int текущий размер загруженного файла
-     */
-    private $current_content_length = 0;
-
-    /**
-     *
-     * @var string путь до источника обновлений
-     */
-    private $update_uri = null;
-
-    /**
-     *
-     * @var resource
-     */
-    private $download_stream = null;
-
-    /**
-     * selfUpdate constructor.
-     * @param null $root_path
-     */
-    function __construct($root_path = null)
+    public function __construct()
     {
-        if(!isset(self::$root_path)){
-            $this->root_path =  self::formatPath($root_path ? $root_path : dirname(__FILE__)).'/';
-        }
+        $this->version_local = (int)str_replace('.', '', version);
     }
 
     /**
-     * Основной метод загрузки и установки обновления
-     * @param $update_uri
-     * @param $target
-     * @throws Exception
-     */
-    public function execute($update_uri,$target)
-    {
-        $this->update_uri = $update_uri;
-        $target = self::formatPath($target).'/';
-        $target = preg_replace('@(^|/)\.\./@','/',$target);
-        $env = self::onBeforeUpdate();
-
-        try {
-            $this->cleanupPath(self::PATH_UPDATE);
-            $download_file = $this->download();
-            $this->replace($download_file,$target);
-            $this->cleanupPath(self::PATH_UPDATE);
-
-            self::onAfterUpdate($env);
-
-        } catch(Exception $ex){
-            //В случае ошибки возвращаем переменные окружения в исходное состояние
-            self::onAfterUpdate($env);
-            //и очищаем директорию от временных файлов
-            $this->cleanupPath(self::PATH_UPDATE,true);
-            throw $ex;
-        }
-    }
-
-    /**
-     * Подготавливаем окружение к обновлению
-     * @return array()
-     */
-    private static function onBeforeUpdate()
-    {
-        $env = array();
-        $env['session_id'] = session_id();
-        if($env['session_id']){
-            //KNOWHOW - на длительных операциях открытая сессия блокирует другие скрипты (с одинаковым идентификатором сессии),
-            // вынуждая их ожидать завершения текущего процесса
-            session_write_close();
-        }
-
-        //KNOWHOW не даем завершаться скрипту даже если браузер закрыл соединение
-        ignore_user_abort(true);
-        return $env;
-    }
-
-    /**
-     * Возвращаем окружение в исходное состояние
-     * @param $env array
-     * @return void
-     */
-    private static function onAfterUpdate($env)
-    {
-        if($env['session_id']){
-            session_start();
-        }
-    }
-
-    /**
-     * Загрузка файла с удаленного сервера.
-     * Определяет подходящий метод загрузки в зависимости от серверного окружения.
-     *
-     * @throws Exception
-     * @return string downloaded file_path
-     */
-    private function download()
-    {
-        $name = basename(preg_replace('/(\?.*)/','',$this->update_uri));
-        $download_file = self::formatPath(self::PATH_UPDATE.'/'.$name);
-
-        try {
-            $this->download_stream=$this->fopen($download_file,'wb');
-            if (!$this->download_stream){
-                throw new Exception("Не могу создать временный файл {$download_file}");
-            }
-
-            if ($this->curlAvailable()){
-                //при доступности cURL используем его, так как метод более гибкий
-                $this->downloadCurl();
-            } elseif($this->fopenAvailable()){
-                //иначе, если allow_fopen_url = On, пробуем получить обновление через fopen()
-                $this->downloadFopen();
-            } else{
-                throw new Exception('Нет подходящего транспорта для установки обновления (не поддерживаются ни cURL, ни allow_fopen_url)');
-            }
-
-            if($this->download_stream && is_resource($this->download_stream)){
-                fclose($this->download_stream);
-            }
-
-            //проверяем длину ответа от сервера - она может не совпадать с заявленной
-            // - в большую сторону в случае допвывода со стороны сервера ошибок и т.п.
-            // - в меньшую в случае обрыва соединения
-            if ($this->content_length && ($real_content_length = filesize($this->root_path.$download_file)) && ($this->content_length != $real_content_length)){
-                throw new Exception(sprintf("Неверный размер файла. Ожидали %d, а получили %d байт.",$this->content_length,$real_content_length));
-            }
-
-            //проверяем md5 хеш загруженного файла
-            if($this->content_md5 && ($md5 = md5_file($this->root_path.$download_file)) &&  (strcasecmp ($this->content_md5,$md5)!=0)){
-                throw new Exception(sprintf("Неверная md5-хеш файла. Ожидали %s, а получили %s",$this->content_md5,$md5));
-            }
-
-            return $download_file;
-
-        } catch(Exception $ex){
-
-            if($this->download_stream && is_resource($this->download_stream)){
-                fclose($this->download_stream);
-            }
-            if($download_file && file_exists($this->root_path.$download_file)){
-                @unlink($this->root_path.$download_file);
-            }
-            throw $ex;
-        }
-    }
-
-
-    /**
-     * Загрузка файла с удаленного сервера через fopen()
-     * Для работы необходимо, чтобы в настройках PHP было allow_fopen_url = On
-     * @throws Exception
-     */
-    private function downloadFopen()
-    {
-        $source_stream = null;
-        try {
-            //по умолчанию таймаут на открытие ресурсов составляет 30 - это слишком много, чтобы узнать, что сети нет, поэтому ставим меньший таймаут
-            $default_socket_timeout = ini_set('default_socket_timeout', self::TIMEOUT_SOCKET);
-            $source_stream = fopen($this->update_uri, 'r');
-            ini_set('default_socket_timeout', $default_socket_timeout);
-
-            if(!$source_stream){
-                throw new Exception("Ошибка подключения к источнику обновлений [{$this->update_uri}].");
-            }
-
-            $this->getStreamInfo($source_stream);
-
-            $retry_counter = 0;
-            while (
-                ($delta=stream_copy_to_stream($source_stream,$this->download_stream,102400))
-                //бывает, что последние байты ответа сервер отдает очень неохотно - nginx и т.п.
-                ||( $this->content_length && ($this->current_content_length<$this->content_length) && (++$retry_counter<20) )
-                ||( !$this->content_length && (++$retry_counter<3) )
-            ){
-                if($delta){
-                    $this->current_content_length += $delta;
-                    $retry_counter = 0;
-                }else{
-                    sleep(3);
-                }
-            }
-            fclose($source_stream);
-        } catch(Exception $ex){
-            if($source_stream && is_resource($source_stream)){
-                fclose($source_stream);
-            }
-            throw $ex;
-        }
-    }
-
-    /**
-     * Загрузка файла с удаленного сервера с помощью cURL
-     *
-     * @throws Exception
-     * @return void
-     */
-    private function downloadCurl()
-    {
-        try{
-            $ch = null;
-            if (!($ch = curl_init()) ){
-                throw new Exception('err_curlinit');
-            }
-
-            if ( curl_errno($ch) != 0 ){
-                throw new Exception('err_curlinit'.curl_errno($ch).' '.curl_error($ch));
-            }
-            $curl_options = array(
-                CURLOPT_HEADER				=> 0,
-                CURLOPT_RETURNTRANSFER		=> 1,
-                CURLOPT_TIMEOUT				=> self::TIMEOUT_SOCKET*60,
-                CURLOPT_CONNECTTIMEOUT		=> self::TIMEOUT_SOCKET,
-                CURLE_OPERATION_TIMEOUTED	=> self::TIMEOUT_SOCKET*60,
-                CURLOPT_BINARYTRANSFER		=> true,
-                //KNOWHOW переопределенная функция записи позволяет дополнительно фиксировать информацию о переданном размере
-                CURLOPT_WRITEFUNCTION		=> array(&$this,'curlWriteHandler'),
-                //KNOWHOW добавляем хук для чтения заголовков, чтобы узнать размер передаваемого файла и его md5 хеш
-                CURLOPT_HEADERFUNCTION		=> array(&$this,'curlHeaderHandler'),
-                CURLOPT_URL					=> $this->update_uri,
-                //TODO на ряде хостингов curl работает только через прокси, который необходимо указать в настройках
-            );
-            foreach($curl_options as $param=>$option){
-                curl_setopt($ch, $param, $option);
-            }
-            $res = curl_exec($ch);
-            if ($errno = curl_errno($ch)) {
-                $message = "Curl error: {$errno}# ".curl_error($ch)." at [{$this->update_uri}]";
-                throw new Exception($message);
-            }
-            $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if ($status != 200){
-                throw new Exception("Неверный ответ сервера {$this->update_uri}",$status);
-            }
-            curl_close($ch);
-
-        } catch(Exception $ex) {
-            if ($ch){
-                curl_close($ch);
-            }
-            throw $ex;
-        }
-    }
-
-    /**
-     * обработчик чтения заголовков для curl
-     *
-     * @param $ch
-     * @param $header
-     * @return int
-     */
-    private function curlHeaderHandler($ch,$header)
-    {
-        $header_matches = null;
-        if(preg_match('/content-length:\s*(\d+)/i',$header,$header_matches)) {
-            $this->content_length = intval($header_matches[1]);
-        }elseif(preg_match('/content-md5:\s*([\da-f]{32})/i',$header,$header_matches)){
-            $this->content_md5=$header_matches[1];
-        }
-        return strlen($header);
-    }
-
-    /**
-     * обработчик записи в файл для curl
-     * @param $ch
-     * @param $chunk
-     * @return bool|int
-     * @throws Exception
-     */
-    private function curlWriteHandler($ch,$chunk)
-    {
-        $size = 0;
-        if ($this->download_stream && is_resource($this->download_stream)) {
-            $size = fwrite($this->download_stream,$chunk);
-            $this->current_content_length += $size;
-        } else {
-            throw new Exception('Ошибка сохранения файла на сервере');
-        }
-        return $size;
-    }
-
-    /**
-     * Replace current version by merged old and updated files
-     * @param $source_path
-     * @param $target_path
-     * @return bool|string
-     * @throws Exception
-     */
-    private function replace($source_path,$target_path)
-    {
-        $target_path = self::formatPath($target_path);
-        $source_path = self::formatPath($source_path);
-        $backup_path = false;
-        if (file_exists($this->root_path.$target_path)){
-            $backup_path = self::PATH_BACKUP;
-            $backup_path = self::formatPath($backup_path);
-            $this->cleanupPath($backup_path);
-            $this->mkdir($backup_path);
-            $backup_path .= '/'.basename($target_path);
-        }
-        if ($backup_path){
-            if(!$this->rename($target_path,$backup_path)){
-                throw new Exception("Ошибка создания бекапа {$target_path} в папке {$backup_path}");
-            }
-        }
-
-        if(!$this->rename($source_path,$target_path)){
-            //rollback rename
-            if($backup_path){
-                $this->rename($backup_path,$target_path);
-            }
-            throw new Exception("Ошибка обновления {$target_path} в {$source_path}");
-        }
-        return $backup_path;
-    }
-
-    /**
-     * "Настойчивое" переименование
-     * @param $oldname
-     * @param $newname
      * @return bool
      */
-    private function rename($oldname,$newname)
+    public function update()
     {
-        $result = false;
-        if(@rename($this->root_path.$oldname,$this->root_path.$newname)
-            ||sleep(3)
-            ||@rename($this->root_path.$oldname,$this->root_path.$newname)){
-            $result = true;
+        $this->script_name =  basename($_SERVER['SCRIPT_NAME']);
+        $new_name = pathinfo($this->script_name)['filename'] . '_v'.$this->version_local . '.php';
+        $this->source_path = backend_path . 'update/'. $this->script_name . '?action=update';
+        $this->file_to_path = path_updater . 'download/' . $this->script_name;
+        $this->backup_path = path_updater . 'backup/' . $new_name;
+
+        $version_json = Playlist::curlJsonResult([
+            'action' => 'version'
+        ], backend_path . 'update/'. $this->script_name, $method = 0);
+
+        if (!$version_json) return false;
+        $version = json_decode($version_json);
+        if (isset($version->version)) {
+            $this->version_remote = (int)str_replace('.', '', $version->version);
+        } else {
+            Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось получить версию скрипта на удаленном сервере', true);
+            return false;
         }
-        return $result;
+
+        if ($this->version_remote > version)
+        {
+
+            return $this->backup();
+        } else {
+            Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось получить версию скрипта на удаленном сервере', true);
+            return false;
+        }
+    }
+
+    public function backup()
+    {
+        try {
+            //todo сохраняем новую версию скрипта в временную папку
+            if (!Playlist::saveFile($this->source_path, $this->file_to_path)) {
+                Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось сохранить из '. $this->source_path . ' в ' . $this->file_to_path, true);
+                return false;
+            }
+
+            //todo копируем старую версию скрипта в backup
+            if (!file_exists($this->script_name)
+                || @!copy($this->script_name, $this->backup_path)) {
+                Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось скопировать из '. $this->script_name . ' в ' . $this->backup_path, true);
+                return false;
+            }
+
+            //todo заменяем старую версию скрипта на новую
+            if (!file_exists($this->file_to_path)
+                || @!rename($this->file_to_path, path_updater . $this->script_name)) {
+                Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось заменить файл '. $this->file_to_path . ' на ' . path_updater . $this->script_name, true);
+                return false;
+            }
+        } catch(Exception $ex){
+            Playlist::my_log(__CLASS__, __FUNCTION__, 'Возникла ошибка при обновлении скрипта: '.$ex->getCode().' - '.$ex->getMessage(), true);
+            return false;
+        }
+        return true;
+    }
+}
+
+class SyncHistory
+{
+    public $type_action;
+    public $guid;
+    public $inf;
+
+    public function __construct()
+    {
+        $this->datetime = time();
+        Playlist::my_log(__CLASS__, __FUNCTION__, '------------------------START---------------------------', false);
+    }
+
+    public function __destruct()
+    {
+        Playlist::my_log(__CLASS__, __FUNCTION__, '-------------------------END----------------------------', false);
     }
 
     /**
-     * Очистка директории от файлов
-     * @param $paths
-     * @param bool $skip_directory
-     * @throws Exception
+     * @return bool
      */
-    private function cleanupPath($paths,$skip_directory = false)
+    public function setCurrentPlay()
     {
-        foreach((array)$paths as $path){
-            $dir = null;
-            try{
-                if(file_exists($this->root_path.$path)){
-                    $dir=opendir($this->root_path.$path);
-                    while (false!==($current_path=readdir($dir))){
-                        if(($current_path != '.' )&&($current_path != '..')){
-                            if(is_dir($this->root_path.$path.'/'.$current_path)){
-                                $this->cleanupPath($path.'/'.$current_path,$skip_directory);
-                            }else{
-                                if(!@unlink($this->root_path.$path.'/'.$current_path)){
-                                    throw new Exception("Не могу удалить файл {$path}/{$current_path}");
-                                }
-                            }
-                        }
-                    }
-                    closedir($dir);
-                    if(!@rmdir($this->root_path.$path)&&!$skip_directory){
-                        throw new Exception("Не могу удалить директорию {$path}");
-                    }
+        //определение позиции и времени играющего видео
+        if ($this->type_action == 'start')
+        {
+            if (Playlist::getCurrentPos() === FALSE)
+                return false;
+
+            //получение информации о играющем видео
+            /** @var mixed $inf */
+            $this->inf = Playlist::getCurrentInf(Playlist::$key_track);
+            if ($this->inf === FALSE)
+                return false;
+
+            $this->inf->pls_pos = Playlist::$key_track;
+
+            if (Playlist::$key_track == 0)
+            {
+                //генерация и запись guid в заголовок плейлиста
+                $this->guid = uniqid(time(), true);
+                if (Playlist::setParamPlaylist("GUID", $this->guid))
+                {
+                    Playlist::my_log(__CLASS__, __FUNCTION__, ': Сгенерирован новый GUID плейлиста - ' . $this->guid, false);
+                } else {
+                    Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось сгенерировать новый GUID плейлиста - ' . $this->guid, false);
                 }
-            }catch(Exception $ex){
-                if($dir&&is_resource($dir)){
-                    closedir($dir);
-                }
-                throw $ex;
-            }
-        }
-    }
-
-    /**
-     * Приводим пути к nix виду
-     *
-     * windows поймет и такие, а в случае использования правил постобработки с использованием регулярных выражения последние упрощаются
-     * @param $path string
-     * @return string
-     */
-    private static function formatPath($path)
-    {
-        $path = preg_replace('@([/\\\\]+)@','/',$path);
-        return preg_replace('@/$@','',$path);
-    }
-
-    /**
-     * Создание директорий с дополнительными проверками на права записи
-     * @param $target_path
-     * @param int $mode
-     * @throws Exception
-     */
-    private function mkdir($target_path,$mode = 0777)
-    {
-        if(!file_exists($this->root_path.$target_path)){
-            if(!mkdir($this->root_path.$target_path,$mode&0777,true)){
-                throw new Exception("не могу создать директорию {$target_path}");
-            }
-        }elseif(!is_dir($this->root_path.$target_path)){
-            throw new Exception("Не могу создать директорию {$target_path}, так как есть файл с таким изменем");
-
-        }elseif(!is_writable($this->root_path.$target_path)){
-            throw new Exception("{$target_path} должна быть доступна по записи. Установите необходимые права доступа.");
-        }
-    }
-
-    /**
-     * Проверяем возможность использовать cURL
-     *
-     * @return boolean
-     */
-    private function curlAvailable()
-    {
-        return extension_loaded('curl') && function_exists('curl_init') && preg_match('/https?:\/\//',$this->update_uri);
-    }
-
-
-    /**
-     * Проверяем возможность использовать fopen
-     *
-     * @return boolean
-     */
-    private function fopenAvailable()
-    {
-        $result = false;
-        if(stream_is_local($this->update_uri)){
-            $result = true;
-        }else{
-            $scheme = parse_url($this->update_uri,PHP_URL_SCHEME);
-            if($scheme == 'https'){
-                $scheme = 'http';
-            }
-            $result = ini_get('allow_url_fopen') && in_array($scheme,stream_get_wrappers());
-        }
-        return $result;
-    }
-
-    /**
-     * Читаем метаданные загружаемого файла
-     *
-     * @param $source_stream resource
-     * @param $download_content_length int
-     * @return void
-     */
-    private function getStreamInfo($source_stream,$download_content_length=4096)
-    {
-        $stream_meta_data=stream_get_meta_data($source_stream);
-
-        //KNOWHOW без явного чтения потока метаданные потока не всегда доступны
-        //read data chunk to determine stream meta data
-        $buf = stream_get_contents($source_stream,$download_content_length);
-
-        $this->current_content_length = min($download_content_length,strlen($buf));
-
-        $stream_seekable = isset($stream_meta_data['seekable'])?$stream_meta_data['seekable']:false;
-
-        $headers = array();
-        //В зависимости от реализации обертки для http заголовки могут находиться в разных местах
-        if(isset($stream_meta_data["wrapper_data"]["headers"])){
-            $headers = $stream_meta_data["wrapper_data"]["headers"];
-        }elseif(isset($stream_meta_data["wrapper_data"])){
-            $headers = $stream_meta_data["wrapper_data"];
-        }
-
-
-        $header_matches = null;
-        foreach($headers as $header){
-            //ищем информацию о размере передаваемых данных
-            if(preg_match('/content-length:\s*(\d+)/i',$header,$header_matches)){
-                $this->content_length=intval($header_matches[1]);
-                //и md5 хеше
-            }elseif(preg_match('/content-md5:\s*([\da-f]{32})/i',$header,$header_matches)){
-                $this->content_md5=$header_matches[1];
             }
         }
 
-
-        if($buf && $this->download_stream){
-            fwrite($this->download_stream,$buf);
+        if (empty($this->guid)) {
+            $this->guid = Playlist::getParamPlaylist("GUID");
         }
+
+        if (Playlist::video_history_up($this)) {
+            Playlist::my_log(__CLASS__, __FUNCTION__, ': Успешно были сохранена история о воспроизводимом видео', false);
+            return true;
+        }
+        return false;
     }
 
-    /**
-     * "Настойчивое" открытие файла
-     * на случай если ресурс занят другим процессом или директория еще не создана
-     * @param $filename
-     * @param $mode
-     * @param $retry
-     * @return resource
-     */
-    private function fopen($filename,$mode,$retry = 5)
+    public function sync()
     {
-        $path = $this->root_path.$filename;
-        if(!file_exists($path)){
-            $this->mkdir(dirname($filename));
-        }
-        while(!($fp = fopen($path,$mode))){
-            if(--$retry>0){
-                sleep(1);
-            }else{
-                break;
-            }
-        }
-        return $fp;
+        self::setCurrentPlay();
     }
 }
 
@@ -570,7 +223,6 @@ class Playlist
     public function __construct()
     {
         $this->time_start = time();
-        require(path_updater . 'env.php');
         self::my_log(__CLASS__, __FUNCTION__, '------------------------START---------------------------', false);
     }
 
@@ -708,7 +360,7 @@ class Playlist
      * @param $saveTo
      * @return bool
      */
-    private static function saveFile($fileUrl, $saveTo)
+    public static function saveFile($fileUrl, $saveTo)
     {
         set_time_limit(0);
         if (file_exists($saveTo)) {
@@ -885,7 +537,11 @@ class Playlist
 
         $error ? $color = 'red' : $color = 'green';
         self::$log_out[] = "<b>".$now."</b> <span style='color: $color;font-weight: bold'>".$function."</span> ".$string;
-        file_put_contents($log_file_name, $now." ".$class.":".$function.$string."\r\n", FILE_APPEND);
+        $handle = fopen($log_file_name, "a");
+        if ($handle) {
+            fwrite($handle, $now." ".$class.":".$function.$string."\r\n");
+            fclose($handle);
+        }
     }
 
     /**
@@ -894,7 +550,7 @@ class Playlist
      * @param int $method
      * @return bool|mixed
      */
-    private static function curlJsonResult($params, $url, $method = 1)
+    public static function curlJsonResult($params, $url, $method = 1)
     {
         if ($curl = curl_init()) {
             if ($method == 0) {
@@ -963,7 +619,7 @@ class Playlist
     /**
      * @return bool
      */
-    protected static function moveToCurrent()
+    public static function moveToCurrent()
     {
         foreach (self::folder(temp) as $file) {
             if (@!rename(temp . '/' . $file, current . '/' . $file)) {
@@ -1471,10 +1127,5 @@ class Playlist
             self::deleteTempFiles();
         }
     }
-}
-
-$Playlist = new Playlist();
-if ($argv[1] == 'sync') {
-    $Playlist->sync();
 }
 ?>
