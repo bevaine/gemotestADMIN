@@ -1,5 +1,5 @@
 <?php
-const version = 1;
+const version = 2;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
