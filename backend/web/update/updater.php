@@ -1,5 +1,5 @@
 <?php
-const version = 2;
+const version = 1;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
@@ -463,15 +463,15 @@ class Playlist
         if (!$pls_Json = Playlist::getJsonPlaylist())
             return 0;
 
+        self::$json_data = $pls_Json->result;
+
         if (empty(self::$json_data->state)) {
             self::$pls_id = 0;
             return 3;
         }
 
-        self::$json_data = $pls_Json->result;
-
         if (empty(self::$json_data->pls->id) || empty(self::$json_data->pls->files)) {
-            self::my_log(__CLASS__, __FUNCTION__, ': Ошибка, пустое обязательное значение JSON-данных, id, files, children', true);
+            self::my_log(__CLASS__, __FUNCTION__, ': Ошибка, пустое обязательное значение JSON-данных, id, files', true);
             return 0;
         }
 
