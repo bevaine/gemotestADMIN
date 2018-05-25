@@ -70,6 +70,8 @@ class PlaylistController extends ActiveController
             throw new ForbiddenHttpException('The requested page does not exist.');
         }
 
+        Yii::getLogger()->log(['Yii::$app->request->post()' => Yii::$app->request->post()], 1, 'binary');
+
         $resp = [];
         $out['state'] = 0;
         $timezone = "Europe/Moscow";
