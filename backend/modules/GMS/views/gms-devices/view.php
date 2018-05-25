@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model common\models\GmsDevices */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Gms Devices', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Устройства', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-devices-view">
