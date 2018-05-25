@@ -68,8 +68,9 @@ class SyncUpdate
     public $version_local;
     public $version_remote;
     public $source_path;
-    public $file_to_path;
+    public $download_path;
     public $backup_path;
+    public $backup_script;
 
     /**
      * SyncUpdate constructor.
@@ -85,10 +86,11 @@ class SyncUpdate
     public function update()
     {
         $this->script_name =  basename($_SERVER['SCRIPT_NAME']);
-        $new_name = pathinfo($this->script_name)['filename'] . '_v'.$this->version_local . '.php';
         $this->source_path = backend_path . 'update/'. $this->script_name . '?action=update';
-        $this->file_to_path = path_updater . 'download/' . $this->script_name;
-        $this->backup_path = path_updater . 'backup/' . $new_name;
+        $this->backup_script = pathinfo($this->script_name)['filename'] . '_v'.$this->version_local . '.php';
+
+        $this->backup_path = path_updater . 'backup/';
+        $this->download_path = path_updater . 'download/';
 
         $version_json = Playlist::curlJsonResult([
             'action' => 'version'
@@ -107,7 +109,8 @@ class SyncUpdate
         {
             return $this->backup();
         } else {
-            Playlist::my_log(__CLASS__, __FUNCTION__, ': Версия скрипта является актуальной, обновление не требуется', true);
+            $msg = ': Версия скрипта ' . version . ' является актуальной, обновление не требуется';
+            Playlist::my_log(__CLASS__, __FUNCTION__, $msg, true);
             return false;
         }
     }
@@ -115,29 +118,49 @@ class SyncUpdate
     public function backup()
     {
         try {
+            //todo создание папок, если нет
+            if (!is_dir($this->backup_path) &&
+                @!mkdir($this->backup_path, 0777, true)) {
+                $msg = ': Ошибка! Не удалось создать директорию ' . $this->backup_path;
+                Playlist::my_log(__CLASS__, __FUNCTION__,$msg , true);
+                return false;
+            }
+            if (!is_dir($this->download_path) &&
+                @!mkdir($this->download_path, 0777, true)) {
+                $msg = ': Ошибка! Не удалось создать директорию ' . $this->download_path;
+                Playlist::my_log(__CLASS__, __FUNCTION__,$msg , true);
+                return false;
+            }
+
             //todo сохраняем новую версию скрипта в временную папку
-            if (!Playlist::saveFile($this->source_path, $this->file_to_path)) {
-                Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось сохранить из '. $this->source_path . ' в ' . $this->file_to_path, true);
+            if (!Playlist::saveFile($this->source_path, $this->download_path . $this->script_name  )) {
+                $msg = ': Ошибка! Не удалось сохранить из '. $this->source_path . ' в ' . $this->download_path . $this->script_name;
+                Playlist::my_log(__CLASS__, __FUNCTION__, $msg, true);
                 return false;
             }
 
             //todo копируем старую версию скрипта в backup
-            if (!file_exists($this->script_name)
-                || @!copy($this->script_name, $this->backup_path)) {
-                Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось скопировать из '. $this->script_name . ' в ' . $this->backup_path, true);
+            if (!file_exists(path_updater . $this->script_name)
+                || @!copy(path_updater . $this->script_name, $this->backup_path . $this->backup_script)) {
+                $msg = ': Ошибка! Не удалось скопировать из '. path_updater . $this->script_name . ' в ' . $this->backup_path . $this->backup_script;
+                Playlist::my_log(__CLASS__, __FUNCTION__, $msg, true);
                 return false;
             }
 
             //todo заменяем старую версию скрипта на новую
-            if (!file_exists($this->file_to_path)
-                || @!rename($this->file_to_path, path_updater . $this->script_name)) {
-                Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось заменить файл '. $this->file_to_path . ' на ' . path_updater . $this->script_name, true);
+            if (!file_exists($this->download_path . $this->script_name  )
+                || @!rename($this->download_path . $this->script_name  , path_updater . $this->script_name)) {
+                $msg = ': Ошибка! Не удалось заменить файл '. $this->download_path . $this->script_name . ' на ' . path_updater . $this->script_name;
+                Playlist::my_log(__CLASS__, __FUNCTION__, $msg, true);
                 return false;
             }
+
         } catch(Exception $ex){
-            Playlist::my_log(__CLASS__, __FUNCTION__, 'Возникла ошибка при обновлении скрипта: '.$ex->getCode().' - '.$ex->getMessage(), true);
+            $msg = 'Возникла ошибка при обновлении скрипта: '.$ex->getCode().' - '.$ex->getMessage();
+            Playlist::my_log(__CLASS__, __FUNCTION__, $msg, true);
             return false;
         }
+
         return true;
     }
 }
