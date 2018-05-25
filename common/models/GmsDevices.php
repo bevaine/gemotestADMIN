@@ -89,7 +89,8 @@ class GmsDevices extends \yii\db\ActiveRecord
             'current_pls_id' => 'Плейлист',
             'sender_name' => 'Отделение',
             'current_pls_name' => 'Плейлист',
-            'timezone' => 'Временная зона'
+            'timezone' => 'Временная зона',
+            'IP' => 'IP-адрес'
         ];
     }
 

@@ -32,6 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => !empty($model->name) ? $model->name : null,
                 'attribute' => 'name'
             ],
+            'IP',
             [
                 'value' => !empty($model->regionModel) ? $model->regionModel->region_name : null,
                 'attribute' => 'region_id'

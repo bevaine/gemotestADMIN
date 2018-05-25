@@ -256,6 +256,10 @@ class Playlist
         self::my_log(__CLASS__, __FUNCTION__, '-------------------------END----------------------------', false);
     }
 
+    static function get_ip_address() {
+        return trim(shell_exec("ifconfig eth0 |grep \"inet addr:\"|cut -f 2 -d ':'|cut -f 1 -d ' '"));
+    }
+
     /**
      * @return bool|mixed|string
      */
@@ -263,10 +267,11 @@ class Playlist
     {
         date_default_timezone_set(timezone);
         $params = [
-            'IP' => $_SERVER["REMOTE_ADDR"],
+            'IP' => self::get_ip_address(),
             'dev' => self::$dev,
             'timezone' => date("e")
         ];
+
         $url = path.'/gms/playlist';
 
         $json_data = self::curlJsonResult($params, $url, 1);
