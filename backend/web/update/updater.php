@@ -1,5 +1,5 @@
 <?php
-const version = 1;
+const version = 2;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
@@ -31,9 +31,11 @@ elseif ($argv[1] == 'update')
     header("Content-type: text/html; charset=utf-8");
     $SyncUpdate = new SyncUpdate();
     if ($SyncUpdate->update()) {
-        Playlist::my_log('', '', ' Успешно было выполнено обновление с версии '.$SyncUpdate->version_local.' на '.$SyncUpdate->version_remote, false);
+        $msg = ' Успешно было выполнено обновление с версии ' . $SyncUpdate->version_local.' на ' . $SyncUpdate->version_remote;
+        Playlist::my_log('', '', $msg, false);
     } else {
-        Playlist::my_log('', '', ' Не удалось выполнить обновление версии с '.$SyncUpdate->version_local.' на '.$SyncUpdate->version_remote, true);
+        $msg = ' Не удалось выполнить обновление версии с ' . $SyncUpdate->version_local.' на ' . $SyncUpdate->version_remote;
+        Playlist::my_log('', '', $msg, true);
     }
 }
 
@@ -59,7 +61,8 @@ try {
             break;
     }
 } catch(Exception $ex){
-    Playlist::my_log(__CLASS__, __FUNCTION__, 'Возникла ошибка при обновлении скрипта: '.$ex->getCode().' - '.$ex->getMessage(), true);
+    $msg = 'Возникла ошибка при обновлении скрипта: ' . $ex->getCode().' - ' . $ex->getMessage();
+    Playlist::my_log(__CLASS__, __FUNCTION__, $msg, true);
 }
 
 class SyncUpdate
