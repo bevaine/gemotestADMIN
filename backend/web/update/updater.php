@@ -463,6 +463,11 @@ class Playlist
         if (!$pls_Json = Playlist::getJsonPlaylist())
             return 0;
 
+        if (empty(self::$json_data->state)) {
+            self::$pls_id = 0;
+            return 3;
+        }
+
         self::$json_data = $pls_Json->result;
 
         if (empty(self::$json_data->pls->id) || empty(self::$json_data->pls->files)) {
@@ -471,11 +476,6 @@ class Playlist
         }
 
         self::$pls_id = self::$json_data->pls->id;
-
-        if (empty(self::$json_data->state)) {
-            self::$pls_id = 0;
-            return 3;
-        }
 
         $currentPls = self::getParamPlaylist("ID");
 
