@@ -1,5 +1,5 @@
 <?php
-const version = 1;
+const version = 1.1;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
@@ -45,7 +45,7 @@ try {
         //todo запрос версии
         case 'version':
             header("Content-type: application/json; charset=utf-8");
-            echo json_encode(['version' => version]);
+            echo json_encode(['version' => (int)str_replace('.', '', version)]);
             break;
         //todo скачивание файла
         case 'update':
@@ -102,13 +102,13 @@ class SyncUpdate
         if (!$version_json) return false;
         $version = json_decode($version_json);
         if (isset($version->version)) {
-            $this->version_remote = (int)str_replace('.', '', $version->version);
+            $this->version_remote = $version->version;
         } else {
             Playlist::my_log(__CLASS__, __FUNCTION__, ': Ошибка! Не удалось получить версию скрипта на удаленном сервере', true);
             return false;
         }
 
-        if ($this->version_remote > version)
+        if ($this->version_remote > $this->version_local)
         {
             return $this->backup();
         } else {
