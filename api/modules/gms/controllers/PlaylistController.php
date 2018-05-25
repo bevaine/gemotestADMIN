@@ -95,6 +95,10 @@ class PlaylistController extends ActiveController
             $modelDevices->last_active_at = $last_active_at->format("Y-m-d H:i:s P");
         }
 
+        if (!empty(Yii::$app->request->post()['IP'])) {
+            $modelDevices->IP = Yii::$app->request->post()['IP'];
+        }
+
         //todo проверка на авторизацию устройства
         if (!empty($modelDevices->auth_status)) {
 

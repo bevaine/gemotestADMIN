@@ -1,5 +1,5 @@
 <?php
-const version = 1.1;
+const version = 1.02;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
@@ -263,6 +263,7 @@ class Playlist
     {
         date_default_timezone_set(timezone);
         $params = [
+            'IP' => $_SERVER["REMOTE_ADDR"],
             'dev' => self::$dev,
             'timezone' => date("e")
         ];

@@ -25,6 +25,7 @@ use DateInterval;
  * @property integer $region_id
  * @property integer $auth_status
  * @property integer $current_pls_id
+ * @property string $IP
  * @property GmsRegions $regionModel
  * @property GmsSenders $senderModel
  * @property GmsPlaylistOut $playListOutModel
@@ -44,7 +45,7 @@ class GmsDevices extends \yii\db\ActiveRecord
     public function scenarios()
     {
         return [
-            self::SCENARIO_ADD_DEVICE => ['device', 'created_at', 'last_active_at', 'auth_status'],
+            self::SCENARIO_ADD_DEVICE => ['device', 'created_at', 'last_active_at', 'auth_status', 'IP'],
             self::SCENARIO_EDIT_DEVICE => ['name', 'device', 'created_at', 'last_active_at', 'auth_status', 'sender_id', 'region_id', 'current_pls_id', 'timezone'],
         ];
     }
@@ -66,7 +67,7 @@ class GmsDevices extends \yii\db\ActiveRecord
             [['device'], 'required', 'on' => 'addDevice'],
             [['name', 'region_id', 'device', 'timezone'], 'required', 'on' => 'editDevice'],
             [['sender_id', 'region_id', 'auth_status', 'current_pls_id'], 'integer'],
-            [['name', 'created_at', 'last_active_at', 'device', 'timezone'], 'string', 'max' => 255],
+            [['name', 'created_at', 'last_active_at', 'device', 'timezone', 'IP'], 'string', 'max' => 255],
             ['auth_status', 'default', 'value' => 0],
         ];
     }
