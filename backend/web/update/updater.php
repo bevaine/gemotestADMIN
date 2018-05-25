@@ -491,7 +491,8 @@ class Playlist
      */
     public static function actionForState($state)
     {
-        if (in_array($state, [0,2,3])) {
+        if (in_array($state, [0,2,3])
+            && self::getActivePlayer('video') === TRUE) {
             //todo сохраняем историю о последнем видео
             self::stopAndEnd();
         }
