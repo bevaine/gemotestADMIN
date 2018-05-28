@@ -3,13 +3,11 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\web\JsExpression;
-use yii\helpers\Url;
 
 \backend\assets\GmsAsset::register($this);
 
 /* @var $this yii\web\View */
 /* @var $model common\models\GmsPlaylist */
-/* @var $action string */
 
 $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Шаблоны плейлистов', 'url' => ['index']];
@@ -17,23 +15,6 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-playlist-view">
 
-    <div class="nav-tabs-custom">
-
-    <ul class="nav nav-tabs">
-        <li class="<?= ($action == 'auth') ? "active" : '' ?>">
-            <a href="<?php echo Url::to(["gms-devices/index/auth"]) ?>">
-                <span>Стандартный</span>
-            </a>
-        </li>
-        <li class="<?= ($action != 'auth') ? "active" : '' ?>">
-            <a href="<?php echo Url::to(["gms-devices/index"]) ?>">
-                <span>Коммерческий</span>
-            </a>
-        </li>
-    </ul>
-
-    <div class="tab-content">
-    <div class="tab-pane active" id="tab_1">
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
