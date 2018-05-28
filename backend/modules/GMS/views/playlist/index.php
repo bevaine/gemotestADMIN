@@ -73,6 +73,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model['group_name'];
 
                             },
+                            'group' => true,
                             'attribute' => 'group_id',
                             'visible' => $action == 'group' ? true : false
                         ],
@@ -82,6 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 return $model['device_name'];
 
                             },
+                            'group' => true,
                             'attribute' => 'device_name',
                             'visible' => $action == 'device' ? true : false
                         ],
