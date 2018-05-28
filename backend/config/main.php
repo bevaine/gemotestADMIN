@@ -151,6 +151,8 @@ return [
                 'POST /GMS/playlist-out/create/<param>' => '/GMS/playlist-out/create',
                 'GET /GMS/gms-devices/activate/<id:[\w\-]+>' => '/GMS/gms-devices/activate',
                 'GET /GMS/gms-devices/deactivate/<id:[\w\-]+>' => '/GMS/gms-devices/deactivate',
+                'GET /GMS/playlist/index/<param>' => '/GMS/playlist/index',
+                'POST /GMS/playlist/index/<param>' => '/GMS/playlist/index',
             ],
         ],
         'authManager' => [

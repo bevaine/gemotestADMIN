@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\GmsPlaylist;
+use yii\data\SqlDataProvider;
 
 /**
  * GmsPlaylistSearch represents the model behind the search form about `common\models\GmsPlaylist`.
@@ -14,15 +15,17 @@ use common\models\GmsPlaylist;
  * @property string $device_name
  * @property string $created_at_from
  * @property string $created_at_to
+ * @property string $playlist
  */
 class GmsPlaylistSearch extends GmsPlaylist
 {
     public $sender_name;
     public $group_id;
+    public $region_id;
     public $device_name;
     public $created_at_from;
     public $created_at_to;
-
+    public $playlist;
 
     /**
      * @inheritdoc
@@ -30,8 +33,8 @@ class GmsPlaylistSearch extends GmsPlaylist
     public function rules()
     {
         return [
-            [['id', 'type', 'region', 'sender_id'], 'integer'],
-            [['name', 'file', 'sender_name', 'group_id', 'device_name', 'created_at_from', 'created_at_to'], 'safe'],
+            [['id', 'type', 'region_id', 'group_id', 'sender_id'], 'integer'],
+            [['name', 'file', 'sender_name', 'device_name', 'created_at_from', 'created_at_to', 'playlist'], 'safe'],
         ];
     }
 
@@ -45,82 +48,140 @@ class GmsPlaylistSearch extends GmsPlaylist
     }
 
     /**
-     * Creates data provider instance with search query applied
-     *
-     * @param array $params
-     *
-     * @return ActiveDataProvider
+     * @param $params
+     * @param $action
+     * @return SqlDataProvider
      */
-    public function search($params)
+    public function search($params, $action)
     {
-        $query = GmsPlaylist::find()
-            ->joinWith('senderModel')
-            ->joinWith('groupDevicesModel')
-            ->joinWith('deviceModel');
+        $this->load($params);
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'sort' => [
-                'defaultOrder' => [
-                    'created_at' => SORT_DESC
+        $query = GmsPlaylist::find();
+        if ($action == 'group')
+        {
+            $query->joinWith('groupDevicesModel')
+                ->distinct()
+                ->select([
+                    'gms_playlist.id',
+                    'gms_playlist.type',
+                    'gms_playlist.name',
+                    'gms_playlist.group_id',
+                    'group_name' => 'gms_group_devices.group_name',
+                ])
+                ->where([
+                    'not',
+                    ['gms_group_devices.group_name' => null]
+                ])
+                ->andFilterWhere([
+                    'gms_playlist.group_id'=> $this->group_id
+                ]);
+
+            $order = [
+                'group_id' => [
+                    'asc' => ['gms_group_devices.group_name' => SORT_ASC],
+                    'desc' => ['gms_group_devices.group_name' => SORT_DESC]
                 ],
+            ];
+
+        } elseif ($action == 'device')
+        {
+            $query->joinWith('deviceModel')
+                ->distinct()
+                ->select([
+                    'gms_playlist.id',
+                    'gms_playlist.type',
+                    'gms_playlist.name',
+                    'gms_playlist.device_id',
+                    'device_name' => 'gms_devices.name'
+                ])
+                ->where([
+                    'not',
+                    ['gms_playlist.device_id' => null]
+                ])
+                ->andFilterWhere([
+                    'like',
+                    'LOWER(gms_devices.name)',
+                    mb_strtolower($this->device_name)
+                ]);
+
+            $order = [
+                'device_name' => [
+                    'asc' => ['gms_devices.name' => SORT_ASC],
+                    'desc' => ['gms_devices.name' => SORT_DESC]
+                ],
+            ];
+
+        } else {
+            $query
+                ->joinWith('senderModel')
+                ->joinWith('regionModel')
+                ->distinct()
+                ->select([
+                    'gms_playlist.id',
+                    'gms_playlist.type',
+                    'gms_playlist.name',
+                    'gms_playlist.region',
+                    'gms_playlist.sender_id',
+                    'gms_regions.region_name',
+                    'gms_senders.sender_name',
+                ])
+                ->where([
+                    'not',
+                    ['gms_regions.region_name' => null]])
+                ->orWhere([
+                    'not',
+                    ['gms_senders.sender_name' => null]])
+                ->andFilterWhere([
+                    'like',
+                    'LOWER(gms_senders.sender_name)',
+                    mb_strtolower($this->sender_name)
+                ])
+                ->andFilterWhere([
+                    'gms_playlist.region' => $this->region_id
+                ]);
+
+            $order = [
+                'region_id' => [
+                    'asc' => ['gms_regions.region_name' => SORT_ASC],
+                    'desc' => ['gms_regions.region_name' => SORT_DESC]
+                ],
+                'sender_name' => [
+                    'asc' => ['gms_senders.sender_name' => SORT_ASC],
+                    'desc' => ['gms_senders.sender_name' => SORT_DESC]
+                ],
+            ];
+        }
+
+        $order = array_merge($order, [
+            'type' => [
+                'asc' => ['gms_playlist.type' => SORT_ASC],
+                'desc' => ['gms_playlist.type' => SORT_DESC]
+            ],
+            'playlist' => [
+                'asc' => ['gms_playlist.name' => SORT_ASC],
+                'desc' => ['gms_playlist.name' => SORT_DESC]
+            ],
+        ]);
+
+        $query->andFilterWhere([
+            'like',
+            'LOWER(gms_playlist.name)',
+            mb_strtolower($this->playlist)
+        ]);
+
+        $query->andFilterWhere(['type' => $this->type]);
+
+        $dataProvider = new SqlDataProvider([
+            'sql' => $query->createCommand()->getRawSql(),
+            'sort' => [
+                'defaultOrder' => $order
             ],
         ]);
 
         $sort = $dataProvider->getSort();
-        $sort->attributes = array_merge($sort->attributes, [
-            'sender_name' => [
-                'asc' => ['gms_senders.sender_name' => SORT_ASC],
-                'desc' => ['gms_senders.sender_name' => SORT_DESC]
-            ],
-            'group_id' => [
-                'asc' => ['gms_group_devices.group_name' => SORT_ASC],
-                'desc' => ['gms_group_devices.group_name' => SORT_DESC]
-            ],
-            'device_name' => [
-                'asc' => ['gms_devices.device' => SORT_ASC],
-                'desc' => ['gms_devices.device' => SORT_DESC]
-            ],
-        ]);
+        $sort->attributes = array_merge($sort->attributes, $order);
+
         $dataProvider->setSort($sort);
-
-        $this->load($params);
-
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
-
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'gms_playlist.id' => $this->id,
-            'gms_playlist.type' => $this->type,
-            'gms_playlist.region' => $this->region,
-            'gms_playlist.group_id'=> $this->group_id,
-        ]);
-
-        $query->andFilterWhere(['like', 'LOWER(gms_playlist.name)', strtolower($this->name)])
-            ->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->device_name)])
-            ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)]);
-
-        if ($this->created_at_from) {
-            $query->andFilterWhere([
-                '>=',
-                'gms_playlist.created_at',
-                GmsPlaylistOut::getTimeStart(strtotime($this->created_at_from))
-            ]);
-        }
-
-        if ($this->created_at_to) {
-            $query->andFilterWhere([
-                '<=',
-                'gms_playlist.created_at',
-                GmsPlaylistOut::getTimeEnd(strtotime($this->created_at_to))
-            ]);
-        }
-
-        //print_r($query);
         return $dataProvider;
     }
 }

@@ -33,17 +33,19 @@ class PlaylistController extends Controller
     }
 
     /**
-     * Lists all GmsPlaylist models.
-     * @return mixed
+     * @param null $param
+     * @return string
      */
-    public function actionIndex()
+    public function actionIndex($param = null)
     {
         $searchModel = new GmsPlaylistSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(
+            Yii::$app->request->queryParams, $param);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'action' => $param
         ]);
     }
 

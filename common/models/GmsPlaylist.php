@@ -5,6 +5,7 @@ namespace common\models;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\log\Logger;
+use yii\helpers\Html;
 
 /**
  * This is the model class for table "gms_playlist".
@@ -75,8 +76,11 @@ class GmsPlaylist extends \yii\db\ActiveRecord
             'jsonPlaylist' => 'Плейлист',
             'sender_id' => 'Код отделения',
             'sender_name' => 'Отделение',
-            'group_id' => 'Группа устр.',
-            'device_name' => 'Устройство'
+            'group_id' => 'Группа устройств',
+            'device_name' => 'Устройство',
+            'region_id' => 'Регион',
+            'group_name' => 'Группа устройств',
+            'playlist' => 'Плейлист'
         ];
     }
 
@@ -119,6 +123,31 @@ class GmsPlaylist extends \yii\db\ActiveRecord
     public function getDeviceModel()
     {
         return $this->hasOne(GmsDevices::className(), ['id' => 'device_id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPlaylistList() {
+        $arr = [];
+        $style = '';
+        /** @var GmsPlaylist $model */
+        foreach ($this as $model) {
+            if ($model->type == 1) {
+                $style = 'primary';
+            } elseif ($model->type == 2) {
+                $style = 'warning';
+            }
+            $html = Html::tag(
+                'span',
+                Html::encode($this->name),
+                ['class' => 'label label-'.$style]
+            );
+            $arr[] = $html;
+        }
+        if (count($arr) > 0) {
+            return implode('<br>', $arr);
+        } else return null;
     }
 
     /**
