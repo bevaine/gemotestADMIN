@@ -12,12 +12,21 @@ use common\models\GmsPlaylist;
 
 $this->title = 'Шаблоны плейлистов';
 $this->params['breadcrumbs'][] = $this->title;
+
+switch ($action) {
+    case 'group':
+        $tab = 'tab_2';
+        break;
+    case 'device':
+        $tab = 'tab_3';
+        break;
+    default:
+        $tab = 'tab_1';
+        break;
+}
 ?>
 
 <div class="gms-playlist-index">
-    <p>
-        <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
 
     <div class="nav-tabs-custom">
 
@@ -41,6 +50,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="tab-content">
             <div class="tab-pane active" id="tab_1">
+                <p>
+                    <?= Html::a('Создать', ['create#'.$tab], ['class' => 'btn btn-success']) ?>
+                </p>
                 <?= GridView::widget([
                     'dataProvider' => $dataProvider,
                     'filterModel' => $searchModel,
@@ -59,12 +71,14 @@ $this->params['breadcrumbs'][] = $this->title;
                         [
                             'value' => function ($model) {
                                 /** @var $model \common\models\GmsPlaylist */
-                                return $model['sender_name'];
-
+                                return !empty($model['sender_name'])
+                                    ? $model['sender_name']
+                                    : Html::tag('span', '(действует во всём регионе)', ['class' => 'not-set']);
                             },
                             'group' => true,
                             'attribute' => 'sender_name',
-                            'visible' => $action == 'region' || is_null($action) ? true : false
+                            'visible' => $action == 'region' || is_null($action) ? true : false,
+                            'format' => 'raw'
                         ],
                         [
                             'filter' =>  \common\models\GmsGroupDevices::getGroupList(),

@@ -101,6 +101,12 @@ HTML;
                             ]
                         ],
                         'extensions' => ['dnd'],
+                        'click' => new JsExpression('function(node, data) {
+                            if (data.node.isFolder()) {
+                                go_to_url = "/GMS/playlist/view?id=59";
+                                window.open(go_to_url, "_blank");
+                            } else return false;
+                        }'),
                         'dblclick' => new JsExpression('function(node, data) {
                             if (!data.node.isFolder()) {
                                 const playlistNode = $("#treetable")
@@ -110,7 +116,7 @@ HTML;
                                 addChild.push(data.node);
                                 playlistNode.addNode(addChild, "child");
                                 sortNode();
-                            }
+                            } 
                         }'),
                         'dnd' => [
                             'preventVoidMoves' => true,
@@ -391,13 +397,13 @@ HTML;
 
                 <ul class="nav nav-tabs">
                     <li class="">
-                        <a data-toggle="" href="#tab_1">Привязка к региону/отделению</a>
+                        <a data-toggle="tab" aria-expanded="true" href="#tab_1">Привязка к региону/отделению</a>
                     </li>
                     <li class="">
-                        <a data-toggle="" href="#tab_2">Привязка к группе устройств</a>
+                        <a data-toggle="tab" aria-expanded="true" href="#tab_2">Привязка к группе устройств</a>
                     </li>
                     <li class="">
-                        <a data-toggle="" href="#tab_3">Привязка к устройству</a>
+                        <a data-toggle="tab" aria-expanded="true" href="#tab_3">Привязка к устройству</a>
                     </li>
                 </ul>
 
@@ -983,87 +989,56 @@ $js1 = <<< JS
     
     /**
     * 
+    * @returns {boolean}
     */
-    function setTabs() {
-        let liTab1 = '',
-            liTab2 = '',
-            liTab3 = '',
-            pineTab1 = '',
-            pineTab2 = '',
-            pineTab3 = '';
-
-        const customTabs = $('.nav-tabs-custom'),
+    function setTabs() 
+    {
+        let liTab1, liTab2, liTab3;
+        let customTabs = $('.nav-tabs-custom'),
             navTabs = customTabs.find('.nav-tabs'),
-            contentTabs = customTabs.find('.tab-content'),
-            liTabs = navTabs.find('li'),
-            pineTabs = contentTabs.find('.tab-pane');
-        
+            liTabs = navTabs.find('li');
+
         if (liTabs.length > 0) {
             liTab1 = liTabs.eq(0);
             liTab2 = liTabs.eq(1);
             liTab3 = liTabs.eq(2);                
+        }        
+        
+        if (isNew === true) {
+           $('ul.nav a[href="#tab_1"]').tab('show');
+           return true;
+        }
+
+        if (String('{$model->region_id}') !== '') {
+            $('ul.nav a[href="#tab_1"]').tab('show');
+            liTab2
+                .addClass('disabled')
+                .find('a').attr('data-toggle', '');
+            liTab3
+                .addClass('disabled')
+                .find('a').attr('data-toggle', '');
         }
         
-        if (pineTabs.length > 0) {
-            pineTab1 = pineTabs.eq(0);
-            pineTab2 = pineTabs.eq(1);
-            pineTab3 = pineTabs.eq(2);
-        }
-
-        if (isNew !== false) {
-            if (liTab1 !== '' && pineTab1 !== '') {
-                liTab1.addClass('active');
-                liTab1.find('a').attr('data-toggle', 'tab');
-                pineTab1.removeClass('tab-pane fade').addClass('tab-pane fade in active');
-            }
-            if (liTab2 !== '') {
-                liTab2.find('a').attr('data-toggle', 'tab');
-                
-            }
-            if (liTab3 !== '') {
-                liTab3.find('a').attr('data-toggle', 'tab');
-            }
-        } else {
-            let data_tab1 = "",
-                data_tab2 = "",
-                data_tab3 = "",
-                class_tab1 = "disabled",
-                class_tab2 = "disabled",
-                class_tab3 = "disabled",
-                class_active1 = 'tab-pane fade',
-                class_active2 = 'tab-pane fade',
-                class_active3 = 'tab-pane fade';
-
-            if (liTab1 !== '' && pineTab1 !== '' && '{$model->region_id}' !== '') {
-                data_tab1 = 'tab';
-                class_tab1 = 'active';
-                class_active1 = 'tab-pane fade in active';
-            }
-            
-            if (liTab2 !== '' && pineTab2 !== '' && '{$model->group_id}' !== '') {
-                data_tab2 = 'tab';
-                class_tab2 = 'active';
-                class_active2 = 'tab-pane fade in active';
-            }
-            
-            if (liTab3 !== '' && pineTab3 !== '' && '{$model->device_id}' !== '') {
-                data_tab3 = 'tab';
-                class_tab3 = 'active';
-                class_active3 = 'tab-pane fade in active';
-            }
-
-            liTab1.addClass(class_tab1);
-            liTab1.find('a').attr('data-toggle', data_tab1);
-            pineTab1.removeClass('tab-pane fade').addClass(class_active1);
-            
-            liTab2.addClass(class_tab2);
-            liTab2.find('a').attr('data-toggle', data_tab2);
-            pineTab2.removeClass('tab-pane fade').addClass(class_active2);
-            
-            liTab3.addClass(class_tab3);
-            liTab3.find('a').attr('data-toggle', data_tab3);
-            pineTab3.removeClass('tab-pane fade').addClass(class_active3);
-        }
+        if (String('{$model->group_id}') !== '') {
+            $('ul.nav a[href="#tab_2"]').tab('show');
+            liTab1
+                .addClass('disabled')
+                .find('a').attr('data-toggle', '');            
+            liTab3
+                .addClass('disabled')
+                .find('a').attr('data-toggle', '');
+        } 
+        
+        if (String('{$model->device_id}') !== '') {
+            $('ul.nav a[href="#tab_3"]').tab('show');
+            liTab1
+                .addClass('disabled')
+                .find('a').attr('data-toggle', '');            
+            liTab2
+                .addClass('disabled')
+                .find('a').attr('data-toggle', '');
+        } 
+        return true;
     }
     
     /**

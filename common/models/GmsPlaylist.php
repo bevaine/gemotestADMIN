@@ -78,6 +78,7 @@ class GmsPlaylist extends \yii\db\ActiveRecord
             'sender_name' => 'Отделение',
             'group_id' => 'Группа устройств',
             'device_name' => 'Устройство',
+            'device_id' => 'Устройство',
             'region_id' => 'Регион',
             'group_name' => 'Группа устройств',
             'playlist' => 'Плейлист'

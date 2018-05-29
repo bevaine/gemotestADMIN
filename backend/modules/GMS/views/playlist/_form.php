@@ -318,6 +318,15 @@ $js1 = <<< JS
         input = $("input"),
         isNew = {$isNew}; 
         
+    function setNewTabs() {
+        if (isNew !== false) {
+            regionSelectConst.prop('selectedIndex', 0);
+            setSender(regionSelectConst.val());
+            groupSelectConst.prop('selectedIndex', 0);
+            deviceSelectConst.prop('selectedIndex', 0);               
+        }        
+    }
+    
     $(function()
     {  
         setTabs();
@@ -327,14 +336,13 @@ $js1 = <<< JS
         }
         
         $("a[href='#tab_1'], a[href='#tab_2'], a[href='#tab_3']").click(function() {
-            if (isNew !== false) {
-                regionSelectConst.prop('selectedIndex', 0);
-                setSender(regionSelectConst.val());
-                groupSelectConst.prop('selectedIndex', 0);
-                deviceSelectConst.prop('selectedIndex', 0);               
-            }
+            setNewTabs();
         });
            
+        let strGET = window.location.hash;
+        $('ul.nav a[href="' + strGET + '"]').tab('show');
+        setNewTabs();
+        
         $(".btn-success").click(function() {
              checkList(
                  regionSelectConst.val(),
