@@ -103,8 +103,10 @@ HTML;
                         'extensions' => ['dnd'],
                         'click' => new JsExpression('function(node, data) {
                             if (data.node.isFolder()) {
-                                go_to_url = "/GMS/playlist/view?id=59";
+                                let id = getFormVal("pls_std_id");
+                                let go_to_url = "/GMS/playlist/view?id=" + id;
                                 window.open(go_to_url, "_blank");
+                                data.node.expanded = false;
                             } else return false;
                         }'),
                         'dblclick' => new JsExpression('function(node, data) {
@@ -162,6 +164,14 @@ HTML;
                             ]
                         ],
                         'extensions' => ['dnd'],
+                        'click' => new JsExpression('function(node, data) {
+                            if (data.node.isFolder()) {
+                                let id = getFormVal("pls_com_id");
+                                let go_to_url = "/GMS/playlist/view?id=" + id;
+                                window.open(go_to_url, "_blank");
+                                data.node.expanded = false;
+                            } else return false;
+                        }'),
                         'dblclick' => new JsExpression('function(node, data) {
                             if (!data.node.isFolder()) {
                                 const playlistNode = $("#treetable")
@@ -1311,6 +1321,7 @@ $js1 = <<< JS
             },
             success: function (res) {
                 if (res !== 'null') {
+                    console.log(res);
                     const pls_id = [];
                     if (res.result[1] !== undefined) {
                         setFormVal("pls_std_id", res.result[1]['pls']);
@@ -1320,6 +1331,7 @@ $js1 = <<< JS
                     if (res.result[2] !== undefined) {
                         setFormVal("pls_com_id", res.result[2]['pls']);
                         commercialObject.fancytree("enable");
+                        console.log(res.result[2]['inf']);
                         commercialTree.reload(res.result[2]['inf']);
                     }                        
                 }
