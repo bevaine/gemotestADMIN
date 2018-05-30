@@ -51,7 +51,7 @@ SCRIPT;
     <?php //$form->field($model, 'last_name')->textInput() ?>
 
     <?php
-    echo $form->field($model, 'guid')->widget(Select2::classname(), [
+    echo $form->field($model, 'guid')->widget(Select2::class, [
         'options' => ['placeholder' => 'ФИО сотрудника'],
         'pluginOptions' => [
             'allowClear' => true,
@@ -69,7 +69,7 @@ SCRIPT;
     ?>
 
     <?php
-    echo $form->field($model, 'sender_key')->widget(Select2::classname(), [
+    echo $form->field($model, 'sender_key')->widget(Select2::class, [
         'options' => ['placeholder' => 'Наименование отделения'],
         'pluginOptions' => [
             'allowClear' => true,

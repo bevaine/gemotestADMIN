@@ -12,7 +12,9 @@ $htmlFileUpload = <<<HTML
             file = data.files[index],
             node = $(data.context.children()[index]);
 
-        if (file.preview !== undefined && file.name !== undefined && file.size !== undefined) {
+        if (file.preview !== undefined 
+            && file.name !== undefined 
+            && file.size !== undefined) {
             var fileName = baseName(file.name),  
             txt_val = escapeHtml(fileName),
             fileSize = file.size;            
@@ -64,15 +66,15 @@ HTML;
 </div>
 <?php
 $js = <<< JS
-var entityMap = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  "'": '&#39;',
-  '/': '&#x2F;',
-  '`': '&#x60;',
-  '=': '&#x3D;'
+    let entityMap = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+      '/': '&#x2F;',
+      '`': '&#x60;',
+      '=': '&#x3D;'
 };
 
 function escapeHtml(string) 
@@ -84,8 +86,8 @@ function escapeHtml(string)
 
 function baseName(str)
 {
-    var base = new String(str).substring(str.lastIndexOf('/') + 1);
-    if(base.lastIndexOf(".") != -1)
+    let base = String(str).substring(str.lastIndexOf('/') + 1);
+    if (base.lastIndexOf(".") !== -1)
         base = base.substring(0, base.lastIndexOf("."));
     return base;
 }

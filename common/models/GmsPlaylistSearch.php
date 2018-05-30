@@ -10,8 +10,9 @@ use yii\data\SqlDataProvider;
 
 /**
  * GmsPlaylistSearch represents the model behind the search form about `common\models\GmsPlaylist`.
- * @property string $sender_name
+ * @property string $sender_id
  * @property string $group_id
+ * @property string $region_id
  * @property string $device_name
  * @property string $created_at_from
  * @property string $created_at_to
@@ -19,7 +20,7 @@ use yii\data\SqlDataProvider;
  */
 class GmsPlaylistSearch extends GmsPlaylist
 {
-    public $sender_name;
+    public $sender_id;
     public $group_id;
     public $region_id;
     public $device_name;
@@ -34,7 +35,7 @@ class GmsPlaylistSearch extends GmsPlaylist
     {
         return [
             [['id', 'type', 'region_id', 'group_id', 'sender_id'], 'integer'],
-            [['name', 'file', 'sender_name', 'device_name', 'created_at_from', 'created_at_to', 'playlist'], 'safe'],
+            [['name', 'file', 'sender_id', 'device_name', 'created_at_from', 'created_at_to', 'playlist'], 'safe'],
         ];
     }
 
@@ -132,9 +133,7 @@ class GmsPlaylistSearch extends GmsPlaylist
                     'not',
                     ['gms_senders.sender_name' => null]])
                 ->andFilterWhere([
-                    'like',
-                    'LOWER(gms_senders.sender_name)',
-                    mb_strtolower($this->sender_name)
+                    'gms_senders.sender_key' => $this->sender_id
                 ])
                 ->andFilterWhere([
                     'gms_playlist.region' => $this->region_id
@@ -145,12 +144,20 @@ class GmsPlaylistSearch extends GmsPlaylist
                     'asc' => ['gms_regions.region_name' => SORT_ASC],
                     'desc' => ['gms_regions.region_name' => SORT_DESC]
                 ],
-                'sender_name' => [
+                'sender_id' => [
                     'asc' => ['gms_senders.sender_name' => SORT_ASC],
                     'desc' => ['gms_senders.sender_name' => SORT_DESC]
                 ],
             ];
         }
+
+        $query->andFilterWhere([
+            'like',
+            'LOWER(gms_playlist.name)',
+            mb_strtolower($this->playlist)
+        ]);
+
+        $query->andFilterWhere(['type' => $this->type]);
 
         $order = array_merge($order, [
             'type' => [
@@ -162,14 +169,6 @@ class GmsPlaylistSearch extends GmsPlaylist
                 'desc' => ['gms_playlist.name' => SORT_DESC]
             ],
         ]);
-
-        $query->andFilterWhere([
-            'like',
-            'LOWER(gms_playlist.name)',
-            mb_strtolower($this->playlist)
-        ]);
-
-        $query->andFilterWhere(['type' => $this->type]);
 
         $dataProvider = new SqlDataProvider([
             'sql' => $query->createCommand()->getRawSql(),

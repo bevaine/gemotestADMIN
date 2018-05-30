@@ -19,7 +19,7 @@ use kartik\select2\Select2;
 
     <?php
     $url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
-    echo $form->field($model, 'sender_key')->widget(Select2::classname(), [
+    echo $form->field($model, 'sender_key')->widget(Select2::class, [
         'options' => ['placeholder' => 'Наименование отделения'],
         'pluginOptions' => [
             'allowClear' => true,
