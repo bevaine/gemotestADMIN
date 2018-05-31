@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $model common\models\GmsVideos */
 
 $this->title = 'Добавить видео в библиотеку';
-$this->params['breadcrumbs'][] = ['label' => 'Видео', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Библиотека видео', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-videos-create">

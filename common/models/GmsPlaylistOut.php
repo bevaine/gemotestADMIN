@@ -6,6 +6,7 @@ use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use common\components\helpers\FunctionsHelper;
 
 /**
  * This is the model class for table "gms_playlist_out".
@@ -111,11 +112,11 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             $this->active = 1;
         }
 
-        $this->date_start = self::getTimeStart($this->date_start);
-        $this->date_end = self::getTimeStart($this->date_end);
+        $this->date_start = FunctionsHelper::getTimeStart($this->date_start);
+        $this->date_end = FunctionsHelper::getTimeStart($this->date_end);
 
-        $this->time_start = self::getTimeDate($this->time_start);
-        $this->time_end = self::getTimeDate($this->time_end);
+        $this->time_start = FunctionsHelper::getTimeDate($this->time_start);
+        $this->time_end = FunctionsHelper::getTimeDate($this->time_end);
 
         return parent::beforeSave($insert);
     }
@@ -382,51 +383,6 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             }
         }
         return false;
-    }
-
-    /**
-     * @param $datetime
-     * @return false|int
-     */
-    public static function getTimeStart($datetime) {
-        return mktime(
-            0,
-            0,
-            0,
-            date("m", $datetime),
-            date("d", $datetime),
-            date("Y", $datetime)
-        );
-    }
-
-    /**
-     * @param $datetime
-     * @return false|int
-     */
-    public static function getTimeEnd($datetime) {
-        return mktime(
-            23,
-            59,
-            59,
-            date("m", $datetime),
-            date("d", $datetime),
-            date("Y", $datetime)
-        );
-    }
-
-    /**
-     * @param $datetime
-     * @return false|int
-     */
-    public static function getTimeDate($datetime) {
-        return mktime(
-            date("H", $datetime),
-            date("i", $datetime),
-            date("s", 0),
-            date("m", 0),
-            date("d", 0),
-            date("Y", 0)
-        );
     }
 
     /**

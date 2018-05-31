@@ -17,6 +17,8 @@ use Yii;
  * @property string $thumbnail
  * @property float $frame_rate
  * @property integer $nb_frames
+ * @property integer $width
+ * @property integer $height
  */
 class GmsVideos extends \yii\db\ActiveRecord
 {
@@ -35,7 +37,7 @@ class GmsVideos extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'file'], 'required'],
-            [['time', 'nb_frames', 'created_at'], 'integer'],
+            [['time', 'width', 'height', 'nb_frames', 'created_at'], 'integer'],
             [['frame_rate'], 'safe'],
             [['name', 'file'], 'string', 'max' => 255],
             [['comment', 'thumbnail', 'type'], 'string']
@@ -57,7 +59,9 @@ class GmsVideos extends \yii\db\ActiveRecord
             'comment' => 'Коментарий',
             'thumbnail' => 'thumbnail',
             'frame_rate' => 'Частота кадров',
-            'nb_frames' => 'Всего кадров'
+            'nb_frames' => 'Всего кадров',
+            'width' => 'Ширина кадров',
+            'height' => 'Высота кадров',
         ];
     }
 
@@ -83,5 +87,22 @@ class GmsVideos extends \yii\db\ActiveRecord
             ];
         }
         return $modules;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getTypeVideo($type = null)
+    {
+        $modules = [];
+        foreach (self::find()
+             ->distinct()
+             ->orderBy(['type' => 'asc'])
+             ->all() as $model
+        ) {
+            /** @var GmsVideos $model */
+            $modules[$model->type] = $model->type;
+        }
+        return is_null($type) ? $modules : $modules[$type];
     }
 }

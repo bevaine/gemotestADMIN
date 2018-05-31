@@ -2,6 +2,7 @@
 
 namespace app\modules\GMS\controllers;
 
+use common\components\helpers\FunctionsHelper;
 use yii\helpers\Html;
 use common\models\GmsPlaylist;
 use Yii;
@@ -155,8 +156,8 @@ class PlaylistOutController extends Controller
             $model->date_start = strtotime($model->date_start);
             $model->date_end = strtotime($model->date_end);
 
-            $model->time_start = GmsPlaylistOut::getTimeDate(strtotime($model->time_start));
-            $model->time_end = GmsPlaylistOut::getTimeDate(strtotime($model->time_end));
+            $model->time_start = FunctionsHelper::getTimeDate(strtotime($model->time_start));
+            $model->time_end = FunctionsHelper::getTimeDate(strtotime($model->time_end));
             $out = $model->checkPlaylist();
         }
 

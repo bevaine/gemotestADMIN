@@ -6,20 +6,28 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\GmsVideos;
+use common\components\helpers\FunctionsHelper;
 
 /**
  * GmsVideosSearch represents the model behind the search form about `common\models\GmsVideos`.
+ * @property $created_at_from
+ * @property $created_at_to
  */
+
 class GmsVideosSearch extends GmsVideos
 {
+    public $created_at_from;
+    public $created_at_to;
+    public $size;
+
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['id', 'type', 'time', 'created_at'], 'integer'],
-            [['name', 'file'], 'safe'],
+            [['id', 'time', 'created_at'], 'integer'],
+            [['name', 'type', 'file', 'created_at_from', 'created_at_to'], 'safe'],
         ];
     }
 
@@ -47,6 +55,11 @@ class GmsVideosSearch extends GmsVideos
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC
+                ],
+            ],
         ]);
 
         $this->load($params);
@@ -62,15 +75,35 @@ class GmsVideosSearch extends GmsVideos
             'id' => $this->id,
             'type' => $this->type,
             'time' => $this->time,
-            'created_at' => $this->created_at,
         ]);
 
-        if ($this->created_at) {
-            $query->andFilterWhere(['>=', 'date_start', strtotime($this->date_start_val)]);
+        if ($this->created_at_from) {
+            $query->andFilterWhere([
+                '>=',
+                'created_at',
+                FunctionsHelper::getTimeStart(strtotime($this->created_at_from))
+            ]);
+        }
+
+        if ($this->created_at_to) {
+            $query->andFilterWhere([
+                '<=',
+                'created_at',
+                FunctionsHelper::getTimeEnd(strtotime($this->created_at_to))
+            ]);
         }
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'file', $this->file]);
+
+        $sort = $dataProvider->getSort();
+        $sort->attributes = array_merge($sort->attributes, [
+            'size' => [
+                'asc' => ['height' => SORT_ASC],
+                'desc' => ['height' => SORT_DESC]
+            ],
+        ]);
+        $dataProvider->setSort($sort);
 
         return $dataProvider;
     }

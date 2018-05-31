@@ -112,7 +112,7 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             $query->andFilterWhere([
                 '>=',
                 'gms_playlist_out.time_start',
-                GmsPlaylistOut::getTimeDate(strtotime($this->time_start))
+                FunctionsHelper::getTimeDate(strtotime($this->time_start))
             ]);
         }
 
@@ -120,7 +120,7 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             $query->andFilterWhere([
                 '<=',
                 'gms_playlist_out.time_end',
-                GmsPlaylistOut::getTimeDate(strtotime($this->time_end))
+                FunctionsHelper::getTimeDate(strtotime($this->time_end))
             ]);
         }
 
@@ -128,7 +128,7 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             $query->andFilterWhere([
                 '>=',
                 'gms_playlist_out.date_start',
-                GmsPlaylistOut::getTimeStart(strtotime($this->date_start_val))
+                FunctionsHelper::getTimeStart(strtotime($this->date_start_val))
             ]);
         }
 
@@ -136,7 +136,7 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             $query->andFilterWhere([
                 '<=',
                 'gms_playlist_out.date_end',
-                GmsPlaylistOut::getTimeEnd(strtotime($this->date_end_val))
+                FunctionsHelper::getTimeEnd(strtotime($this->date_end_val))
             ]);
         }
 

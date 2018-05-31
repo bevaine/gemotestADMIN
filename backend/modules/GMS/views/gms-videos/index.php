@@ -108,33 +108,59 @@ $urlAjaxCheckVideo = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-check-video']
                 },
                 'format' => 'raw',
             ],
-            'name',
             [
-                'headerOptions' => array('style' => 'width: 195px; text-align: center;'),
+                'width'=>'196px',
                 'attribute' => 'created_at',
                 'value' => function ($model) {
-                    /** @var $model \common\models\GmsVideos */
-                    return isset($model->created_at) ? date('d-m-Y', $model->created_at) : null;
+                    /** @var $model \common\models\GmsDevices */
+                    return !empty($model->created_at)
+                        ? date("Y-m-d H:i:s T", $model->created_at)
+                        : null;
                 },
                 'filter' => \kartik\date\DatePicker::widget([
                     'model' => $searchModel,
-                    'name' => 'created_at',
-                    'attribute' => 'created_at',
-                    'type' => DatePicker::TYPE_COMPONENT_PREPEND,
+                    'attribute' => 'created_at_from',
+                    'attribute2' => 'created_at_to',
+                    'options' => [
+                        'placeholder' => 'от',
+                        'style'=>['width' => '98px']
+                    ],
+                    'options2' => [
+                        'placeholder' => 'до',
+                        'style'=>['width' => '98px']
+                    ],
+                    'separator' => '-',
+                    'readonly' => false,
+                    'type' => \kartik\date\DatePicker::TYPE_RANGE,
                     'pluginOptions' => [
+                        'format' => 'yyyy-mm-dd',
                         'autoclose' => true,
-                        'format' => 'dd-mm-yyyy'
                     ]
                 ]),
                 'format' => 'html', // datetime
             ],
-            'type',
+            'name',
             [
-                'attribute' => 'time',
+                'attribute' => 'type',
+                'width'=>'150px',
+                'filter' => \common\models\GmsVideos::getTypeVideo(),
+                'value' => function ($model) {
+                    if (!is_null($model->type)) {
+                        return \common\models\GmsVideos::getTypeVideo($model->type);
+                    } else return null;
+                }
+            ],
+            [
+                'attribute' => 'size',
+                'headerOptions' => array('style' => 'width: 50px;'),
+                'label' => 'Разрешение',
                 'value' => function($model) {
-                    /** @var $model \common\models\GmsVideos */
-                    return date("H:i:s" , mktime(0, 0, $model->time));
+                    /** @var \common\models\GmsVideos $model */
+                    return !empty($model->width && $model->height)
+                        ? $model->width.'x'.$model->height
+                        : null;
                 },
+                'format' => 'html',
             ],
             [
                 'class' => 'yii\grid\ActionColumn',

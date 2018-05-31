@@ -110,7 +110,8 @@ class GmsVideosController extends Controller
                         Yii::$app->session->setFlash('error', $message);
                         return $this->redirect(Url::toRoute('create'));
                     }
-
+                    $model->width = $infoVideo['width'];
+                    $model->height = $infoVideo['height'];
                     $model->time = round($infoVideo['duration']);
                     $model->frame_rate = round($infoVideo['frame_rate'], 2);
                     $model->nb_frames = round($infoVideo['nb_frames']);

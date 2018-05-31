@@ -159,8 +159,8 @@ class PlaylistController extends ActiveController
         $region_id = null;
         $sender_id = null;
 
-        $this->currentDate = GmsPlaylistOut::getTimeStart($this->timeForTimeZone);
-        $this->currentTime = GmsPlaylistOut::getTimeDate($this->timeForTimeZone);
+        $this->currentDate = FunctionsHelper::getTimeStart($this->timeForTimeZone);
+        $this->currentTime = FunctionsHelper::getTimeDate($this->timeForTimeZone);
 
         if ($this->modelDevice) {
             $deviceId = $this->modelDevice->id;

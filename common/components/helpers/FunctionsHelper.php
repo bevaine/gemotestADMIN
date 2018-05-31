@@ -274,4 +274,49 @@ SCRIPT;
             ];
         }
     }
+
+    /**
+     * @param $datetime
+     * @return false|int
+     */
+    public static function getTimeStart($datetime) {
+        return mktime(
+            0,
+            0,
+            0,
+            date("m", $datetime),
+            date("d", $datetime),
+            date("Y", $datetime)
+        );
+    }
+
+    /**
+     * @param $datetime
+     * @return false|int
+     */
+    public static function getTimeEnd($datetime) {
+        return mktime(
+            23,
+            59,
+            59,
+            date("m", $datetime),
+            date("d", $datetime),
+            date("Y", $datetime)
+        );
+    }
+
+    /**
+     * @param $datetime
+     * @return false|int
+     */
+    public static function getTimeDate($datetime) {
+        return mktime(
+            date("H", $datetime),
+            date("i", $datetime),
+            date("s", 0),
+            date("m", 0),
+            date("d", 0),
+            date("Y", 0)
+        );
+    }
 }
