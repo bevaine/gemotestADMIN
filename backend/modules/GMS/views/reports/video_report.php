@@ -3,11 +3,11 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\grid\GridView;
-use kartik\form\ActiveForm;
-use common\models\GmsPlaylistOut;
 use kartik\export\ExportMenu;
 use common\models\GmsPlaylist;
-use common\models\GmsDevices;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
+use common\components\helpers\FunctionsHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsVideoHistorySearch */
@@ -15,6 +15,8 @@ use common\models\GmsDevices;
 
 $this->title = 'Отчет по воспроизведенным видео';
 $this->params['breadcrumbs'][] = $this->title;
+
+$url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
 
 $gridColumns = [
     ['class' => 'kartik\grid\SerialColumn'],
@@ -117,13 +119,41 @@ $gridColumns = [
     ],
     [
         'label' => 'Отделение',
+        'filter' => Select2::widget([
+            'name' => 'GmsVideoHistorySearch[sender_id]',
+            'value' => $searchModel["sender_id"],
+            'options' => ['placeholder' => 'Наименование отделения'],
+            'pluginOptions' => [
+                'allowClear' => true,
+                'minimumInputLength' => 2,
+                'multiple' => false,
+                'ajax' => [
+                    'url' => $url,
+                    'dataType' => 'json',
+                    'data' => new JsExpression('function(params) { return { search:params.term}; }'),
+                    'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
+                    'cache' => true
+                ],
+                'initSelection' => new JsExpression(FunctionsHelper::AjaxInitScript($url)),
+            ],
+        ]),
         'value' => function ($model) {
+            /** @var \common\models\GmsVideoHistorySearch $model  */
             return !empty($model["sender_name"]) ? $model["sender_name"] : null;
         },
         'group'=> true,
-        'attribute' => 'sender_name',
-        'pageSummaryOptions'=>['class'=>'text-right']
+        'attribute' => 'sender_id',
+        'format' => 'raw'
     ],
+//    [
+//        'label' => 'Отделение',
+//        'value' => function ($model) {
+//            return !empty($model["sender_name"]) ? $model["sender_name"] : null;
+//        },
+//        'group'=> true,
+//        'attribute' => 'sender_name',
+//        'pageSummaryOptions'=>['class'=>'text-right']
+//    ],
     [
         'attribute' => 'device_name',
         'label' => 'Устройство',

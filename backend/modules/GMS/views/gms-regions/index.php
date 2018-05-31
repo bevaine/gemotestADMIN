@@ -21,7 +21,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'region_name',
+            [
+                'filter' =>  \common\models\GmsRegions::getRegionList(),
+                'label' => 'Регион',
+                'value' => function ($model) {
+                    /** @var \common\models\GmsRegions $model */
+                    return !empty($model->region_name) ? $model->region_name : null;
+                },
+                'attribute' => 'id',
+            ],
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

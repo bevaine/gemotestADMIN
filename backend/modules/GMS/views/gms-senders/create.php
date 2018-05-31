@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $model common\models\GmsSenders */
 
 $this->title = 'Создать отделение';
-$this->params['breadcrumbs'][] = ['label' => 'Gms Senders', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Отделения', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-senders-create">

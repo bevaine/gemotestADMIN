@@ -74,7 +74,6 @@ $url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
                         ],
                         [
                             'filter' => Select2::widget([
-                                'initValueText' => 'weeqweqw',
                                 'name' => 'GmsPlaylistSearch[sender_id]',
                                 'value' => $searchModel->sender_id,
                                 'options' => ['placeholder' => 'Наименование отделения'],

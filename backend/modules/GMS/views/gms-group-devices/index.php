@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\GmsGroupDevicesSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Гуппы устройств';
+$this->title = 'Группы устройств';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="gms-group-devices-index">

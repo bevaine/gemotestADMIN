@@ -12,7 +12,7 @@ use yii\data\SqlDataProvider;
  * GmsVideoHistorySearch represents the model behind the search form about `common\models\GmsVideoHistory`.
  * @property string $pls_name
  * @property integer $region_id
- * @property string $sender_name
+ * @property string $sender_id
  * @property string $video_name
  * @property string $device_name
  */
@@ -22,7 +22,6 @@ class GmsVideoHistorySearch extends GmsVideoHistory
      * @inheritdoc
      */
     public $region_id;
-    public $sender_name;
     public $pls_name;
     public $date_from;
     public $date_to;
@@ -33,8 +32,8 @@ class GmsVideoHistorySearch extends GmsVideoHistory
     public function rules()
     {
         return [
-            [['id', 'pls_id', 'video_key', 'region_id', 'type'], 'integer'],
-            [['date_from', 'video_name', 'device_name', 'date_to', 'sender_name', 'pls_name', 'device_id', 'created_at'], 'safe'],
+            [['id', 'pls_id', 'video_key', 'region_id', 'type', 'sender_id'], 'integer'],
+            [['date_from', 'video_name', 'device_name', 'date_to',  'pls_name', 'device_id', 'created_at'], 'safe'],
         ];
     }
 
@@ -73,7 +72,7 @@ class GmsVideoHistorySearch extends GmsVideoHistory
 
 
         $query->andFilterWhere(['t1.id' => $this->region_id])
-            ->andFilterWhere(['like', 't2.sender_name', $this->sender_name])
+            ->andFilterWhere(['like', 't2.sender_key', $this->sender_id])
             ->andFilterWhere(['like', 'LOWER(t3.name)', strtolower($this->pls_name)])
             ->andFilterWhere(['like', 'LOWER(t4.name)', strtolower($this->video_name)]);
 
@@ -110,9 +109,9 @@ class GmsVideoHistorySearch extends GmsVideoHistory
                 'asc' => ['t1.region_name' => SORT_ASC],
                 'desc' => ['t1.region_name' => SORT_DESC]
             ],
-            'sender_name' => [
-                'asc' => ['t2.sender_name' => SORT_ASC],
-                'desc' => ['t2.sender_name' => SORT_DESC]
+            'sender_id' => [
+                'asc' => ['t2.sender_key' => SORT_ASC],
+                'desc' => ['t2.sender_key' => SORT_DESC]
             ],
             'device_name' => [
                 'asc' => ['t3.device' => SORT_ASC],
