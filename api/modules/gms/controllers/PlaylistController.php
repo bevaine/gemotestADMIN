@@ -15,6 +15,7 @@ use yii\helpers\Json;
 use DateTime;
 use DateTimeZone;
 use yii\db\Query;
+use yii\log\Logger;
 
 /**
  * @property GmsDevices $modelDevice
@@ -70,8 +71,6 @@ class PlaylistController extends ActiveController
             throw new ForbiddenHttpException('The requested page does not exist.');
         }
 
-        Yii::getLogger()->log(['Yii::$app->request->post()' => Yii::$app->request->post()], 1, 'binary');
-
         $resp = [];
         $out['state'] = 0;
         $timezone = "Europe/Moscow";
@@ -122,6 +121,23 @@ class PlaylistController extends ActiveController
                 /** @var $plsID GmsPlaylistOut */
                 //todo проверка на соотвествие плейлиста на устройстве и подобранного автоматически
                 if ($plsID = $this->getCurrentPlaylist()) {
+
+                    $arr_merge_dev = [];
+                    if (!empty($plsID->update_json)) {
+                        $arr_merge_dev = ArrayHelper::toArray(
+                            json_decode($plsID->update_json)
+                        );
+                    }
+
+                    $arr_merge_dev[$modelDevices->id] = time();
+                    $plsID->update_json = json_encode($arr_merge_dev);
+                    if (!$plsID->save()) {
+                        Yii::getLogger()->log(
+                            $plsID->errors,
+                            Logger::LEVEL_ERROR, 'binary'
+                        );
+                    }
+
                     $out['state'] = 1;
                     $out['pls'] = [
                         'id' => $plsID->id,

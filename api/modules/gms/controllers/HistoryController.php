@@ -64,7 +64,6 @@ class HistoryController extends ActiveController
     {
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
-        $arr_merge_dev = [];
 
         if (!empty(Yii::$app->request->post()))
         {
@@ -80,7 +79,7 @@ class HistoryController extends ActiveController
                 !isset($post["inf"]["pls_pos"]))
                 return ['state' => 0];
 
-            if (!$findModel = GmsPlaylistOut::findOne($post["pls_id"]))
+            if (!GmsPlaylistOut::findOne($post["pls_id"]))
                 return ['state' => 0];
 
             if (!$findModelDevice = GmsDevices::findOne([
@@ -88,35 +87,6 @@ class HistoryController extends ActiveController
                 return ['state' => 0];
 
             $device_key = $findModelDevice->id;
-
-            if (!empty($findModel->update_json)) {
-                $arr_merge_dev = ArrayHelper::toArray(
-                    json_decode($findModel->update_json)
-                );
-            }
-
-            $arr_merge_dev[$device_key] = time();
-            $findModel->update_json = json_encode($arr_merge_dev);
-
-            $arr = [];
-            $json = json_decode($findModel->update_json);
-            foreach ($json as $key => $val) {
-                $arr[] = date('Y-m-d H:i:s', $val);
-            }
-            if (!$findModel->save()) {
-                Yii::getLogger()->log([
-                    'post' => $post,
-                    '$arr' => $arr
-                ],Logger::LEVEL_ERROR, 'binary'
-                );
-            }
-
-            if (!$findModel->save()) {
-                Yii::getLogger()->log(
-                    $findModel->errors,
-                    Logger::LEVEL_ERROR, 'binary'
-                );
-            }
 
             if ($post["type_action"] == 'stop')
             {
