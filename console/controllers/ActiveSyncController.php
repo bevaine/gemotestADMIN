@@ -253,7 +253,12 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
-
+        $json = '{"10":1527169297,"7":1527833195,"11":1527169868,"12":1527170231}';
+        $json = json_decode($json);
+        foreach ($json as $key => $val) {
+            echo "\r\n".date('Y-m-d H:i:s', $val);
+        }
+        exit;
         date_default_timezone_set('Europe/Moscow');
         $timeNowTrack = mktime(
             1,
