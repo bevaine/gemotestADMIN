@@ -59,10 +59,14 @@ class LoginsSearch extends Logins
      */
     public function search($params)
     {
-        $params['LoginsSearch'] = array_map(
-            'trim',
-            $params['LoginsSearch']
-        );
+        if (array_key_exists('LoginsSearch', $params)
+            && !empty($params['LoginsSearch'])
+        ) {
+            $params['LoginsSearch'] = array_map(
+                'trim',
+                $params['LoginsSearch']
+            );
+        }
         $this->load($params);
 
         $query = Logins::find()
