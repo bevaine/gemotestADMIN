@@ -59,6 +59,10 @@ class LoginsSearch extends Logins
      */
     public function search($params)
     {
+        $params['LoginsSearch'] = array_map(
+            'trim',
+            $params['LoginsSearch']
+        );
         $this->load($params);
 
         $query = Logins::find()
@@ -119,7 +123,6 @@ class LoginsSearch extends Logins
         }
 
         $query->andFilterWhere(['like', '[Logins].[Login]', $this->Login])
-            ->andFilterWhere(['like', 'Pass', $this->Pass])
             ->andFilterWhere(['like', 'Name', $this->Name])
             ->andFilterWhere(['like', 'Email', $this->Email])
             ->andFilterWhere(['like', 'Logo', $this->Logo])
