@@ -252,17 +252,36 @@ $html .= <<<HTML
                         </tbody>
                         <thead>
                             <tr>
-                                <th style="font-size: smaller">Итого:</th>
-                                <th style="font-size: smaller" colspan="1">
+                                <th style="padding-left: 5px;font-size: smaller">Итого:</th>
+                                <th style="font-size: smaller" colspan="2">
                                     <span class="day-summ" id="day-summ"></span>
                                 </th>
-                                <th style="text-align: left; font-size: smaller" colspan="3">
-                                    <span class="error_span" id="error_span"></span>
-                                </th>
-                                <th>
-                                    <div class="duration-summ" id="duration-summ"></div>
+                                <th colspan="2">Стандартное время:</th>
+                                <th colspan="1">
+                                    <div class="duration-std" id="duration-std"></div>
                                 </th>
                                 <th></th>
+                            </tr>
+                            <tr>
+                                <th colspan="3"></th>
+                                <th colspan="2">Коммерческое время:</th>
+                                <th colspan="1">
+                                    <div class="duration-com" id="duration-com"></div>
+                                </th>
+                                <th></th>                            
+                            </tr>
+                            <tr>
+                                <th colspan="3"></th>
+                                <th colspan="2">Общее время:</th>
+                                <th colspan="1">
+                                    <div class="duration-summ" id="duration-summ"></div>
+                                </th>
+                                <th></th>                            
+                            </tr>
+                            <tr>
+                                <th colspan="7">
+                                    <div style="padding-left: 5px" class="error_span" id="error_span"></div>
+                                </th> 
                             </tr>
                         </thead>
                     </table>
@@ -1147,6 +1166,10 @@ $js1 = <<< JS
                     color,
                     total,
                     error = '',
+                    std_time = 0,
+                    com_time = 0,
+                    stdStr = '00:00:00',
+                    comStr = '00:00:00',
                     totalStr = '00:00:00';
                 
                 if (res !== 'null' && res.state !== undefined) {
@@ -1154,6 +1177,12 @@ $js1 = <<< JS
                         color = 'green';
                         if (res.std_time !== null) std_time = res.std_time;
                         if (res.com_time !== null) com_time = res.com_time;
+                        if (std_time > 0) {
+                            stdStr = moment.unix(std_time).utc().format("HH:mm:ss");
+                        } 
+                        if (com_time > 0) {
+                            comStr = moment.unix(com_time).utc().format("HH:mm:ss");
+                        } 
                         total = res.std_time + res.com_time;                            
                         if (total > 0) {
                             totalStr = moment.unix(total).utc().format("HH:mm:ss");
@@ -1164,6 +1193,12 @@ $js1 = <<< JS
                     }
                 }
                 
+                $('#duration-std').html(stdStr).css({
+                    color : color
+                });
+                $('#duration-com').html(comStr).css({
+                    color : color
+                });
                 $('#duration-summ').html(totalStr).css({
                     color : color
                 });
