@@ -1218,6 +1218,12 @@ $js1 = <<< JS
     */
     function resetTimeDuration() 
     {
+        $('#duration-std').html('00:00:00').css({
+            color : 'green'
+        });
+        $('#duration-com').html('00:00:00').css({
+            color : 'green'
+        });
         $('#duration-summ').html('00:00:00').css({
             color : 'green'
         });
