@@ -174,7 +174,6 @@ class PlaylistOutController extends Controller
 
         $f = [];
         $s = [];
-        $sum = 0;
         $std_time = 0;
         $com_time = 0;
         $minimal_std = 60;
@@ -196,10 +195,31 @@ class PlaylistOutController extends Controller
         if (!empty($post['pls_commerce'])) $pls_commerce = $post['pls_commerce'];
         if (!empty($post['pls_standart'])) $pls_standart = $post['pls_standart'];
 
-        if (empty($arr_standart) || empty($all_time)) {
+        if (empty($arr_standart)) {
             return [
                 'state' => 0,
-                'message' => 'Ошибка формирования плейлиста дневного эфира!'
+                'message' => 'Ошибка формирования плейлиста дневного эфира! Нет добавленых стандартных видео!'
+            ];
+        }
+
+        if (empty($all_time)) {
+            return [
+                'state' => 0,
+                'message' => 'Ошибка формирования плейлиста дневного эфира! Пустое значение времени дневного эфира!'
+            ];
+        }
+
+        if (empty($pls_commerce)) {
+            return [
+                'state' => 0,
+                'message' => 'Ошибка формирования плейлиста дневного эфира! Не удалось получить id коммерческого плейлиста!'
+            ];
+        }
+
+        if (empty($pls_standart)) {
+            return [
+                'state' => 0,
+                'message' => 'Ошибка формирования плейлиста дневного эфира! Не удалось получить id стандартного плейлиста!'
             ];
         }
 
@@ -208,11 +228,14 @@ class PlaylistOutController extends Controller
         }
 
         foreach ($arr_commerce as $input) {
-            $sum += $input['duration'] * $input['views'];
+            $com_time += $input['duration'] * $input['views'];
         }
 
-        $play_standart = ($all_time - $sum)
-            / array_sum(ArrayHelper::getColumn($arr_commerce, 'views'));
+        $play_standart = ($all_time - $com_time)
+            / array_sum(ArrayHelper::getColumn(
+                $arr_commerce,
+                'views')
+            );
 
         $play_standart = ceil($play_standart);
 
@@ -281,10 +304,8 @@ class PlaylistOutController extends Controller
                         'pos_in_all' => $pos_in_all,
                     ];
 
-                    $std_time += array_sum(ArrayHelper::getColumn($time, 'duration'));
                     if (!empty($val)) {
                         $s[] = $val;
-                        $com_time += array_sum(ArrayHelper::getColumn($val, 'duration'));
                     }
 
                 } else if ($play_standart < $time['duration'])
@@ -306,10 +327,9 @@ class PlaylistOutController extends Controller
                                 'end' => (int)$time['duration'],
                                 'pos_in_all' => $pos_in_all,
                             ];
-                            $std_time += $time['duration'] - $b;
+
                             if (!empty($val)) {
                                 $s[] = $val;
-                                $com_time += $val['end'];
                             }
                             break;
                         } elseif ($a > 0)
@@ -328,7 +348,6 @@ class PlaylistOutController extends Controller
                                     'end' => (int)$time['duration'],
                                     'pos_in_all' => $pos_in_all,
                                 ];
-                                $std_time += $time['duration'] - $b;
                                 break;
                             }
                             $s[] = [
@@ -343,15 +362,14 @@ class PlaylistOutController extends Controller
                                 'end' => (int)$a,
                                 'pos_in_all' => $pos_in_all,
                             ];
-                            $std_time += $a - $b;
                             if (!empty($val)) {
                                 $s[] = $val;
-                                $com_time += $val['end'];
                             }
                         }
                     }
                 }
 
+                $std_time = $this->getStandartTime($s);
                 if (($std_time + $com_time) > $all_time) {
                     array_pop($s);
                     break;
@@ -367,6 +385,7 @@ class PlaylistOutController extends Controller
                 foreach ($s as $key => $val) {
                     $s[$key]["pos_in_list"] = $key;
                 }
+                $std_time = $this->getStandartTime($s);
                 return [
                     'com_time' => $com_time,
                     'std_time' => $std_time,
@@ -394,11 +413,39 @@ class PlaylistOutController extends Controller
         }
     }
 
+    /**
+     * @param $arr
+     * @return int
+     */
+    public function getStandartTime($arr)
+    {
+        $sum_std = 0;
+        reset($arr);
+
+        foreach ($arr as $item) {
+            if (array_key_exists('type', $item)
+                && $item['type'] == 1) {
+                $sum_std += $item['end'] - $item['start'];
+            }
+        }
+        return $sum_std;
+    }
+
+    /**
+     * @param $arr_standart
+     * @param $pls_standart
+     * @return array
+     */
     public function getStandartPls($arr_standart, $pls_standart)
     {
         $pos_in_all = -1;
 
-        $std_time = array_sum(ArrayHelper::getColumn($arr_standart, 'duration'));
+        $std_time = array_sum(
+            ArrayHelper::getColumn(
+                $arr_standart,
+                'duration'
+            )
+        );
         $findStandartModel = GmsPlaylist::findOne($pls_standart);
 
         foreach ($arr_standart as $time) {
@@ -461,6 +508,7 @@ class PlaylistOutController extends Controller
                 }
             }
         }
+
         if (!empty($keys)) {
             $url = [];
             foreach ($keys as $key) {

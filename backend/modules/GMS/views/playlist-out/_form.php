@@ -90,55 +90,56 @@ $html = <<<HTML
                 </div>
                 <div class="box-body">
 HTML;
-                $html .= FancytreeWidget::widget([
-                    'id' => 'template_region',
-                    'options' =>[
-                        'disabled' => true,
-                        'source' => [
-                            [
-                                'title' => 'уточните параметры для отображения',
-                                'folder' => false,
-                            ]
-                        ],
-                        'extensions' => ['dnd'],
-                        'click' => new JsExpression('function(node, data) {
-                            if (data.node.isFolder()) {
-                                let id = getFormVal("pls_std_id");
-                                let go_to_url = "/GMS/playlist/view?id=" + id;
-                                window.open(go_to_url, "_blank");
-                                data.node.expanded = false;
-                            } else return false;
-                        }'),
-                        'dblclick' => new JsExpression('function(node, data) {
-                            if (!data.node.isFolder()) {
-                                const playlistNode = $("#treetable")
-                                    .fancytree("getTree")
-                                    .getNodeByKey("playlist"),
-                                    addChild = [];
-                                addChild.push(data.node);
-                                playlistNode.addNode(addChild, "child");
-                                sortNode();
-                            } 
-                        }'),
-                        'dnd' => [
-                            'preventVoidMoves' => true,
-                            'preventRecursiveMoves' => true,
-                            'autoExpandMS' => 400,
-                            'dragStart' => new JsExpression('function(node, data) {
+$html .= FancytreeWidget::widget([
+    'id' => 'template_region',
+    'options' => [
+        'disabled' => true,
+        'source' => [
+            [
+                'title' => 'уточните параметры для отображения',
+                'folder' => false,
+            ]
+        ],
+        'extensions' => ['dnd'],
+        'click' => new JsExpression('function(node, data) {
+            if (data.node.isFolder()) {
+                let id = getFormVal("pls_std_id");
+                let go_to_url = "/GMS/playlist/view?id=" + id;
+                window.open(go_to_url, "_blank");
+                data.node.expanded = false;
+            } else return false;
+        }'),
+        'dblclick' => new JsExpression('function(node, data) {
+            if (!data.node.isFolder()) {
+                const playlistNode = $("#treetable")
+                    .fancytree("getTree")
+                    .getNodeByKey("playlist"),
+                    addChild = [];
+                addChild.push(data.node);
+                playlistNode.addNode(addChild, "child");
+                sortNode();
+                sumDuration();
+            } 
+        }'),
+        'dnd' => [
+            'preventVoidMoves' => true,
+            'preventRecursiveMoves' => true,
+            'autoExpandMS' => 400,
+            'dragStart' => new JsExpression('function(node, data) {
                                 if (!data.tree.options.disabled) {
                                     return true;
                                     return !node.isFolder();
                                 } else return false;
                             }'),
-                            'dragEnter' => new JsExpression('function(node, data) {
+            'dragEnter' => new JsExpression('function(node, data) {
                                 return true;
                             }'),
-                            'dragDrop' => new JsExpression('function(node, data) {
+            'dragDrop' => new JsExpression('function(node, data) {
                                 return false;
                             }'),
-                        ],
-                    ]
-                ]);
+        ],
+    ]
+]);
 $html .= <<<HTML
                 </div>
             </div>
@@ -153,55 +154,56 @@ $html .= <<<HTML
                 </div>
                 <div class="box-body">
 HTML;
-                $html .= FancytreeWidget::widget([
-                    'id' => 'template_commercial',
-                    'options' =>[
-                        'disabled' => true,
-                        'source' => [
-                            [
-                                'title' => 'уточните параметры для отображения',
-                                'folder' => false,
-                            ]
-                        ],
-                        'extensions' => ['dnd'],
-                        'click' => new JsExpression('function(node, data) {
-                            if (data.node.isFolder()) {
-                                let id = getFormVal("pls_com_id");
-                                let go_to_url = "/GMS/playlist/view?id=" + id;
-                                window.open(go_to_url, "_blank");
-                                data.node.expanded = false;
-                            } else return false;
-                        }'),
-                        'dblclick' => new JsExpression('function(node, data) {
-                            if (!data.node.isFolder()) {
-                                const playlistNode = $("#treetable")
-                                    .fancytree("getTree")
-                                    .getNodeByKey("playlist"),
-                                    addChild = [];
-                                data.node.moveTo(playlistNode, "child");
-                                sortNode();
-                            }
-                        }'),
-                        'dnd' => [
-                            'preventVoidMoves' => true,
-                            'preventRecursiveMoves' => true,
-                            'autoExpandMS' => 400,
-                            'dragStart' => new JsExpression('function(node, data) {
+$html .= FancytreeWidget::widget([
+    'id' => 'template_commercial',
+    'options' => [
+        'disabled' => true,
+        'source' => [
+            [
+                'title' => 'уточните параметры для отображения',
+                'folder' => false,
+            ]
+        ],
+        'extensions' => ['dnd'],
+        'click' => new JsExpression('function(node, data) {
+            if (data.node.isFolder()) {
+                let id = getFormVal("pls_com_id");
+                let go_to_url = "/GMS/playlist/view?id=" + id;
+                window.open(go_to_url, "_blank");
+                data.node.expanded = false;
+            } else return false;
+        }'),
+        'dblclick' => new JsExpression('function(node, data) {
+            if (!data.node.isFolder()) {
+                const playlistNode = $("#treetable")
+                    .fancytree("getTree")
+                    .getNodeByKey("playlist"),
+                    addChild = [];
+                data.node.moveTo(playlistNode, "child");
+                sortNode();
+                sumDuration();
+            }
+        }'),
+        'dnd' => [
+            'preventVoidMoves' => true,
+            'preventRecursiveMoves' => true,
+            'autoExpandMS' => 400,
+            'dragStart' => new JsExpression('function(node, data) {
                                 if (!data.tree.options.disabled) {
                                     return !node.isFolder();
                                 } else return false;
                             }'),
-                            'dragEnter' => new JsExpression('function(node, data) {
+            'dragEnter' => new JsExpression('function(node, data) {
                                 return true;
                             }'),
-                            'dragDrop' => new JsExpression('function(node, data) {
+            'dragDrop' => new JsExpression('function(node, data) {
                                 return false;
                             }'),
-                            'dragEnd' => new JsExpression('function(node, data) {
+            'dragEnd' => new JsExpression('function(node, data) {
                             }'),
-                        ],
-                    ]
-                ]);
+        ],
+    ]
+]);
 $html .= <<<HTML
                 </div>
             </div>
@@ -254,8 +256,8 @@ $html .= <<<HTML
                                 <th style="font-size: smaller" colspan="1">
                                     <span class="day-summ" id="day-summ"></span>
                                 </th>
-                                <th style="text-align: right;" colspan="3">
-                                    <span style="padding: 4px" class="error_span" id="error_span"></span>
+                                <th style="text-align: left; font-size: smaller" colspan="3">
+                                    <span class="error_span" id="error_span"></span>
                                 </th>
                                 <th>
                                     <div class="duration-summ" id="duration-summ"></div>
@@ -278,7 +280,8 @@ HTML;
 
     <?= Html::hiddenInput('GmsPlaylistOut[pls_id]', $model->id) ?>
 
-    <div class="modal bootstrap-dialog type-warning fade size-normal in" id="modal-dialog" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+    <div class="modal bootstrap-dialog type-warning fade size-normal in" id="modal-dialog" tabindex="-1" role="dialog"
+         aria-labelledby="deactivateLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -388,11 +391,11 @@ HTML;
                                 <p>
                                     <?php
                                     foreach ($model::WEEK as $key => $value) {
-                                        echo "<span style='padding-left: 10px'>".Html::Activecheckbox($model, $key, [
-                                            'value' => "1",
-                                            'label' => $value,
-                                            'data-url' => 'is_monday'
-                                        ])."</span>";
+                                        echo "<span style='padding-left: 10px'>" . Html::Activecheckbox($model, $key, [
+                                                'value' => "1",
+                                                'label' => $value,
+                                                'data-url' => 'is_monday'
+                                            ]) . "</span>";
                                     }
                                     ?>
                                 </p>
@@ -524,7 +527,7 @@ $pls_id = 'null';
 $source = [];
 if ($model->isNewRecord) {
     $isNew = 'true';
-    $source =  [
+    $source = [
         [
             'title' => 'Новый плейлист',
             'key' => 'playlist',
@@ -537,7 +540,7 @@ if ($model->isNewRecord) {
 } else {
     $pls_id = $model->id;
     if (!empty($model->jsonPlaylist)) {
-        $source = new JsExpression('['.$model->jsonPlaylist.']');
+        $source = new JsExpression('[' . $model->jsonPlaylist . ']');
     }
 }
 
@@ -595,7 +598,6 @@ $js1 = <<< JS
         $(".region select").change(function() {
             disableTree();
             resetPlayer();
-            sumDuration();
             setSender ($(this).val());
             setTreeData (
                 $(this).val(), 
@@ -608,7 +610,6 @@ $js1 = <<< JS
         $(".sender_id select").change(function() {
             disableTree();
             resetPlayer();
-            sumDuration();            
             setTreeData (
                 regionSelectConst.val(), 
                 $(this).val(),
@@ -620,7 +621,6 @@ $js1 = <<< JS
         $(".group_id select").change(function() {
             disableTree();
             resetPlayer();
-            sumDuration(); 
             setTreeData (
                 null, 
                 null, 
@@ -632,7 +632,6 @@ $js1 = <<< JS
         $(".device_id select").change(function() {
             disableTree();            
             resetPlayer();
-            sumDuration(); 
             setTreeData (
                 null, 
                 null, 
@@ -768,7 +767,6 @@ $js1 = <<< JS
 
                 if (!node.isFolder()) {
                     tdList.eq(6).html('<span id="trash-node" style="cursor:pointer;" class="glyphicon glyphicon-trash"></span>');
-                    sumDuration();
                 }
             },
             edit: {
@@ -843,6 +841,7 @@ $js1 = <<< JS
                         }, data.hitMode);
                     }
                     sortNode();
+                    sumDuration();
                     node.setExpanded();
                 }
             }
@@ -875,9 +874,9 @@ $js1 = <<< JS
             }
             node.render(true); 
             e.stopPropagation();  
-            sumDuration();
             resetPlayer();
             sortNode();
+            sumDuration();
         });
         
         tree.delegate(".dblclick", "dblclick", function(e)
@@ -953,6 +952,11 @@ $js1 = <<< JS
                 groupSelectConst.val(),
                 deviceSelectConst.val()
             );
+
+        }, 500);             
+        
+        setTimeout(function(){
+            sumDuration();
         }, 1000); 
         
         sortNode();
@@ -1085,56 +1089,105 @@ $js1 = <<< JS
     */
     function sumDuration() 
     {
-        let i = 0;
-        let total = 0;
-        let tdList = '';
-        let totalStr = '00:00:00';
-        
-        const treeObject = $("#treetable"), 
+        let i = 0,
+            total = 0,
+            std_time = 0,
+            com_time = 0,
+            color = 'green',
+            totalStr = '00:00:00';
+
+        const 
+            treeObject = $("#treetable"), 
             tree = treeObject.fancytree("getTree"),
-            parent = tree.getNodeByKey("playlist");
-        let color = 'green', error = '';
+            d = tree.toDict(true);
+            
+        if (d.children[0].children === undefined) {
+            resetTimeDuration();
+            return false;
+        }
         
-        if (parent !== undefined && parent.getChildren() !== null) 
-        { 
-            $.each(parent.getChildren(), function() 
+        d.children[0].children.forEach(function(children) 
+        {
+            if (children.data.type !== undefined) {
+                let tdList = $(children.tr).find(">td");
+                if (children.data.type === '1') {
+                    tdList.eq(0).text(++i).addClass("alignRight");
+                } else if (children.data.type === '2') {
+                    tdList.eq(0).append().css({
+                        backgroundImage: "url(/img/rand.png)",
+                        backgroundPosition: "0 0",
+                        backgroundRepeat: "no-repeat"
+                    });
+                }
+            }
+        });
+            
+        let 
+            timeDay = getTimeDay(),
+            objChildren = getTreeNodeTypes();
+        
+        if (objChildren === false) {
+            resetTimeDuration();
+            return false;
+        } 
+        
+        $.ajax({
+            type : 'POST',
+            url: '{$urlAjaxCheckPlaylist}',
+            data: {
+                all_time: timeDay,
+                pls_commerce: getFormVal('pls_com_id'),
+                pls_standart: getFormVal('pls_std_id'),
+                arr_commerce: objChildren.arrCommercialChildren,
+                arr_standart: objChildren.arrStandartChildren
+            },
+            success: function (res)
             {
-                if (this.data.type !== undefined) {
-                    tdList = $(this.tr).find(">td");
-                    if (this.data.type === '1') {
-                        tdList.eq(0).text(++i).addClass("alignRight");
-                    } else if (this.data.type === '2') {
-                        tdList.eq(0).append().css({
-                            backgroundImage: "url(/img/rand.png)",
-                            backgroundPosition: "0 0",
-                            backgroundRepeat: "no-repeat"
-                        });
+                let 
+                    color,
+                    total,
+                    error = '',
+                    totalStr = '00:00:00';
+                
+                if (res !== 'null' && res.state !== undefined) {
+                    if (res.state === 1) {
+                        color = 'green';
+                        if (res.std_time !== null) std_time = res.std_time;
+                        if (res.com_time !== null) com_time = res.com_time;
+                        total = res.std_time + res.com_time;                            
+                        if (total > 0) {
+                            totalStr = moment.unix(total).utc().format("HH:mm:ss");
+                        }                        
+                    } else {
+                        color = 'red';
+                        error = res.message;
                     }
                 }
                 
-                if (this.data.total !== undefined) {
-                    total += parseInt(this.data.total, 10);                
-                }
-            });
+                $('#duration-summ').html(totalStr).css({
+                    color : color
+                });
             
-            if (total > 0) {
-                totalStr = moment.unix(total).utc().format("HH:mm:ss");
-                let timeDay = getTimeDay();
-                if (timeDay && total > timeDay) {
-                    color = "red";
-                    error = 'Превышен лимит за указанное время:';
-                }
+                $('#error_span').html(error).css({
+                    color : color
+                });
+                
+                return color !== 'red';            
             }
-        }
-        
-        $('#duration-summ').html(totalStr).css({
-            color : color
+        }); 
+    }
+    
+    /**
+    * 
+    * @returns {string}
+    */
+    function resetTimeDuration() 
+    {
+        $('#duration-summ').html('00:00:00').css({
+            color : 'green'
         });
     
-        $('#error_span').html(error).css({
-            color : color
-        });
-        return color!=='red';
+        $('#error_span').html('');
     }
     
     /**
@@ -1298,7 +1351,11 @@ $js1 = <<< JS
     * @param group
     * @param device
     */
-    function setTreeData (region = null, sender = null, group = null, device = null) 
+    function setTreeData (
+        region = null, 
+        sender = null, 
+        group = null, 
+        device = null) 
     {
         const regionObject = $("#fancyree_template_region");
         const regionTree = regionObject.fancytree("getTree");
@@ -1321,7 +1378,6 @@ $js1 = <<< JS
             },
             success: function (res) {
                 if (res !== 'null') {
-                    console.log(res);
                     const pls_id = [];
                     if (res.result[1] !== undefined) {
                         setFormVal("pls_std_id", res.result[1]['pls']);
@@ -1331,7 +1387,6 @@ $js1 = <<< JS
                     if (res.result[2] !== undefined) {
                         setFormVal("pls_com_id", res.result[2]['pls']);
                         commercialObject.fancytree("enable");
-                        console.log(res.result[2]['inf']);
                         commercialTree.reload(res.result[2]['inf']);
                     }                        
                 }
@@ -1357,6 +1412,11 @@ $js1 = <<< JS
         }).appendTo("form");
     }
     
+    /**
+    * 
+    * @param name
+    * @returns {*|jQuery}
+    */
     function getFormVal(name) 
     {
         return $('#' + name).val();
@@ -1364,26 +1424,29 @@ $js1 = <<< JS
     
     /**
     * 
-    * @returns {Array}
+    * @returns {*}
     */
-    function addJSON() 
+    function getTreeNodeTypes() 
     {
-        let arrOutPls = {},
+         let 
+            arrOutPls = {},
+            returnObj = {},
             arrChildrenOnePls = [],
             arrStandartChildren = [],
-            arrCommercialChildren = [],
-            htm_header = 'Ошибка сохранения плейлиста';
-        
-        const treeObject = $("#treetable"), 
+            arrCommercialChildren = [];
+         
+         const treeObject = $("#treetable"), 
             tree = treeObject.fancytree("getTree"),
-            parentFolder = tree.getNodeByKey("playlist"),
-            rootTitle = parentFolder.title,
-            playListKey = parentFolder.key,
-            timeDay = getTimeDay();
-
-        if (parentFolder.children === null) return false;
+            d = tree.toDict(true);
+            
+        if (d.children[0].children === null) 
+            return false;
         
-        parentFolder.children.forEach(function(children) 
+        let 
+            playListKey = d.children[0].key,
+            rootTitle = d.children[0].title;
+        
+        d.children[0].children.forEach(function(children) 
         {
             let arrChildren = {}, 
                 arrChildrenPls = {},
@@ -1407,7 +1470,7 @@ $js1 = <<< JS
                 duration === 0 || 
                 total === 0)
             ) return true;
-
+            
             arrChildrenPls.title = children.title;
             arrChildrenPls.key = children.key;
             arrChildrenPls.data = {};
@@ -1417,7 +1480,7 @@ $js1 = <<< JS
             arrChildrenPls.data.duration = children.data.duration;
             arrChildrenPls.data.frame_rate = children.data.frame_rate;
             arrChildrenPls.data.nb_frames = children.data.nb_frames;
-            arrChildrenPls.data.total = children.data.total;                            
+            arrChildrenPls.data.total = children.data.total;
             arrChildrenOnePls.push(arrChildrenPls); 
 
             arrChildren.key = key; 
@@ -1437,11 +1500,38 @@ $js1 = <<< JS
         arrOutPls["folder"] = true;
         arrOutPls["expanded"] = true; 
         arrOutPls["children"] = arrChildrenOnePls;
+
+        returnObj.arrStandartChildren = arrStandartChildren;
+        returnObj.arrCommercialChildren = arrCommercialChildren;
+        returnObj.arrOutPls = arrOutPls;
+        return returnObj; 
+    }
+    
+    /**
+    * 
+    * @returns {boolean}
+    */
+    function addJSON() 
+    {
+        let 
+            htm_header = 'Ошибка сохранения плейлиста';
         
-        let d = tree.toDict(true);
-        const jsonStrPls = JSON.stringify(arrOutPls);
-        //const jsonStrPls = JSON.stringify(d.children);
+        const treeObject = $("#treetable"), 
+            tree = treeObject.fancytree("getTree"),
+            parentFolder = tree.getNodeByKey("playlist");
+
+        let objChildren = getTreeNodeTypes();
         
+        if (objChildren === false) 
+            return false;
+        
+        let 
+            timeDay = getTimeDay(), 
+            arrOutPls = objChildren.arrOutPls,
+            rootTitle = arrOutPls.title,
+            playListKey = arrOutPls.key,
+            jsonStrPls = JSON.stringify(arrOutPls);        
+
         if (inputVar.is("#gmsplaylistout-jsonplaylist")) {
             $("#gmsplaylistout-jsonplaylist").remove();
         }
@@ -1475,10 +1565,11 @@ $js1 = <<< JS
                 all_time: timeDay,
                 pls_commerce: getFormVal('pls_com_id'),
                 pls_standart: getFormVal('pls_std_id'),
-                arr_commerce: arrCommercialChildren,
-                arr_standart: arrStandartChildren
+                arr_commerce: objChildren.arrCommercialChildren,
+                arr_standart: objChildren.arrStandartChildren
             },
-            success: function (res) {
+            success: function (res) 
+            {
                 let arrOut = {};
                 if (res !== 'null') {
                     if (res.state === 0) {
@@ -1525,6 +1616,7 @@ $js1 = <<< JS
             timeSum = getSum(),       
             strTimeDay = moment.unix(timeDay).utc().format("HH:mm:ss"),
             strTimeSum = moment.unix(timeSum).utc().format("HH:mm:ss");
+        
        
         if (parentFolder === null || parentFolder.children === null) {
             html_body = 'Необходимо добавить хотя бы одно видео в окончательный плейлист'; 
@@ -1560,7 +1652,8 @@ $js1 = <<< JS
     /**
     * 
     */
-    function checkTime() {
+    function checkTime() 
+    {
         const m_data = $('#form').serialize();
         let html_body = '';
 
