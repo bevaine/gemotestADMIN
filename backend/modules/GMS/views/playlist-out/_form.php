@@ -252,10 +252,7 @@ $html .= <<<HTML
                         </tbody>
                         <thead>
                             <tr>
-                                <th style="padding-left: 5px;font-size: smaller">Итого:</th>
-                                <th style="font-size: smaller" colspan="2">
-                                    <span class="day-summ" id="day-summ"></span>
-                                </th>
+                                <th colspan="3"></th>
                                 <th colspan="2">Стандартное время:</th>
                                 <th colspan="1">
                                     <div class="duration-std" id="duration-std"></div>
@@ -271,7 +268,10 @@ $html .= <<<HTML
                                 <th></th>                            
                             </tr>
                             <tr>
-                                <th colspan="3"></th>
+                                <th style="padding-left: 5px;font-size: smaller">Итого:</th>
+                                <th style="font-size: smaller" colspan="2">
+                                    <span class="day-summ" id="day-summ"></span>
+                                </th>
                                 <th colspan="2">Общее время:</th>
                                 <th colspan="1">
                                     <div class="duration-summ" id="duration-summ"></div>
