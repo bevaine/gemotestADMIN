@@ -1,12 +1,15 @@
 <?php
 
 use yii\helpers\Html;
-use yii\grid\GridView;
+use kartik\grid\GridView;
 use kartik\date\DatePicker;
 use yii\helpers\ArrayHelper;
 use common\models\GmsPlaylistOut;
 use common\models\GmsDevices;
 use kartik\time\TimePicker;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
+use common\components\helpers\FunctionsHelper;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsPlaylistOutSearch */
@@ -14,6 +17,7 @@ use kartik\time\TimePicker;
 
 $this->title = 'Действующие плейлисты';
 $this->params['breadcrumbs'][] = $this->title;
+$url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
 ?>
 <div class="gms-playlist-out-index">
 
@@ -43,12 +47,31 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'region_id'
             ],
             [
+                'filter' => Select2::widget([
+                    'name' => 'GmsPlaylistOutSearch[sender_id]',
+                    'value' => $searchModel->sender_id,
+                    'options' => ['placeholder' => 'Наименование отделения'],
+                    'pluginOptions' => [
+                        'allowClear' => true,
+                        'minimumInputLength' => 2,
+                        'multiple' => false,
+                        'ajax' => [
+                            'url' => $url,
+                            'dataType' => 'json',
+                            'data' => new JsExpression('function(params) { return { search:params.term}; }'),
+                            'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
+                            'cache' => true
+                        ],
+                        'initSelection' => new JsExpression(FunctionsHelper::AjaxInitScript($url)),
+                    ],
+                ]),
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylist */
                     return !empty($model->senderModel) ? $model->senderModel->sender_name : null;
 
                 },
-                'attribute' => 'sender_name'
+                'attribute' => 'sender_id',
+                'format' => 'raw'
             ],
             [
                 'options' => ['style' => 'font-size:12px;'],

@@ -102,11 +102,11 @@ class GmsPlaylistOutSearch extends GmsPlaylistOut
             'gms_playlist_out.region_id' => $this->region_id,
             'gms_playlist_out.active' => $this->active,
             'gms_playlist_out.group_id' => $this->group_id,
+            'gms_senders.sender_key' => $this->sender_id,
         ]);
 
         $query->andFilterWhere(['like', 'LOWER(gms_playlist_out.name)', strtolower($this->name)])
-            ->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->device_name)])
-            ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)]);
+            ->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->device_name)]);
 
         if (!empty($this->time_start)) {
             $query->andFilterWhere([

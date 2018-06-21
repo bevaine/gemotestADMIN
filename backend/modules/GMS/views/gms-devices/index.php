@@ -5,6 +5,8 @@ use kartik\grid\GridView;
 use yii\helpers\Url;
 use common\models\GmsDevices;
 use common\components\helpers\FunctionsHelper;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsDevicesSearch */
@@ -13,7 +15,7 @@ use common\components\helpers\FunctionsHelper;
 
 $this->title = 'Устройства';
 $this->params['breadcrumbs'][] = $this->title;
-
+$url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
 ?>
 <div class="gms-devices-index">
 
@@ -102,12 +104,30 @@ $this->params['breadcrumbs'][] = $this->title;
                             'attribute' => 'region_id'
                         ],
                         [
+                            'filter' => Select2::widget([
+                                'name' => 'GmsDevicesSearch[sender_id]',
+                                'value' => $searchModel->sender_id,
+                                'options' => ['placeholder' => 'Наименование отделения'],
+                                'pluginOptions' => [
+                                    'allowClear' => true,
+                                    'minimumInputLength' => 2,
+                                    'multiple' => false,
+                                    'ajax' => [
+                                        'url' => $url,
+                                        'dataType' => 'json',
+                                        'data' => new JsExpression('function(params) { return { search:params.term}; }'),
+                                        'results' => new JsExpression('function(data,page) { return {results:data.results}; }'),
+                                        'cache' => true
+                                    ],
+                                    'initSelection' => new JsExpression(FunctionsHelper::AjaxInitScript($url)),
+                                ],
+                            ]),
                             'value' => function ($model) {
-                                /** @var $model \common\models\GmsDevices */
+                                /** @var $model \common\models\GmsPlaylist */
                                 return !empty($model->senderModel) ? $model->senderModel->sender_name : null;
-
                             },
-                            'attribute' => 'sender_name'
+                            'attribute' => 'sender_id',
+                            'format' => 'raw'
                         ],
                         [
                             'headerOptions' => ['style' => 'width: 75px;'],

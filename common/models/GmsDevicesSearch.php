@@ -95,6 +95,7 @@ class GmsDevicesSearch extends GmsDevices
             'gms_devices.region_id' => $this->region_id,
             'auth_status' => $this->auth_status,
             'timezone' => $this->timezone,
+            'gms_senders.sender_key' => $this->sender_id,
         ]);
 
         if ($param == 'auth') {
@@ -111,7 +112,6 @@ class GmsDevicesSearch extends GmsDevices
 
         $query->andFilterWhere(['like', 'LOWER(gms_devices.name)', strtolower($this->name)])
             ->andFilterWhere(['like', 'LOWER(device)', strtolower($this->device)])
-            ->andFilterWhere(['like', 'LOWER(gms_senders.sender_name)', strtolower($this->sender_name)])
             ->andFilterWhere(['like', 'LOWER(gms_playlist_out.name)', strtolower($this->current_pls_name)]);
 
         if ($this->created_at_from) {
