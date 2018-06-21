@@ -133,7 +133,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]),
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsPlaylistOut */
-                    return !empty($model->time_start) ? date('H:i', $model->time_start) : null;
+                    return isset($model->time_start) ? date('H:i', $model->time_start) : null;
 
                 },
                 'attribute' => 'time_start'

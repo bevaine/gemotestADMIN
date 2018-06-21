@@ -77,7 +77,7 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                     [
                                         'value' => function ($model) {
                                             /** @var $model \common\models\GmsPlaylistOut */
-                                            return !empty($model->time_start) ? date('H:i', $model->time_start) : null;
+                                            return isset($model->time_start) ? date('H:i', $model->time_start) : null;
 
                                         },
                                         'attribute' => 'time_start'
@@ -85,7 +85,7 @@ empty($model->active) ? $activePls = 'active' : $activePls = 'block';
                                     [
                                         'value' => function ($model) {
                                             /** @var $model \common\models\GmsPlaylistOut */
-                                            return !empty($model->time_end) ? date('H:i', $model->time_end) : null;
+                                            return isset($model->time_end) ? date('H:i', $model->time_end) : null;
 
                                         },
                                         'attribute' => 'time_end'
