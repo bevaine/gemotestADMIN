@@ -120,6 +120,7 @@ class KkmUsersController extends Controller
         if ($findModel = $this->findModel($id))
         {
             $sender_key = $findModel->kkm->sender_key;
+            $kkm = $findModel->kkm->number;
             $searchModel = new NKkmUsersSearch();
             if ($sender_key == 'Физ. мс выездная') {
                 $search['NKkmUsersSearch']['sender_key'] = 'Физ. мс выездная';
