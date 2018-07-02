@@ -9,9 +9,12 @@ use common\models\NKkmUsers;
 
 /**
  * NKkmUsersSearch represents the model behind the search form of `common\models\NKkmUsers`.
+ * @property string $sender_key
  */
 class NKkmUsersSearch extends NKkmUsers
 {
+    public $sender_key;
+
     /**
      * @inheritdoc
      */
@@ -19,7 +22,7 @@ class NKkmUsersSearch extends NKkmUsers
     {
         return [
             [['id', 'kkm_id', 'user_id'], 'integer'],
-            [['login', 'password', 'user_type'], 'safe'],
+            [['sender_key', 'login', 'password', 'user_type'], 'safe'],
         ];
     }
 
@@ -67,7 +70,8 @@ class NKkmUsersSearch extends NKkmUsers
 
         $query->andFilterWhere(['like', 'login', $this->login])
             ->andFilterWhere(['like', 'password', $this->password])
-            ->andFilterWhere(['like', 'user_type', $this->user_type]);
+            ->andFilterWhere(['like', 'user_type', $this->user_type])
+            ->andFilterWhere(['n_kkm.sender_key' => $this->sender_key]);
 
         return $dataProvider;
     }

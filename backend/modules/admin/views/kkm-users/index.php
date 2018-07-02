@@ -27,9 +27,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
             //'id',
             //'kkm_id',
-            'user_id',
-            //'user_type',
 
+            //'user_type',
+            'user_id',
             'logins.Name',
             [
                 'attribute' => 'fio',
@@ -39,7 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if (!empty($model->logins->operators->fio)) {
                         $fio = $model->logins->operators->fio;
                         return !empty($fio) ? $fio : $model->logins->Name;
-                    } else return null;
+                    } else return $model->logins->Name;
                 },
             ],
             'kkm.number',
