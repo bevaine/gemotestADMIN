@@ -142,6 +142,7 @@ XML;
             }
 
             $xml = <<<XML
+                <?xml version="1.0" encoding="utf-8"?>
                 <courier dt="2018-04-13 01:00:05">
                   <menu login="xFFFF" name="РЕЖИМЫ РАБОТЫ">
                     <menu login="1" image="delivery.b16" name="РАБОТА С ЗНД" func="Seller_Start" />
