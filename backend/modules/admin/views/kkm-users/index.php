@@ -36,8 +36,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'text',
                 'value' => function ($model) {
                     /** @var \common\models\NKkmUsers $model */
-                    $fio = $model->logins->operators->fio;
-                    return !empty($fio) ? $fio : $model->logins->Name;
+                    if (!empty($model->logins->operators->fio)) {
+                        $fio = $model->logins->operators->fio;
+                        return !empty($fio) ? $fio : $model->logins->Name;
+                    } else return null;
                 },
             ],
             'kkm.number',
