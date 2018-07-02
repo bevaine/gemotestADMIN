@@ -317,7 +317,9 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getOperators()
     {
-        return $this->hasOne(Operators::className(), ['CACHE_OperatorID' => 'Key']);
+        return $this->UserType == 7
+            ? $this->hasOne(Operators::className(), ['CACHE_OperatorID' => 'Key'])
+            : null;
     }
 
     /**

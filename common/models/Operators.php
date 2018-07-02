@@ -38,6 +38,7 @@ use Yii;
  * @property integer $ClientMen
  * @property integer $mto
  * @property integer $mto_editor
+ * @property string $fio
  */
 class Operators extends \yii\db\ActiveRecord
 {
@@ -66,6 +67,17 @@ class Operators extends \yii\db\ActiveRecord
             [['BirthDate', 'DateIns', 'DateLastUpdate'], 'safe'],
             [['MG', 'Active', 'CanRegister', 'InputOrderRM', 'OrderEdit', 'MedReg', 'PriceID', 'ClientMen', 'mto', 'mto_editor'], 'integer'],
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getFio()
+    {
+        $m = explode(' ', $this->Name);
+        return !empty($m[0]) && !empty($m[0])
+            ? $this->LastName . ' ' . substr($m[0],0,2) . '.' . substr($m[1],0,2) . '.'
+            : null;
     }
 
     /**
