@@ -112,7 +112,7 @@ class KkmUsersController extends Controller
 
     public function actionExport($id)
     {
-        header('Content-Type: application/xml; charset=utf-8');
+        header('Content-Type: text/plain; charset=utf-8');
         header('Content-Disposition: attachment; filename="settings.xml"');
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_HTML;
