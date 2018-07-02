@@ -171,6 +171,15 @@
                                     ],
                                 ]
                             ],
+                            [
+                                'label' => 'ККМ',
+                                'icon' => 'circle-o',
+                                'url' => '#',
+                                'active' => true,
+                                'items' => [
+                                    ['label' => 'Пользователи ККМ', 'icon' => 'dashboard', 'url' => '/admin/kkm-users/'],
+                                ]
+                            ],
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
                             ['label' => 'Инкасации', 'icon' => 'dashboard', 'url' => ['/admin/encashment'],],
                             ['label' => 'Контрагенты', 'icon' => 'dashboard', 'url' => ['/admin/kontragents'],],

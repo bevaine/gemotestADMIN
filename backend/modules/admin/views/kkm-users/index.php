@@ -25,14 +25,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
-            'kkm_id',
+            //'id',
+            //'kkm_id',
             'user_id',
-            'login',
-            'password',
-            'user_type',
-            'kkm.number',
-            'kkm.sender_key',
+            //'user_type',
+
             'logins.Name',
             [
                 'attribute' => 'fio',
@@ -43,6 +40,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     return !empty($fio) ? $fio : $model->logins->Name;
                 },
             ],
+            'kkm.number',
+            'kkm.sender_key',
+            'login',
+            'password',
             //'logins.operators.LastName',
             [
                 'class' => 'yii\grid\ActionColumn',
