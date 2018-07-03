@@ -15,6 +15,10 @@ return [
         'gms' => [
             'basePath' => '@app/modules/gms',
             'class' => 'api\modules\gms\Module'
+        ],
+        'rent' => [
+            'basePath' => '@app/modules/rent',
+            'class' => 'api\modules\rent\Module'
         ]
     ],
     'components' => [        
@@ -56,6 +60,8 @@ return [
                 //'GET /gms/playlist' => 'gms/playlist/view',
                 'POST /gms/history' => 'gms/history/ajax-history-post',
                 'POST /gms/video-history' => 'gms/history/ajax-video-history-post',
+                'POST /rent/add' => 'rent/register-objects/add',
+                'GET /rent/add' => 'rent/register-objects/add',
             ],
         ]
     ],

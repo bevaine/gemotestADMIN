@@ -35,3 +35,7 @@ phpunit.phar
 /.vagrant
 /composer.lock
 /composer.json
+/api/modules/rent/Module.php
+/api/modules/rent/controllers/RegisterObjectsController.php
+/console/migrations/m180629_060028_add_new_table_register_objects.php
+/api/modules/rent/views/register-objects/add.php
