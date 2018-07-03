@@ -172,7 +172,8 @@ class LoginsController extends Controller
      */
     public function actionView($id, $ad = '')
     {
-        $model = $this->findModel($id, $ad);
+        if (!$model = $this->findModel($id, $ad))
+            return $this->render('index');
 
         $post = Yii::$app->request->post();
         if (isset($post['block-account'])) {
@@ -205,25 +206,31 @@ class LoginsController extends Controller
         } elseif (isset($post['active-gs'])) {
 
             $status = $post['active-gs'];
-            if ($model->adUsers) {
-                $modelAdUser = $model->adUsers;
-                if ($status == 'active') {
-                    $modelAdUser->auth_ldap_only = 1;
-                } elseif ($status == 'block') {
-                    $modelAdUser->auth_ldap_only = 0;
-                }
-                if (!$modelAdUser->save()) {
-                    Yii::getLogger()->log([
-                        'modelAdUser->auth_ldap_only'=>$modelAdUser->errors
-                    ], Logger::LEVEL_ERROR, 'binary');
-                } else {
-                    Yii::getLogger()->log([
-                        'modelAdUser->auth_ldap_only'=>$modelAdUser->auth_ldap_only
-                    ], Logger::LEVEL_WARNING, 'binary');
+            $findModel = NAdUsers::findAll([
+                'gs_id' => $id
+            ]);
+            if ($findModel)
+            {
+                foreach ($findModel as $modelAdUser) {
+                    /** @var NAdUsers $model */
+                    if ($status == 'active') {
+                        $modelAdUser->auth_ldap_only = 1;
+                    } elseif ($status == 'block') {
+                        $modelAdUser->auth_ldap_only = 0;
+                    }
+                    if (!$modelAdUser->save()) {
+                        Yii::getLogger()->log([
+                            'modelAdUser->auth_ldap_only'=>$modelAdUser->errors
+                        ], Logger::LEVEL_ERROR, 'binary');
+                    } else {
+                        Yii::getLogger()->log([
+                            'modelAdUser->auth_ldap_only'=>$modelAdUser->auth_ldap_only
+                        ], Logger::LEVEL_WARNING, 'binary');
+                    }
                 }
             }
-        } elseif (isset($post['reset-pass-gd'])) {
-
+        } elseif (isset($post['reset-pass-gd']))
+        {
             if ($model->UserType == 9) {
                 $model->EmailPassword = $model->Pass;
                 self::resetPassword($model);
