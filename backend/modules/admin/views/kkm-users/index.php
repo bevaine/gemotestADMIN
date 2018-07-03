@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use yii\grid\GridView;
+use kartik\export\ExportMenu;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\NKkmUsersSearch */
@@ -9,6 +10,25 @@ use yii\grid\GridView;
 
 $this->title = 'Пользователи ККМ';
 $this->params['breadcrumbs'][] = $this->title;
+
+$gridColumns = [
+    [
+        'label' => 'Имя',
+        'value' => 'logins.Name'
+    ],
+    [
+        'label' => 'Номер кассы',
+        'value' => 'kkm.number'
+    ],
+    [
+        'label' => 'Полный номер кассы',
+        'value' => 'kkm.name'
+    ],
+    [
+        'label' => 'Должность',
+        'value' => 'kkm.sender_key'
+    ],
+];
 ?>
 <div class="nkkm-users-index">
     <p>
@@ -23,6 +43,25 @@ $this->params['breadcrumbs'][] = $this->title;
             );
         ?>
     </p>
+
+    <?php
+    echo ExportMenu::widget([
+        'dataProvider' => $dataProvider,
+        'columns' => $gridColumns,
+        //'encoding' => 'windows-1251',
+        'target' => ExportMenu::TARGET_POPUP,
+        'showConfirmAlert'=>true,
+        'timeout' => 1000,
+        'exportConfig' => [
+//                ExportMenu::FORMAT_CSV => true,
+//                ExportMenu::FORMAT_HTML=> true,
+//                ExportMenu::FORMAT_TEXT => true,
+//                ExportMenu::FORMAT_PDF => false,
+            ExportMenu::FORMAT_EXCEL => false,
+            ExportMenu::FORMAT_EXCEL_X => false,
+        ],
+    ]);
+    ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
