@@ -130,16 +130,19 @@ HTML;
         $kkm = $findModel->kkm->number;
         $searchModel = new NKkmUsersSearch();
         if ($sender_key == 'Физ. мс выездная') {
-            $search['NKkmUsersSearch']['sender_key'] = 'Физ. мс выездная';
+            $s = NKkmUsers::find()->joinWith(['kkm'])->where(['sender_key' => 'Физ. мс выездная'])->all();
+            //$search['NKkmUsersSearch']['sender_key'] = 'Физ. мс выездная';
         } elseif ($sender_key == 'Физ.Врач выездной') {
-            $search['NKkmUsersSearch']['sender_key'] = 'Физ.Врач выездной';
+            $s = NKkmUsers::find()->joinWith(['kkm'])->where(['sender_key' => 'Физ.Врач выездной'])->all();
+            //$search['NKkmUsersSearch']['sender_key'] = 'Физ.Врач выездной';
         } else {
             return printf($html_error, 'Не удалось определить sender_key');
         }
 
         $xml_logins = '';
-        $dataProvider = $searchModel->search($search);
-        foreach ($dataProvider->getModels() as $model) {
+//        $dataProvider = $searchModel->search($search);
+//        $s = NKkmUsers::find()->where([''])
+        foreach ($s as $model) {
             /** @var NKkmUsers $model */
             $fio = $model->logins->Name;
             if (!empty($model->logins->operators->fio)) {

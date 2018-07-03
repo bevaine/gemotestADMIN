@@ -57,8 +57,8 @@ $gridColumns = [
 //                ExportMenu::FORMAT_HTML=> true,
 //                ExportMenu::FORMAT_TEXT => true,
 //                ExportMenu::FORMAT_PDF => false,
-            ExportMenu::FORMAT_EXCEL => false,
-            ExportMenu::FORMAT_EXCEL_X => false,
+//            ExportMenu::FORMAT_EXCEL => false,
+//            ExportMenu::FORMAT_EXCEL_X => false,
         ],
     ]);
     ?>
