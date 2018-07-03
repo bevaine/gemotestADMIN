@@ -7,16 +7,12 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\NKkmUsersSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Nkkm Users';
+$this->title = 'Пользователи ККМ';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="nkkm-users-index">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <p>
-        <?= Html::a('Create Nkkm Users', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([
@@ -27,10 +23,12 @@ $this->params['breadcrumbs'][] = $this->title;
 
             //'id',
             //'kkm_id',
-
             //'user_type',
             'user_id',
-            'logins.Name',
+            [
+                'attribute' => 'name_gs',
+                'value' => 'logins.Name'
+            ],
             [
                 'attribute' => 'fio',
                 'format' => 'text',
@@ -42,8 +40,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     } else return $model->logins->Name;
                 },
             ],
-            'kkm.number',
-            'kkm.sender_key',
+            [
+                'attribute' => 'number',
+                'value' => 'kkm.number'
+            ],
+            [
+                'filter' =>  \common\models\NKkmUsers::getSenderList(),
+                'value' => function ($model) {
+                    /** @var $model \common\models\NKkmUsers */
+                    return !empty($model->kkm) ? $model->kkm->sender_key : null;
+                },
+                'attribute' => 'sender_key'
+            ],
             'login',
             'password',
             //'logins.operators.LastName',

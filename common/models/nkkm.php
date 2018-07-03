@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "n_kkm".
@@ -83,5 +84,18 @@ class nkkm extends \yii\db\ActiveRecord
     public function getBranch()
     {
         return $this->hasOne(Kontragents::className(), ['AID' => 'branch_id']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getSenderList()
+    {
+        $arr = self::find()
+            ->orderBy(['sender_key' => 'asc'])
+            ->asArray()
+            ->all();
+
+        return ArrayHelper::map($arr,'id','sender_key');
     }
 }

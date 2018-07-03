@@ -10,10 +10,17 @@ use common\models\NKkmUsers;
 /**
  * NKkmUsersSearch represents the model behind the search form of `common\models\NKkmUsers`.
  * @property string $sender_key
+ * @property string $number
+ * @property string $name_gs
+ * @property string $fio
  */
+
 class NKkmUsersSearch extends NKkmUsers
 {
     public $sender_key;
+    public $number;
+    public $name_gs;
+    public $fio;
 
     /**
      * @inheritdoc
@@ -22,7 +29,7 @@ class NKkmUsersSearch extends NKkmUsers
     {
         return [
             [['id', 'kkm_id', 'user_id'], 'integer'],
-            [['sender_key', 'login', 'password', 'user_type'], 'safe'],
+            [['number', 'name_gs', 'sender_key', 'login', 'password', 'user_type'], 'safe'],
         ];
     }
 
@@ -51,7 +58,29 @@ class NKkmUsersSearch extends NKkmUsers
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'sender_key' => SORT_DESC
+                ],
+            ],
         ]);
+
+        $sort = $dataProvider->getSort();
+        $sort->attributes = array_merge($sort->attributes, [
+            'name_gs' => [
+                'asc' => ['Logins.[Name]' => SORT_ASC],
+                'desc' => ['Logins.[Name]' => SORT_DESC]
+            ],
+            'number' => [
+                'asc' => ['n_kkm.number' => SORT_ASC],
+                'desc' => ['n_kkm.number' => SORT_DESC]
+            ],
+            'sender_key' => [
+                'asc' => ['n_kkm.sender_key' => SORT_ASC],
+                'desc' => ['n_kkm.sender_key' => SORT_DESC]
+            ],
+        ]);
+        $dataProvider->setSort($sort);
 
         $this->load($params);
 
@@ -68,9 +97,11 @@ class NKkmUsersSearch extends NKkmUsers
             'user_id' => $this->user_id,
         ]);
 
-        $query->andFilterWhere(['like', 'login', $this->login])
+        $query->andFilterWhere(['like', 'lower(login)', mb_strtolower($this->login, 'UTF-8')])
             ->andFilterWhere(['like', 'password', $this->password])
             ->andFilterWhere(['like', 'user_type', $this->user_type])
+            ->andFilterWhere(['like', 'lower(Logins.[Name])', mb_strtolower($this->name_gs, 'UTF-8')])
+            ->andFilterWhere(['like', 'n_kkm.number', $this->number])
             ->andFilterWhere(['n_kkm.sender_key' => $this->sender_key]);
 
         return $dataProvider;

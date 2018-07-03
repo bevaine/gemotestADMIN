@@ -146,7 +146,7 @@ HTML;
                 $fio = $model->logins->operators->fio;
             }
             $xml_logins .= "\r\n".<<<XML
-<seller name="{$fio}" login="{$model->login}" mode="K" mask="x0001" pass="{$model->password}"/>
+    <seller name="{$fio}" login="{$model->login}" mode="K" mask="x0001" pass="{$model->password}"/>
 XML;
         }
 

@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "n_kkm_users".
@@ -14,6 +15,7 @@ use Yii;
  * @property string $password
  * @property int $user_type
  * @property nkkm $kkm
+ * @property nkkm $kkmMany
  * @property Logins $logins
  */
 class NKkmUsers extends \yii\db\ActiveRecord
@@ -85,5 +87,21 @@ class NKkmUsers extends \yii\db\ActiveRecord
     public function getLogins()
     {
         return $this->hasOne(Logins::class, ['aid' => 'user_id']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getSenderList()
+    {
+        $arr = self::find()
+            ->distinct()
+            ->joinWith(['kkm'])
+            ->select(['sender_key'])
+            ->where(['is not', 'sender_key', null])
+            ->orderBy(['sender_key' => 'asc'])
+            ->asArray()
+            ->all();
+        return ArrayHelper::map($arr,'sender_key','sender_key');
     }
 }
