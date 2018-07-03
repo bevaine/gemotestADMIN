@@ -97,7 +97,7 @@ class NKkmUsers extends \yii\db\ActiveRecord
         $arr = self::find()
             ->distinct()
             ->joinWith(['kkm'])
-            ->select(['sender_key'])
+            ->select(['sender_key', 'kkm_id'])
             ->where(['is not', 'sender_key', null])
             ->orderBy(['sender_key' => 'asc'])
             ->asArray()
