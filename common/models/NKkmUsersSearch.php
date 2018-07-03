@@ -103,9 +103,9 @@ class NKkmUsersSearch extends NKkmUsers
             'user_id' => $this->user_id,
         ]);
 
-        $query->andFilterWhere(['like', 'lower(login)', mb_strtolower($this->login, 'UTF-8')])
-            ->andFilterWhere(['like', 'password', $this->password])
-            ->andFilterWhere(['like', 'user_type', $this->user_type])
+        $query->andFilterWhere(['like', 'lower(n_kkm_users.login)', mb_strtolower($this->login, 'UTF-8')])
+            ->andFilterWhere(['like', 'n_kkm_users.password', $this->password])
+            ->andFilterWhere(['like', 'n_kkm_users.user_type', $this->user_type])
             ->andFilterWhere(['like', 'lower(Logins.[Name])', mb_strtolower($this->name_gs, 'UTF-8')])
             ->andFilterWhere(['like', 'n_kkm.number', $this->number])
             ->andFilterWhere(['like', 'n_kkm.[name]', $this->kkm_name])
