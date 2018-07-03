@@ -54,6 +54,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => 'kkm.number'
             ],
             [
+                'attribute' => 'kkm_name',
+                'value' => 'kkm.name'
+            ],
+            [
                 'filter' =>  \common\models\NKkmUsers::getSenderList(),
                 'value' => function ($model) {
                     /** @var $model \common\models\NKkmUsers */

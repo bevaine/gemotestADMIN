@@ -13,6 +13,7 @@ use common\models\NKkmUsers;
  * @property string $number
  * @property string $name_gs
  * @property string $fio
+ * @property string $kkm_name
  */
 
 class NKkmUsersSearch extends NKkmUsers
@@ -20,6 +21,7 @@ class NKkmUsersSearch extends NKkmUsers
     public $sender_key;
     public $number;
     public $name_gs;
+    public $kkm_name;
     public $fio;
 
     /**
@@ -29,7 +31,7 @@ class NKkmUsersSearch extends NKkmUsers
     {
         return [
             [['id', 'kkm_id', 'user_id'], 'integer'],
-            [['number', 'name_gs', 'sender_key', 'login', 'password', 'user_type'], 'safe'],
+            [['kkm_name', 'number', 'name_gs', 'sender_key', 'login', 'password', 'user_type'], 'safe'],
         ];
     }
 
@@ -75,6 +77,10 @@ class NKkmUsersSearch extends NKkmUsers
                 'asc' => ['n_kkm.number' => SORT_ASC],
                 'desc' => ['n_kkm.number' => SORT_DESC]
             ],
+            'kkm_name' => [
+                'asc' => ['n_kkm.[name]' => SORT_ASC],
+                'desc' => ['n_kkm.[name]' => SORT_DESC]
+            ],
             'sender_key' => [
                 'asc' => ['n_kkm.sender_key' => SORT_ASC],
                 'desc' => ['n_kkm.sender_key' => SORT_DESC]
@@ -102,6 +108,7 @@ class NKkmUsersSearch extends NKkmUsers
             ->andFilterWhere(['like', 'user_type', $this->user_type])
             ->andFilterWhere(['like', 'lower(Logins.[Name])', mb_strtolower($this->name_gs, 'UTF-8')])
             ->andFilterWhere(['like', 'n_kkm.number', $this->number])
+            ->andFilterWhere(['like', 'n_kkm.[name]', $this->kkm_name])
             ->andFilterWhere(['n_kkm.sender_key' => $this->sender_key]);
 
         return $dataProvider;
