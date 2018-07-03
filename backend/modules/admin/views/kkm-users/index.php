@@ -13,6 +13,15 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="nkkm-users-index">
     <p>
         <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a( '<i class="glyphicon glyphicon-envelope" aria-hidden="true"></i> Загрузить сертификат',
+                ['/upload/ca.p7b'],
+                ['class' => 'btn btn-primary',
+                    'target' => '_blank',
+                    'title' => 'Загрузить',
+                    'data-pjax' => '0'
+                ]
+            );
+        ?>
     </p>
 
     <?= GridView::widget([
@@ -64,10 +73,10 @@ $this->params['breadcrumbs'][] = $this->title;
                             'admin/kkm-users/export',
                             'id' => $model['id']
                         ]);
-                        return \yii\helpers\Html::a( '<span class="glyphicon glyphicon-save"></span>', $customurl,
+                        return Html::a( '<span class="glyphicon glyphicon-save"></span>', $customurl,
                             [
                                 'target' => '_blank',
-                                'title' => Yii::t('yii', 'Export'),
+                                'title' => 'Загрузить settings.xml',
                                 'data-pjax' => '0'
                             ]
                         );
