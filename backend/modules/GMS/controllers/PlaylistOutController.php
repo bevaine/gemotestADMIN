@@ -209,13 +209,6 @@ class PlaylistOutController extends Controller
             ];
         }
 
-        if (empty($pls_commerce)) {
-            return [
-                'state' => 0,
-                'message' => 'Ошибка формирования плейлиста дневного эфира! Не удалось получить id коммерческого плейлиста!'
-            ];
-        }
-
         if (empty($pls_standart)) {
             return [
                 'state' => 0,
