@@ -3,6 +3,7 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use yii\web\JsExpression;
+use common\components\helpers\FunctionsHelper;
 
 \backend\assets\GmsAsset::register($this);
 
@@ -13,17 +14,37 @@ $this->title = $model->name;
 $this->params['breadcrumbs'][] = ['label' => 'Шаблоны плейлистов', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+<div class="modal bootstrap-dialog type-warning fade size-normal in" id="modal-dialog" tabindex="-1" role="dialog" aria-labelledby="deactivateLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="bootstrap-dialog-header">
+                    <div class="bootstrap-dialog-close-button" style="display: none;">
+                        <button class="close" aria-label="close">×</button>
+                    </div>
+                    <div class="bootstrap-dialog-title" id="w1_title">Подтверждение</div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="bootstrap-dialog-body">
+                    <div class="bootstrap-dialog-message" id="bootstrap-dialog-message">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="bootstrap-dialog-footer">
+                    <div class="bootstrap-dialog-footer-buttons" id="bootstrap-dialog-footer-buttons"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="gms-playlist-view">
 
     <p>
         <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
+        <?= Html::a('<span onclick="checkPlayList('.$model['id'].')" class="btn btn-danger">Удалить</span>', "#") ?>
     </p>
 
     <?= DetailView::widget([
@@ -241,3 +262,4 @@ $js1 = <<< JS
     }
 JS;
 $this->registerJs($js1);
+$this->registerJs(FunctionsHelper::getJSCode(), yii\web\View::POS_HEAD);

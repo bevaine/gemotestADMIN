@@ -538,4 +538,61 @@ class PlaylistOutController extends Controller
             throw new NotFoundHttpException('The requested page does not exist.');
         }
     }
+
+    /**
+     * @param $children
+     * @return array|bool
+     */
+    public function parseJSON($children)
+    {
+        if (!empty($children)) {
+            $key = ArrayHelper::getColumn($children, 'key');
+            return array_filter(
+                array_combine($key, $children),
+                function($v) {return $v['data']['type'] == 2;}
+            );
+        }
+        return false;
+    }
+
+
+    /**
+     * @param null $playlist_key
+     * @return array|string
+     */
+    public function actionAjaxDeletePlaylist($playlist_key = null)
+    {
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+
+        if (!$model = GmsPlaylist::findOne($playlist_key))
+            return 'null';
+
+        $findModel = GmsPlaylistOut::find();
+        if (isset($model->region)) {
+            $findModel->andWhere([
+                'region_id' => $model->region,
+                'sender_id' => $model->sender_id
+            ]);
+        } elseif (isset($model->group_id)) {
+            $findModel->andWhere([
+                'group_id' => $model->group_id
+            ]);
+        } elseif (isset($model->device_id)) {
+            $findModel->andWhere([
+                'device_id' => $model->device_id
+            ]);
+        } else return 'null';
+
+        $findModel= $findModel->one();
+
+        if ($findModel) {
+            $jsonModel = ArrayHelper::toArray(json_decode($findModel->jsonPlaylist));
+            $ddd = ArrayHelper::getColumn($jsonModel['children'], 'data');
+            $ddd = ArrayHelper::getColumn($ddd, 'type');
+            if (in_array($model->type, $ddd)) return ['id' => $findModel->id, 'name' => $findModel->name];
+        }
+        return 'null';
+    }
+
 }

@@ -319,4 +319,56 @@ SCRIPT;
             date("Y", 0)
         );
     }
+
+    /**
+     * @return string
+     */
+    public static function getJSCode()
+    {
+        $urlAjaxDeletePlaylist = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-delete-playlist']);
+
+        $js1 = <<< JS
+
+        function deleteItem(playlist_key) {
+            $.post("/GMS/playlist/delete?id=" + playlist_key, { id: playlist_key});
+        }
+        
+        function checkPlayList(playlist_key) {
+            $.ajax({
+                type : 'GET',
+                url: '{$urlAjaxDeletePlaylist}',
+                data: {
+                    playlist_key: playlist_key,
+                },
+                success: function (res) {
+                    let message = '';
+                    let html_button = '';
+                    let style = '';
+                    let button_cancel = '<button class="btn btn-default" data-dismiss="modal">';
+                    button_cancel += '<span class="glyphicon glyphicon-ban-circle"></span> Отмена';
+                    button_cancel += '</button>';                
+                    if (res !== 'null') {
+                        style = 'danger';
+                        message = 'Не возможно удалить шаблон т.к. он используется в плейлисте ';
+                        message += '<a target="_blank" href="/GMS/playlist-out/view?id=' + res.id + '">' + res.name + '</a>';
+                    } else {
+                        style = 'warning';
+                        message = "Вы уверены, что хотите удалить этот элемент?";
+                        html_button += '<button class="btn btn-' + style + '" id="delete-item"';
+                        html_button += ' onClick="deleteItem(' + playlist_key + ')">';
+                        html_button += '<span class="glyphicon glyphicon-ok"></span> Ok';
+                        html_button += '</button>';
+                    }                        
+                    $('#bootstrap-dialog-message').html(message);  
+                    $('#bootstrap-dialog-footer-buttons').html(button_cancel + html_button); 
+                    $('#modal-dialog')
+                        .removeClass()
+                        .toggleClass('modal bootstrap-dialog type-' + style + ' fade size-normal in')
+                        .modal('show');
+                }
+            });
+        }
+JS;
+        return $js1;
+    }
 }

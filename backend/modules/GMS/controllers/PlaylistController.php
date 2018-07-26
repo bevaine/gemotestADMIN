@@ -18,21 +18,6 @@ use yii\helpers\Json;
 class PlaylistController extends Controller
 {
     /**
-     * @inheritdoc
-     */
-    public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::className(),
-                'actions' => [
-                    'delete' => ['POST'],
-                ],
-            ],
-        ];
-    }
-
-    /**
      * @param null $param
      * @return string
      */
