@@ -90,11 +90,14 @@ HTML;
                     if (data.files[0].preview !== undefined) {
                         width = data.files[0].preview.videoWidth;
                         height = data.files[0].preview.videoHeight;                        
-                    }                         
-                    if (width === 0 
-                        || height === 0
-                        || width > 1280 
-                        || height > 720) {
+                    }
+                    if (width === undefined 
+                        || height === undefined 
+                        || width === 0
+                        || height === 0) {
+                        return;
+                    }
+                    if (width > 1280 || height > 720) {
                         data.context["0"].innerHTML = "";
                         let message = "Размеры <b>" + width + "x" + height + "</b> данного видео не соотвествуют максимально установленным <b>1280x720</b>";
                         let style = "danger";

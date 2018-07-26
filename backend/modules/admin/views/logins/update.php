@@ -89,7 +89,7 @@ $this->params['breadcrumbs'][] = 'Редактирование';
 
             <?= $form->field($model, 'Logo')->textInput() ?>
 
-            <?= $form->field($model, 'Logo')->textInput() ?>
+            <?= $form->field($model, 'LogoType')->textInput() ?>
 
             <?= $form->field($model, 'LogoText')->textInput() ?>
 

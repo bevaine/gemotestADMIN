@@ -122,7 +122,7 @@ class Logins extends \yii\db\ActiveRecord
             'Logo' => 'Логотип',
             'LogoText' => 'Текст логотипа №1',
             'LogoText2' => 'Текст логотипа №2',
-            'LogoType' => 'Logo Type',
+            'LogoType' => 'Тип логотипа',
             'LogoWidth' => 'Logo Width',
             'TextPaddingLeft' => 'Text Padding Left',
             'OpenExcel' => 'Open Excel',

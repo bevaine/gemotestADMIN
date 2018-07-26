@@ -253,6 +253,14 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+
+        $file = 'blob:http://itr-local.admin/c945658e-8716-481e-b1b1-507d6accdc84';
+        if ($infoVideo = FunctionsHelper::getInfoVideo($file))
+        {
+            print_r($infoVideo);
+        }
+        exit;
+
         $json = '{"10":1527169297,"7":1527835860,"11":1527169868,"12":1527170231}';
         $json = json_decode($json);
         foreach ($json as $key => $val) {

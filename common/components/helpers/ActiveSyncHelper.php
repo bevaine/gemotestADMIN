@@ -769,7 +769,7 @@ class ActiveSyncHelper
             $objectDirectorFloSender->director_id = $this->directorID;
         }
 
-        if ($objectDirectorFloSender->save()) {
+        if (@$objectDirectorFloSender->save()) {
             Yii::getLogger()->log([
                 'objectDirectorFloSender->save()' => $objectDirectorFloSender
             ], Logger::LEVEL_WARNING, 'binary');
@@ -1312,33 +1312,42 @@ class ActiveSyncHelper
 
         if ($this->type == 8 && !empty($this->key)) {
             $this->cnName = $this->fullName.' '.$this->key;
-            $this->accountName = $this->key;
-            $this->accountName .= ".".substr($this->translit($this->firstName),0,1);
-            $this->accountName .= ".".$this->translit($this->lastName);
+            $account_name_v1 = $this->key;
+            $account_name_v1 .= ".".substr($this->translit($this->firstName),0,1);
+            $account_name_v1 .= ".".$this->translit($this->lastName);
         } else {
-            $this->accountName .= $this->translit($this->firstName . "." . $this->lastName);
+            $account_name_v1 = $this->translit($this->firstName . "." . $this->lastName);
+        }
+        $arr_logins[] = self::cutAccountName($account_name_v1);
+
+        if (!empty($this->middleName)) {
+            $account_name_v2 = $this->translit($this->firstName);
+            $account_name_v2 .= "." . substr($this->translit($this->middleName), 0, 1);
+            $account_name_v2 .= ".".$this->translit($this->lastName);
+            $arr_logins[] = self::cutAccountName($account_name_v2);
+        }
+
+        for ($i = 1; $i < 10; $i++) {
+            $account_name_v3 = substr($this->translit($this->firstName), 0, 1);
+            $account_name_v3 .= "." . $this->translit($this->lastName);
+            $arr_logins[] = self::cutAccountName($account_name_v3) . $i;;
+        }
+
+        foreach ($arr_logins as $login)
+        {
+            if ($this->checkUserAccountAd($login))
+            {
+                if ($this->typeLO != 'FLO' && !empty($this->operatorofficestatus)) {
+                    $this->cnName = $this->fullName." (".$this->operatorofficestatus.")";
+                }
+            } else {
+                $this->accountName = $login;
+                break;
+            }
         }
 
         if (!empty($this->operatorofficestatus)) {
             $this->displayName = $this->fullName . " (" . $this->operatorofficestatus . ")";
-        }
-
-        if ($this->checkUserAccountAd())
-        {
-            //todo если есть, то добавляю отчество в присвоеный логин в AD
-            $this->accountName = $this->translit($this->firstName);
-            if (!empty($this->middleName)) {
-                $this->accountName .= "." . substr($this->translit($this->middleName), 0, 1);
-            } else $this->accountName .= "1";
-            $this->accountName .= ".".$this->translit($this->lastName);
-
-            if ($this->typeLO != 'FLO' && !empty($this->operatorofficestatus)) {
-                $this->cnName = $this->fullName." (".$this->operatorofficestatus.")";
-            }
-        }
-
-        if (strlen($this->accountName) > 20) {
-            $this->accountName = substr($this->accountName, 0, 20);
         }
 
         //todo создаем нового пользователя в AD
@@ -1362,6 +1371,17 @@ class ActiveSyncHelper
             $this->passwordAD = $arrAccountAD['AccountPassword'];
         }
         return true;
+    }
+
+    /**
+     * @param $accountName
+     * @return bool|string
+     */
+    static function cutAccountName ($accountName)
+    {
+        if (strlen($accountName) > 19) {
+            return substr($accountName, 0, 19);
+        } else return $accountName;
     }
 
     /**
@@ -1793,10 +1813,10 @@ class ActiveSyncHelper
     /**
      * @return bool
      */
-    public function checkUserAccountAd()
+    public function checkUserAccountAd ($accountName)
     {
         //todo проверяем на совпадение УЗ AD
-        $ADcheckUser = "(samaccountname=*".$this->accountName."*)";
+        $ADcheckUser = "(samaccountname=*".$accountName."*)";
         $justthese = array("samaccountname");
 
         try {
@@ -1814,15 +1834,15 @@ class ActiveSyncHelper
             $info = ldap_get_entries($ldapconn, $sr);
             ldap_close($ldapconn);
 
-            //todo проверяем существует ли запись по лигину в AD
+            //todo проверяем существует ли запись по логину в AD
             if (!$info || $info['count'] == 0) {
                 Yii::getLogger()->log([
-                    'checkUserAccountAd'=>$this->accountName.' '.'не найдена в AD!'
+                    'checkUserAccountAd'=>$accountName.' '.'не найдена в AD!'
                 ], Logger::LEVEL_WARNING, 'binary');
                 return false;
             } else {
                 Yii::getLogger()->log([
-                    'checkUserAccountAd'=>$this->accountName.' '.'найдена в AD!'
+                    'checkUserAccountAd'=>$accountName.' '.'найдена в AD!'
                 ], Logger::LEVEL_WARNING, 'binary');
                 return true;
             }
