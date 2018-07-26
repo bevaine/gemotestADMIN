@@ -14,7 +14,7 @@ use kartik\date\DatePicker;
 $this->title = 'Видео библиотека';
 $this->params['breadcrumbs'][] = $this->title;
 
-$urlAjaxCheckPlaylist = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-check-playlist']);
+$urlAjaxCheckVideo = \yii\helpers\Url::to(['/GMS/playlist-out/ajax-check-video']);
 ?>
     <style>
         .center {
