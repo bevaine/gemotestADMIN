@@ -511,25 +511,43 @@ class LoginsController extends Controller
             }
         }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save())
+        {
+            if ($adUsers = $model->adUsers)
+            {
+                if (!$adUsers->load(Yii::$app->request->post()) || !$adUsers->save())
+                {
+                    Yii::getLogger()->log([
+                        '!$adUsers->save()' => $adUsers->errors
+                    ], Logger::LEVEL_ERROR, 'binary');
+                }
 
-            if (($adUsers = $model->adUsers) &&
-                ($adUserAccountsOne = $model->adUsers->adUserAccounts)) {
-                if ($adUserAccountsOne->load(Yii::$app->request->post())) {
-                    if ($adUserAccountsOne->getOldAttribute('ad_pass')
-                        != $adUserAccountsOne['ad_pass']){
-                        $status = 'error';
-                        $message = 'Не удалось сбросить пароль для УЗ <b>'.$adUsers->AD_login.'</b>, возможно AD запись удалена!';
-                        if ($adPass = ActiveSyncHelper::resetPasswordAD(
-                            $adUsers->AD_login, $adUserAccountsOne['ad_pass'])
-                        ) {
-                            $adUserAccountsOne->ad_pass = $adPass;
-                            if ($adUserAccountsOne->save()) {
+                if ($adUserAccountsOne = $model->adUsers->adUserAccounts)
+                {
+                    if ($adUserAccountsOne->load(Yii::$app->request->post()))
+                    {
+                        if ($adUserAccountsOne->getOldAttribute('ad_pass')
+                            != $adUserAccountsOne['ad_pass'])
+                        {
+                            $status = 'error';
+                            $message = 'Не удалось сбросить пароль для УЗ <b>'.$adUsers->AD_login.'</b>, возможно AD запись удалена!';
+
+                            if ($adPass = ActiveSyncHelper::resetPasswordAD(
+                                $adUsers->AD_login,
+                                $adUserAccountsOne['ad_pass'])
+                            ) {
                                 $status = 'success';
                                 $message = 'Успешно был сброшен пароль для УЗ <b>'.$adUsers->AD_login.'</b>';
+                                $adUserAccountsOne->ad_pass = $adPass;
+
+                                if (!$adUserAccountsOne->save()) {
+                                    Yii::getLogger()->log([
+                                        '$adUserAccountsOne->save()' => $adUserAccountsOne->errors
+                                    ], Logger::LEVEL_ERROR, 'binary');
+                                }
                             }
+                            Yii::$app->session->setFlash($status, $message);
                         }
-                        Yii::$app->session->setFlash($status, $message);
                     }
                 }
             }
