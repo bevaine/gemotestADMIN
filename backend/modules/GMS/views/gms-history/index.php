@@ -72,10 +72,10 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => function($model) {
                     /** @var \common\models\GmsHistorySearch $model  */
                     return Html::a(
-                        $model->device ? $model->device->device : null,
+                        $model->device ? $model->device->name : null,
                         Url::to(["/GMS/gms-devices/view?id=".$model->device_id]),
                         [
-                            'title' => $model->device ? $model->device->device : null,
+                            'title' => $model->device ? $model->device->name : null,
                             'target' => '_blank'
                         ]
                     );
