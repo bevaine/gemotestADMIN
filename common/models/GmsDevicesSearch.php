@@ -63,7 +63,7 @@ class GmsDevicesSearch extends GmsDevices
             'query' => $query,
             'sort' => [
                 'defaultOrder' => [
-                    'created_at' => SORT_DESC,
+                    'last_active_at' => SORT_DESC,
                 ]
             ],
         ]);
