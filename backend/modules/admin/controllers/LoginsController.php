@@ -366,9 +366,10 @@ class LoginsController extends Controller
 
             if ($newUserData) {
 
-                Yii::getLogger()->log([
-                    'УСПЕШНО БЫЛА ДОБАВЛЕНА УЗ ДЛЯ '.$activeSyncHelper->fullName
-                ], Logger::LEVEL_WARNING, 'binary');
+                Yii::getLogger()->log(
+                    'УСПЕШНО БЫЛА ДОБАВЛЕНА УЗ ДЛЯ '.$activeSyncHelper->fullName,
+                    Logger::LEVEL_INFO,
+                    'ADD_SKYNET_USER');
 
                 $style = '';
                 $message = '';

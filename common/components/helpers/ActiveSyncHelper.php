@@ -71,6 +71,7 @@ use yii\db\Transaction;
  * @property string  $tableName
  * @property boolean $createNewGS
  * @property integer $erpGroup
+ * @property integer $message
  */
 
 class ActiveSyncHelper
@@ -127,6 +128,7 @@ class ActiveSyncHelper
     public $changeGD;
     public $createNewGS;
     public $erpGroup;
+    public $message;
 
     /**
      * ActiveSyncHelper constructor.
@@ -136,6 +138,19 @@ class ActiveSyncHelper
        $this->orgName = self::ORG_NAME;
        $this->resetPassword = false;
        $this->createNewGS = false;
+    }
+
+    /**
+     * ActiveSyncHelper destructor.
+     */
+    public function __destruct()
+    {
+        if (!empty($this->message)) {
+            Yii::getLogger()->log(
+                $this->message,
+                Logger::LEVEL_INFO, 'ADD_SKYNET_USER'
+            );
+        }
     }
 
     /**
@@ -284,12 +299,7 @@ class ActiveSyncHelper
         if (empty($this->lastName)
             || empty($this->firstName)
         ) {
-            Yii::getLogger()->log([
-                'addCheckOperators'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addCheckOperators : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -322,13 +332,9 @@ class ActiveSyncHelper
             $objectOperators->ClientMen = in_array($this->department, [3,4,5,6]) ? 1 : 0;
 
             if ($objectOperators->save()) {
-                Yii::getLogger()->log([
-                    'objectOperators->save()'=>$objectOperators
-                ], Logger::LEVEL_WARNING, 'binary');
+                $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectOperators::tableName();
             } else {
-                Yii::getLogger()->log([
-                    'objectOperators->save()'=>$objectOperators->errors
-                ], Logger::LEVEL_ERROR, 'binary');
+                $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectOperators::tableName();
                 return false;
             }
         }
@@ -378,13 +384,16 @@ class ActiveSyncHelper
     /**
      * @param null $login
      * @param null $password
-     * @return bool
+     * @return array|bool
      */
     public static function createResetPasswordGD($login = null, $password = null)
     {
-        if (is_null($login)
-            || is_null($password))
-            return false;
+        if (is_null($login) || is_null($password)) {
+            return [
+                "status" => 0,
+                "msg" => "createResetPasswordGD : пустые логин или пароль"
+            ];
+        }
 
         $script = "sudo ./changePasswordSkynet.sh '".$login."' '".$password."'";
 
@@ -394,18 +403,26 @@ class ActiveSyncHelper
                 $connection,
                 self::POSTFIX_LOGIN,
                 self::POSTFIX_PASSW)
-            ) return false;
+            ) {
+                return [
+                    "status" => 0,
+                    "msg" => "createResetPasswordGD : Не удалось авторизироваться на сервере " . self::POSTFIX_SERVER
+                ];
+            }
 
             ssh2_shell($connection, 'xterm');
             if (!ssh2_exec($connection, $script)) return false;
 
         } catch (Exception $e) {
-            Yii::getLogger()->log([
-                'resetPasswordGD'=>$e->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
-            return false;
+            return [
+                "status" => 0,
+                "msg" => "createResetPasswordGD : " . $e->getMessage()
+            ];
         }
-        return true;
+        return [
+            "status" => 0,
+            "msg" => ''
+        ];
     }
 
     /**
@@ -416,12 +433,7 @@ class ActiveSyncHelper
         if (empty($this->fullName)
             || empty($this->cacheId)
         ) {
-            Yii::getLogger()->log([
-                'addCheckLogins1'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addCheckLogins1 : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -435,12 +447,7 @@ class ActiveSyncHelper
                 || empty($this->loginGS)
                 || empty($this->cachePass)
             ) {
-                Yii::getLogger()->log([
-                    'addCheckLogins2'=>[
-                        'Одно из обязательных полей пустое!',
-                        ArrayHelper::toArray($this)
-                    ]
-                ], Logger::LEVEL_ERROR, 'binary');
+                $this->message['error'][] = 'addCheckLogins2 : Одно из обязательных полей пустое!';
                 return false;
             }
 
@@ -461,15 +468,12 @@ class ActiveSyncHelper
                 $loginName = $this->fullName;
                 $email = $this->loginGS."@gemosystem.ru";
 
-                if (ActiveSyncHelper::createResetPasswordGD(
-                    $this->loginGS,
-                    $this->cachePass)
-                ) {
-                    Yii::getLogger()->log(
-                        'Успешно была добавлена почта '.$email,
-                        Logger::LEVEL_WARNING,
-                        'binary'
-                    );
+                $result = ActiveSyncHelper::createResetPasswordGD($this->loginGS, $this->cachePass);
+
+                if ($result['status'] == 1) {
+                    $this->message['info'][] = "Успешно был обновлен пароль для " . $this->loginGS;
+                } else {
+                    $this->message['error'][] = $result["msg"];
                 }
             }
 
@@ -509,14 +513,9 @@ class ActiveSyncHelper
             $objectUsersLogins->show_preanalytic = in_array($this->department, [4,5]) ? 1 : 0;
 
             if ($objectUsersLogins->save()) {
-                $this->state = 'new';
-                Yii::getLogger()->log([
-                    'objectUsersLogins->save()' => $objectUsersLogins
-                ], Logger::LEVEL_WARNING, 'binary');
+                $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectUsersLogins::tableName();
             } else {
-                Yii::getLogger()->log([
-                    'objectUsersLogins->save()' => $objectUsersLogins->errors
-                ], Logger::LEVEL_ERROR, 'binary');
+                $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectUsersLogins::tableName();
                 return false;
             }
 
@@ -539,35 +538,25 @@ class ActiveSyncHelper
     public function addNewAdUserAccount()
     {
         if (empty($this->accountName) || empty($this->passwordAD)) {
-            Yii::getLogger()->log([
-                'addNewAdUserAccount1'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addNewAdUserAccount1 : Одно из обязательных полей пустое!';
             return false;
         }
 
         $this->loginAD = "lab\\".$this->accountName;
         $objectUserAccountsAD = NAdUseraccounts::findAdUserAccount($this->loginAD);
 
-        if ($objectUserAccountsAD) {
-            Yii::getLogger()->log([
-                'addNewAdUserAccount=>objectUserAccountsAD'=>'В NAdUseraccounts уже есть запись!'
-            ], Logger::LEVEL_WARNING, 'binary');
+        if ($objectUserAccountsAD)
+        {
+            $this->message['info'][] = 'addNewAdUserAccount=>objectUserAccountsAD : В NAdUseraccounts уже есть запись!';
 
             if ($this->resetPassword) {
                 $objectUserAccountsAD->ad_pass = $this->passwordAD;
             }
 
             if ($objectUserAccountsAD->save()) {
-                Yii::getLogger()->log([
-                    'objectUserAccountsAD->save()'=>$objectUserAccountsAD
-                ], Logger::LEVEL_WARNING, 'binary');
+                $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectUserAccountsAD::tableName();
             } else {
-                Yii::getLogger()->log([
-                    'objectUserAccountsAD->save()'=>$objectUserAccountsAD->errors
-                ], Logger::LEVEL_ERROR, 'binary');
+                $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectUserAccountsAD::tableName();
                 return false;
             }
             return $objectUserAccountsAD;
@@ -577,12 +566,7 @@ class ActiveSyncHelper
             || empty($this->firstName)
             || empty($this->cacheId)
         ) {
-            Yii::getLogger()->log([
-                'addNewAdUserAccount2'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addNewAdUserAccount2 : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -598,13 +582,9 @@ class ActiveSyncHelper
         $objectUserAccountsAD->ad_pass = $this->passwordAD;
 
         if ($objectUserAccountsAD->save()) {
-            Yii::getLogger()->log([
-                'objectUserAccountsAD->save()'=>$objectUserAccountsAD
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectUserAccountsAD::tableName();
         } else {
-            Yii::getLogger()->log([
-                'objectUserAccountsAD->save()'=>$objectUserAccountsAD->errors
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectUserAccountsAD::tableName();
             return false;
         }
         return $objectUserAccountsAD;
@@ -626,16 +606,12 @@ class ActiveSyncHelper
             if (!empty($this->type)) $findNAdUsers->gs_usertype = $this->type;
 
             if(!$findNAdUsers->save()) {
-                Yii::getLogger()->log([
-                    'objectUserAD->save()' => $findNAdUsers->errors
-                ], Logger::LEVEL_WARNING, 'binary');
+                $this->message['info'][] = ['objectUserAD->save()' => $findNAdUsers->errors];
             }
 
             $this->state = 'old';
             $this->idAD = $findNAdUsers->ID;
-            Yii::getLogger()->log([
-                'addNewAdUsers'=>'В NAdUsers уже есть запись!'
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'addNewAdUsers : В NAdUsers уже есть запись';
             return true;
         }
 
@@ -645,12 +621,7 @@ class ActiveSyncHelper
             || empty($this->aid)
             || empty($this->cacheId)
         ) {
-            Yii::getLogger()->log([
-                'addNewAdUsers'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addNewAdUsers : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -679,14 +650,10 @@ class ActiveSyncHelper
                 $this->state = 'new';
                 $this->idAD = $transaction->db->getLastInsertID();
                 $this->loginAD = $this->accountName;
-                Yii::getLogger()->log([
-                    'objectUserAD->save()' => $objectUserAD
-                ], Logger::LEVEL_WARNING, 'binary');
+                $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectUserAD::tableName();
             } else {
                 $transaction->rollBack();
-                Yii::getLogger()->log([
-                    'objectUserAD->save()'=>$objectUserAD->errors
-                ], Logger::LEVEL_ERROR, 'binary');
+                $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectUserAD::tableName();
                 return false;
             }
             return true;
@@ -709,19 +676,12 @@ class ActiveSyncHelper
             || empty($this->lastName)
             || empty($this->loginGS)
         ) {
-            Yii::getLogger()->log([
-                'addDoctorConsultant'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addDoctorConsultant : Одно из обязательных полей пустое!';
             return false;
         }
 
         if (NSprDoctorConsultant::findOne(['id' => strval($this->cacheId)])) {
-            Yii::getLogger()->log([
-                'addDoctorConsultant'=>'В NSprDoctorConsultant уже есть запись!'
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'addDoctorConsultant : В NSprDoctorConsultant уже есть запись!';
             return true;
         }
 
@@ -736,13 +696,9 @@ class ActiveSyncHelper
         $objectDoctorConsultant->login = $this->loginGS;
 
         if ($objectDoctorConsultant->save()) {
-            Yii::getLogger()->log([
-                'objectDoctorConsultant->save()' => $objectDoctorConsultant
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectDoctorConsultant::tableName();
         } else {
-            Yii::getLogger()->log([
-                'objectDoctorConsultant->save()'=>$objectDoctorConsultant->errors
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectDoctorConsultant::tableName();
             return false;
         }
         return true;
@@ -770,13 +726,9 @@ class ActiveSyncHelper
         }
 
         if (@$objectDirectorFloSender->save()) {
-            Yii::getLogger()->log([
-                'objectDirectorFloSender->save()' => $objectDirectorFloSender
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectDirectorFloSender::tableName();
         } else {
-            Yii::getLogger()->log([
-                'objectDirectorFloSender->save()'=>$objectDirectorFloSender->errors
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectDirectorFloSender::tableName();
             return false;
         }
         return true;
@@ -795,12 +747,7 @@ class ActiveSyncHelper
             || empty($this->loginGS)
             || empty($this->cachePass)
         ) {
-            Yii::getLogger()->log([
-                'addCheckDirectorFlo' => [
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addCheckDirectorFlo : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -829,14 +776,10 @@ class ActiveSyncHelper
                     $transaction->commit();
                     $this->state = 'new';
                     $this->directorID = $transaction->db->getLastInsertID();
-                    Yii::getLogger()->log([
-                        'objectDirectorFlo->save()' => $objectDirectorFlo
-                    ], Logger::LEVEL_WARNING, 'binary');
+                    $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectDirectorFlo::tableName();
                 } else {
                     $transaction->rollBack();
-                    Yii::getLogger()->log([
-                        'objectDirectorFlo->save()' => $objectDirectorFlo->errors
-                    ], Logger::LEVEL_ERROR, 'binary');
+                    $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectDirectorFlo::tableName();
                     return false;
                 }
 
@@ -852,9 +795,7 @@ class ActiveSyncHelper
             $this->state = 'old';
         }
 
-        Yii::getLogger()->log([
-            'addCheckDirectorFlo->state' => $this->state
-        ], Logger::LEVEL_WARNING, 'binary');
+        $this->message['info'][] = 'addCheckDirectorFlo->state : ' . $this->state;
 
         $this->directorID = $objectDirectorFlo->id;
         $this->aid = 8000000 + strval($this->directorID);
@@ -871,12 +812,7 @@ class ActiveSyncHelper
             || empty($this->loginGS)
             || empty($this->cachePass)
         ) {
-            Yii::getLogger()->log([
-                'addLpassUsers'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addLpassUsers : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -885,9 +821,7 @@ class ActiveSyncHelper
             'utype' => $this->type
             ]))
         {
-            Yii::getLogger()->log([
-                'addLpassUsers'=>'В LpASs уже есть запись!'
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'addLpassUsers : В LpASs уже есть запись!';
             return true;
         }
 
@@ -902,13 +836,9 @@ class ActiveSyncHelper
         $objectLpASs->active = strval(1);
 
         if ($objectLpASs->save()) {
-            Yii::getLogger()->log([
-                'objectLpASs->save()' => $objectLpASs
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectLpASs::tableName();
         } else {
-            Yii::getLogger()->log([
-                'objectLpASs->save()'=>$objectLpASs->errors
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectLpASs::tableName();
             return false;
         }
         return true;
@@ -922,12 +852,7 @@ class ActiveSyncHelper
         if (empty($this->firstName)
             || empty($this->lastName)
         ) {
-            Yii::getLogger()->log([
-                'addCheckNNurse'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addCheckNNurse : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -936,9 +861,7 @@ class ActiveSyncHelper
             'last_name' => $this->lastName,
             'middle_name' => $this->middleName
         ])) {
-            Yii::getLogger()->log([
-                'addCheckNNurse'=>'В NNurse уже есть запись!'
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'addCheckNNurse : В NNurse уже есть запись!';
             return true;
         }
 
@@ -950,13 +873,9 @@ class ActiveSyncHelper
         $objectNurse->save();
 
         if ($objectNurse->save()) {
-            Yii::getLogger()->log([
-                'objectNurse->save()' => $objectNurse
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectNurse::tableName();
         } else {
-            Yii::getLogger()->log([
-                'objectNurse->save()'=>$objectNurse->errors
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectNurse::tableName();
             return false;
         }
         return true;
@@ -966,13 +885,16 @@ class ActiveSyncHelper
      * @param $department
      * @return bool|string
      */
-    public static function getRelationGroup($department) {
+    public static function getRelationGroup($department) 
+    {
         if (!$groupId = ErpGroupsRelations::findOne([
             'department' => $department
         ])) {
-            Yii::getLogger()->log([
-                'addCheckErpUsers'=>'Нет привязки департамента к роли в ERP!'
-            ], Logger::LEVEL_ERROR, 'binary');
+            Yii::getLogger()->log(
+                'addCheckErpUsers : Нет привязки департамента к роли в ERP!',
+                Logger::LEVEL_ERROR,
+                'ADD_SKYNET_USER'
+            );
             return false;
         }  else return $groupId->group;
     }
@@ -987,19 +909,12 @@ class ActiveSyncHelper
             || empty($this->loginAD)
             || empty($this->fullName)
         ) {
-            Yii::getLogger()->log([
-                'addCheckErpUsers'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addCheckErpUsers : Одно из обязательных полей пустое!';
             return false;
         }
 
         if (ErpUsers::findOne(['login' => $this->accountName])){
-            Yii::getLogger()->log([
-                'addCheckErpUsers'=>'В ErpUsers уже есть запись!'
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'addCheckErpUsers : В ErpUsers уже есть запись!';
             return true;
         }
 
@@ -1012,13 +927,9 @@ class ActiveSyncHelper
         $objectErpUsers->status = 1;
 
         if ($objectErpUsers->save()) {
-            Yii::getLogger()->log([
-                'objectErpUsers->save()' => $objectErpUsers
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectErpUsers::tableName();
         } else {
-            Yii::getLogger()->log([
-                'objectErpUsers->save()'=>$objectErpUsers->errors
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectErpUsers::tableName();
             return false;
         }
         return true;
@@ -1032,12 +943,7 @@ class ActiveSyncHelper
     {
         if (!isset($this->cacheId)
         ) {
-            Yii::getLogger()->log([
-                'addCheckErpNurses'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addCheckErpNurses : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -1054,13 +960,9 @@ class ActiveSyncHelper
         $objectErpNurses->nurse_key = strval($this->cacheId);
 
         if ($objectErpNurses->save()) {
-            Yii::getLogger()->log([
-                'objectErpNurses->save()' => $objectErpNurses
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectErpNurses::tableName();
         } else {
-            Yii::getLogger()->log([
-                'objectErpNurses->save()'=>$objectErpNurses->errors
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectErpNurses::tableName();
             return false;
         }
         return true;
@@ -1073,19 +975,12 @@ class ActiveSyncHelper
     {
         if (empty($this->aid)
         ) {
-            Yii::getLogger()->log([
-                'addCheckCounterparty'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addCheckCounterparty : Одно из обязательных полей пустое!';
             return false;
         }
 
         if (medUserCounterparty::findOne(['user_id' => $this->aid])){
-            Yii::getLogger()->log([
-                'addCheckCounterparty'=>'В medUserCounterparty уже есть запись!'
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'addCheckCounterparty : В medUserCounterparty уже есть запись!';
             return true;
         }
 
@@ -1096,13 +991,9 @@ class ActiveSyncHelper
         $objectUserCounterparty->counterparty_id = $counterparty_id;
 
         if ($objectUserCounterparty->save()) {
-            Yii::getLogger()->log([
-                'objectUserCounterparty->save()' => $objectUserCounterparty
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'Обновлены/добавлены данные в таблицу : ' . $objectUserCounterparty::tableName();
         } else {
-            Yii::getLogger()->log([
-                'objectUserCounterparty->save()'=>$objectUserCounterparty->errors
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'Ошибка при обновлении/добавлении данных в таблицу : ' . $objectUserCounterparty::tableName();
             return false;
         }
         return true;
@@ -1113,13 +1004,9 @@ class ActiveSyncHelper
      */
     private function setDoctorObjectParams() {
 
-        if (empty($this->key) || empty($this->specId)) {
-            Yii::getLogger()->log([
-                'setDoctorObjectParams'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+        if (empty($this->key) || empty($this->specId))
+        {
+            $this->message['error'][] = 'setDoctorObjectParams : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -1207,9 +1094,7 @@ class ActiveSyncHelper
             if ($this->resetPassword) {
                 $newPasswordAd = self::resetPasswordAD($this->accountName);
                 if ($newPasswordAd) {
-                    Yii::getLogger()->log([
-                        'resetPasswordAD' => 'Пароль успешно изменен для ' . $this->accountName
-                    ], Logger::LEVEL_WARNING, 'binary');
+                    $this->message['info'][] = 'resetPasswordAD : Пароль успешно изменен для ' . $this->accountName;
 
                     $this->passwordAD = $newPasswordAd;
                     $message = '<p>Для пользователя <b>' . $this->fullName . '</b> был изменен пароль для входа в Windows!</p>';
@@ -1236,12 +1121,7 @@ class ActiveSyncHelper
     private function addPermissions()
     {
         if (empty($this->aid)) {
-            Yii::getLogger()->log([
-                'ActiveSyncController=>addPermissions'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'ActiveSyncController=>addPermissions : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -1280,9 +1160,7 @@ class ActiveSyncHelper
             $transaction->commit();
         } catch (\Exception $e) {
             $transaction->rollBack();
-            Yii::getLogger()->log([
-                'NAuthASsignment->batchInsert' => $e->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'NAuthASsignment->batchInsert : ' . $e->getMessage();
             return false;
         }
         return true;
@@ -1298,12 +1176,7 @@ class ActiveSyncHelper
             || empty($this->firstName))
             || empty($this->fullName)
         ){
-            Yii::getLogger()->log([
-                'addUserAD'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addUserAD : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -1354,18 +1227,14 @@ class ActiveSyncHelper
         $arrAccountAD = $this->addNewUserAd();
 
         if (!$arrAccountAD) {
-            Yii::getLogger()->log([
-                'addUserAD=>arrAccountAD'=>'Не удалось добавить учетную запись в AD'
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'addUserAD=>arrAccountAD : Не удалось добавить учетную запись в AD';
             return false;
         }
         else {
             if (!$infGroup = self::addGroupLdap()) {
                 return false;
             }
-            Yii::getLogger()->log([
-                'addUserAD=>arrAccountAD'=>$arrAccountAD
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = 'addUserAD=>arrAccountAD : Успешно!';
             $this->accountName = $arrAccountAD['SamAccountName'];
             $this->emailAD = $arrAccountAD['UserPrincipalName'];
             $this->passwordAD = $arrAccountAD['AccountPassword'];
@@ -1459,9 +1328,10 @@ class ActiveSyncHelper
 
             } catch (Exception $e) {
                 $transaction->rollBack();
-                Yii::getLogger()->log([
-                    'addFromDonor->batchInsert' => $e->getMessage()
-                ], Logger::LEVEL_ERROR, 'binary');
+                Yii::getLogger()->log(
+                    'addFromDonor->batchInsert : ' . $e->getMessage(),
+                    Logger::LEVEL_ERROR,
+                    'ADD_SKYNET_USER');
                 return false;
             }
 
@@ -1476,12 +1346,7 @@ class ActiveSyncHelper
     {
         if (empty($this->key)
         ) {
-            Yii::getLogger()->log([
-                'checkFranchazyAccount'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['error'][] = 'checkFranchazyAccount : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -1513,12 +1378,7 @@ class ActiveSyncHelper
         if (empty($this->firstName) ||
             empty($this->lastName)
         ) {
-            Yii::getLogger()->log([
-                'checkOperatorAccount'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['error'][] = 'checkOperatorAccount : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -1552,12 +1412,7 @@ class ActiveSyncHelper
         if (empty($this->fullName) ||
             empty($this->key)
         ) {
-            Yii::getLogger()->log([
-                'addFranchazyUser'=>[
-                    'Одно из обязательных полей пустое!',
-                    ArrayHelper::toArray($this)
-                ]
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['error'][] = 'addFranchazyUser : Одно из обязательных полей пустое!';
             return false;
         }
 
@@ -1633,9 +1488,11 @@ class ActiveSyncHelper
             return $newPassword;
 
         } catch (Exception $e) {
-            Yii::getLogger()->log([
-                'ActiveSyncController'=>$e->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
+
+            Yii::getLogger()->log(
+                'ActiveSyncController : ' . $e->getMessage(),
+                Logger::LEVEL_ERROR,
+                'ADD_SKYNET_USER');
             return false;
         }
     }
@@ -1665,9 +1522,7 @@ class ActiveSyncHelper
             "userAccountControl" => "544" //доступ
         ];
 
-        Yii::getLogger()->log([
-            'addNewUserAd->$ldaprecord'=>$ldaprecord
-        ], Logger::LEVEL_WARNING, 'binary');
+        $this->message['info'][] = ['addNewUserAd->$ldaprecord' => $ldaprecord];
 
         try {
 
@@ -1686,10 +1541,9 @@ class ActiveSyncHelper
             $output = ldap_add($ldapconn, $ADgroup, $ldaprecord);
             ldap_close($ldapconn);
 
-            if ($output) {
-                Yii::getLogger()->log([
-                    'addNewUserAd'=>'В AD успешно добавлена УЗ '.$this->accountName
-                ], Logger::LEVEL_WARNING, 'binary');
+            if ($output)
+            {
+                $this->message['info'][] = 'addNewUserAd: В AD успешно добавлена УЗ '.$this->accountName;
                 return [
                     'SamAccountName' => $this->accountName,
                     'UserPrincipalName' => $email,
@@ -1710,9 +1564,8 @@ class ActiveSyncHelper
                 $message .= ' т.к. данный пользователь с таким <b>логином</b> уже есть, либо не синхронизированы контроллеры домена! Повторите попытку позже!</p>';
                 Yii::$app->session->setFlash('warning', $message);
             }
-            Yii::getLogger()->log([
-                'ActiveSyncController'=>$e->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
+
+            $this->message['error'][] = 'ActiveSyncController : ' . $e->getMessage();
             return false;
         }
     }
@@ -1738,12 +1591,19 @@ class ActiveSyncHelper
             $ADmember = 'CN=SSO '.$this->typeLO.' USERS,OU=SSO '.$strPath;
 
             $userdata['member'] = $ADgroup;
-            return ldap_modify($ldapconn, $ADmember, $userdata);
 
-        } catch (Exception $e) {
-            Yii::getLogger()->log([
-                'addGroupLdap'=>$e->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
+            $result = ldap_modify($ldapconn, $ADmember, $userdata);
+
+            if (!$result) {
+                $this->message['error'][] = 'Возникли ошибки при добавлении в группу "' . $ADgroup . '" или назначении контейнера "' . $ADmember . '"';
+            } else {
+                $this->message['info'][] = 'Пользователь успешно добавлен в группу "' . $ADgroup . '"" и назначен контейнер "' . $ADmember . '"';
+            }
+            return $result;
+
+        } catch (Exception $e) 
+        {
+            $this->message['error'][] = 'Возникли ошибки при добавлении в группу/контейнер : ' . $e->getMessage();
             return false;
         }
     }
@@ -1774,15 +1634,12 @@ class ActiveSyncHelper
             $info = ldap_get_entries($ldapconn, $sr);
             ldap_close($ldapconn);
 
-            if (!$info || $info['count'] == 0)  {
-                Yii::getLogger()->log([
-                    'checkUserNameAd'=>$this->fullName.' '.'не найден в AD'
-                ], Logger::LEVEL_WARNING, 'binary');
+            if (!$info || $info['count'] == 0)  
+            {
+                $this->message['info'][] = 'checkUserNameAd : ' . $this->fullName.' '.'не найден в AD';
                 return false;
             } else {
-                Yii::getLogger()->log([
-                    '$info'=>$info
-                ], Logger::LEVEL_WARNING, 'binary');
+                $this->message['info'][] = ['$info' => $info];
             }
 
             for ($i = 0; $i < $info['count']; $i++) {
@@ -1797,14 +1654,11 @@ class ActiveSyncHelper
                 ];
             }
 
-            Yii::getLogger()->log([
-                'checkUserNameAd=>arrAccounts'=>$arrAccounts
-            ], Logger::LEVEL_WARNING, 'binary');
+            $this->message['info'][] = ['checkUserNameAd=>arrAccounts' => $arrAccounts];
 
-        } catch (Exception $e) {
-            Yii::getLogger()->log([
-                'checkUserNameAd'=>$e->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
+        } catch (Exception $e)
+        {
+            $this->message['error'][] = 'checkUserNameAd : ' . $e->getMessage();
             return false;
         }
         return empty($arrAccounts) ? false : $arrAccounts;
@@ -1835,22 +1689,17 @@ class ActiveSyncHelper
             ldap_close($ldapconn);
 
             //todo проверяем существует ли запись по логину в AD
-            if (!$info || $info['count'] == 0) {
-                Yii::getLogger()->log([
-                    'checkUserAccountAd'=>$accountName.' '.'не найдена в AD!'
-                ], Logger::LEVEL_WARNING, 'binary');
+            if (!$info || $info['count'] == 0)
+            {
+                $this->message['info'][] = 'checkUserAccountAd : ' . $accountName . ' не найдена в AD!';
                 return false;
             } else {
-                Yii::getLogger()->log([
-                    'checkUserAccountAd'=>$accountName.' '.'найдена в AD!'
-                ], Logger::LEVEL_WARNING, 'binary');
+                $this->message['info'][] = 'checkUserAccountAd : ' . $accountName . ' найдена в AD!';
                 return true;
             }
 
         } catch (Exception $e) {
-            Yii::getLogger()->log([
-                'checkUserAccountAd'=>$e->getMessage()
-            ], Logger::LEVEL_ERROR, 'binary');
+            $this->message['error'][] = 'checkUserAccountAd : ' . $e->getMessage();
             return false;
         }
     }

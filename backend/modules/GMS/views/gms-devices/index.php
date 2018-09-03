@@ -63,35 +63,16 @@ $url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
                             }
                         ],
                         [
-                            'width'=>'196px',
-                            'attribute' => 'created_at',
-                            'value' => function ($model) {
-                                /** @var $model \common\models\GmsDevices */
-                                return !empty($model->created_at)
-                                    ? date("Y-m-d H:i:s T", strtotime($model->created_at))
-                                    : null;
+                            'headerOptions' => array('style' => 'text-align: center;'),
+                            'contentOptions' => function ($model, $key, $index, $column) {
+                                return ['style' => 'text-align: center;'];
                             },
-                            'filter' => \kartik\date\DatePicker::widget([
-                                'model' => $searchModel,
-                                'attribute' => 'created_at_from',
-                                'attribute2' => 'created_at_to',
-                                'options' => [
-                                    'placeholder' => 'от',
-                                    'style'=>['width' => '98px']
-                                ],
-                                'options2' => [
-                                    'placeholder' => 'до',
-                                    'style'=>['width' => '98px']
-                                ],
-                                'separator' => '-',
-                                'readonly' => false,
-                                'type' => \kartik\date\DatePicker::TYPE_RANGE,
-                                'pluginOptions' => [
-                                    'format' => 'yyyy-mm-dd',
-                                    'autoclose' => true,
-                                ]
-                            ]),
-                            'format' => 'html', // datetime
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                /** @var \common\models\GmsDevices $model */
+                                return $model->getLastActiveGrid();
+                            },
+                            'attribute' => 'last_active_at'
                         ],
                         'name',
                         'device',
@@ -148,16 +129,35 @@ $url = \yii\helpers\Url::to(['/admin/kontragents/ajax-kontragents-list']);
                             'attribute' => 'current_pls_name'
                         ],
                         [
-                            'headerOptions' => array('style' => 'text-align: center;'),
-                            'contentOptions' => function ($model, $key, $index, $column) {
-                                return ['style' => 'text-align: center;'];
-                            },
-                            'format' => 'raw',
+                            'width'=>'196px',
+                            'attribute' => 'created_at',
                             'value' => function ($model) {
-                                /** @var \common\models\GmsDevices $model */
-                                return $model->getLastActiveGrid();
+                                /** @var $model \common\models\GmsDevices */
+                                return !empty($model->created_at)
+                                    ? date("Y-m-d H:i:s T", strtotime($model->created_at))
+                                    : null;
                             },
-                            'attribute' => 'last_active_at'
+                            'filter' => \kartik\date\DatePicker::widget([
+                                'model' => $searchModel,
+                                'attribute' => 'created_at_from',
+                                'attribute2' => 'created_at_to',
+                                'options' => [
+                                    'placeholder' => 'от',
+                                    'style'=>['width' => '98px']
+                                ],
+                                'options2' => [
+                                    'placeholder' => 'до',
+                                    'style'=>['width' => '98px']
+                                ],
+                                'separator' => '-',
+                                'readonly' => false,
+                                'type' => \kartik\date\DatePicker::TYPE_RANGE,
+                                'pluginOptions' => [
+                                    'format' => 'yyyy-mm-dd',
+                                    'autoclose' => true,
+                                ]
+                            ]),
+                            'format' => 'html', // datetime
                         ],
                         [
                             'label' => 'Статус',
