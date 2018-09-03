@@ -14,6 +14,7 @@
                         'label' => 'Wiki',
                         'icon' => 'dashboard',
                         'url' => ['/wiki/content/admin'],
+                        'visible' => Yii::$app->user->can('GemotestAdmin'),
                     ],
                     [
                         'label' => 'Модуль GMS',
@@ -40,7 +41,7 @@
                                 'active' => true,
                                 'items' => [
                                     ['label' => 'Плейлисты', 'icon' => 'dashboard', 'url' => '/GMS/gms-history'],
-                                    ['label' => 'Видео', 'icon' => 'dashboard', 'url' => '/GMS/gms-video-history'],
+                                    //['label' => 'Видео', 'icon' => 'dashboard', 'url' => '/GMS/gms-video-history'],
                                 ]
                             ],
                             [

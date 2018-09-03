@@ -67,7 +67,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
                 'format' => 'raw',
             ],
-
             [
                 'attribute' => 'device_id',
                 'value' => function($model) {
