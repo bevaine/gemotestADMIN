@@ -33,8 +33,8 @@ class GmsHistory extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pls_id', 'status'], 'integer'],
-            [['device_id', 'log_text', 'created_at'], 'string'],
+            [['device_id', 'pls_id', 'status'], 'integer'],
+            [['log_text', 'created_at'], 'string'],
         ];
     }
 
