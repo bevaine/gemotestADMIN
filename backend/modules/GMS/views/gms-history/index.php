@@ -53,12 +53,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'pls_name',
                 'label' => 'Плейлист',
                 'value' => function($model) {
-                    if (!empty($model["pls_id"]) && !empty($model["pls_name"])) {
+                    /** @var \common\models\GmsHistorySearch $model  */
+                    if ($model->playlist) {
                         return Html::a(
-                            $model['pls_name'],
-                            Url::to(["/GMS/playlist-out/view?id=" . $model['pls_id']]),
+                            $model->playlist->name,
+                            Url::to(["/GMS/playlist-out/view?id=" . $model->pls_id]),
                             [
-                                'title' => $model['pls_name'],
+                                'title' => $model->playlist->name,
                                 'target' => '_blank'
                             ]
                         );
@@ -71,14 +72,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'device_id',
                 'value' => function($model) {
                     /** @var \common\models\GmsHistorySearch $model  */
-                    return Html::a(
-                        $model->device ? $model->device->name : null,
-                        Url::to(["/GMS/gms-devices/view?id=".$model->device_id]),
-                        [
-                            'title' => $model->device ? $model->device->name : null,
-                            'target' => '_blank'
-                        ]
-                    );
+                    if ($model->device) {
+                        return Html::a(
+                            $model->device->name,
+                            Url::to(["/GMS/gms-devices/view?id=".$model->device_id]),
+                            [
+                                'title' => $model->device->name,
+                                'target' => '_blank'
+                            ]
+                        );
+                    } else return null;
                 },
                 'format' => 'raw',
             ],

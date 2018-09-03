@@ -16,6 +16,7 @@ use yii\helpers\ArrayHelper;
  * @property string $log_text
  * @property GmsPlaylistOut $playlistOutModel
  * @property GmsDevices $device
+ * @property GmsDevices $playlist
  */
 class GmsHistory extends \yii\db\ActiveRecord
 {
@@ -75,7 +76,15 @@ class GmsHistory extends \yii\db\ActiveRecord
      */
     public function getDevice()
     {
-        return GmsDevices::find()->where(['id' => (int)$this->device_id]);
+        return $this->hasOne(GmsDevices::class, ['id' => 'device_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPlaylist()
+    {
+        return $this->hasOne(GmsPlaylistOut::class, ['id' => 'pls_id']);
     }
 
     /**
