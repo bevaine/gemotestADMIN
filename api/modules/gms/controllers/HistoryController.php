@@ -46,15 +46,25 @@ class HistoryController extends ActiveController
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
 
+        $post = null;
         $model = new GmsHistory();
 
-        //todo если плейлист не изменился или нет подходящего плейлиста то историю не сохраняем
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return ['state' => 1];
-        } else {
-            Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
-            return ['state' => 0];
+        if (!empty(Yii::$app->request->post())) {
+            $post = Yii::$app->request->post();
         }
+
+        //todo если плейлист не изменился или нет подходящего плейлиста то историю не сохраняем
+        if ($model->load($post)) {
+            if ($findDevice = GmsDevices::findOne(['device' => $post['GmsHistory']['device_id']])) {
+                $model->device_id = $findDevice->id;
+            }
+            if ($model->save()) {
+                return ['state' => 1];
+            } else {
+                Yii::getLogger()->log($model->errors, Logger::LEVEL_ERROR, 'binary');
+            }
+        }
+        return ['state' => 0];
     }
 
     /**

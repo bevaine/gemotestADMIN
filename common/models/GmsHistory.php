@@ -3,6 +3,7 @@
 namespace common\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "gms_history".
@@ -14,6 +15,7 @@ use Yii;
  * @property integer $status
  * @property string $log_text
  * @property GmsPlaylistOut $playlistOutModel
+ * @property GmsDevices $device
  */
 class GmsHistory extends \yii\db\ActiveRecord
 {
@@ -65,7 +67,15 @@ class GmsHistory extends \yii\db\ActiveRecord
      */
     public function getPlaylistOutModel()
     {
-        return $this->hasOne(GmsPlaylistOut::className(), ['id' => 'pls_id']);
+        return $this->hasOne(GmsPlaylistOut::class, ['id' => 'pls_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDevice()
+    {
+        return GmsDevices::find()->where(['id' => (int)$this->device_id]);
     }
 
     /**
@@ -73,7 +83,24 @@ class GmsHistory extends \yii\db\ActiveRecord
      * @return array|mixed
      */
     public static function getStatusTypeArray($id = null) {
-        $arr =  ['0' => 'Ошибка', '1' => 'Не изменился', '2' => 'Изменился', '3' => 'Нет подход. плейлистов'];
-        return is_null($id) ? $arr : $arr[$id];
+        $arr = [
+            '0' => [
+                'txt' => 'Ошибка',
+                'style' => 'red'
+            ],
+            '1' => [
+                'txt' => 'Не изменился',
+                'style' => 'blue'
+            ],
+            '2' => [
+                'txt' => 'Изменился',
+                'style' => 'green'
+            ],
+            '3' => [
+                'txt' => 'Нет подход. плейлистов',
+                'style' => 'orange'
+            ]
+        ];
+        return is_null($id) ? array_combine(array_keys($arr), ArrayHelper::getColumn($arr, 'txt')) : $arr[$id];
     }
 }

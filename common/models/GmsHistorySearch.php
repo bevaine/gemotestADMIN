@@ -55,6 +55,11 @@ class GmsHistorySearch extends GmsHistory
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC,
+                ]
+            ],
         ]);
 
         $sort = $dataProvider->getSort();

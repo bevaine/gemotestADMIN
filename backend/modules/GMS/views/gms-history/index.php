@@ -3,10 +3,12 @@
 use yii\helpers\Html;
 use yii\grid\GridView;
 use common\models\GmsHistory;
+use yii\helpers\Url;
 
 /* @var $this yii\web\View */
 /* @var $searchModel common\models\GmsHistorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
 
 $this->title = 'История';
 $this->params['breadcrumbs'][] = $this->title;
@@ -18,8 +20,6 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
             [
                 'headerOptions' => array('style' => 'width: 196px; text-align: center;'),
                 'attribute' => 'created_at',
@@ -50,21 +50,49 @@ $this->params['breadcrumbs'][] = $this->title;
                 'format' => 'html', // datetime
             ],
             [
-                'value' => function ($model) {
-                    /** @var $model \common\models\GmsHistory */
-                    return !empty($model->playlistOutModel) ? $model->playlistOutModel->name.", ID:".$model->playlistOutModel->id : null;
-
+                'attribute' => 'pls_name',
+                'label' => 'Плейлист',
+                'value' => function($model) {
+                    if (!empty($model["pls_id"]) && !empty($model["pls_name"])) {
+                        return Html::a(
+                            $model['pls_name'],
+                            Url::to(["/GMS/playlist-out/view?id=" . $model['pls_id']]),
+                            [
+                                'title' => $model['pls_name'],
+                                'target' => '_blank'
+                            ]
+                        );
+                    } else return null;
                 },
-                'attribute' => 'pls_name'
+                'format' => 'raw',
             ],
-            'device_id',
+
+            [
+                'attribute' => 'device_id',
+                'value' => function($model) {
+                    /** @var \common\models\GmsHistorySearch $model  */
+                    return Html::a(
+                        $model->device ? $model->device->device : null,
+                        Url::to(["/GMS/gms-devices/view?id=".$model->device_id]),
+                        [
+                            'title' => $model->device ? $model->device->device : null,
+                            'target' => '_blank'
+                        ]
+                    );
+                },
+                'format' => 'raw',
+            ],
 
             [
                 'attribute' => 'status',
                 'filter' => GmsHistory::getStatusTypeArray(),
                 'value' => function ($model) {
                     /** @var $model \common\models\GmsHistory */
-                    return  !empty($model->status) ? GmsHistory::getStatusTypeArray($model->status) : null;
+                    return  !empty($model->status) ? GmsHistory::getStatusTypeArray($model->status)['txt'] : null;
+                },
+                'contentOptions' => function ($model) {
+                    /** @var $model \common\models\GmsHistory */
+                    return  ['style'=>'color:' . GmsHistory::getStatusTypeArray($model->status)['style']];
                 }
             ],
 
