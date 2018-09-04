@@ -82,10 +82,10 @@ $gridColumns = [
                 'format' => 'text',
                 'value' => function ($model) {
                     /** @var \common\models\NKkmUsers $model */
-                    if (!empty($model->logins->operators->fio)) {
-                        $fio = $model->logins->operators->fio;
-                        return !empty($fio) ? $fio : $model->logins->Name;
-                    } else return $model->logins->Name;
+                    if (!empty($model->erpUsers->fio)) {
+                        return $model->erpUsers->fio;
+                    }
+                    return $model->logins->Name;
                 },
             ],
             [

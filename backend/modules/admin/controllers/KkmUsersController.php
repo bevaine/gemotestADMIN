@@ -129,21 +129,20 @@ HTML;
         $sender_key = $findModel->kkm->sender_key;
         $kkm = $findModel->kkm->number;
 
-        if ($sender_key == 'Физ. мс выездная'
-            || $sender_key == 'Физ.Врач выездной') {
+        if (!empty($sender_key)) {
             $s = NKkmUsers::find()
                 ->joinWith(['kkm'])
                 ->where(['sender_key' => $sender_key])
                 ->all();
         } else
-            return printf($html_error, 'Не удалось определить sender_key');
+            return printf($html_error, 'Пустой sender_key');
 
         $xml_logins = '';
         foreach ($s as $model) {
             /** @var NKkmUsers $model */
             $fio = $model->logins->Name;
-            if (!empty($model->logins->operators->fio)) {
-                $fio = $model->logins->operators->fio;
+            if (!empty($model->erpUsers->fio)) {
+                $fio = $model->erpUsers->fio;
             }
             $xml_logins .= "\r\n".<<<XML
     <seller name="{$fio}" login="{$model->login}" mode="K" mask="x0001" pass="{$model->password}"/>
@@ -249,8 +248,10 @@ XML;
   </common>
 
   <connections>
-    <conn name="WIFI" type="WIFI" apn="IRAS" pass="" dhcp="1" timeout="45" />
+    <!--<conn name="WIFI" type="WIFI" apn="IRAS" pass="" dhcp="1" timeout="45" />-->
     <conn name="Megafon" type="GPRS" apn="internet.megafon.ru" login="megafon" pass="megafon" timeout="60" />
+    <!--<conn name="TELE2" type="GPRS" apn="internet.tele2.ru" timeout="60" />-->
+    <!--<conn name="MTS" type="GPRS" apn="internet.mts.ru" login="mts" pass="mts" timeout="60" />-->
     <conn name="USB-ETH" type="ETH1" dhcp="1" timeout="45" />
   </connections>
 

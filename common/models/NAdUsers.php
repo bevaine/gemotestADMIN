@@ -149,5 +149,4 @@ class NAdUsers extends \yii\db\ActiveRecord
             'q4' => 'middle_name',
         ]);
     }
-
 }

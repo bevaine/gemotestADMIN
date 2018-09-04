@@ -15,6 +15,7 @@ use Yii;
  * @property integer $status
  * @property string $password_dt
  * @property string $skynet_login
+ * @property string $fio
  */
 class ErpUsers extends \yii\db\ActiveRecord
 {
@@ -61,5 +62,22 @@ class ErpUsers extends \yii\db\ActiveRecord
             'password_dt' => 'Password Dt',
             'skynet_login' => 'Skynet Login',
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getFio()
+    {
+        $fio = '';
+        $fio1 = '';
+        $this->name = trim($this->name);
+        if (empty($this->name)) return null;
+        $m = explode(' ', $this->name);
+        if (!empty($m[0])) $fio .= $m[0];
+        else return $this->name;
+        $fio1 .= !empty($m[1]) ? mb_strtoupper(substr($m[1],0,2)) . '.' : '';
+        $fio1 .= !empty($m[2]) ? mb_strtoupper(substr($m[2],0,2)) . '.' : '';
+        return !empty($fio1) ? $fio.' '.$fio1 : $fio;
     }
 }

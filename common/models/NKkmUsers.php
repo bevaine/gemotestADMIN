@@ -17,6 +17,7 @@ use yii\helpers\ArrayHelper;
  * @property nkkm $kkm
  * @property nkkm $kkmMany
  * @property Logins $logins
+ * @property ErpUsers $erpUsers
  */
 class NKkmUsers extends \yii\db\ActiveRecord
 {
@@ -87,6 +88,14 @@ class NKkmUsers extends \yii\db\ActiveRecord
     public function getLogins()
     {
         return $this->hasOne(Logins::class, ['aid' => 'user_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getErpUsers()
+    {
+        return $this->hasOne(ErpUsers::class, ['skynet_login' => 'Login'])->via('logins');
     }
 
     /**

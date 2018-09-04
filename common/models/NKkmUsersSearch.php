@@ -55,7 +55,7 @@ class NKkmUsersSearch extends NKkmUsers
     {
         $query = NKkmUsers::find()
             ->joinWith(['kkm'], false)
-            ->joinWith(['logins'], false);
+            ->joinWith(['erpUsers'], false);
         // add conditions that should always apply here
 
         $dataProvider = new ActiveDataProvider([

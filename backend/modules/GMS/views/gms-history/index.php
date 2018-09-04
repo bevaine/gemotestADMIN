@@ -74,7 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     if ($model->device) {
                         return Html::a(
                             $model->device->name,
-                            Url::to(["/GMS/gms-devices/view?id=".$model->device_id]),
+                            Url::to(["/GMS/gms-devices/view?id=" . $model->device_id]),
                             [
                                 'title' => $model->device->name,
                                 'target' => '_blank'
