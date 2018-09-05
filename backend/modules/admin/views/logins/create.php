@@ -337,7 +337,7 @@ if ($action == 'user' ||
 
         $(".glyphicon-pencil").click(function() {
             let department = $('#adduserform-department').val(); 
-            window.open("../roles/" + department, '_blank');
+            window.open("../../admin/logins/roles/" + department, '_blank');
         });
 JS;
     $this->registerJs($js1);
