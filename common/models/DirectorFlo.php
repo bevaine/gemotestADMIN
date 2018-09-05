@@ -68,7 +68,7 @@ class DirectorFlo extends \yii\db\ActiveRecord
     /**
      * @return string
      */
-    public function fullName() {
+    public function getFullName() {
         return $this->last_name.' '.$this->first_name.' '.$this->middle_name;
     }
 }

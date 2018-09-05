@@ -675,9 +675,8 @@ class LoginsController extends Controller
         }
 
         //todo проверяем существует ли пользователь с ФИО в GD
-
         if (!empty($gd_id)) {
-            if ($checkGD = self::checkGD($gd_id)) {
+            if ($checkGD = DirectorFloSender::checkGD($gd_id)) {
                 $arrAccountAD = array_merge($arrAccountAD, $checkGD);
             }
         }
@@ -687,28 +686,6 @@ class LoginsController extends Controller
         } else {
             return $arrAccountAD;
         }
-    }
-
-    /**
-     * @param null $key
-     * @return null
-     */
-    public static function checkGD($key = null)
-    {
-        $out = null;
-
-        if (!is_null($key)) {
-            $findModel = DirectorFloSender::findOne([
-                'sender_key' => $key
-            ]);
-            if (isset($findModel->directorFlo)) {
-                $fullName = $findModel->directorFlo->last_name
-                    ." ".$findModel->directorFlo->first_name
-                    ." ".$findModel->directorFlo->middle_name;
-                $out['gd'] = $fullName;
-            }
-        }
-        return !empty($out) ? $out : false;
     }
 
     /**

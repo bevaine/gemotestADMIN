@@ -54,9 +54,13 @@ use yii\log\Logger;
  * @property NAdUsers $adUsers
  * @property NAdUserAccounts $adUserAccountsMany
  * @property NAdUserAccounts $adUserAccounts
+ * 
  * @property DirectorFlo $directorFlo
+ * @property DirectorFloSender $directorFloSender
+ * 
  * @property DirectorFlo $directorInfo
  * @property DirectorFloSender $directorInfoSender
+
  * @property integer $idAD
  * @property integer $aid_donor
  * @property Franchazy $franchazy
@@ -197,18 +201,9 @@ class Logins extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDirectorFlo()
-    {
-        return $this->hasOne(DirectorFlo::className(), [])
-            ->andOnCondition('[Logins].[login] = [DirectorFlo].[login]');
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getDirectorInfo()
     {
-        return $this->hasOne(DirectorFlo::className(), ['login' => 'Login']);
+        return $this->hasOne(DirectorFlo::class, ['login' => 'Login']);
     }
 
     /**
@@ -216,14 +211,49 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getDirectorInfoSender()
     {
-        return $this->hasMany(DirectorFloSender::className(), [
+        return $this->hasMany(DirectorFloSender::class, [
             'director_id' => 'id'
         ])->via('directorInfo');
     }
 
-        /**
-         * @return array
-         */
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getDirectorFlo()
+//    {
+//        return $this->hasOne(DirectorFlo::class, [])
+//            ->andOnCondition('[Logins].[login] = [DirectorFlo].[login]');
+//    }
+//
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getDirectorFloSender()
+//    {
+//        return $this->hasOne(DirectorFloSender::class, [])
+//            ->andOnCondition('[DirectorFloSender].[director_id] = [DirectorFlo].[id]');
+//    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDirectorFloSender()
+    {
+        return $this->hasOne(DirectorFloSender::class, ['sender_key' => 'Key']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDirectorFlo()
+    {
+        return $this->hasOne(DirectorFlo::class, ['id' => 'director_id'])
+            ->via('directorFloSender');
+    }
+
+    /**
+     * @return array
+     */
     public function getSendersList()
     {
         $modules = [];
@@ -234,15 +264,6 @@ class Logins extends \yii\db\ActiveRecord
             }
         }
         return $modules;
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDirectorFloSender()
-    {
-        return $this->hasOne(DirectorFloSender::className(), [])
-            ->andOnCondition('[DirectorFloSender].[director_id] = [DirectorFlo].[id]');
     }
 
     /**
@@ -263,7 +284,7 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getAdUsersMany()
     {
-        return $this->hasMany(NAdUsers::className(), [
+        return $this->hasMany(NAdUsers::class, [
             'gs_id' => 'aid',
             'gs_usertype' => 'UserType',
         ]);
@@ -278,7 +299,7 @@ class Logins extends \yii\db\ActiveRecord
             return NAdUsers::find()->where(['[n_ad_Users].[ID]' => $this->idAD]);
         }
 
-        return $this->hasOne(NAdUsers::className(), [
+        return $this->hasOne(NAdUsers::class, [
             'gs_id' => 'aid',
             'gs_usertype' => 'UserType'
         ]);
@@ -298,7 +319,7 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getAdUserAccountsMany()
     {
-        return $this->adUsersMany ? $this->hasMany(NAdUseraccounts::className(), [])
+        return $this->adUsersMany ? $this->hasMany(NAdUseraccounts::class, [])
             ->andOnCondition('\'lab\\\' + [n_ad_Users].[AD_login] = [n_ad_Useraccounts].[ad_login]') : null;
     }
 
@@ -318,7 +339,7 @@ class Logins extends \yii\db\ActiveRecord
     public function getOperators()
     {
         return $this->UserType == 7
-            ? $this->hasOne(Operators::className(), ['CACHE_OperatorID' => 'Key'])
+            ? $this->hasOne(Operators::class, ['CACHE_OperatorID' => 'Key'])
             : null;
     }
 
@@ -327,7 +348,7 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getFranchazy()
     {
-        return $this->hasOne(Franchazy::className(), ['Key' => 'Key']);
+        return $this->hasOne(Franchazy::class, ['Key' => 'Key']);
     }
 
     /**
@@ -335,7 +356,7 @@ class Logins extends \yii\db\ActiveRecord
      */
     public function getLpASs()
     {
-        return $this->hasOne(LpASs::className(), [
+        return $this->hasOne(LpASs::class, [
             'ukey' => 'Key',
             'utype' => 'UserType'
         ]);
