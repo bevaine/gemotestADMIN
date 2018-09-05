@@ -1062,8 +1062,6 @@ class Playlist
         $params["request"] = json_encode($json);
         $result = self::curlJsonResult($params, jsonrpc, 0);
 
-        self::my_log(__CLASS__, __FUNCTION__, " result: " . $result, true);
-
         if (empty($result)) {
             self::my_log(__CLASS__, __FUNCTION__, ": Oшибка при получении JSON данных от " . jsonrpc, true);
             return false;
@@ -1072,7 +1070,7 @@ class Playlist
         $json_data = json_decode($result);
 
         if (empty($json_data->result)) {
-            self::my_log(__CLASS__, __FUNCTION__, ': Ошибка, пустое обязательное значение JSON-данных, "result". В данный момент нет активных плейров!', true);
+            self::my_log(__CLASS__, __FUNCTION__, ': Ошибка, пустое значение "result". В данный момент нет активных плейров!', true);
             return false;
         }
 
