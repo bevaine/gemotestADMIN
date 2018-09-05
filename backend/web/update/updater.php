@@ -1,5 +1,5 @@
 <?php
-const version = 1.02;
+const version = 1.03;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
@@ -1062,6 +1062,8 @@ class Playlist
         $params["request"] = json_encode($json);
         $result = self::curlJsonResult($params, jsonrpc, 0);
 
+        self::my_log(__CLASS__, __FUNCTION__, " result: " . $result, true);
+
         if (empty($result)) {
             self::my_log(__CLASS__, __FUNCTION__, ": Oшибка при получении JSON данных от " . jsonrpc, true);
             return false;
@@ -1069,8 +1071,8 @@ class Playlist
 
         $json_data = json_decode($result);
 
-        if (!isset($json_data->result)) {
-            self::my_log(__CLASS__, __FUNCTION__, ': Ошибка, пустое обязательное значение JSON-данных, "result"!', true);
+        if (empty($json_data->result)) {
+            self::my_log(__CLASS__, __FUNCTION__, ': Ошибка, пустое обязательное значение JSON-данных, "result". В данный момент нет активных плейров!', true);
             return false;
         }
 
