@@ -1,5 +1,5 @@
 <?php
-const version = 1.03;
+const version = 1.04;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
@@ -590,6 +590,7 @@ class Playlist
             }
             curl_setopt($curl, CURLOPT_URL, $url);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_TIMEOUT, 60);
             if ($method == 1) {
                 curl_setopt($curl, CURLOPT_POST, true);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($params));
