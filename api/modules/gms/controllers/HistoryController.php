@@ -11,6 +11,7 @@ namespace api\modules\gms\controllers;
 use common\models\GmsDevices;
 use common\models\GmsPlaylistOut;
 use common\models\GmsVideoHistory;
+use common\models\GmsVideos;
 use yii\rest\ActiveController;
 use yii;
 use common\models\GmsHistory;
@@ -68,6 +69,25 @@ class HistoryController extends ActiveController
     }
 
     /**
+     * @param $startTime
+     * @param $stopTime
+     * @param $videoKey
+     * @return int
+     */
+    public static function roundDuration($startTime, $stopTime, $videoKey)
+    {
+        $duration = $stopTime - $startTime;
+        $findVideoModel = GmsVideos::findOne($videoKey);
+        if ($findVideoModel && !empty($findVideoModel->time)) {
+            $different = $findVideoModel->time - $duration;
+            if ($different == 1 || $different == -1) {
+                return $startTime + $findVideoModel->time;
+            }
+        }
+        return $stopTime;
+    }
+
+    /**
      * @return array
      */
     public function actionAjaxVideoHistoryPost()
@@ -113,7 +133,12 @@ class HistoryController extends ActiveController
                     $videoHistoryModel->delete();
                     return ['state' => 0];
                 }
-                $videoHistoryModel->last_at = $post["datetime"];
+
+                $videoHistoryModel->last_at = self::roundDuration(
+                    $videoHistoryModel->created_at,
+                    $post["datetime"],
+                    $videoHistoryModel->video_key
+                );
 
             } else {
                 $pls_pos = $post["inf"]["pls_pos"];
