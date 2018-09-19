@@ -1,5 +1,5 @@
 <?php
-const version = 1.04;
+const version = 1.05;
 const timezone = 'Europe/Moscow';
 
 const logo_img = 'logo.jpg';
@@ -519,7 +519,7 @@ class Playlist
                 return 1;
                 break;
 
-            //todo плейлист получен и изменился
+            //todo 2 - плейлист получен и изменился
             case 2:
                 //todo скачиваем файлы с удаленного сервера
                 if (!self::downloadMedia()) return 0;
@@ -600,6 +600,7 @@ class Playlist
             if (curl_errno($curl)){
                 self::my_log(__CLASS__, __FUNCTION__, ": ".curl_error($curl), true);
                 curl_close($curl);
+                self::restartKodi();
                 return false;
             }
 
@@ -608,15 +609,18 @@ class Playlist
 
             if ($statusCode != 200) {
                 self::my_log(__CLASS__, __FUNCTION__, ": Ошибка получения данных, код статуса: " . $statusCode, true);
+                self::restartKodi();
                 return false;
             }
 
             if (empty($json_data)) {
                 self::my_log(__CLASS__, __FUNCTION__, ": Ошибка получения данных, пустые данные от " . $url, true);
+                self::restartKodi();
                 return false;
             }
         } else {
             self::my_log(__CLASS__, __FUNCTION__, ": Ошибка curl_init: " . $url, true);
+            self::restartKodi();
             return false;
         }
         return $json_data;
@@ -926,6 +930,14 @@ class Playlist
     }
 
     /**
+     *
+     */
+    public static function restartKodi()
+    {
+        shell_exec('systemctl restart kodi');
+    }
+
+    /**
      * @param $state
      */
     public static function shell_up($state)
@@ -976,7 +988,7 @@ class Playlist
         }
 
         if ($state == 2 //плейлист изменился
-            || ($state == 1 && self::getActivePlayer('video') === FALSE) //плейлист изменился и не воспроизводится
+            //|| ($state == 1 && self::getActivePlayer('video') === FALSE) //плейлист не изменился и не воспроизводится
             || ($state == 3 && self::getActivePlayer('picture') === FALSE) //если смена на картинку
         ) {
             $arr_params = [
