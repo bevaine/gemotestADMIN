@@ -233,37 +233,34 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         $arr_dev = [];
         $html_dev = Html::img('/img/stop.png');
         $value = $this->update_json;
-        if (empty($value)) return null;
-
-        $update_json = json_decode($value);
-        if (!is_array($update_json)) return null;
-
-        foreach ($update_json as $key_dev => $val_dev) {
-            if (!$findModel = GmsDevices::findOne($key_dev)) {
-                continue;
+        if (!empty($value)) {
+            $update_json = json_decode($value);
+            foreach ($update_json as $key_dev => $val_dev) {
+                if (!$findModel = GmsDevices::findOne($key_dev)) {
+                    continue;
+                }
+                $name_dev = $findModel->name;
+                if (GmsPlaylistOut::checkTime($val_dev)) {
+                    $arr_dev[$name_dev] = Html::a(
+                        Html::tag(
+                            'span',
+                            $name_dev,
+                            ['class' => 'label label-success']
+                        ),
+                        Url::to(['gms-devices/view', 'id' => $key_dev]),
+                        [
+                            'style' => ['cursor' => 'pointer'],
+                            'title' => "Последняя активность в ".date("Y-m-d h:i:s", $val_dev),
+                            'target' => '_blank'
+                        ]
+                    );
+                }
             }
-            $name_dev = $findModel->name;
-            if (GmsPlaylistOut::checkTime($val_dev)) {
-                $arr_dev[$name_dev] = Html::a(
-                    Html::tag(
-                        'span',
-                        $name_dev,
-                        ['class' => 'label label-success']
-                    ),
-                    Url::to(['gms-devices/view', 'id' => $key_dev]),
-                    [
-                        'style' => ['cursor' => 'pointer'],
-                        'title' => "Последняя активность в ".date("Y-m-d h:i:s", $val_dev),
-                        'target' => '_blank'
-                    ]
-                );
+            if (!empty($arr_dev)) {
+                asort($arr_dev);
+                $html_dev = implode('<br>', $arr_dev);
             }
         }
-        if (!empty($arr_dev)) {
-            asort($arr_dev);
-            $html_dev = implode('<br>', $arr_dev);
-        }
-
         return $html_dev;
     }
 
