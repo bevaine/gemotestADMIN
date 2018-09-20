@@ -238,14 +238,13 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
         $update_json = json_decode($value);
         if (!is_array($update_json)) return null;
 
-        asort($update_json);
         foreach ($update_json as $key_dev => $val_dev) {
             if (!$findModel = GmsDevices::findOne($key_dev)) {
                 continue;
             }
             $name_dev = $findModel->name;
             if (GmsPlaylistOut::checkTime($val_dev)) {
-                $arr_dev[] = Html::a(
+                $arr_dev[$name_dev] = Html::a(
                     Html::tag(
                         'span',
                         $name_dev,
@@ -261,6 +260,7 @@ class GmsPlaylistOut extends \yii\db\ActiveRecord
             }
         }
         if (!empty($arr_dev)) {
+            asort($arr_dev);
             $html_dev = implode('<br>', $arr_dev);
         }
 
