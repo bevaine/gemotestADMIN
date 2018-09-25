@@ -855,7 +855,7 @@ class LoginsController extends Controller
                 foreach ($module as $tableClass)
                 {
                     if ($tblField = ActiveSyncHelper::getTableFields($tableClass)) {
-                        $tableFields[basename($tableClass)] = $tblField;
+                        $tableFields[ActiveSyncHelper::parseClassPath($tableClass)] = $tblField;
                     }
                 }
                 $out['result'][$nameModule] = $tableFields;

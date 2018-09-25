@@ -834,10 +834,17 @@ class ActiveSyncHelper
         {
             preg_match("^\{(.*?)\}^", $fieldVal, $outField);
             if (!isset($outField[1])){
-                $outArr[basename($tablesClass)][$fieldName] = $fieldVal;
+                $outArr[self::parseClassPath($tablesClass)][$fieldName] = $fieldVal;
             }
         }
         return !empty($outArr) ? $outArr : false;
+    }
+
+
+    public static function parseClassPath($name)
+    {
+        $array = explode('\\', $name);
+        return $array[count($array) - 1];
     }
 
     /**
@@ -856,7 +863,7 @@ class ActiveSyncHelper
         $objectVars = self::checkObjectVars($tablesClass);
         if ($objectVars !== false) {
             $this->message["error"][] = [
-                "Не заполнены обязательные поля для добавления в " . basename($tablesClass) . ": ",
+                "Не заполнены обязательные поля для добавления в " . self::parseClassPath($tablesClass) . ": ",
                 $objectVars
             ];
             return false;
@@ -1373,18 +1380,18 @@ class ActiveSyncHelper
     {
         if (!$object || !class_exists($object->className())) return false;
 
-        $this->message["info"][] = __FUNCTION__ . ": В " . basename($object::tableName()) . " уже есть запись!";
+        $this->message["info"][] = __FUNCTION__ . ": В " . self::parseClassPath($object::tableName()) . " уже есть запись!";
 
         if (!$loadData = $this->loadUserData($object->className())) {
-            $this->message["info"][] = __FUNCTION__ . ": В " . basename($object::tableName()) . " нет полей для обновления!";
+            $this->message["info"][] = __FUNCTION__ . ": В " . self::parseClassPath($object::tableName()) . " нет полей для обновления!";
             return true;
         }
 
         if ($object->load($loadData) && $object->save()) {
-            $this->message["info"][] = __FUNCTION__ . ": В " . basename($object::tableName()) . " успешно обновлены данные в соотвествии с правами!";
+            $this->message["info"][] = __FUNCTION__ . ": В " . self::parseClassPath($object::tableName()) . " успешно обновлены данные в соотвествии с правами!";
             return $object;
         } else {
-            $this->message["error"][] = __FUNCTION__ . ": Возникли ошибки при обновлении данных в " . basename($object::tableName()) . "!";
+            $this->message["error"][] = __FUNCTION__ . ": Возникли ошибки при обновлении данных в " . self::parseClassPath($object::tableName()) . "!";
             return false;
         }
     }
