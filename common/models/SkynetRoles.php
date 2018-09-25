@@ -39,7 +39,12 @@ class SkynetRoles extends \yii\db\ActiveRecord
             [['name', 'structure_json', 'tables_json', 'info_json'], 'string'],
             [['type'], 'integer'],
             ['permission', 'each', 'rule' => ['string']],
-        ];
+            ['name', 'required', 'when' => function ($model) {
+                return $model->type == 7;
+                }, 'whenClient' => 'function (attribute, value) {
+                    return $("#skynet-type option:selected").val() === 7;
+                }', 'message' => 'Название роли обязательно к заполнению']
+            ];
     }
 
     /**

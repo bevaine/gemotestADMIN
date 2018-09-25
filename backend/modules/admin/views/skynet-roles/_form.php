@@ -270,6 +270,10 @@ $js = <<< JS
     const structure_json = {$structure_json};
     const tables_json = {$tables_json};
     const info_json = {$info_json};
+    const TYPE_SLO = '7';
+    const TYPE_FLO = '8';
+    const TYPE_DOC = '5';
+    const TYPE_GD = '9';
    
     $(document).ready(function() 
     {
@@ -300,8 +304,6 @@ $js = <<< JS
     $('#skynet-type').change(function() 
     {
         resetForm($(this));
-        let name = $("#skynet-type option:selected").text();
-        setFormVal('SkynetRoles[name]', name);
         showHideDepartment($(this).val());
         constructBody($(this).val())
     });
@@ -321,8 +323,6 @@ $js = <<< JS
                 {
                     $.each(res.result, function(module_name, tables) 
                     {
-                        console.log(module_name);
-                        console.log(tables);
                         if (module_name === 'franchazy') {
                             disablePermmissions();
                         } else if (module_name === 'main') {
@@ -357,9 +357,9 @@ $js = <<< JS
     function checkDisable(type = null, module_name = null) 
     {
         return (module_name === 'operator')
-            || (type === '5' && module_name === 'doctor_consultant')
-            || (type === '8' && module_name === 'ad_authorization')
-            || (type === '9' && module_name === 'director');
+            || (type === TYPE_DOC && module_name === 'doctor_consultant')
+            || (type === TYPE_FLO && module_name === 'ad_authorization')
+            || (type === TYPE_GD && module_name === 'director');
         
     }
 
@@ -397,7 +397,10 @@ $js = <<< JS
     {
         let val = object.val();
         $('#form-input')[0].reset();
-        object.val(val);
+        if (val !== TYPE_SLO) {
+            let name = $("#skynet-type option:selected").text();
+            setFormVal('SkynetRoles[name]', name);            
+        }
         $('.panel').each(function() {
             $(this).css('display', 'none');
             $(this).find('.panel-body').css('display', 'none');
@@ -413,7 +416,7 @@ $js = <<< JS
     
     function showHideDepartment(type) 
     {
-        $('#type-frame').css('display', type !== '7' ? 'none' : "block");
+        $('#type-frame').css('display', type !== TYPE_SLO ? 'none' : "block");
     }
     
     function setType() {

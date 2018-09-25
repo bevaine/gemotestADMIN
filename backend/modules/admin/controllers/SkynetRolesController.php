@@ -187,6 +187,7 @@ class SkynetRolesController extends Controller
         /** @var SkynetRoles $findModel */
         if ($findModel = $this->findModel($id)) {
             Permissions::deleteAll(['department' => $id]);
+            $findModel->delete();
         }
         return $this->redirect(['index']);
     }
