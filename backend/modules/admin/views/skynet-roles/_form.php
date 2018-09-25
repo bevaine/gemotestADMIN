@@ -397,10 +397,7 @@ $js = <<< JS
     {
         let val = object.val();
         $('#form-input')[0].reset();
-        if (val !== TYPE_SLO) {
-            let name = $("#skynet-type option:selected").text();
-            setFormVal('SkynetRoles[name]', name);            
-        }
+        object.val(val);
         $('.panel').each(function() {
             $(this).css('display', 'none');
             $(this).find('.panel-body').css('display', 'none');

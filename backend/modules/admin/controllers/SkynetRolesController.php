@@ -3,6 +3,7 @@
 namespace app\modules\admin\controllers;
 
 use common\components\helpers\ActiveSyncHelper;
+use common\models\AddUserForm;
 use common\models\Permissions;
 use Yii;
 use common\models\SkynetRoles;
@@ -17,6 +18,11 @@ use yii\log\Logger;
  */
 class SkynetRolesController extends Controller
 {
+    CONST TYPE_SLO = '7';
+    CONST TYPE_FLO = '8';
+    CONST TYPE_DOC = '5';
+    CONST TYPE_GD = '9';
+
     /**
      * {@inheritdoc}
      */
@@ -114,6 +120,9 @@ class SkynetRolesController extends Controller
 
         if ($model->load(Yii::$app->request->post()))
         {
+            if ($model->type !== self::TYPE_SLO) {
+                $model->name = AddUserForm::getTypes($model->type);
+            }
             $post = Yii::$app->request->post();
             if ($this->addUpdateRole($model, $post)) {
                 return $this->redirect(['view', 'id' => $model->id]);
