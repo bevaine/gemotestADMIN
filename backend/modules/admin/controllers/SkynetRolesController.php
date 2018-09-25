@@ -93,8 +93,8 @@ class SkynetRolesController extends Controller
                     continue;
 
                 $tableBase = $conf['tables'][$tableConf];
-                if (array_key_exists(basename($tableConf), $post['tables'])) {
-                    $tablePost = $post['tables'][basename($tableConf)];
+                if (array_key_exists(ActiveSyncHelper::parseClassPath($tableConf), $post['tables'])) {
+                    $tablePost = $post['tables'][ActiveSyncHelper::parseClassPath($tableConf)];
                     $tableBase = array_replace_recursive($tableBase, $tablePost);
                 }
                 $newConf['tables'][$tableConf] = $tableBase;
@@ -187,7 +187,6 @@ class SkynetRolesController extends Controller
         /** @var SkynetRoles $findModel */
         if ($findModel = $this->findModel($id)) {
             Permissions::deleteAll(['department' => $id]);
-            $findModel->delete();
         }
         return $this->redirect(['index']);
     }
