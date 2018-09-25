@@ -8,6 +8,7 @@ use common\models\GmsPlaylist;
 use common\models\GmsPlaylistOut;
 use common\models\Logins;
 use common\models\NAdUsers;
+use common\models\Operators;
 use common\models\Permissions;
 use yii\console\Controller;
 use yii\db\Expression;
@@ -253,7 +254,31 @@ class ActiveSyncController extends Controller
 
     public function actionTest ()
     {
+//        $activeSyncHelper = new ActiveSyncHelper();
+//        $activeSyncHelper->firstName = 'Тест';
+//        $activeSyncHelper->lastName = 'Тест';
+//        $activeSyncHelper->type = 7;
+//        $activeSyncHelper->department = 1;
+//        $newUserData = $activeSyncHelper->checkAccount();
+//        exit;
 
+        //$a = new ActiveSyncHelper();
+        $lastIdNadUsers = NAdUsers::find()->select(['MAX(id) maxId'])->asArray()->one();
+        print_r($lastIdNadUsers);
+        exit;
+
+        $conf = ActiveSyncHelper::getConf();
+        $slo = $conf[7];
+        foreach ($slo['tables'] as $class_name => $fields) {
+            $a->setParamsForTable($class_name, $fields);
+        }
+
+
+
+
+        //print_r($slo);
+
+        exit;
         $file = 'blob:http://itr-local.admin/c945658e-8716-481e-b1b1-507d6accdc84';
         if ($infoVideo = FunctionsHelper::getInfoVideo($file))
         {

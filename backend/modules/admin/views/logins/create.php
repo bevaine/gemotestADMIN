@@ -60,11 +60,16 @@ $this->params['breadcrumbs'][] = $this->title;
                                         echo Html::label('Департамент');
                                         echo select2\Select2::widget([
                                             'model' => $model,
-                                            'data' => \common\models\AddUserForm::getDepartments(),
+                                            'data' => \common\models\AddUserForm::getDepartments(7),
                                             'attribute' => 'department',
+                                            'options' => [
+                                                //'placeholder' => 'Без прав'
+                                            ],
                                             'addon' => [
                                                 'prepend' => [
-                                                    'content' => Html::a('','#', ['class' => 'glyphicon glyphicon-pencil'])
+                                                    'content' => Html::a('','#', [
+                                                        'class' => 'glyphicon glyphicon-pencil'
+                                                    ])
                                                 ],
                                             ]
                                         ]);
@@ -200,7 +205,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 echo Html::Button('Создать', ['class' => 'btn btn-success']);
                             }
                             echo " ";
-                            echo Html::a('Роли', ['roles'], ['class' => 'btn btn-primary']) ?>
+                            echo Html::a('Роли', [Url::to(["./skynet-roles"])], ['target' => '_blank', 'class' => 'btn btn-primary']) ?>
                         </p>
                         <?php ActiveForm::end(); ?>
 
@@ -337,7 +342,7 @@ if ($action == 'user' ||
 
         $(".glyphicon-pencil").click(function() {
             let department = $('#adduserform-department').val(); 
-            window.open("../../admin/logins/roles/" + department, '_blank');
+            window.open("/admin/skynet-roles/update?id=" + department, '_blank');
         });
 JS;
     $this->registerJs($js1);

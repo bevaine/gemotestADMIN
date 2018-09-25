@@ -63,6 +63,7 @@ class Operators extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['CACHE_Login'], 'required'],
             [['CACHE_Login', 'Name', 'LastName', 'Orders', 'PassportNum', 'PassportVidan', 'Palata', 'IndCity', 'StreetHouse', 'PhoneNumber', 'StrahNumber', 'PasportNum', 'PasportDate', 'CACHE_OperatorID', 'OperatorOffice', 'OperatorOfficeStatus', 'Pass'], 'string'],
             [['BirthDate', 'DateIns', 'DateLastUpdate'], 'safe'],
             [['MG', 'Active', 'CanRegister', 'InputOrderRM', 'OrderEdit', 'MedReg', 'PriceID', 'ClientMen', 'mto', 'mto_editor'], 'integer'],
@@ -87,7 +88,7 @@ class Operators extends \yii\db\ActiveRecord
     {
         return [
             'AID' => 'Aid',
-            'CACHE_Login' => 'Cache  Login',
+            'CACHE_Login' => 'Cache Login',
             'Name' => 'Name',
             'LastName' => 'Last Name',
             'BirthDate' => 'Birth Date',

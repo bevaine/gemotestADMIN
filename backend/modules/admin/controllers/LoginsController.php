@@ -10,6 +10,7 @@ use common\models\NAuthItem;
 use common\models\Permissions;
 use PHPUnit\Exception;
 use Yii;
+use yii\base\Model;
 use yii\helpers\ArrayHelper;
 use yii\log\Logger;
 use yii\web\Controller;
@@ -87,38 +88,30 @@ class LoginsController extends Controller
      */
     public function actionRoles($department = '')
     {
-        $action = '';
         $arrRows = [];
         $rowInsert = [];
-        if ($department == 7) $department = '';
 
-        if (!empty(Yii::$app->request->post()['Permissions'])) {
-            $request = Yii::$app->request->post()['Permissions'];
+        if ($department == 7) $department = 0;
 
-            if (!empty($request['action']) && isset($request['department'])) {
-                $action = $request['action'];
-                $department = $request['department'];
-            }
+        if (!$model = ErpGroupsRelations::findOne([
+            'department' => $department
+        ])) {
+            $model = new ErpGroupsRelations();
+        }
 
-            ErpGroupsRelations::deleteAll(
-                ['department' => $department]
-            );
+        if (!empty(Yii::$app->request->post())) {
+            print_r(Yii::$app->request->post());
+            exit;
+        }
 
-            !empty($request['erp-user-nurse']) ? $nurse = 1 : $nurse = null;
-            isset($request['erp-user-groups']) ? $groups = $request['erp-user-groups'] : $groups = null;
 
-            $newErpUser = new ErpGroupsRelations();
-            $newErpUser->group = $groups;
-            $newErpUser->department = $department;
-            $newErpUser->nurse = $nurse;
-            $newErpUser->save();
-
-            if ($action == 'assign'
-                && !empty($request['list-permission'])
-                && is_array($request['list-permission'])
-                && $request['department'] != 7)
+        if ($model->load(Yii::$app->request->post()) && $model->save())
+        {
+            if ($model->action == 'assign'
+                && !empty($model->list_permission)
+                && is_array($model->list_permission))
             {
-                foreach ($request['list-permission'] as $permission) {
+                foreach ($model->list_permission as $permission) {
                     $rowInsert[] = [$department, $permission];
                     $arrRows[] = $permission;
                 }
@@ -126,31 +119,32 @@ class LoginsController extends Controller
                     Permissions::deleteAll([
                         'AND',
                         ['department' => $department],
-                        ['in','permission',$arrRows]
+                        ['in', 'permission', $arrRows]
                     ]);
                     Yii::$app->db->createCommand()->batchInsert(
                         Permissions::tableName(),
                         ['department', 'permission'],
                         $rowInsert
                     )->execute();
+
                 } catch (Exception $e) {
                     Yii::getLogger()->log([
                         'addPermissions->batchInsert'=>$e->getMessage()
                     ], Logger::LEVEL_ERROR, 'binary');
                 }
 
-            } elseif ($action == 'revoke'
-                && !empty($request['permission'])
-                && is_array($request['permission']))
+            } elseif ($model->action == 'revoke'
+                && !empty($model->permission)
+                && is_array($model->permission))
             {
-                foreach ($request['permission'] as $permission) {
+                foreach ($model->permission as $permission) {
                     $arrRows[] = $permission;
                 }
                 try {
                     Permissions::deleteAll([
                         'AND',
                         ['department' => $department],
-                        ['in','permission',$arrRows]
+                        ['in', 'permission', $arrRows]
                     ]);
                 } catch (Exception $e) {
                     Yii::getLogger()->log([
@@ -158,6 +152,8 @@ class LoginsController extends Controller
                     ], Logger::LEVEL_ERROR, 'binary');
                 }
             }
+        } else {
+            //print_r($model->errors);
         }
 
         return $this->render('roles', [
@@ -323,6 +319,7 @@ class LoginsController extends Controller
                 if (Yii::$app->request->post('radioAccountsList') != 'new')
                 {
                     $activeSyncHelper->accountName = Yii::$app->request->post('radioAccountsList');
+
                     $arrEmails = Yii::$app->request->post('hiddenEmailList');
 
                     if (!empty($activeSyncHelper->accountName)
@@ -339,29 +336,12 @@ class LoginsController extends Controller
                 if (Yii::$app->request->post('radioAIDList') == 'new') {
                     $activeSyncHelper->createNewGS = true;
                 } else {
-                    $activeSyncHelper->aid = Yii::$app->request->post('radioAIDList');
+                    $activeSyncHelper->aid = strval(Yii::$app->request->post('radioAIDList'));
                 }
             }
 
-            $activeSyncHelper->erpGroup = $activeSyncHelper->department;
-
-            //todo признак добавления в справочник медсестр
-
-            if ($dataNurse = ErpGroupsRelations::findOne([
-                'department' => $activeSyncHelper->department
-            ])) $activeSyncHelper->nurse = $dataNurse->nurse;
-
-            //todo установка алиаса для ролей
-            if ($activeSyncHelper->department == 10)
-                $activeSyncHelper->department = 0;
-
-            if (in_array($activeSyncHelper->department, [21, 22]))
-                $activeSyncHelper->department = 2;
-
-            if (in_array($activeSyncHelper->department, [31, 32, 33]))
-                $activeSyncHelper->department = 3;
-
             //todo добавление УЗ
+            $message = '';
             $newUserData = $activeSyncHelper->checkAccount();
 
             if ($newUserData) {
@@ -372,7 +352,6 @@ class LoginsController extends Controller
                     'ADD_SKYNET_USER');
 
                 $style = '';
-                $message = '';
                 !empty($activeSyncHelper->idAD) ? $auth = 'Active Directory' : $auth = 'GemoSystem';
                 $message .= '<p>Aвторизации через '.$auth.'</p>';
 
@@ -435,13 +414,21 @@ class LoginsController extends Controller
                 $message .= '<br>Пароль: <b>' . $activeSyncHelper->password.'</b>';
                 Yii::$app->session->setFlash($style, $message);
             } else {
+                $style = 'error';
                 Yii::getLogger()->log([
                     'ВОЗНИКЛА ОШИБКА ПРИ ДОБАВЛЕНИИ УЗ ДЛЯ '.$activeSyncHelper->fullName
                 ], Logger::LEVEL_ERROR, 'binary');
 
                 $message = '<p>Не удалось создать УЗ для <b>'.$activeSyncHelper->fullName.'</b> авторизации в GemoSystem</p>';
-                Yii::$app->session->setFlash('error', $message);
             }
+
+            if (isset($activeSyncHelper->message["success"])
+                && is_array($activeSyncHelper->message["success"])) {
+                $successMsg = implode("<br>", $activeSyncHelper->message["success"]);
+                $message = "<div style='color: #0a0a0a' class=\"well well-sm\">{$successMsg}</div>" . $message;
+            }
+
+            Yii::$app->session->setFlash($style, $message);
         }
 
         return $this->render('create', [
@@ -632,6 +619,8 @@ class LoginsController extends Controller
 
         if ($type == 'user') {
             $activeSyncHelper->type = 7;
+        } elseif ($type == 'franch') {
+            $activeSyncHelper->type = 8;
         }
 
         if (!empty($doc_id)) {
@@ -686,6 +675,10 @@ class LoginsController extends Controller
         } else {
             return $arrAccountAD;
         }
+    }
+
+    static function getFullName() {
+
     }
 
     /**
@@ -794,10 +787,80 @@ class LoginsController extends Controller
             if ($data = ErpGroupsRelations::findOne(['department' => $department])) {
                 $out['erp_groups'] = $data->group;
                 $out['erp_nurse'] = !empty($data->nurse) ? true : false;
-
+                $out['mis_access'] = json_encode($data->mis_access);
             }
         }
 
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : 'null';
+    }
+
+    /**
+     * @param bool $department
+     * @return null
+     */
+    public function actionAjaxPermissions($department = false)
+    {
+        if (!is_null($department)) {
+            $data = Permissions::find()
+                ->where(['department'=>$department])
+                ->all();
+            if ($data) {
+                /** @var Permissions $userData */
+                foreach ($data as $userData) {
+                    $out['result'][$userData->permission] = $userData->name->description;
+                }
+            }
+        }
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : 'null';
+    }
+
+    /**
+     * @param bool $type
+     * @return array|string
+     */
+    public function actionAjaxStructureType($type = false)
+    {
+        $out = [];
+        $activeSync = new ActiveSyncHelper();
+        $conf = $activeSync->getConf();
+
+        if (!empty($conf['structure'][$type])){
+            $out = $conf['structure'][$type];
+        }
+        $response = Yii::$app->response;
+        $response->format = yii\web\Response::FORMAT_JSON;
+        return !empty($out) ? $out : 'null';
+    }
+
+    /**
+     * @param null $type
+     * @return mixed
+     */
+    public function actionAjaxListTable($type = null)
+    {
+        $out = [];
+        $activeSync = new ActiveSyncHelper();
+        $conf = $activeSync->getConf();
+
+        if (!empty($conf['structure'][$type]))
+        {
+            $modules = $conf['structure'][$type];
+            foreach ($modules as $nameModule => $module)
+            {
+                $tableFields = [];
+                foreach ($module as $tableClass)
+                {
+                    if ($tblField = ActiveSyncHelper::getTableFields($tableClass)) {
+                        $tableFields[basename($tableClass)] = $tblField;
+                    }
+                }
+                $out['result'][$nameModule] = $tableFields;
+            }
+        }
         $response = Yii::$app->response;
         $response->format = yii\web\Response::FORMAT_JSON;
         return !empty($out) ? $out : 'null';

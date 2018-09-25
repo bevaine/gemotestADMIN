@@ -10,6 +10,7 @@ namespace common\models;
 
 use yii\base\Model;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class AddUserForm
@@ -118,27 +119,74 @@ class AddUserForm extends Model
         ];
     }
 
+    public static function getTypes($type = null)
+    {
+        $arr = [
+            7 => 'Собственные лабораторные отделения',
+            8 => 'Франчайзи',
+            5 => 'Доктор-консультант',
+            9 => 'Генеральный директор'
+        ];
+        return !is_null($type) && array_key_exists($type, $arr) ? $arr[$type] : $arr;
+    }
+
+    public static function getTypeList()
+    {
+        $options = [];
+        $values = [];
+        $types = self::getTypes();
+
+        $object = SkynetRoles::find()
+            ->where(['not in', 'type', [7]])
+            ->orderBy(['name' => 'asc'])
+            ->asArray()
+            ->all();
+
+        $abjectArr = ArrayHelper::getColumn($object, 'type');
+
+        foreach ($types as $typeKey => $typeName)
+        {
+            $disable = false;
+            $style = 'color:#02723f';
+            $txt = $typeName;
+            if (in_array($typeKey, $abjectArr)) {
+                $disable = true;
+                $txt .= ' - уже есть';
+                $style =  'color:#ec1c24;font-weight:bold';
+            }
+            $values[$typeKey] = $txt;
+            $options[$typeKey] = [
+                'disabled' => $disable,
+                'label' => $txt,
+                'style' => $style
+            ];
+        }
+
+        if (!empty($options) && !empty($values)) {
+            //krsort($options);
+            //krsort($values);
+            return [
+                'arrOptions' =>
+                    ['options' => $options],
+                'arrValues' =>
+                    $values
+            ];
+        } else return null;
+    }
+
     /**
+     * @param int $type
      * @return array
      */
-    public static function getDepartments()
+    public static function getDepartments($type = 7)
     {
-        return [
-            7 => 'Без прав', //вход через AD
-            0 => 'Cобственные отделения', //вход через AD
-            10 => 'Выездная медсетсра', //вход через AD
-            1 => 'Контакт центр', //вход через AD
-            2 => 'Продажи', //вход через AD
-            21 => 'Региональный менеджер', //вход через AD
-            22 => 'Лабораторный техник', //вход через AD
-            3 => 'Развитие', //вход через AD
-            31 => 'ДУОЛО', //вход через AD
-            32 => 'Фин. сопровождение договоров', //вход через AD
-            33 => 'Бухгалтерия', //вход через AD
-            4 => 'Отдел клиентской инф. поддержки', //вход через Logins
-            5 => 'Мед регистратор', //вход через Logins
-            6 => 'Клиент-менеджер', //вход через AD
-        ];
+        $arr = SkynetRoles::find()
+            ->where(['type' => $type])
+            ->orderBy(['name' => 'asc'])
+            ->asArray()
+            ->all();
+
+        return ArrayHelper::map($arr,'id','name');
     }
 
     /**

@@ -10,11 +10,20 @@ use Yii;
  * @property integer $id
  * @property string $department
  * @property string $group
+ * @property string $mis_access
  * @property integer $nurse
  * @property ErpUsergroups $name
+ * @property string $action
+ * @property array $permission
+ * @property array $list_permission
  */
+
 class ErpGroupsRelations extends \yii\db\ActiveRecord
 {
+    public $action;
+    public $permission;
+    public $list_permission;
+
     /**
      * @inheritdoc
      */
@@ -30,8 +39,9 @@ class ErpGroupsRelations extends \yii\db\ActiveRecord
     {
         return [
             [['department'], 'required'],
-            [['department', 'group'], 'string', 'max' => 255],
-            [['nurse'], 'integer']
+            [['action', 'department', 'group'], 'string', 'max' => 255],
+            [['nurse', 'mis_access'], 'integer'],
+            [['permission', 'list_permission'], 'each', 'rule' => ['string']],
         ];
     }
 
@@ -45,6 +55,7 @@ class ErpGroupsRelations extends \yii\db\ActiveRecord
             'department' => 'Department',
             'group' => 'Group',
             'nurse' => 'Nurse',
+            'mis_access' => 'mis_access',
         ];
     }
 

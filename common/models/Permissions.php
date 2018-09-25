@@ -58,6 +58,6 @@ class Permissions extends \yii\db\ActiveRecord
      */
     public function getName()
     {
-        return $this->hasOne(NAuthItem::className(), ['name' => 'permission']);
+        return $this->hasOne(NAuthItem::class, ['name' => 'permission']);
     }
 }
