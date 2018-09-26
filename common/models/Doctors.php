@@ -170,7 +170,7 @@ class Doctors extends \yii\db\ActiveRecord
             if (!empty($model['LastName'])) $FIO .= $model['LastName'];
             if (!empty($model['Name'])) $FIO .= " ".$model['Name'];
             if (!empty($model['GsID'])) {
-                $disable = true;
+                //$disable = true;
                 $FIO .= " - уже добавлен";
                 $color =  '#d4282e';
             }

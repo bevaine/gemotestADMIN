@@ -330,7 +330,9 @@ $js = <<< JS
                         } else if (module_name === 'party') {
                             addParty();
                         } 
-                        if (checkDisable(type, module_name)) {
+                        //console.log(module_name);
+                        //console.log(tables);
+                        if (checkDisable(type, module_name) || tables.length === 0) {
                             setFormVal('structure[' + module_name + ']', '1');
                         }
                         $('#panel-' + module_name).css('display', "block");
@@ -405,6 +407,9 @@ $js = <<< JS
         $("#frame-permissions")
             .find("input,select")
             .removeAttr("disabled");
+        
+        $("input[data-id=set-val]")
+            .remove();
     }
 
     function disablePermmissions() {
@@ -430,14 +435,15 @@ $js = <<< JS
     function setFormVal(name, val) 
     {
         if ($("input").is("#" + name)) {
-            $("#" + name).remove();
+            $(this).remove();
         }
         $("<input>").attr({
             type: "hidden",
             id: name,
             name: name,
-            value: val
-        }).appendTo("form");
+            value: val,
+            "data-id": 'set-val'
+        }).appendTo("#form-input");
     }
 
     /**

@@ -26,20 +26,20 @@ return [
             'password' => 'itrTest',
             'charset' => 'utf8',
         ],
-//        'GemoTestDB' => [
-//            'class' => 'yii\db\Connection',
-//            'dsn' => 'sqlsrv:Server=SW-SQL-TEST-LST;Database=OrdersFromCACHE_dev',
-//            'username' => 'importfromcache',
-//            'password' => 'import',
-//            'charset' => 'utf8',
-//        ],
         'GemoTestDB' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
+            'dsn' => 'sqlsrv:Server=SW-SQL-TEST-LST;Database=OrdersFromCACHE_dev',
             'username' => 'importfromcache',
             'password' => 'import',
             'charset' => 'utf8',
         ],
+//        'GemoTestDB' => [
+//            'class' => 'yii\db\Connection',
+//            'dsn' => 'sqlsrv:Server=sw-sky-cl;Database=OrdersFromCACHE',
+//            'username' => 'importfromcache',
+//            'password' => 'import',
+//            'charset' => 'utf8',
+//        ],
 //        'MIS' => [
 //            'class' => 'yii\db\Connection',
 //            'dsn' => 'sqlsrv:Server=SW-SQL-TEST-LST;Database=MIS_dev',
