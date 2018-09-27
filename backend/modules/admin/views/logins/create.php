@@ -125,7 +125,17 @@ $this->params['breadcrumbs'][] = $this->title;
                             <div class="row">
                                 <div class="col-lg-4">
                                     <div class="form-group">
-                                        <?= $form->field($model, 'key')->dropDownlist(\common\models\AddUserForm::getKeysList(), ['prompt' => '---', 'disabled' => false]); ?>
+                                        <?php
+                                        echo Html::label('Отделение');
+                                        echo select2\Select2::widget([
+                                            'model' => $model,
+                                            'data' => \common\models\AddUserForm::getKeysList(),
+                                            'attribute' => 'key',
+                                            'options' => [
+                                                'placeholder' => '---'
+                                            ],
+                                        ]);
+                                        ?>
                                     </div>
                                 </div>
                                 <div class="col-lg-4">
