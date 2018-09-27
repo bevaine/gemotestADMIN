@@ -1734,11 +1734,14 @@ class ActiveSyncHelper
         $dnPath = "OU=Departments,OU=Gemotest";
         $dnName = "SSO {$this->typeLO} Users";
 
-        $groupPath = "OU=SSO {$this->typeLO},OU=Departments,OU=Gemotest";//рабочий путь
-        $groupName = "SSO {$this->typeLO} Users"; //рабочая группа
+//        $groupPath = "OU=SSO {$this->typeLO} Users,OU=Departments,OU=Gemotest";//рабочий путь
+//        $groupName = "SSO {$this->typeLO} Users"; //рабочая группа
 
-        //$groupPath = "OU=ALL,OU=Departments,OU=Gemotest"; //тестовый путь
-        //$groupName = "svc-bitrix-import-exclude"; //тестовая группа
+        $groupPath = "OU=ALL,OU=Departments,OU=Gemotest"; //тестовый путь
+        $groupName = "svc-bitrix-import-exclude"; //тестовая группа
+
+        $dnMember = "CN={$this->cnName},OU={$dnName},{$dnPath},".self::LDAP_DN; //контенер
+        $groupMember = "CN={$groupName},{$groupPath},".self::LDAP_DN;; //группа
 
         try {
             $ldapconn = ldap_connect(self::LDAP_SERVER);
@@ -1751,9 +1754,6 @@ class ActiveSyncHelper
 
             if (!$ldapbind) return false;
 
-            $dnMember = "CN={$this->cnName},OU={$dnName},{$dnPath},".self::LDAP_DN; //контенер
-            $groupMember = "CN={$groupName},{$groupPath},".self::LDAP_DN;; //группа
-
             $userdata['member'] = $dnMember;
 
             $result = ldap_modify($ldapconn, $groupMember, $userdata);
@@ -1762,7 +1762,7 @@ class ActiveSyncHelper
                 $txt = "<h4>AD Info:</h4><p>Возникли ошибки при добавлении пользователя: <b>{$this->cnName}</b>";
                 $txt .= "<br> в группу <b>\"{$groupName}\"</b> и/или контейнер <b>\"{$dnName}\"</b> </p>";
                 $this->message['success'][] = $txt;
-                $this->message['error'][] = $txt;
+                $this->message['error'][] = [$dnMember, $groupMember];
             } else {
                 $txt = "<h4>AD Info:</h4><p>Пользователь: <b>{$this->cnName}</b> успешно добавлен";
                 $txt .= "<br> в группу <b>\"{$groupName}\"</b> и контейнер <b>\"{$dnName}\"</b> </p>";
@@ -1777,7 +1777,7 @@ class ActiveSyncHelper
             $txt .= "<br> в группу <b>\"{$groupName}\"</b> и/или контейнер <b>\"{$dnName}\"</b> </p>";
             $txt .= "<br>msg: " . $e->getMessage();
             $this->message['success'][] = $txt;
-            $this->message['error'][] = $txt;
+            $this->message['error'][] = [$dnMember, $groupMember];
             return false;
         }
     }
