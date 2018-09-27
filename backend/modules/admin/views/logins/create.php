@@ -341,8 +341,10 @@ if ($action == 'user' ||
         });
 
         $(".glyphicon-pencil").click(function() {
-            let department = $('#adduserform-department').val(); 
-            window.open("/admin/skynet-roles/update?id=" + department, '_blank');
+            let department = $('#adduserform-department').val();
+            if (department !== null) {
+                window.open("/admin/skynet-roles/update?id=" + department, '_blank');
+            }
         });
 JS;
     $this->registerJs($js1);
