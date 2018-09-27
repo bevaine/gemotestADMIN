@@ -1734,11 +1734,11 @@ class ActiveSyncHelper
         $dnPath = "OU=Departments,OU=Gemotest";
         $dnName = "SSO {$this->typeLO} Users";
 
-//        $groupPath = "OU=SSO {$this->typeLO} Users,OU=Departments,OU=Gemotest";//рабочий путь
-//        $groupName = "SSO {$this->typeLO} Users"; //рабочая группа
+        $groupPath = "OU=SSO {$this->typeLO} Users,OU=Departments,OU=Gemotest";//рабочий путь
+        $groupName = "SSO {$this->typeLO} Users"; //рабочая группа
 
-        $groupPath = "OU=ALL,OU=Departments,OU=Gemotest"; //тестовый путь
-        $groupName = "svc-bitrix-import-exclude"; //тестовая группа
+//        $groupPath = "OU=ALL,OU=Departments,OU=Gemotest"; //тестовый путь
+//        $groupName = "svc-bitrix-import-exclude"; //тестовая группа
 
         $dnMember = "CN={$this->cnName},OU={$dnName},{$dnPath},".self::LDAP_DN; //контенер
         $groupMember = "CN={$groupName},{$groupPath},".self::LDAP_DN;; //группа
