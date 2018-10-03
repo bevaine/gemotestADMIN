@@ -372,26 +372,6 @@ $js = <<< JS
             let tr_title = '';
             let tr_row = '';
             let type_str = ''; 
-//            jQuery("#w0").yiiActiveForm("add",{
-//                "id": "customer-name",
-//                "name": "name",
-//                "container": ".field-customer-name",
-//                "input": "#customer-name",
-//                "error": ".help-block.help-block-error",
-//                "validate": function(attribute, value, messages, deferred, $form) {
-//
-//                    yii.validation.required(value, messages, {
-//                        "message": "Name be blank bug."
-//                    });
-//
-//                    yii.validation.string(value, messages, {
-//                        "message": "Name must be a string.",
-//                        "max": 255,
-//                        "tooLong": "Name should contain at most 255 characters.",
-//                        "skipOnEmpty": 1
-//                    });
-//                }
-//            });
             $.each(val_rows, function(key, val) 
             { 
                 type_str = val.type === 'integer' ? 'number' : 'text';
