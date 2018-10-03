@@ -264,16 +264,17 @@ $tables_json = !empty($model->tables_json) ? $model->tables_json : '""';
 $info_json = !empty($model->info_json) ? $model->info_json : '""';
 
 $js = <<< JS
+    const TYPE_SLO = '7';
+    const TYPE_FLO = '8';
+    const TYPE_DOC = '5';
+    const TYPE_GD = '9';
+    
     const isNew = '{$model->isNewRecord}';  
     const type = '{$type}';
     const department = '{$department}';
     const structure_json = {$structure_json};
     const tables_json = {$tables_json};
     const info_json = {$info_json};
-    const TYPE_SLO = '7';
-    const TYPE_FLO = '8';
-    const TYPE_DOC = '5';
-    const TYPE_GD = '9';
    
     $(document).ready(function() 
     {
@@ -330,8 +331,6 @@ $js = <<< JS
                         } else if (module_name === 'party') {
                             addParty();
                         } 
-                        //console.log(module_name);
-                        //console.log(tables);
                         if (checkDisable(type, module_name) || tables.length === 0) {
                             setFormVal('structure[' + module_name + ']', '1');
                         }
@@ -373,6 +372,26 @@ $js = <<< JS
             let tr_title = '';
             let tr_row = '';
             let type_str = ''; 
+//            jQuery("#w0").yiiActiveForm("add",{
+//                "id": "customer-name",
+//                "name": "name",
+//                "container": ".field-customer-name",
+//                "input": "#customer-name",
+//                "error": ".help-block.help-block-error",
+//                "validate": function(attribute, value, messages, deferred, $form) {
+//
+//                    yii.validation.required(value, messages, {
+//                        "message": "Name be blank bug."
+//                    });
+//
+//                    yii.validation.string(value, messages, {
+//                        "message": "Name must be a string.",
+//                        "max": 255,
+//                        "tooLong": "Name should contain at most 255 characters.",
+//                        "skipOnEmpty": 1
+//                    });
+//                }
+//            });
             $.each(val_rows, function(key, val) 
             { 
                 type_str = val.type === 'integer' ? 'number' : 'text';

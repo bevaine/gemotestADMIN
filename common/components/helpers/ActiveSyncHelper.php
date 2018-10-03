@@ -724,10 +724,11 @@ class ActiveSyncHelper
                 continue;
 
             $fields[] = [
+                'required' => $type[1],
                 'value' => $field_out[1],
                 'title' => $title,
                 'name' => $field,
-                'type' => $type
+                'type' => $type[0]
             ];
         }
         return !empty($fields) ? $fields : false;
@@ -798,20 +799,25 @@ class ActiveSyncHelper
     public static function checkVar($model, $field)
     {
         /** @var Model $modelClass */
+        $type = 'string';
+        $required = false;
         $modelClass = new $model;
         $rules = $modelClass->rules();
         foreach ($rules as $rule) {
-            if (isset($rule[0])) {
-                if (in_array('string', $rule)
-                    && in_array($field, $rule[0])){
-                    return 'string';
-                } elseif (in_array('integer', $rule)
-                    && in_array($field, $rule[0])){
-                    return 'integer';
-                }
+            if (!isset($rule[0])
+                || !isset($rule[1])
+                || !in_array($field, $rule[0]))
+                continue;
+
+            if (in_array($rule[1], ['string', 'integer'])) {
+                $type = $rule[1];
+            }
+
+            if ($rule[1] == 'required'){
+                $required = true;
             }
         }
-        return false;
+        return [$type, $required];
     }
 
     /**
@@ -878,7 +884,7 @@ class ActiveSyncHelper
             {
                 $type = self::checkVar($tablesClass, $fieldName);
                 if (isset($this->{$outField[1]})) {
-                    $newModel->{$fieldName} = (!$type || $type== 'string')
+                    $newModel->{$fieldName} = (!$type || $type[0] == 'string')
                         ? strval($this->{$outField[1]})
                         : (int)$this->{$outField[1]};
                 }

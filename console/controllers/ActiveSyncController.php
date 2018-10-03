@@ -252,19 +252,20 @@ class ActiveSyncController extends Controller
         }
     }
 
+   public function get_tag( $tag, $xml ) {
+        $tag = preg_quote($tag);
+        preg_match_all('{<'.$tag.'[^>]*>(.*?)</'.$tag.'>}',
+                       $xml,
+                       $matches,
+                       PREG_PATTERN_ORDER);
+
+      return $matches[1];
+    }
+
     public function actionTest ()
     {
-//        $activeSyncHelper = new ActiveSyncHelper();
-//        $activeSyncHelper->firstName = 'Тест';
-//        $activeSyncHelper->lastName = 'Тест';
-//        $activeSyncHelper->type = 7;
-//        $activeSyncHelper->department = 1;
-//        $newUserData = $activeSyncHelper->checkAccount();
-//        exit;
-
-        //$a = new ActiveSyncHelper();
-        $lastIdNadUsers = NAdUsers::find()->select(['MAX(id) maxId'])->asArray()->one();
-        print_r($lastIdNadUsers);
+        $r = '<?XML VERSION=1.0?><SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="urn:OdoctorControllerwsdl" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body><ns1:create_orderResponse><return xsi:type="ns1:response_create_order"><status xsi:type="xsd:string">accepted</status><error_description xsi:type="ns1:error_description"><error_code xsi:type="xsd:integer">0</error_code><error_description xsi:type="xsd:string"></error_description></error_description><order xsi:type="ns1:order"><ext_num xsi:type="xsd:string">aro-39</ext_num><order_num xsi:type="xsd:string">44982029</order_num><doctor xsi:type="xsd:string">Тестовый доктор</doctor><contractor xsi:type="xsd:string">4006</contractor><hash xsi:type="xsd:string">29c45a9ca2d5933fa4afb1b0fe44c7561641604c</hash><comment xsi:nil="true"/><order_status xsi:type="xsd:integer">2</order_status><patient xsi:type="ns1:patient"><surname xsi:type="xsd:string">Чечулин123</surname><firstname xsi:type="xsd:string">Имяяяя</firstname><middlename xsi:type="xsd:string">null</middlename><birthdate xsi:type="xsd:date">1988-09-08</birthdate><gender xsi:type="xsd:int">2</gender></patient><representative xsi:type="ns1:representative"><surname xsi:type="xsd:string">Test</surname><firstname xsi:type="xsd:string">Test</firstname><middlename xsi:type="xsd:string">Test</middlename></representative><informing xsi:type="ns1:informing"><email xsi:type="xsd:string">qwe@qwe.tt</email><mobile_phone xsi:type="xsd:string">892211111112</mobile_phone><home_phone xsi:type="xsd:string">892211111111</home_phone></informing><additional_information xsi:type="ns1:additional_information"><pregnant_week xsi:type="xsd:int">1</pregnant_week><cycle_day xsi:type="xsd:int">20</cycle_day><region xsi:type="xsd:string">Москва</region><city xsi:type="xsd:string">Москва</city><address xsi:type="xsd:string">Москва</address><passport xsi:type="xsd:string">45 06 124456</passport><passport_issued xsi:type="xsd:date">2007-10-23</passport_issued><snils xsi:type="xsd:string">5465456</snils><oms xsi:nil="true"/><dms xsi:nil="true"/><dmc_companyname xsi:nil="true"/></additional_information><services SOAP-ENC:arrayType="ns1:services[2]" xsi:type="ns1:servicesArray"><item xsi:type="ns1:services"><id xsi:type="xsd:string">COMPL1_4006</id><name xsi:type="xsd:string">Проверка на ВИЧ, сифилис и гепатит B и C</name></item><item xsi:type="ns1:services"><id xsi:type="xsd:string">COMPL10_4006</id><name xsi:type="xsd:string">Здоровый CheckUP</name></item></services></order></return></ns1:create_orderResponse></SOAP-ENV:Body></SOAP-ENV:Envelope>';
+        print_r(self::get_tag('order_num', $r));
         exit;
 
         $conf = ActiveSyncHelper::getConf();

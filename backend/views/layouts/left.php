@@ -185,7 +185,20 @@
                             ['label' => 'Инкасации', 'icon' => 'dashboard', 'url' => ['/admin/encashment'],],
                             ['label' => 'Контрагенты', 'icon' => 'dashboard', 'url' => ['/admin/kontragents'],],
                             ['label' => 'Франчайзи', 'icon' => 'dashboard', 'url' => ['/admin/franchazy'],],
-                            ['label' => 'Запись на прием', 'icon' => 'dashboard', 'url' => ['/admin/doctor-spec'],],
+                            ['label' => 'Запись на прием', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
+                                [
+                                    [
+                                        'label' => 'Отделения',
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/spr-filials'],
+                                    ],
+                                    [
+                                        'label' => 'Запись на прием',
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/doctor-spec'],
+                                    ]
+                                ],
+                            ],
                             ['label' => 'Движение ДС в ЛО', 'icon' => 'dashboard', 'url' => ['/admin/cash-balance-lo'],],
                             ['label' => 'Таблицы', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [

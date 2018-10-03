@@ -51,9 +51,9 @@ class SprFilials extends \yii\db\ActiveRecord
         return [
             'AID' => 'Aid',
             'Fid' => 'Fid',
-            'Fkey' => 'Fkey',
-            'Fname' => 'Fname',
-            'Type' => 'Type',
+            'Fkey' => 'Код',
+            'Fname' => 'Наименование',
+            'Type' => 'Тип',
         ];
     }
 
