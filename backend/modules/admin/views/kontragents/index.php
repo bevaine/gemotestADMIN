@@ -23,15 +23,33 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'AID',
-            'Name',
             'Key',
-            'ShortName',
+            [
+                'value' => function($model) {
+                    /* @var \common\models\Kontragents $model */
+                    return \yii\helpers\StringHelper::truncate($model->Name, 25);
+                },
+                'attribute' => 'Name'
+            ],
+            [
+                'value' => function($model) {
+                    /* @var \common\models\Kontragents $model */
+                    return \yii\helpers\StringHelper::truncate($model->ShortName, 25);
+                },
+                'attribute' => 'ShortName'
+            ],
             'LoginsAID',
             //'BlankText',
-            'BlankName',
+            [
+                'value' => function($model) {
+                    /* @var \common\models\Kontragents $model */
+                    return \yii\helpers\StringHelper::truncate($model->BlankName, 25);
+                },
+                'attribute' => 'BlankName'
+            ],
             //'Blanks',
             'LCN',
-            'mapPoint1.address',
+            //'mapPoint1.address',
             // 'isDelete',
             // 'PayType',
             // 'Type',
