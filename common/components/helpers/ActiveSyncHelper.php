@@ -84,6 +84,7 @@ use yii\db\Transaction;
  * @property string  $loginEmail
  * @property object  $conf
  * @property boolean $addAd
+ * @property integer $operatorAid
  */
 
 class ActiveSyncHelper
@@ -147,6 +148,7 @@ class ActiveSyncHelper
     public $loginEmail;
     public $nurseId;
     public $addAd;
+    public $operatorAid;
 
     /**
      * ActiveSyncHelper constructor.
@@ -414,7 +416,8 @@ class ActiveSyncHelper
                         return false;
                     }
                 }
-                $this->aid = 3000000 + strval($model->AID);
+                $this->operatorAid = $model->AID;
+                $this->aid = 3000000 + $this->operatorAid;
                 return true;
                 break;
 
@@ -1004,9 +1007,9 @@ class ActiveSyncHelper
     public function generateLoginSlo()
     {
         if ($this->department == 5) {
-            $this->loginGS = 'medr' . $this->aid;
+            $this->loginGS = 'medr' . $this->operatorAid;
         } else {
-            $this->loginGS = 'reg' . $this->aid;
+            $this->loginGS = 'reg' . $this->operatorAid;
         }
         return true;
     }
