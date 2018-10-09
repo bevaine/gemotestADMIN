@@ -1684,7 +1684,7 @@ class ActiveSyncHelper
             "objectClass" => "user",
             "displayname" => $this->displayName, //ФИО
             "unicodepwd" => iconv("UTF-8", "UTF-16LE", '"' . $password . '"'),
-            "userAccountControl" => "544" //доступ
+            "userAccountControl" => "65536" //доступ
         ];
 
         $this->message['info'][] = ['addNewUserAd->$ldaprecord' => $ldaprecord];
