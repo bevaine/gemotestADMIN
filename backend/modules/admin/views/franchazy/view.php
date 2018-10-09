@@ -7,16 +7,14 @@ use yii\widgets\DetailView;
 /* @var $model common\models\Franchazy */
 
 $this->title = $model->Name;
-$this->params['breadcrumbs'][] = ['label' => 'Franchazies', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Франчайзи', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="franchazy-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
     <p>
-        <?= Html::a('Update', ['update', 'id' => $model->AID], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->AID], [
+        <?= Html::a('Сохранить', ['update', 'id' => $model->AID], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Удалить', ['delete', 'id' => $model->AID], [
             'class' => 'btn btn-danger',
             'data' => [
                 'confirm' => 'Are you sure you want to delete this item?',

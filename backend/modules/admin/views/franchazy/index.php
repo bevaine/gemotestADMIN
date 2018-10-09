@@ -7,16 +7,13 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\FranchazySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Franchazies';
+$this->title = 'Франчайзи';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="franchazy-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <p>
-        <?= Html::a('Create Franchazy', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
