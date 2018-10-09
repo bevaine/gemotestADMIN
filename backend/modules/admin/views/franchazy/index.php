@@ -26,15 +26,27 @@ $this->params['breadcrumbs'][] = $this->title;
 
             'AID',
             'Active',
+            'Key',
             'Login',
             'Pass',
-            'Name',
+            [
+                'value' => function($model) {
+                    /* @var \common\models\Franchazy $model */
+                    return \yii\helpers\StringHelper::truncate($model->Name, 25);
+                },
+                'attribute' => 'Name'
+            ],
             // 'IsOperator',
             // 'Email:email',
             // 'IsAdmin',
-             'Key',
              //'BlankText',
-             'BlankName',
+            [
+                'value' => function($model) {
+                    /* @var \common\models\Franchazy $model */
+                    return \yii\helpers\StringHelper::truncate($model->BlankName, 25);
+                },
+                'attribute' => 'BlankName'
+            ],
             // 'Logo',
             // 'LogoText',
             // 'LogoText2',
