@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="franchazy-view">
 
     <p>
-        <?= Html::a('Сохранить', ['update', 'id' => $model->AID], ['class' => 'btn btn-primary']) ?>
+        <?= Html::a('Редактировать', ['update', 'id' => $model->AID], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->AID], [
             'class' => 'btn btn-danger',
             'data' => [
