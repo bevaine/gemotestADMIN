@@ -1133,7 +1133,7 @@ class ActiveSyncHelper
         $this->loginGS = 'v'.$doctorModel->CACHE_DocID;
         $this->lastName = $doctorModel->LastName;
         $this->firstName = $expName[0];
-        if (count($expName) > 2) $this->middleName = $expName[1];
+        if (count($expName) > 1) $this->middleName = $expName[1];
         $this->fullName = $this->lastName . " " . $this->firstName;
         if (!empty($this->middleName))
             $this->fullName .= " " . $this->middleName;
