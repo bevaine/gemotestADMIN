@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\controllers;
 
+use common\models\DirectorFlo;
 use common\models\ErpGroupsRelations;
 use common\models\ErpUsergroups;
 use common\models\NAdUseraccounts;
@@ -230,6 +231,8 @@ class LoginsController extends Controller
             if ($model->UserType == 9) {
                 $model->EmailPassword = $model->Pass;
                 self::resetPassword($model);
+                $model->directorFlo->password = $model->Pass;
+                $model->directorFlo->save();
             }
         }
 
