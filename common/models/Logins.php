@@ -216,24 +216,6 @@ class Logins extends \yii\db\ActiveRecord
         ])->via('directorInfo');
     }
 
-//    /**
-//     * @return \yii\db\ActiveQuery
-//     */
-//    public function getDirectorFlo()
-//    {
-//        return $this->hasOne(DirectorFlo::class, [])
-//            ->andOnCondition('[Logins].[login] = [DirectorFlo].[login]');
-//    }
-//
-//    /**
-//     * @return \yii\db\ActiveQuery
-//     */
-//    public function getDirectorFloSender()
-//    {
-//        return $this->hasOne(DirectorFloSender::class, [])
-//            ->andOnCondition('[DirectorFloSender].[director_id] = [DirectorFlo].[id]');
-//    }
-
     /**
      * @return \yii\db\ActiveQuery
      */

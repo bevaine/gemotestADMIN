@@ -231,10 +231,9 @@ class LoginsController extends Controller
             if ($model->UserType == 9) {
                 $model->EmailPassword = $model->Pass;
                 self::resetPassword($model);
-                if (isset($model->directorFlo)) {
-                    $findModel = DirectorFlo::findOne($model->directorFlo->id);
-                    $findModel->password = $model->Pass;
-                    $findModel->save();
+                if (isset($model->directorInfo)) {
+                    $model->directorInfo->password = $model->Pass;
+                    $model->directorInfo->save();
                 }
             }
         }
