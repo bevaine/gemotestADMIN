@@ -118,17 +118,14 @@ class DirectorFloSender extends \yii\db\ActiveRecord
         /** @var Logins $model */
         foreach ($object as $model)
         {
-            $disable = false;
             $style = 'color:#02723f';
             $FIO = $model->Name;
             if (!empty($model->directorFlo)) {
-                $disable = true;
                 $FIO .= ' - уже назначен: ' . $model->directorFlo->fullName;
                 $style =  'color:#ec1c24;font-weight:bold';
             }
             $values[$model->Key] = $FIO;
             $options[$model->Key] = [
-                'disabled' => $disable,
                 'label' => $FIO,
                 'style' => $style
             ];
