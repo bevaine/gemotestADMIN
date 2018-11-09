@@ -41,7 +41,8 @@ class DoctorSpecSearch extends DoctorSpec
      */
     public function search($params)
     {
-        $query = DoctorSpec::find();
+        $query = DoctorSpec::find()
+            ->joinWith('spec');
 
         // add conditions that should always apply here
 
@@ -57,6 +58,13 @@ class DoctorSpecSearch extends DoctorSpec
             return $dataProvider;
         }
 
+        $query->select([
+            'Name',
+            'LastName',
+            'GroupID',
+            'SpetialisationID'
+        ]);
+
         // grid filtering conditions
         $query->andFilterWhere([
             'AID' => $this->AID,
@@ -68,6 +76,13 @@ class DoctorSpecSearch extends DoctorSpec
         $query->andFilterWhere(['like', 'Name', $this->Name])
             ->andFilterWhere(['like', 'LastName', $this->LastName])
             ->andFilterWhere(['like', 'Fkey', $this->Fkey]);
+
+        $query->groupBy([
+            'Name',
+            'LastName',
+            'GroupID',
+            'SpetialisationID'
+        ]);
 
         return $dataProvider;
     }

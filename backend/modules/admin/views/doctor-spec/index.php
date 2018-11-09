@@ -7,32 +7,83 @@ use yii\grid\GridView;
 /* @var $searchModel common\models\DoctorSpecSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Doctor Specs';
+$this->title = 'Запись на прием';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="doctor-spec-index">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <p>
-        <?= Html::a('Create Doctor Spec', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Создать', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
-            'AID',
             'Name',
             'LastName',
-            'SpetialisationID',
-            'Active',
-            'GroupID',
-            'Fkey',
-
-            ['class' => 'yii\grid\ActionColumn'],
+            [
+                'attribute' => 'SpetialisationID',
+                'value' => function($model) {
+                    /** @var \common\models\DoctorSpec $model*/
+                    return $model->spec->specName;
+                }
+            ],
+            [
+                'attribute' => 'Fkey',
+                'value' => function($model) {
+                    /** @var \common\models\DoctorSpec $model*/
+                    return implode(", ", $model->getSenders());
+                    //$senders = \common\models\SprFilials::findOne(['Fkey' => $model->Fkey]);
+                }
+            ],
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'view' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'admin/doctor-spec/view',
+                            'id' => $model['GroupID']
+                        ]);
+                        return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $customurl,
+                            [
+                                'target' => '_blank',
+                                'title' => 'Загрузить settings.xml',
+                                'data-pjax' => '0'
+                            ]
+                        );
+                    },
+                    'update' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'admin/doctor-spec/update',
+                            'id' => $model['GroupID']
+                        ]);
+                        return Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $customurl,
+                            [
+                                'target' => '_blank',
+                                'title' => 'Загрузить settings.xml',
+                                'data-pjax' => '0'
+                            ]
+                        );
+                    },
+                    'delete' => function ($url, $model) {
+                        /** @var \common\models\LoginsSearch $model */
+                        $customurl = Yii::$app->getUrlManager()->createUrl([
+                            'admin/doctor-spec/delete',
+                            'id' => $model['GroupID']
+                        ]);
+                        return Html::a( '<span class="glyphicon glyphicon-trash"></span>', $customurl,
+                            [
+                                'target' => '_blank',
+                                'title' => 'Загрузить settings.xml',
+                                'data-pjax' => '0'
+                            ]
+                        );
+                    },
+                ],
+                'template' => '{view} {update} {delete} '
+            ]
         ],
     ]); ?>
 </div>

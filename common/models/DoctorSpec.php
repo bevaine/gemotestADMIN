@@ -3,6 +3,8 @@
 namespace common\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "DoctorSpec".
@@ -14,7 +16,11 @@ use Yii;
  * @property integer $Active
  * @property integer $GroupID
  * @property string $Fkey
+ * @property SprDoctorSpec $spec
+ * @property SprFilials $filials
+ * @property array $senders
  */
+
 class DoctorSpec extends \yii\db\ActiveRecord
 {
     /**
@@ -51,12 +57,46 @@ class DoctorSpec extends \yii\db\ActiveRecord
     {
         return [
             'AID' => 'Aid',
-            'Name' => 'Name',
-            'LastName' => 'Last Name',
-            'SpetialisationID' => 'Spetialisation ID',
-            'Active' => 'Active',
-            'GroupID' => 'Group ID',
-            'Fkey' => 'Fkey',
+            'Name' => 'Имя',
+            'LastName' => 'Фамилия',
+            'SpetialisationID' => 'Специализация',
+            'Active' => 'Активность',
+            'GroupID' => 'Группа',
+            'Fkey' => 'Отделение',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSpec()
+    {
+        return $this->hasOne(SprDoctorSpec::className(), ['aid' => 'SpetialisationID']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFilials()
+    {
+        return $this->hasOne(SprFilials::className(), ['Fkey' => 'Fkey']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getSenders()
+    {
+        $finModel = self::find()->alias('ds')
+            ->joinWith(['filials f'], true, 'RIGHT JOIN')
+            ->select(['f.Fkey'])
+            ->where([
+                'ds.Name' => $this->Name,
+                'ds.LastName' => $this->LastName,
+                'ds.SpetialisationID' => $this->SpetialisationID,
+                'ds.GroupID' => $this->GroupID
+            ])->asArray()->all();
+
+        return ArrayHelper::getColumn($finModel, 'Fkey');
     }
 }
