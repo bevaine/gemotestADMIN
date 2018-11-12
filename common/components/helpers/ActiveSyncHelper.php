@@ -85,6 +85,7 @@ use yii\db\Transaction;
  * @property object  $conf
  * @property boolean $addAd
  * @property integer $operatorAid
+ * @property string  $guid
  */
 
 class ActiveSyncHelper
@@ -149,6 +150,7 @@ class ActiveSyncHelper
     public $nurseId;
     public $addAd;
     public $operatorAid;
+    public $guid;
 
     /**
      * ActiveSyncHelper constructor.
@@ -1686,6 +1688,14 @@ class ActiveSyncHelper
             "unicodepwd" => iconv("UTF-8", "UTF-16LE", '"' . $password . '"'),
             "userAccountControl" => "65536" //доступ
         ];
+
+        if (!empty($this->guid)) {
+            $ldaprecord = array_merge(
+                $ldaprecord, [
+                    "businessCategory" => $this->guid //guid 1C
+                ]
+            );
+        }
 
         $this->message['info'][] = ['addNewUserAd->$ldaprecord' => $ldaprecord];
 

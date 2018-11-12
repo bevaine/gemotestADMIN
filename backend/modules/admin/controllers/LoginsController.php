@@ -280,6 +280,7 @@ class LoginsController extends Controller
                 $activeSyncHelper->middleName = trim($model->middleName);
                 $activeSyncHelper->department = $model->department;
                 $activeSyncHelper->operatorofficestatus = trim($model->operatorofficestatus);
+                $activeSyncHelper->guid = trim($model->guid);
             } elseif ($param == 'franch') {
                 $activeSyncHelper->type = 8;
                 $activeSyncHelper->typeLO = 'FLO';

@@ -81,6 +81,11 @@ $this->params['breadcrumbs'][] = $this->title;
                                         <?= $form->field($model, 'operatorofficestatus')->textInput() ?>
                                     </div>
                                 </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group">
+                                        <?= $form->field($model, 'guid')->textInput() ?>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="row">

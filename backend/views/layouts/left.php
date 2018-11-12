@@ -184,7 +184,20 @@
                             ['label' => 'Пользователи', 'icon' => 'dashboard', 'url' => ['/admin/logins'],],
                             ['label' => 'Инкасации', 'icon' => 'dashboard', 'url' => ['/admin/encashment'],],
                             ['label' => 'Контрагенты', 'icon' => 'dashboard', 'url' => ['/admin/kontragents'],],
-                            ['label' => 'Франчайзи', 'icon' => 'dashboard', 'url' => ['/admin/franchazy'],],
+                            ['label' => 'Франчайзи', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
+                                [
+                                    [
+                                        'label' => 'Отделения',
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/franchazy'],
+                                    ],
+                                    [
+                                        'label' => 'Мед. сообщество',
+                                        'icon' => 'dashboard',
+                                        'url' => ['/admin/rep-period-lab-gemotest'],
+                                    ],
+                                ]
+                            ],
                             ['label' => 'Запись на прием', 'active' => true, 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
                                     [

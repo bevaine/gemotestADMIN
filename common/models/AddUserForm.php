@@ -32,6 +32,7 @@ use yii\helpers\ArrayHelper;
  * @property string  $specId
  * @property string  $phone
  * @property string  $changeGD
+ * @property string  $guid
  */
 
 class AddUserForm extends Model
@@ -53,6 +54,8 @@ class AddUserForm extends Model
     public $specId;
     public $phone;
     public $changeGD;
+    public $guid;
+
 
     CONST SCENARIO_ADD_USER = 'addUser';
     CONST SCENARIO_ADD_DOC = 'addUserDoc';
@@ -72,7 +75,7 @@ class AddUserForm extends Model
     public function scenarios()
     {
         return [
-            self::SCENARIO_ADD_USER => ['type', 'department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
+            self::SCENARIO_ADD_USER => ['type', 'department', 'nurse', 'lastName', 'firstName', 'middleName', 'operatorofficestatus', 'guid'],
             self::SCENARIO_ADD_DOC => ['docId', 'specId'],
             self::SCENARIO_ADD_GD => ['name', 'key', 'phone', 'email', 'lastName', 'firstName', 'middleName','changeGD'],
             self::SCENARIO_ADD_FR => ['key', 'lastName', 'firstName', 'middleName', 'operatorofficestatus'],
@@ -116,6 +119,7 @@ class AddUserForm extends Model
             'docId' => 'Врач',
             'specId' => 'Специализация',
             'phone' => 'Телефон',
+            'guid' => 'GUID из 1С',
         ];
     }
 
