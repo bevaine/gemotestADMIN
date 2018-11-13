@@ -88,7 +88,7 @@ class AddUserForm extends Model
     public function rules()
     {
         return [
-            [['type', 'lastName', 'firstName', 'operatorofficestatus', 'department', 'nurse'], 'required', 'on' => 'addUser'],
+            [['type', 'lastName', 'firstName', 'operatorofficestatus', 'department', 'nurse', 'guid'], 'required', 'on' => 'addUser'],
             [['docId', 'specId'], 'required', 'on' => 'addUserDoc'],
             [['name', 'key', 'phone', 'lastName', 'firstName'], 'required', 'on' => 'addUserGD'],
             [['lastName', 'firstName', 'key'], 'required', 'on' => 'addUserFranch'],
