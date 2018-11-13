@@ -103,7 +103,9 @@ SCRIPT;
     <?= DateTimePicker::widget([
         'name' => 'NWorkshift[open_date]',
         'type' => DateTimePicker::TYPE_INPUT,
-        'value' => date("Y-m-d H:i:s", strtotime($model->open_date)),
+        'value' => isset($model->open_date)
+            ? date("Y-m-d  H:i:s", strtotime($model->open_date))
+            : null,
         'pluginOptions' => [
             'autoclose'=>true,
             'format' => 'yyyy-mm-dd hh:ii:ss'
@@ -116,7 +118,9 @@ SCRIPT;
     <?= DateTimePicker::widget([
         'name' => 'NWorkshift[close_date]',
         'type' => DateTimePicker::TYPE_INPUT,
-        'value' => date("Y-m-d H:i:s", strtotime($model->close_date)),
+        'value' => isset($model->close_date)
+            ? date("Y-m-d  H:i:s", strtotime($model->close_date))
+            : null,
         'pluginOptions' => [
             'autoclose'=>true,
             'format' => 'yyyy-mm-dd hh:ii:ss'

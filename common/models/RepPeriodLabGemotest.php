@@ -73,7 +73,7 @@ class RepPeriodLabGemotest extends \yii\db\ActiveRecord
             'login' => 'Логин',
             'pass' => 'Пароль',
             'date_active' => 'Дата активации',
-            'reward' => 'награда',
+            'reward' => 'Награда',
             'test_period' => 'Тестовый период',
             'deleted' => 'Удален',
             'user_id' => 'Пользователь',
