@@ -43,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         /** @var \common\models\LoginsSearch $model */
                         $customurl = Yii::$app->getUrlManager()->createUrl([
                             'admin/doctor-spec/view',
-                            'id' => $model['GroupID']
+                            'GroupID' => $model['GroupID']
                         ]);
                         return Html::a( '<span class="glyphicon glyphicon-eye-open"></span>', $customurl,
                             [
@@ -57,7 +57,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         /** @var \common\models\LoginsSearch $model */
                         $customurl = Yii::$app->getUrlManager()->createUrl([
                             'admin/doctor-spec/update',
-                            'id' => $model['GroupID']
+                            'GroupID' => $model['GroupID']
                         ]);
                         return Html::a( '<span class="glyphicon glyphicon-pencil"></span>', $customurl,
                             [
@@ -71,7 +71,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         /** @var \common\models\LoginsSearch $model */
                         $customurl = Yii::$app->getUrlManager()->createUrl([
                             'admin/doctor-spec/delete',
-                            'id' => $model['GroupID']
+                            'GroupID' => $model['GroupID']
                         ]);
                         return Html::a( '<span class="glyphicon glyphicon-trash"></span>', $customurl,
                             [

@@ -168,7 +168,7 @@ class OrdersToExport extends \yii\db\ActiveRecord
             'notifyQueued' => 'Notify Queued',
             'isEditing' => 'Is Editing',
             'isComplite' => 'Is Complite',
-            'CompliteDate' => 'Complite Date',
+            'CompliteDate' => 'Дата вып. исследов.',
             'External' => 'External',
             'req_passport' => 'Req Passport',
             'PatMedHistory' => 'Pat Med History',

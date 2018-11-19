@@ -3,19 +3,19 @@
 namespace app\modules\admin\controllers;
 
 use Yii;
-use common\models\DoctorSpec;
-use common\models\DoctorSpecSearch;
+use common\models\Sms;
+use common\models\SmsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * DoctorSpecController implements the CRUD actions for DoctorSpec model.
+ * SmsController implements the CRUD actions for Sms model.
  */
-class DoctorSpecController extends Controller
+class SmsController extends Controller
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function behaviors()
     {
@@ -30,12 +30,12 @@ class DoctorSpecController extends Controller
     }
 
     /**
-     * Lists all DoctorSpec models.
+     * Lists all Sms models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new DoctorSpecSearch();
+        $searchModel = new SmsSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -45,9 +45,10 @@ class DoctorSpecController extends Controller
     }
 
     /**
-     * Displays a single DoctorSpec model.
-     * @param integer $id
+     * Displays a single Sms model.
+     * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
     {
@@ -57,47 +58,49 @@ class DoctorSpecController extends Controller
     }
 
     /**
-     * Creates a new DoctorSpec model.
+     * Creates a new Sms model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new DoctorSpec();
+        $model = new Sms();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->AID]);
-        } else {
-            return $this->render('create', [
-                'model' => $model,
-            ]);
+            return $this->redirect(['view', 'id' => $model->id]);
         }
+
+        return $this->render('create', [
+            'model' => $model,
+        ]);
     }
 
     /**
-     * Updates an existing DoctorSpec model.
+     * Updates an existing Sms model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
+     * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->GroupID]);
-        } else {
-            return $this->render('update', [
-                'model' => $model,
-            ]);
+            return $this->redirect(['view', 'id' => $model->id]);
         }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
     }
 
     /**
-     * Deletes an existing DoctorSpec model.
+     * Deletes an existing Sms model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
+     * @param string $id
      * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
     {
@@ -107,18 +110,18 @@ class DoctorSpecController extends Controller
     }
 
     /**
-     * Finds the DoctorSpec model based on its primary key value.
+     * Finds the Sms model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return DoctorSpec the loaded model
+     * @param string $id
+     * @return Sms the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = DoctorSpec::findOne($id)) !== null) {
+        if (($model = Sms::findOne($id)) !== null) {
             return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
         }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

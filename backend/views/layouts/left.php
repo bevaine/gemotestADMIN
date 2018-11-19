@@ -224,6 +224,7 @@
                             ],
                             ['label' => 'Операции', 'icon' => 'circle-o', 'url' => '#', 'items' =>
                                 [
+                                    ['label' => 'Отчет о доставке СМС', 'active' => true,'icon' => 'dashboard', 'url' => '/admin/sms',],
                                     ['label' => 'Сбой инхронизации', 'active' => true,'icon' => 'dashboard', 'url' => 'http://labc:57772/csp/syncutils/sumain.csp',],
                                 ]
                             ],

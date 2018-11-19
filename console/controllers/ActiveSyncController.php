@@ -20,6 +20,7 @@ use yii\log\Logger;
 use common\models\NAuthASsignment;
 use yii\base\Exception;
 use common\models\BranchStaff;
+use yii\data\SqlDataProvider;
 
 /**
  * Created by PhpStorm.
@@ -55,6 +56,36 @@ class ActiveSyncController extends Controller
 
     public function actionUpdate ()
     {
+        $filelist = array();
+        if ($handle = glob("C:\\tempShare\\PDF_InputSMB_3\\*.pdf")) {
+            foreach ($handle as $fileName) {
+                $fileData = explode('_', pathinfo($fileName, PATHINFO_FILENAME));
+                $orderId = $fileData[0];
+                $hash = $fileData[1];
+                $sql = <<<sql
+                    SELECT *
+                    FROM research_result_email_list
+                    WHERE order_num = '{$orderId}' AND file_hash = '{$hash}'
+sql;
+                $dataProvider = new SqlDataProvider([
+                    'sql' => $sql,
+                    'db' => 'GemoTestDB',
+                    'pagination' => false,
+                ]);
+//                foreach ($dataProvider->getModels() as $model) {
+//                    $a = $model;
+//                }
+            }
+        }
+
+        $entries = scandir("\\\\sw-fscl-01.lab.gemotest.ru\\labc\\sky_buf");
+        $filelist = array();
+        foreach($entries as $entry) {
+            if (strpos($entry, "te") === 0) {
+                $filelist[] = $entry;
+            }
+        }
+
         $findModel = Logins::find()
             ->where([
                     'OR',
