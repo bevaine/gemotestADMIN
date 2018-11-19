@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'CompliteDate',
                 'value' => function($model) {
-                    return $model->order->CompliteDate;
+                    return isset($model->order) ? $model->order->CompliteDate : null;
                 }
             ],
             'created_at',
@@ -50,6 +50,10 @@ $this->params['breadcrumbs'][] = $this->title;
             //'bounce_reason',
             //'callback',
             //'attempts_get_status',
+            [
+                'class' => 'yii\grid\ActionColumn',
+                'template' => '{view}'
+            ],
         ],
     ]); ?>
 </div>
