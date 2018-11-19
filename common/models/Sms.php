@@ -124,7 +124,7 @@ class Sms extends \yii\db\ActiveRecord
     public static function getStatusArray($id = null) {
         $arr = [
             'delivered' => 'Доставлено',
-            'bounced' => 'bounced',
+            'bounced' => 'Отказ',
             'pending' => 'В ожидании',
             'sent' => 'Отправлено',
             'buried' => 'Не доставлено'
