@@ -263,6 +263,7 @@ class ActiveSyncHelper
                     "auth_ldap_only" => "{userData}",
                     "create_date" => "{dateNow}",
                     "last_update" => "{dateNow}",
+                    "subdivision" => "{guid}"
                 ],
                 ErpUsers::class => [
                     //"group_id" => "{group_id}",
