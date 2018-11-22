@@ -88,10 +88,10 @@ class AddUserForm extends Model
     public function rules()
     {
         return [
-            [['type', 'lastName', 'firstName', 'operatorofficestatus', 'department', 'nurse', 'guid'], 'required', 'on' => 'addUser'],
-            [['docId', 'specId'], 'required', 'on' => 'addUserDoc'],
-            [['name', 'key', 'phone', 'lastName', 'firstName'], 'required', 'on' => 'addUserGD'],
-            [['lastName', 'firstName', 'key'], 'required', 'on' => 'addUserFranch'],
+            [['type', 'lastName', 'firstName', 'operatorofficestatus', 'department', 'nurse', 'guid'], 'required', 'on' => self::SCENARIO_ADD_USER],
+            [['docId', 'specId'], 'required', 'on' => self::SCENARIO_ADD_DOC],
+            [['name', 'key', 'phone', 'lastName', 'firstName'], 'required', 'on' => self::SCENARIO_ADD_GD],
+            [['lastName', 'firstName', 'key'], 'required', 'on' => self::SCENARIO_ADD_FR],
             [['lastName', 'firstName', 'email'], 'string'],
             [['department', 'nurse', 'key','changeGD'], 'integer'],
             ['nurse', 'in', 'range' => array_keys(self::getNurses())],

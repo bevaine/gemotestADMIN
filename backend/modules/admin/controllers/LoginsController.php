@@ -255,16 +255,16 @@ class LoginsController extends Controller
 
         switch ($param) {
             case 'user':
-                $model->scenario = 'addUser';
+                $model->scenario = AddUserForm::SCENARIO_ADD_USER;
                 break;
             case 'gd':
-                $model->scenario = 'addUserGD';
+                $model->scenario = AddUserForm::SCENARIO_ADD_GD;
                 break;
             case 'doc':
-                $model->scenario = 'addUserDoc';
+                $model->scenario = AddUserForm::SCENARIO_ADD_DOC;
                 break;
             case 'franch':
-                $model->scenario = 'addUserFranch';
+                $model->scenario = AddUserForm::SCENARIO_ADD_FR;
                 break;
         }
 

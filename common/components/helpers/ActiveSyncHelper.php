@@ -524,6 +524,7 @@ class ActiveSyncHelper
                     /** @var $transaction Transaction */
                     $transaction = NAdUsers::getDb()->beginTransaction();
                     try {
+                        isset($this->guid) ?: $this->guid = '';
                         if (!$model = $this->constructModel($tablesClass)) {
                             return false;
                         }
